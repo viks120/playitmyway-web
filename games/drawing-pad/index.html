@@ -591,72 +591,6 @@
         preview.style.background = isEraser ? "#ff6b6b" : currentColor;
       }
 
-      // Drawing functions
-      function startDrawing(e) {
-        isDrawing = true;
-        draw(e);
-      }
-
-      function stopDrawing() {
-        isDrawing = false;
-        ctx.beginPath();
-      }
-
-      function draw(e) {
-        if (!isDrawing) return;
-
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        if (currentStamp) {
-          // Draw stamp
-          ctx.font = currentBrushSize * 2 + "px Arial";
-          ctx.fillStyle = currentColor;
-          ctx.fillText(
-            currentStamp,
-            x - currentBrushSize,
-            y + currentBrushSize
-          );
-        } else if (isEraser) {
-          // Eraser mode
-          ctx.globalCompositeOperation = "destination-out";
-          ctx.lineWidth = currentBrushSize;
-          ctx.lineCap = "round";
-          ctx.lineTo(x, y);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.globalCompositeOperation = "source-over";
-        } else {
-          // Normal drawing
-          ctx.lineWidth = currentBrushSize;
-          ctx.lineCap = "round";
-          ctx.strokeStyle = currentColor;
-          ctx.lineTo(x, y);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-        }
-      }
-
-      // Touch support for mobile
-      function handleTouch(e) {
-        e.preventDefault();
-        const touch = e.touches[0];
-        const mouseEvent = new MouseEvent("mousemove", {
-          clientX: touch.clientX,
-          clientY: touch.clientY,
-        });
-        draw(mouseEvent);
-      }
-
-      // Event listeners
-      canvas.addEventListener("mousedown", startDrawing);
-      canvas.addEventListener("mousemove", draw);
-      canvas.addEventListener("mouseup", stopDrawing);
-      canvas.addEventListener("mouseout", stopDrawing);
-
       // Enhanced touch and mouse drawing
       function getPointerPosition(e) {
         const rect = canvas.getBoundingClientRect();
@@ -669,8 +603,12 @@
           // Touch event
           clientX = e.touches[0].clientX;
           clientY = e.touches[0].clientY;
+        } else if (e.changedTouches && e.changedTouches[0]) {
+          // Touch end event
+          clientX = e.changedTouches[0].clientX;
+          clientY = e.changedTouches[0].clientY;
         } else {
-          // Mouse event
+          // Mouse or pointer event
           clientX = e.clientX;
           clientY = e.clientY;
         }
@@ -685,11 +623,12 @@
         e.preventDefault();
         isDrawing = true;
         const pos = getPointerPosition(e);
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
 
         if (currentStamp) {
           drawStamp(pos.x, pos.y);
+        } else {
+          ctx.beginPath();
+          ctx.moveTo(pos.x, pos.y);
         }
       }
 
@@ -709,46 +648,67 @@
       }
 
       function stopDrawing(e) {
-        e.preventDefault();
+        if (e) e.preventDefault();
         isDrawing = false;
         ctx.beginPath();
       }
 
       function drawStamp(x, y) {
+        ctx.save();
         ctx.font = currentBrushSize * 2 + "px Arial";
         ctx.fillStyle = currentColor;
-        ctx.fillText(currentStamp, x - currentBrushSize, y + currentBrushSize);
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(currentStamp, x, y);
+        ctx.restore();
       }
 
       function drawEraser(x, y) {
+        ctx.save();
         ctx.globalCompositeOperation = "destination-out";
         ctx.lineWidth = currentBrushSize;
         ctx.lineCap = "round";
-        ctx.strokeStyle = "rgba(0,0,0,1)";
+        ctx.lineJoin = "round";
         ctx.lineTo(x, y);
         ctx.stroke();
-        ctx.globalCompositeOperation = "source-over";
+        ctx.restore();
       }
 
       function drawLine(x, y) {
         ctx.lineWidth = currentBrushSize;
         ctx.lineCap = "round";
+        ctx.lineJoin = "round";
         ctx.strokeStyle = currentColor;
         ctx.lineTo(x, y);
         ctx.stroke();
       }
 
-      // Mouse events
-      canvas.addEventListener("mousedown", startDrawing);
-      canvas.addEventListener("mousemove", draw);
-      canvas.addEventListener("mouseup", stopDrawing);
-      canvas.addEventListener("mouseout", stopDrawing);
+      // Unified event handling for both mouse and touch
+      let pointerSupported = false;
 
-      // Touch events
-      canvas.addEventListener("touchstart", startDrawing, { passive: false });
-      canvas.addEventListener("touchmove", draw, { passive: false });
-      canvas.addEventListener("touchend", stopDrawing, { passive: false });
-      canvas.addEventListener("touchcancel", stopDrawing, { passive: false });
+      // Check if pointer events are supported
+      if (window.PointerEvent) {
+        pointerSupported = true;
+        canvas.addEventListener("pointerdown", startDrawing);
+        canvas.addEventListener("pointermove", draw);
+        canvas.addEventListener("pointerup", stopDrawing);
+        canvas.addEventListener("pointercancel", stopDrawing);
+        canvas.addEventListener("pointerout", stopDrawing);
+        canvas.addEventListener("pointerleave", stopDrawing);
+      } else {
+        // Fallback to mouse and touch events
+        // Mouse events
+        canvas.addEventListener("mousedown", startDrawing);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("mouseup", stopDrawing);
+        canvas.addEventListener("mouseout", stopDrawing);
+
+        // Touch events
+        canvas.addEventListener("touchstart", startDrawing, { passive: false });
+        canvas.addEventListener("touchmove", draw, { passive: false });
+        canvas.addEventListener("touchend", stopDrawing, { passive: false });
+        canvas.addEventListener("touchcancel", stopDrawing, { passive: false });
+      }
 
       function clearCanvas() {
         ctx.fillStyle = "white";
