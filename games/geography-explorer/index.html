@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#667eea" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>
+      Geography Explorer Game for Kids - Free World Geography Game | Play It My
+      Way
+    </title>
+    <meta
+      name="description"
+      content="Free geography game for kids ages 10+. Explore world countries, capitals, flags, and landmarks. Educational geography learning game."
+    />
+    <meta
+      name="keywords"
+      content="geography games, world geography, country games, capital cities, flag games, educational games, kids geography, free geography games, world map games, learning geography"
+    />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta
+      property="og:title"
+      content="Geography Explorer Game for Kids - Free World Geography Game"
+    />
+    <meta
+      property="og:description"
+      content="Fun geography game for children. Explore countries, capitals, and world landmarks."
+    />
+    <meta property="og:type" content="game" />
+    <meta
+      property="og:url"
+      content="https://playitmyway.com/games/geography-explorer"
+    />
+    <meta
+      property="og:image"
+      content="https://playitmyway.com/images/geography-explorer.jpg"
+    />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Geography Explorer Game for Kids" />
+    <meta
+      name="twitter:description"
+      content="Free geography game for children. Explore world countries and capitals."
+    />
+    <meta
+      name="twitter:image"
+      content="https://playitmyway.com/images/geography-explorer.jpg"
+    />
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="language" content="English" />
+    <meta name="classification" content="Educational Geography Game" />
+    <link
+      rel="canonical"
+      href="https://playitmyway.com/games/geography-explorer"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: "Comic Sans MS", "Arial Rounded MT Bold", "Arial",
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 10px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-x: hidden;
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 25px;
+      }
+
+      .header h1 {
+        font-size: clamp(2em, 7vw, 2.5em);
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: clamp(1.2em, 4vw, 1.4em);
+        font-weight: 500;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .stats {
+        display: flex;
+        gap: 25px;
+        margin-bottom: 25px;
+        color: white;
+        font-size: clamp(1.1em, 4vw, 1.3em);
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .mode-selector {
+        margin-bottom: 25px;
+        text-align: center;
+      }
+
+      .mode-selector h3 {
+        font-size: clamp(1.3em, 5vw, 1.6em);
+        color: white;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        margin-bottom: 15px;
+      }
+
+      .mode-btn {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: clamp(1em, 4vw, 1.2em);
+        font-weight: bold;
+        cursor: pointer;
+        margin: 0 12px;
+        transition: transform 0.2s;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .mode-btn.active {
+        background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        transform: scale(1.05);
+      }
+
+      .mode-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .game-container {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        max-width: 800px;
+        width: 100%;
+      }
+
+      .question-area {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .question {
+        font-size: clamp(1.4em, 5vw, 1.8em);
+        color: #333;
+        font-weight: bold;
+        margin-bottom: 15px;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+      }
+
+      .flag-display {
+        width: 120px;
+        height: 80px;
+        margin: 15px auto;
+        border: 3px solid #333;
+        border-radius: 10px;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2em;
+      }
+
+      .world-map {
+        width: 100%;
+        max-width: 600px;
+        height: 300px;
+        margin: 20px auto;
+        background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        border-radius: 15px;
+        position: relative;
+        overflow: hidden;
+        border: 3px solid #333;
+      }
+
+      .continent {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.8);
+        border: 2px solid #333;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #333;
+        font-size: clamp(0.8em, 2vw, 1em);
+      }
+
+      .continent:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .continent.correct {
+        background: #a8e6cf;
+        border-color: #2d5a3d;
+      }
+
+      .continent.incorrect {
+        background: #ff6b6b;
+        border-color: #8b0000;
+      }
+
+      .answer-options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .answer-btn {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 10px;
+        font-size: clamp(1em, 3vw, 1.2em);
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .answer-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .answer-btn.correct {
+        background: linear-gradient(45deg, #4ecdc4, #44a08d);
+      }
+
+      .answer-btn.incorrect {
+        background: linear-gradient(45deg, #ff6b6b, #8b0000);
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: clamp(1em, 4vw, 1.2em);
+        font-weight: bold;
+        cursor: pointer;
+        margin: 0 12px;
+        transition: transform 0.2s;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn:hover {
+        transform: scale(1.05);
+      }
+
+      .feedback {
+        text-align: center;
+        font-size: clamp(1.2em, 5vw, 1.5em);
+        font-weight: bold;
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 12px;
+        display: none;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .feedback.correct {
+        background: #a8e6cf;
+        color: #2d5a3d;
+      }
+
+      .feedback.incorrect {
+        background: #ff6b6b;
+        color: white;
+      }
+
+      .back-link {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: white;
+        text-decoration: none;
+        font-size: clamp(0.9em, 3vw, 1em);
+        background: rgba(255, 255, 255, 0.2);
+        padding: 8px 12px;
+        border-radius: 20px;
+        transition: background 0.3s;
+      }
+
+      .back-link:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      /* Mobile-specific improvements */
+      @media (max-width: 768px) {
+        body {
+          padding-top: 60px; /* Space for back link */
+        }
+
+        .game-container {
+          padding: 15px;
+          margin: 0 5px;
+        }
+
+        .world-map {
+          height: 250px;
+        }
+
+        .continent {
+          font-size: 0.7em;
+        }
+
+        .answer-options {
+          grid-template-columns: 1fr;
+        }
+
+        .controls {
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .btn {
+          margin: 5px 0;
+        }
+
+        .mode-selector {
+          margin-bottom: 20px;
+        }
+
+        .mode-btn {
+          display: block;
+          margin: 8px auto;
+          width: 200px;
+          max-width: 90%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding-top: 50px; /* Less space on smaller screens */
+        }
+
+        .world-map {
+          height: 200px;
+        }
+
+        .continent {
+          font-size: 0.6em;
+        }
+
+        .flag-display {
+          width: 100px;
+          height: 60px;
+        }
+
+        .mode-btn {
+          width: 180px;
+          font-size: clamp(0.9em, 3.5vw, 1.1em);
+          padding: 10px 20px;
+        }
+
+        .stats {
+          flex-direction: column;
+          gap: 10px;
+          align-items: center;
+        }
+      }
+
+      /* Prevent text selection on mobile */
+      .continent,
+      .mode-btn,
+      .answer-btn,
+      .btn {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        touch-action: manipulation;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../../" class="back-link">← Back to Games</a>
+
+    <div class="header">
+      <h1>🌍 Geography Explorer</h1>
+      <p>Explore the world through countries, capitals, and flags!</p>
+    </div>
+
+    <div class="stats">
+      <div>Score: <span id="score">0</span></div>
+      <div>Level: <span id="level">1</span></div>
+      <div>Countries Found: <span id="found">0</span></div>
+    </div>
+
+    <div class="mode-selector">
+      <h3>Choose Challenge Type:</h3>
+      <button class="mode-btn active" onclick="setMode('countries')">
+        Countries
+      </button>
+      <button class="mode-btn" onclick="setMode('capitals')">Capitals</button>
+      <button class="mode-btn" onclick="setMode('flags')">Flags</button>
+    </div>
+
+    <div class="game-container">
+      <div class="question-area">
+        <div class="question" id="question">Find the country on the map</div>
+        <div class="flag-display" id="flagDisplay">🏳️</div>
+      </div>
+
+      <div class="world-map" id="worldMap">
+        <!-- Continents will be generated here -->
+      </div>
+
+      <div class="answer-options" id="answerOptions">
+        <!-- Answer options will be generated here -->
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div class="controls">
+        <button class="btn" onclick="getHint()">Get Hint</button>
+        <button class="btn" onclick="newChallenge()">New Challenge</button>
+      </div>
+    </div>
+
+    <script>
+      let currentMode = "countries";
+      let currentChallenge = {};
+      let score = 0;
+      let level = 1;
+      let countriesFound = 0;
+      let hintsUsed = 0;
+
+      const geographyDatabase = {
+        countries: [
+          {
+            name: "United States",
+            capital: "Washington D.C.",
+            continent: "North America",
+            flag: "🇺🇸",
+            hint: "Home to Hollywood and the Statue of Liberty",
+          },
+          {
+            name: "Canada",
+            capital: "Ottawa",
+            continent: "North America",
+            flag: "🇨🇦",
+            hint: "Known for maple syrup and hockey",
+          },
+          {
+            name: "Mexico",
+            capital: "Mexico City",
+            continent: "North America",
+            flag: "🇲🇽",
+            hint: "Famous for tacos and ancient pyramids",
+          },
+          {
+            name: "Brazil",
+            capital: "Brasília",
+            continent: "South America",
+            flag: "🇧🇷",
+            hint: "Home to the Amazon rainforest and Carnival",
+          },
+          {
+            name: "Argentina",
+            capital: "Buenos Aires",
+            continent: "South America",
+            flag: "🇦🇷",
+            hint: "Known for tango dancing and beef",
+          },
+          {
+            name: "United Kingdom",
+            capital: "London",
+            continent: "Europe",
+            flag: "🇬🇧",
+            hint: "Famous for Big Ben and the Royal Family",
+          },
+          {
+            name: "France",
+            capital: "Paris",
+            continent: "Europe",
+            flag: "🇫🇷",
+            hint: "Home to the Eiffel Tower and Louvre Museum",
+          },
+          {
+            name: "Germany",
+            capital: "Berlin",
+            continent: "Europe",
+            flag: "🇩🇪",
+            hint: "Known for Oktoberfest and BMW cars",
+          },
+          {
+            name: "Italy",
+            capital: "Rome",
+            continent: "Europe",
+            flag: "🇮🇹",
+            hint: "Famous for pizza, pasta, and the Colosseum",
+          },
+          {
+            name: "Spain",
+            capital: "Madrid",
+            continent: "Europe",
+            flag: "🇪🇸",
+            hint: "Known for flamenco dancing and bullfighting",
+          },
+          {
+            name: "China",
+            capital: "Beijing",
+            continent: "Asia",
+            flag: "🇨🇳",
+            hint: "Home to the Great Wall and pandas",
+          },
+          {
+            name: "Japan",
+            capital: "Tokyo",
+            continent: "Asia",
+            flag: "🇯🇵",
+            hint: "Famous for sushi, anime, and Mount Fuji",
+          },
+          {
+            name: "India",
+            capital: "New Delhi",
+            continent: "Asia",
+            flag: "🇮🇳",
+            hint: "Known for Bollywood movies and the Taj Mahal",
+          },
+          {
+            name: "Australia",
+            capital: "Canberra",
+            continent: "Oceania",
+            flag: "🇦🇺",
+            hint: "Home to kangaroos and the Great Barrier Reef",
+          },
+          {
+            name: "South Africa",
+            capital: "Pretoria",
+            continent: "Africa",
+            flag: "🇿🇦",
+            hint: "Known for safaris and Nelson Mandela",
+          },
+          {
+            name: "Egypt",
+            capital: "Cairo",
+            continent: "Africa",
+            flag: "🇪🇬",
+            hint: "Famous for pyramids and the Nile River",
+          },
+        ],
+      };
+
+      const continentPositions = {
+        "North America": {
+          top: "20%",
+          left: "15%",
+          width: "25%",
+          height: "35%",
+        },
+        "South America": {
+          top: "55%",
+          left: "25%",
+          width: "20%",
+          height: "35%",
+        },
+        Europe: { top: "15%", left: "45%", width: "20%", height: "25%" },
+        Africa: { top: "40%", left: "45%", width: "25%", height: "35%" },
+        Asia: { top: "20%", left: "70%", width: "25%", height: "40%" },
+        Oceania: { top: "60%", left: "75%", width: "20%", height: "25%" },
+      };
+
+      function setMode(mode) {
+        currentMode = mode;
+
+        // Update active button
+        document.querySelectorAll(".mode-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // Generate new challenge
+        newChallenge();
+      }
+
+      function createWorldMap() {
+        const mapContainer = document.getElementById("worldMap");
+        mapContainer.innerHTML = "";
+
+        Object.entries(continentPositions).forEach(([continent, pos]) => {
+          const continentDiv = document.createElement("div");
+          continentDiv.className = "continent";
+          continentDiv.textContent = continent;
+          continentDiv.style.top = pos.top;
+          continentDiv.style.left = pos.left;
+          continentDiv.style.width = pos.width;
+          continentDiv.style.height = pos.height;
+          continentDiv.dataset.continent = continent;
+
+          continentDiv.addEventListener("click", () =>
+            checkContinentAnswer(continent)
+          );
+
+          mapContainer.appendChild(continentDiv);
+        });
+      }
+
+      function generateCountryChallenge() {
+        const country =
+          geographyDatabase.countries[
+            Math.floor(Math.random() * geographyDatabase.countries.length)
+          ];
+        const question = `Find ${country.name} on the map`;
+
+        document.getElementById("question").textContent = question;
+        document.getElementById("flagDisplay").textContent = country.flag;
+
+        // Show the world map for country challenges
+        document.getElementById("worldMap").style.display = "block";
+
+        // Create answer options (continents)
+        const continents = Object.keys(continentPositions);
+        const answerOptions = document.getElementById("answerOptions");
+        answerOptions.innerHTML = "";
+
+        continents.forEach((continent) => {
+          const btn = document.createElement("button");
+          btn.className = "answer-btn";
+          btn.textContent = continent;
+          btn.onclick = () => checkAnswer(continent === country.continent);
+          answerOptions.appendChild(btn);
+        });
+
+        return { country, correctAnswer: country.continent };
+      }
+
+      function generateCapitalChallenge() {
+        const country =
+          geographyDatabase.countries[
+            Math.floor(Math.random() * geographyDatabase.countries.length)
+          ];
+        const question = `What is the capital of ${country.name}?`;
+
+        document.getElementById("question").textContent = question;
+        document.getElementById("flagDisplay").textContent = country.flag;
+
+        // Hide the world map for capital challenges
+        document.getElementById("worldMap").style.display = "none";
+
+        // Create answer options (capitals)
+        const allCapitals = geographyDatabase.countries.map((c) => c.capital);
+        const shuffledCapitals = allCapitals
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 4);
+
+        if (!shuffledCapitals.includes(country.capital)) {
+          shuffledCapitals[0] = country.capital;
+        }
+
+        const answerOptions = document.getElementById("answerOptions");
+        answerOptions.innerHTML = "";
+
+        shuffledCapitals
+          .sort(() => Math.random() - 0.5)
+          .forEach((capital) => {
+            const btn = document.createElement("button");
+            btn.className = "answer-btn";
+            btn.textContent = capital;
+            btn.onclick = () => checkAnswer(capital === country.capital);
+            answerOptions.appendChild(btn);
+          });
+
+        return { country, correctAnswer: country.capital };
+      }
+
+      function generateFlagChallenge() {
+        const country =
+          geographyDatabase.countries[
+            Math.floor(Math.random() * geographyDatabase.countries.length)
+          ];
+        const question = `Which country does this flag belong to?`;
+
+        document.getElementById("question").textContent = question;
+        document.getElementById("flagDisplay").textContent = country.flag;
+
+        // Hide the world map for flag challenges
+        document.getElementById("worldMap").style.display = "none";
+
+        // Create answer options (countries)
+        const allCountries = geographyDatabase.countries.map((c) => c.name);
+        const shuffledCountries = allCountries
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 4);
+
+        if (!shuffledCountries.includes(country.name)) {
+          shuffledCountries[0] = country.name;
+        }
+
+        const answerOptions = document.getElementById("answerOptions");
+        answerOptions.innerHTML = "";
+
+        shuffledCountries
+          .sort(() => Math.random() - 0.5)
+          .forEach((countryName) => {
+            const btn = document.createElement("button");
+            btn.className = "answer-btn";
+            btn.textContent = countryName;
+            btn.onclick = () => checkAnswer(countryName === country.name);
+            answerOptions.appendChild(btn);
+          });
+
+        return { country, correctAnswer: country.name };
+      }
+
+      function newChallenge() {
+        hintsUsed = 0;
+
+        switch (currentMode) {
+          case "countries":
+            currentChallenge = generateCountryChallenge();
+            break;
+          case "capitals":
+            currentChallenge = generateCapitalChallenge();
+            break;
+          case "flags":
+            currentChallenge = generateFlagChallenge();
+            break;
+        }
+
+        // Clear feedback and reset map
+        document.getElementById("feedback").style.display = "none";
+        document.querySelectorAll(".continent").forEach((c) => {
+          c.classList.remove("correct", "incorrect");
+        });
+        document.querySelectorAll(".answer-btn").forEach((btn) => {
+          btn.classList.remove("correct", "incorrect");
+        });
+      }
+
+      function checkAnswer(isCorrect) {
+        const points = 50 - hintsUsed * 10;
+
+        if (isCorrect) {
+          // Correct answer
+          score += points;
+          countriesFound++;
+
+          if (countriesFound >= level * 5) {
+            level++;
+          }
+
+          updateStats();
+
+          document.getElementById(
+            "feedback"
+          ).textContent = `🎉 Correct! +${points} points`;
+          document.getElementById("feedback").className = "feedback correct";
+          document.getElementById("feedback").style.display = "block";
+
+          // Highlight correct answer
+          event.target.classList.add("correct");
+
+          setTimeout(() => {
+            newChallenge();
+          }, 2000);
+        } else {
+          // Incorrect answer
+          document.getElementById("feedback").textContent = "😅 Try again!";
+          document.getElementById("feedback").className = "feedback incorrect";
+          document.getElementById("feedback").style.display = "block";
+
+          // Highlight incorrect answer
+          event.target.classList.add("incorrect");
+
+          setTimeout(() => {
+            document.getElementById("feedback").style.display = "none";
+            event.target.classList.remove("incorrect");
+          }, 2000);
+        }
+      }
+
+      function checkContinentAnswer(selectedContinent) {
+        if (currentMode === "countries") {
+          const isCorrect =
+            selectedContinent === currentChallenge.correctAnswer;
+          checkAnswer(isCorrect);
+
+          // Highlight continent
+          const continentElement = event.target;
+          continentElement.classList.add(isCorrect ? "correct" : "incorrect");
+        }
+      }
+
+      function getHint() {
+        hintsUsed++;
+        const hintElement = document.getElementById("feedback");
+        hintElement.textContent = `💡 Hint: ${currentChallenge.country.hint}`;
+        hintElement.className = "feedback";
+        hintElement.style.display = "block";
+
+        setTimeout(() => {
+          hintElement.style.display = "none";
+        }, 3000);
+      }
+
+      function updateStats() {
+        document.getElementById("score").textContent = score;
+        document.getElementById("level").textContent = level;
+        document.getElementById("found").textContent = countriesFound;
+      }
+
+      // Initialize game
+      createWorldMap();
+      newChallenge();
+    </script>
+  </body>
+</html>

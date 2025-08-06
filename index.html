@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
+    <meta name="theme-color" content="#ffa500" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="shortcut icon" href="favicon.svg" />
+    <link rel="icon" href="favicon.svg" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIj4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNSIgZmlsbD0iI2ZmYTUwMCIgc3Ryb2tlPSIjZmY2YjZiIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cmVjdCB4PSI4IiB5PSIxMiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjgiIHJ4PSI0IiBmaWxsPSIjNGVjZGM0IiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxjaXJjbGUgY3g9IjExIiBjeT0iMTYiIHI9IjIiIGZpbGw9IiNmZjZiNmIiLz4KICA8Y2lyY2xlIGN4PSIyMSIgY3k9IjE2IiByPSIyIiBmaWxsPSIjZmY2YjZiIi8+CiAgPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMS41IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3QgeD0iMTMiIHk9IjE0IiB3aWR0aD0iNiIgaGVpZ2h0PSI0IiBmaWxsPSIjMzMzIi8+CiAgPHJlY3QgeD0iMTQuNSIgeT0iMTIuNSIgd2lkdGg9IjMiIGhlaWdodD0iNyIgZmlsbD0iIzMzMyIvPgo8L3N2Zz4K"
+    />
+
+    <!-- SEO Meta Tags -->
+    <title>
+      Play It My Way - Free Educational Kids Games for Ages 3+ | Memory, Math,
+      Drawing
+    </title>
+    <meta
+      name="description"
+      content="Free educational games for kids ages 3+. Play memory match, color matcher, counting games, and drawing pad. Safe, fun, and educational online games for children."
+    />
+    <meta
+      name="keywords"
+      content="kids games, educational games, free games, memory games, math games, drawing games, preschool games, toddler games, learning games, children games, online games for kids, safe games for kids, educational activities, brain games for kids, color games, counting games"
+    />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta
+      property="og:title"
+      content="Play It My Way - Free Educational Kids Games for Ages 3+"
+    />
+    <meta
+      property="og:description"
+      content="Safe and educational online games for children. Memory, math, drawing, and color games designed for kids ages 3 and up."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://playitmyway.com" />
+    <meta
+      property="og:image"
+      content="https://playitmyway.com/images/og-image.jpg"
+    />
+    <meta property="og:site_name" content="Play It My Way" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Play It My Way - Free Educational Kids Games"
+    />
+    <meta
+      name="twitter:description"
+      content="Safe and fun educational games for children ages 3+. Memory, math, drawing, and color games."
+    />
+    <meta
+      name="twitter:image"
+      content="https://playitmyway.com/images/twitter-card.jpg"
+    />
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="distribution" content="global" />
+    <meta name="rating" content="general" />
+    <meta name="classification" content="Educational Games" />
+    <link rel="canonical" href="https://playitmyway.com" />
+    <style>
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: "Comic Sans MS", "Arial Rounded MT Bold", "Arial",
+          sans-serif;
+        background-color: #fff8dc;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      header {
+        background-color: #ffa500;
+        padding: 1.2em 0;
+        color: white;
+        font-size: clamp(2em, 6vw, 2.5em);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      h2 {
+        color: #333;
+        font-size: clamp(1.5em, 5vw, 2em);
+        margin: 25px 0;
+        padding: 0 15px;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .game-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        padding: 15px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 480px) {
+        .game-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+          padding: 10px;
+        }
+      }
+
+      .game-card {
+        background: #ffefd5;
+        border-radius: 15px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        touch-action: manipulation;
+      }
+
+      .game-card:hover,
+      .game-card:active {
+        transform: scale(1.02);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .game-card img {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        margin-bottom: 10px;
+      }
+
+      @media (max-width: 480px) {
+        .game-card img {
+          width: 50px;
+          height: 50px;
+        }
+      }
+
+      .game-card a {
+        display: block;
+        font-size: clamp(1.1em, 4vw, 1.4em);
+        text-decoration: none;
+        color: #000080;
+        margin-top: 8px;
+        font-weight: bold;
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        line-height: 1.3;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+      }
+
+      .game-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+      }
+
+      .support-section {
+        margin-top: 40px;
+        padding: 30px 15px;
+        background: linear-gradient(135deg, #ffa500, #ff6b6b);
+        border-radius: 15px;
+        margin: 40px 15px 20px 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+
+      .support-content {
+        text-align: center;
+        color: white;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .support-content h3 {
+        font-size: clamp(1.5em, 5vw, 2em);
+        margin-bottom: 15px;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .support-content p {
+        font-size: clamp(1em, 3vw, 1.2em);
+        margin-bottom: 15px;
+        line-height: 1.5;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .support-btn {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.9);
+        color: #ff6b6b;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: clamp(1.1em, 4vw, 1.3em);
+        font-weight: bold;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+        text-shadow: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .support-btn:hover {
+        transform: scale(1.05);
+        background: white;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .footer {
+        margin-top: 30px;
+        font-size: clamp(1em, 3vw, 1.1em);
+        color: #555;
+        padding: 25px 15px;
+        line-height: 1.5;
+        font-weight: 500;
+        text-align: center;
+      }
+
+      .footer-links {
+        margin-top: 15px;
+      }
+
+      .footer-links a {
+        color: #ffa500;
+        text-decoration: none;
+        font-weight: bold;
+        transition: color 0.3s;
+        margin: 0 10px;
+      }
+
+      .footer-links a:hover {
+        color: #ff6b6b;
+      }
+
+      /* Mobile-specific improvements */
+      @media (max-width: 768px) {
+        body {
+          padding: 0;
+          padding-top: 60px; /* Space for back link */
+        }
+
+        header {
+          padding: 0.8em 0;
+        }
+
+        .game-card {
+          padding: 12px;
+          min-height: 100px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding-top: 50px; /* Less space on smaller screens */
+        }
+
+        .game-card {
+          padding: 10px;
+          min-height: 90px;
+        }
+
+        .support-section {
+          margin: 30px 10px 15px 10px;
+          padding: 20px 10px;
+        }
+
+        .support-content h3 {
+          font-size: clamp(1.3em, 5vw, 1.8em);
+        }
+
+        .support-content p {
+          font-size: clamp(0.9em, 3vw, 1.1em);
+        }
+
+        .support-btn {
+          padding: 12px 25px;
+          font-size: clamp(1em, 4vw, 1.2em);
+        }
+      }
+
+      /* Prevent text selection on mobile */
+      .game-card {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      /* Cookie Banner Styles */
+      .cookie-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 15px;
+        z-index: 1000;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+      }
+
+      .cookie-banner.show {
+        transform: translateY(0);
+      }
+
+      .cookie-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .cookie-content p {
+        margin: 0;
+        font-size: clamp(0.9em, 3vw, 1em);
+        line-height: 1.4;
+      }
+
+      .cookie-buttons {
+        display: flex;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+
+      .cookie-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 20px;
+        font-size: clamp(0.8em, 3vw, 0.9em);
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .cookie-btn.accept {
+        background: #4ecdc4;
+        color: white;
+      }
+
+      .cookie-btn.reject {
+        background: #ff6b6b;
+        color: white;
+      }
+
+      .cookie-btn:hover {
+        transform: scale(1.05);
+      }
+
+      @media (max-width: 768px) {
+        .cookie-content {
+          flex-direction: column;
+          text-align: center;
+          gap: 15px;
+        }
+
+        .cookie-buttons {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header
+      role="banner"
+      aria-label="Play It My Way - Educational Games for Kids"
+    >
+      🎮 Play It My Way – Just for Kids
+    </header>
+
+    <h2 id="main-heading">Choose Your Fun Game for Ages 3+</h2>
+
+    <div class="game-grid" role="main" aria-labelledby="main-heading">
+      <div
+        class="game-card"
+        role="button"
+        tabindex="0"
+        aria-label="Play Memory Match game"
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/888/888879.png"
+          width="100"
+          alt="Memory Game icon"
+        />
+        <a
+          href="games/memory-game/index.html"
+          aria-label="Play Memory Match game"
+          >Memory Match</a
+        >
+      </div>
+      <div
+        class="game-card"
+        role="button"
+        tabindex="0"
+        aria-label="Play Color Matcher game"
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/2965/2965873.png"
+          width="100"
+          alt="Color Game icon"
+        />
+        <a
+          href="games/color-matcher/index.html"
+          aria-label="Play Color Matcher game"
+          >Color Matcher</a
+        >
+      </div>
+      <div
+        class="game-card"
+        role="button"
+        tabindex="0"
+        aria-label="Play Count With Me game"
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/3032/3032937.png"
+          width="100"
+          alt="Math Game icon"
+        />
+        <a
+          href="games/counting-game/index.html"
+          aria-label="Play Count With Me game"
+          >Count With Me</a
+        >
+      </div>
+      <div
+        class="game-card"
+        role="button"
+        tabindex="0"
+        aria-label="Play Drawing Pad game"
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/2947/2947525.png"
+          width="100"
+          alt="Drawing Pad icon"
+        />
+        <a
+          href="games/drawing-pad/index.html"
+          aria-label="Play Drawing Pad game"
+          >Drawing Pad</a
+        >
+      </div>
+    </div>
+
+    <h2
+      id="advanced-heading"
+      style="
+        margin-top: 40px;
+        color: #333;
+        font-size: clamp(1.5em, 5vw, 2em);
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      "
+    >
+      Advanced Games for Ages 7+
+    </h2>
+
+    <div class="game-grid" role="region" aria-labelledby="advanced-heading">
+      <div
+        class="game-card"
+        role="button"
+        tabindex="0"
+        aria-label="Play Word Scramble game"
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/2491/2491516.png"
+          width="100"
+          alt="Word Scramble icon"
+        />
+        <a
+          href="games/word-scramble/index.html"
+          aria-label="Play Word Scramble game"
+          >Word Scramble</a
+        >
+      </div>
+      <div
+        class="game-card"
+        role="button"
+        tabindex="0"
+        aria-label="Play Math Puzzle game"
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/2491/2491517.png"
+          width="100"
+          alt="Math Puzzle icon"
+        />
+        <a
+          href="games/math-puzzle/index.html"
+          aria-label="Play Math Puzzle game"
+          >Math Puzzle</a
+        >
+      </div>
+      <div
+        class="game-card"
+        role="button"
+        tabindex="0"
+        aria-label="Play Geography Explorer game"
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/2491/2491518.png"
+          width="100"
+          alt="Geography Explorer icon"
+        />
+        <a
+          href="games/geography-explorer/index.html"
+          aria-label="Play Geography Explorer game"
+          >Geography Explorer</a
+        >
+      </div>
+      <div
+        class="game-card"
+        role="button"
+        tabindex="0"
+        aria-label="Play Science Trivia game"
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/2491/2491519.png"
+          width="100"
+          alt="Science Trivia icon"
+        />
+        <a
+          href="games/science-trivia/index.html"
+          aria-label="Play Science Trivia game"
+          >Science Trivia</a
+        >
+      </div>
+    </div>
+
+    <div class="support-section">
+      <div class="support-content">
+        <h4>🎉 Thank You for Playing!</h4>
+        <p>
+          If you love our <strong>FREE</strong> educational games and want to
+          support us, consider buying us a coffee ☕
+        </p>
+        <a
+          href="https://buymeacoffee.com/viks120"
+          target="_blank"
+          class="support-btn"
+        >
+          ☕ Buy Us a Coffee
+        </a>
+      </div>
+    </div>
+
+    <div class="footer">
+      © <span id="currentYear"></span> PlayItMyWay.com — Learn, Play, Smile 😊
+      <div class="footer-links">
+        <a href="disclaimer.html">Disclaimer</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+      </div>
+    </div>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner" class="cookie-banner">
+      <div class="cookie-content">
+        <p>
+          🍪 We use essential cookies to make our games work. No tracking or
+          personal data is collected.
+        </p>
+        <div class="cookie-buttons">
+          <button id="accept-cookies" class="cookie-btn accept">Accept</button>
+          <button id="reject-cookies" class="cookie-btn reject">Reject</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Update copyright year automatically
+      document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+
+      // Make entire game cards clickable and keyboard accessible
+      document.querySelectorAll(".game-card").forEach((card) => {
+        card.addEventListener("click", function (e) {
+          // Don't trigger if clicking on the link itself
+          if (e.target.tagName === "A") return;
+
+          // Find the link within this card and click it
+          const link = this.querySelector("a");
+          if (link) {
+            link.click();
+          }
+        });
+
+        // Add keyboard support for accessibility
+        card.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            const link = this.querySelector("a");
+            if (link) {
+              link.click();
+            }
+          }
+        });
+      });
+
+      // Cookie consent functionality
+      const cookieBanner = document.getElementById("cookie-banner");
+      const acceptCookies = document.getElementById("accept-cookies");
+      const rejectCookies = document.getElementById("reject-cookies");
+
+      // Check if user has already made a choice
+      const cookieChoice = localStorage.getItem("cookieChoice");
+
+      if (!cookieChoice) {
+        // Show cookie banner after a short delay
+        setTimeout(() => {
+          cookieBanner.classList.add("show");
+        }, 1000);
+      }
+
+      acceptCookies.addEventListener("click", function () {
+        localStorage.setItem("cookieChoice", "accepted");
+        cookieBanner.classList.remove("show");
+      });
+
+      rejectCookies.addEventListener("click", function () {
+        localStorage.setItem("cookieChoice", "rejected");
+        cookieBanner.classList.remove("show");
+      });
+    </script>
+  </body>
+</html>

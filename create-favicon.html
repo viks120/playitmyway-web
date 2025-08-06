@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Favicon</title>
+  </head>
+  <body>
+    <h2>Play It My Way - Favicon Generator</h2>
+    <p>This will create a favicon for your children's gaming site.</p>
+
+    <canvas id="canvas" width="32" height="32"></canvas>
+    <br /><br />
+    <button onclick="download()">Download favicon.png</button>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // Orange background circle
+      ctx.fillStyle = "#ffa500";
+      ctx.beginPath();
+      ctx.arc(16, 16, 15, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Red border
+      ctx.strokeStyle = "#ff6b6b";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Game controller body (teal)
+      ctx.fillStyle = "#4ecdc4";
+      ctx.fillRect(8, 12, 16, 8);
+
+      // Controller buttons (red)
+      ctx.fillStyle = "#ff6b6b";
+      ctx.beginPath();
+      ctx.arc(11, 16, 2, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(21, 16, 2, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Center button (white)
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(16, 16, 1.5, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // D-pad (black)
+      ctx.fillStyle = "#333";
+      ctx.fillRect(13, 14, 6, 4);
+      ctx.fillRect(14.5, 12.5, 3, 7);
+
+      function download() {
+        const link = document.createElement("a");
+        link.download = "favicon.png";
+        link.href = canvas.toDataURL();
+        link.click();
+      }
+    </script>
+  </body>
+</html>

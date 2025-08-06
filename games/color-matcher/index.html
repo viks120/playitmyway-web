@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#667eea" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>
+      Color Matcher Game for Kids - Learn RGB Colors | Play It My Way
+    </title>
+    <meta
+      name="description"
+      content="Free color matching game for kids ages 3+. Learn RGB color mixing and color theory with interactive sliders. Educational color game for children."
+    />
+    <meta
+      name="keywords"
+      content="color game, color matcher, RGB game, color mixing, educational games, color theory, kids color game, free color game, color learning, color education, RGB sliders, color matching, educational activities, preschool games, toddler games, color recognition"
+    />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta
+      property="og:title"
+      content="Color Matcher Game for Kids - Learn RGB Colors"
+    />
+    <meta
+      property="og:description"
+      content="Interactive color matching game for children. Learn RGB color mixing with fun sliders. Free educational game for kids ages 3+."
+    />
+    <meta property="og:type" content="game" />
+    <meta
+      property="og:url"
+      content="https://playitmyway.com/games/color-matcher"
+    />
+    <meta
+      property="og:image"
+      content="https://playitmyway.com/images/color-matcher.jpg"
+    />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Color Matcher Game for Kids" />
+    <meta
+      name="twitter:description"
+      content="Free color learning game for children. Mix RGB colors and learn color theory."
+    />
+    <meta
+      name="twitter:image"
+      content="https://playitmyway.com/images/color-matcher.jpg"
+    />
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="language" content="English" />
+    <meta name="classification" content="Educational Color Game" />
+    <link rel="canonical" href="https://playitmyway.com/games/color-matcher" />
+    <style>
+      body {
+        font-family: "Comic Sans MS", "Arial Rounded MT Bold", "Arial",
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 25px;
+      }
+
+      .header h1 {
+        font-size: clamp(2em, 7vw, 2.5em);
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: clamp(1.2em, 4vw, 1.4em);
+        font-weight: 500;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .game-container {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 100%;
+      }
+
+      .target-section {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .target-color {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin: 20px auto;
+        border: 5px solid #333;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .player-color {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin: 20px auto;
+        border: 5px solid #333;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        background: rgb(128, 128, 128);
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .color-control {
+        text-align: center;
+      }
+
+      .color-control label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 12px;
+        color: #333;
+        font-size: clamp(1.1em, 4vw, 1.3em);
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+      }
+
+      .slider {
+        width: 100%;
+        height: 20px;
+        border-radius: 10px;
+        outline: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+        touch-action: none;
+      }
+
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .slider::-moz-range-thumb {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .slider:active::-webkit-slider-thumb {
+        transform: scale(1.1);
+      }
+
+      .slider:active::-moz-range-thumb {
+        transform: scale(1.1);
+      }
+
+      .red-slider {
+        background: linear-gradient(to right, #000, #f00);
+      }
+
+      .red-slider::-webkit-slider-thumb {
+        background: #f00;
+      }
+
+      .green-slider {
+        background: linear-gradient(to right, #000, #0f0);
+      }
+
+      .green-slider::-webkit-slider-thumb {
+        background: #0f0;
+      }
+
+      .blue-slider {
+        background: linear-gradient(to right, #000, #00f);
+      }
+
+      .blue-slider::-webkit-slider-thumb {
+        background: #00f;
+      }
+
+      .value-display {
+        font-size: clamp(1.1em, 4vw, 1.3em);
+        font-weight: bold;
+        margin-top: 12px;
+        color: #333;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+      }
+
+      .stats {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 25px;
+        color: #333;
+        font-size: clamp(1.1em, 4vw, 1.3em);
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+      }
+
+      .controls-buttons {
+        text-align: center;
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 25px;
+        font-size: clamp(1em, 4vw, 1.2em);
+        font-weight: bold;
+        cursor: pointer;
+        margin: 0 12px;
+        transition: transform 0.2s;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn:hover {
+        transform: scale(1.05);
+      }
+
+      .accuracy {
+        text-align: center;
+        font-size: clamp(1.2em, 5vw, 1.5em);
+        font-weight: bold;
+        margin-top: 25px;
+        padding: 15px;
+        border-radius: 12px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .perfect {
+        background: #a8e6cf;
+        color: #2d5a3d;
+      }
+      .good {
+        background: #ffd93d;
+        color: #8b6914;
+      }
+      .poor {
+        background: #ff6b6b;
+        color: white;
+      }
+
+      .back-link {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px 15px;
+        border-radius: 20px;
+        transition: background 0.3s;
+      }
+
+      .back-link:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      /* Mobile-specific improvements */
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+          padding-top: 60px; /* Space for back link */
+        }
+
+        .header h1 {
+          font-size: clamp(1.5em, 6vw, 2em);
+        }
+
+        .header p {
+          font-size: clamp(0.9em, 3vw, 1em);
+        }
+
+        .game-container {
+          padding: 20px;
+          margin: 0 5px;
+        }
+
+        .target-color,
+        .player-color {
+          width: 120px;
+          height: 120px;
+        }
+
+        .controls {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+
+        .color-control label {
+          font-size: clamp(0.9em, 3vw, 1em);
+        }
+
+        .value-display {
+          font-size: clamp(0.9em, 3vw, 1em);
+        }
+
+        .btn {
+          padding: 10px 20px;
+          font-size: clamp(0.9em, 3vw, 1em);
+        }
+
+        .back-link {
+          top: 10px;
+          left: 10px;
+          font-size: clamp(0.9em, 3vw, 1em);
+          padding: 8px 12px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding-top: 50px; /* Space for back link */
+        }
+
+        .target-color,
+        .player-color {
+          width: 100px;
+          height: 100px;
+        }
+
+        .controls {
+          gap: 10px;
+        }
+
+        .slider {
+          height: 15px;
+        }
+
+        .slider::-webkit-slider-thumb {
+          width: 20px;
+          height: 20px;
+        }
+      }
+
+      /* Prevent text selection on mobile */
+      .slider,
+      .btn,
+      .color-btn {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        touch-action: manipulation;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../../" class="back-link">← Back to Games</a>
+
+    <div class="header">
+      <h1>🎨 Color Matcher</h1>
+      <p>Match the target color by mixing RGB values!</p>
+    </div>
+
+    <div class="game-container">
+      <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+      </div>
+
+      <div class="target-section">
+        <h3>Target Color</h3>
+        <div class="target-color" id="targetColor"></div>
+      </div>
+
+      <div class="target-section">
+        <h3>Your Color</h3>
+        <div class="player-color" id="playerColor"></div>
+      </div>
+
+      <div class="controls">
+        <div class="color-control">
+          <label>Red</label>
+          <input
+            type="range"
+            min="0"
+            max="255"
+            value="128"
+            class="slider red-slider"
+            id="redSlider"
+          />
+          <div class="value-display" id="redValue">128</div>
+        </div>
+        <div class="color-control">
+          <label>Green</label>
+          <input
+            type="range"
+            min="0"
+            max="255"
+            value="128"
+            class="slider green-slider"
+            id="greenSlider"
+          />
+          <div class="value-display" id="greenValue">128</div>
+        </div>
+        <div class="color-control">
+          <label>Blue</label>
+          <input
+            type="range"
+            min="0"
+            max="255"
+            value="128"
+            class="slider blue-slider"
+            id="blueSlider"
+          />
+          <div class="value-display" id="blueValue">128</div>
+        </div>
+      </div>
+
+      <div class="accuracy" id="accuracy"></div>
+
+      <div class="controls-buttons">
+        <button class="btn" onclick="checkMatch()">Check Match</button>
+        <button class="btn" onclick="newColor()">New Color</button>
+      </div>
+    </div>
+
+    <script>
+      let targetColor = { r: 0, g: 0, b: 0 };
+      let playerColor = { r: 128, g: 128, b: 128 };
+      let score = 0;
+      let level = 1;
+
+      const redSlider = document.getElementById("redSlider");
+      const greenSlider = document.getElementById("greenSlider");
+      const blueSlider = document.getElementById("blueSlider");
+      const redValue = document.getElementById("redValue");
+      const greenValue = document.getElementById("greenValue");
+      const blueValue = document.getElementById("blueValue");
+      const targetColorDiv = document.getElementById("targetColor");
+      const playerColorDiv = document.getElementById("playerColor");
+      const accuracyDiv = document.getElementById("accuracy");
+
+      function generateRandomColor() {
+        return {
+          r: Math.floor(Math.random() * 256),
+          g: Math.floor(Math.random() * 256),
+          b: Math.floor(Math.random() * 256),
+        };
+      }
+
+      function updatePlayerColor() {
+        playerColor.r = parseInt(redSlider.value);
+        playerColor.g = parseInt(greenSlider.value);
+        playerColor.b = parseInt(blueSlider.value);
+
+        redValue.textContent = playerColor.r;
+        greenValue.textContent = playerColor.g;
+        blueValue.textContent = playerColor.b;
+
+        playerColorDiv.style.background = `rgb(${playerColor.r}, ${playerColor.g}, ${playerColor.b})`;
+      }
+
+      function updateTargetColor() {
+        targetColorDiv.style.background = `rgb(${targetColor.r}, ${targetColor.g}, ${targetColor.b})`;
+      }
+
+      function calculateAccuracy() {
+        const rDiff = Math.abs(targetColor.r - playerColor.r);
+        const gDiff = Math.abs(targetColor.g - playerColor.g);
+        const bDiff = Math.abs(targetColor.b - playerColor.b);
+
+        const totalDiff = rDiff + gDiff + bDiff;
+        const maxDiff = 255 * 3;
+        const accuracy = ((maxDiff - totalDiff) / maxDiff) * 100;
+
+        return Math.round(accuracy);
+      }
+
+      function checkMatch() {
+        const accuracy = calculateAccuracy();
+        let message = "";
+        let className = "";
+
+        if (accuracy >= 95) {
+          message = `🎉 Perfect! ${accuracy}% accuracy!`;
+          className = "perfect";
+          score += 100;
+        } else if (accuracy >= 80) {
+          message = `👍 Good job! ${accuracy}% accuracy!`;
+          className = "good";
+          score += 50;
+        } else if (accuracy >= 60) {
+          message = `😊 Not bad! ${accuracy}% accuracy!`;
+          className = "good";
+          score += 25;
+        } else {
+          message = `😅 Keep trying! ${accuracy}% accuracy!`;
+          className = "poor";
+        }
+
+        accuracyDiv.textContent = message;
+        accuracyDiv.className = `accuracy ${className}`;
+
+        document.getElementById("score").textContent = score;
+
+        if (score >= level * 200) {
+          level++;
+          document.getElementById("level").textContent = level;
+          alert(`🎊 Level Up! You're now at level ${level}!`);
+        }
+      }
+
+      function newColor() {
+        targetColor = generateRandomColor();
+        updateTargetColor();
+        accuracyDiv.textContent = "";
+        accuracyDiv.className = "accuracy";
+      }
+
+      // Enhanced slider functionality for mobile
+      function setupSliderTouch(slider) {
+        let isDragging = false;
+
+        // Mouse events
+        slider.addEventListener("mousedown", () => {
+          isDragging = true;
+        });
+
+        document.addEventListener("mouseup", () => {
+          isDragging = false;
+        });
+
+        // Touch events
+        slider.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          isDragging = true;
+          updateSliderFromTouch(slider, e);
+        });
+
+        slider.addEventListener("touchmove", (e) => {
+          e.preventDefault();
+          if (isDragging) {
+            updateSliderFromTouch(slider, e);
+          }
+        });
+
+        slider.addEventListener("touchend", (e) => {
+          e.preventDefault();
+          isDragging = false;
+        });
+
+        // Input event for all changes
+        slider.addEventListener("input", updatePlayerColor);
+        slider.addEventListener("change", updatePlayerColor);
+      }
+
+      function updateSliderFromTouch(slider, touchEvent) {
+        const touch = touchEvent.touches[0];
+        const rect = slider.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const percentage = Math.max(0, Math.min(1, x / rect.width));
+        const value = Math.round(percentage * 255);
+        slider.value = value;
+        updatePlayerColor();
+      }
+
+      // Setup touch support for all sliders
+      setupSliderTouch(redSlider);
+      setupSliderTouch(greenSlider);
+      setupSliderTouch(blueSlider);
+
+      // Initialize game
+      newColor();
+      updatePlayerColor();
+    </script>
+  </body>
+</html>

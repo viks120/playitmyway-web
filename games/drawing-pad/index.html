@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#667eea" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>
+      Drawing Pad for Kids - Free Online Drawing Game | Play It My Way
+    </title>
+    <meta
+      name="description"
+      content="Free online drawing pad for kids ages 3+. Creative drawing game with colors, brushes, stamps, and eraser. Educational art game for children."
+    />
+    <meta
+      name="keywords"
+      content="drawing game, drawing pad, kids drawing, free drawing game, online drawing, art games, creative games, educational games, kids art, free art game, drawing tools, color tools, brush tools, stamp tools, educational activities, preschool art, toddler art, creative activities"
+    />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta
+      property="og:title"
+      content="Drawing Pad for Kids - Free Online Drawing Game"
+    />
+    <meta
+      property="og:description"
+      content="Creative drawing game for children. Use colors, brushes, stamps, and eraser tools. Free educational art game for kids ages 3+."
+    />
+    <meta property="og:type" content="game" />
+    <meta
+      property="og:url"
+      content="https://playitmyway.com/games/drawing-pad"
+    />
+    <meta
+      property="og:image"
+      content="https://playitmyway.com/images/drawing-pad.jpg"
+    />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Drawing Pad for Kids" />
+    <meta
+      name="twitter:description"
+      content="Free online drawing game for children. Creative art tools and activities."
+    />
+    <meta
+      name="twitter:image"
+      content="https://playitmyway.com/images/drawing-pad.jpg"
+    />
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="language" content="English" />
+    <meta name="classification" content="Educational Art Game" />
+    <link rel="canonical" href="https://playitmyway.com/games/drawing-pad" />
+    <style>
+      body {
+        font-family: "Comic Sans MS", "Arial Rounded MT Bold", "Arial",
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 25px;
+      }
+
+      .header h1 {
+        font-size: clamp(2em, 7vw, 2.5em);
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: clamp(1.2em, 4vw, 1.4em);
+        font-weight: 500;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .drawing-container {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        max-width: 800px;
+        width: 100%;
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .color-palette {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+      }
+
+      .color-btn {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #333;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .color-btn:hover {
+        transform: scale(1.1);
+      }
+
+      .color-btn.active {
+        border-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      }
+
+      .brush-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brush-size {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .brush-preview {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid #333;
+      }
+
+      .canvas-container {
+        position: relative;
+        border: 3px solid #333;
+        border-radius: 10px;
+        overflow: hidden;
+        background: white;
+        width: 100%;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      #drawingCanvas {
+        display: block;
+        cursor: crosshair;
+        touch-action: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: clamp(1em, 4vw, 1.2em);
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn:hover {
+        transform: scale(1.05);
+      }
+
+      .btn.clear {
+        background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+      }
+
+      .btn.save {
+        background: linear-gradient(45deg, #4ecdc4, #44a08d);
+      }
+
+      .back-link {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px 15px;
+        border-radius: 20px;
+        transition: background 0.3s;
+      }
+
+      .back-link:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .stamp-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .stamp-btn {
+        font-size: 24px;
+        padding: 5px 10px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+      }
+
+      .stamp-btn:hover {
+        border-color: #333;
+        transform: scale(1.1);
+      }
+
+      .stamp-btn.active {
+        border-color: #4ecdc4;
+        background: #e8f5e8;
+      }
+
+      .eraser-btn {
+        padding: 5px 10px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+        font-size: 14px;
+      }
+
+      .eraser-btn:hover {
+        border-color: #333;
+        transform: scale(1.1);
+      }
+
+      .eraser-btn.active {
+        border-color: #ff6b6b;
+        background: #ffe8e8;
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+          padding-top: 60px; /* Space for back link */
+        }
+
+        .header h1 {
+          font-size: clamp(1.5em, 6vw, 2em);
+        }
+
+        .header p {
+          font-size: clamp(0.9em, 3vw, 1em);
+        }
+
+        .drawing-container {
+          padding: 15px;
+          margin: 0 5px;
+        }
+
+        .toolbar {
+          flex-direction: column;
+          gap: 15px;
+          align-items: center;
+        }
+
+        .color-palette {
+          justify-content: center;
+        }
+
+        .color-btn {
+          width: 25px;
+          height: 25px;
+        }
+
+        .brush-controls {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .stamp-container {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .stamp-btn {
+          font-size: 20px;
+          padding: 8px 12px;
+        }
+
+        .eraser-btn {
+          padding: 8px 12px;
+          font-size: 12px;
+        }
+
+        .btn {
+          padding: 8px 15px;
+          font-size: clamp(0.8em, 3vw, 1em);
+          margin: 5px;
+        }
+
+        .back-link {
+          top: 10px;
+          left: 10px;
+          font-size: clamp(0.9em, 3vw, 1em);
+          padding: 8px 12px;
+        }
+
+        #drawingCanvas {
+          max-width: 100%;
+          height: auto;
+        }
+
+        .controls {
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding-top: 50px; /* Less space on smaller screens */
+        }
+
+        .toolbar {
+          gap: 10px;
+        }
+
+        .color-btn {
+          width: 20px;
+          height: 20px;
+        }
+
+        .stamp-btn {
+          font-size: 18px;
+          padding: 6px 10px;
+        }
+
+        .controls {
+          gap: 10px;
+        }
+
+        .btn {
+          margin: 3px;
+        }
+      }
+
+      /* Prevent text selection on mobile */
+      .color-btn,
+      .stamp-btn,
+      .eraser-btn,
+      .btn,
+      .slider {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        touch-action: manipulation;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../../" class="back-link">← Back to Games</a>
+
+    <div class="header">
+      <h1>🎨 Drawing Pad</h1>
+      <p>Create your own masterpiece!</p>
+    </div>
+
+    <div class="drawing-container">
+      <div class="toolbar">
+        <div class="color-palette">
+          <div
+            class="color-btn active"
+            style="background: #000000"
+            data-color="#000000"
+          ></div>
+          <div
+            class="color-btn"
+            style="background: #ff0000"
+            data-color="#ff0000"
+          ></div>
+          <div
+            class="color-btn"
+            style="background: #00ff00"
+            data-color="#00ff00"
+          ></div>
+          <div
+            class="color-btn"
+            style="background: #0000ff"
+            data-color="#0000ff"
+          ></div>
+          <div
+            class="color-btn"
+            style="background: #ffff00"
+            data-color="#ffff00"
+          ></div>
+          <div
+            class="color-btn"
+            style="background: #ff00ff"
+            data-color="#ff00ff"
+          ></div>
+          <div
+            class="color-btn"
+            style="background: #00ffff"
+            data-color="#00ffff"
+          ></div>
+          <div
+            class="color-btn"
+            style="background: #ffa500"
+            data-color="#ffa500"
+          ></div>
+          <div
+            class="color-btn"
+            style="background: #800080"
+            data-color="#800080"
+          ></div>
+          <div
+            class="color-btn"
+            style="background: #008000"
+            data-color="#008000"
+          ></div>
+        </div>
+
+        <div class="brush-controls">
+          <div class="brush-size">
+            <label>Size:</label>
+            <input type="range" id="brushSize" min="1" max="50" value="5" />
+            <div class="brush-preview" id="brushPreview"></div>
+          </div>
+        </div>
+
+        <div class="stamp-container">
+          <div class="stamp-btn" data-stamp="⭐">⭐</div>
+          <div class="stamp-btn" data-stamp="❤️">❤️</div>
+          <div class="stamp-btn" data-stamp="🌟">🌟</div>
+          <div class="stamp-btn" data-stamp="🎈">🎈</div>
+          <div class="stamp-btn" data-stamp="🌸">🌸</div>
+          <div class="eraser-btn" id="eraserBtn">🧽</div>
+        </div>
+      </div>
+
+      <div class="canvas-container">
+        <canvas id="drawingCanvas"></canvas>
+      </div>
+
+      <div class="controls">
+        <button class="btn clear" onclick="clearCanvas()">Clear Canvas</button>
+        <button class="btn save" onclick="saveDrawing()">Save Drawing</button>
+        <button class="btn" onclick="downloadDrawing()">Download</button>
+      </div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("drawingCanvas");
+      const ctx = canvas.getContext("2d");
+
+      let isDrawing = false;
+      let currentColor = "#000000";
+      let currentBrushSize = 5;
+      let currentStamp = null;
+      let isEraser = false;
+
+      // Responsive canvas setup
+      function resizeCanvas() {
+        const container = canvas.parentElement;
+        const containerWidth = container.clientWidth - 40; // Account for padding
+        const containerHeight = Math.min(
+          containerWidth * 0.7,
+          window.innerHeight * 0.5
+        );
+
+        canvas.width = containerWidth;
+        canvas.height = containerHeight;
+
+        // Set canvas display size
+        canvas.style.width = containerWidth + "px";
+        canvas.style.height = containerHeight + "px";
+
+        // Reinitialize canvas with white background
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // Initialize canvas
+      resizeCanvas();
+
+      // Resize canvas on window resize
+      window.addEventListener("resize", resizeCanvas);
+
+      // Color selection
+      document.querySelectorAll(".color-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".color-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentColor = btn.dataset.color;
+          isEraser = false;
+          document.getElementById("eraserBtn").classList.remove("active");
+          document
+            .querySelectorAll(".stamp-btn")
+            .forEach((s) => s.classList.remove("active"));
+          currentStamp = null;
+          updateBrushPreview();
+        });
+      });
+
+      // Brush size
+      document.getElementById("brushSize").addEventListener("input", (e) => {
+        currentBrushSize = parseInt(e.target.value);
+        updateBrushPreview();
+      });
+
+      // Stamp selection
+      document.querySelectorAll(".stamp-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".stamp-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentStamp = btn.dataset.stamp;
+          isEraser = false;
+          document.getElementById("eraserBtn").classList.remove("active");
+          document
+            .querySelectorAll(".color-btn")
+            .forEach((c) => c.classList.remove("active"));
+        });
+      });
+
+      // Eraser
+      document.getElementById("eraserBtn").addEventListener("click", () => {
+        document.getElementById("eraserBtn").classList.toggle("active");
+        isEraser = document
+          .getElementById("eraserBtn")
+          .classList.contains("active");
+        if (isEraser) {
+          document
+            .querySelectorAll(".stamp-btn")
+            .forEach((s) => s.classList.remove("active"));
+          document
+            .querySelectorAll(".color-btn")
+            .forEach((c) => c.classList.remove("active"));
+          currentStamp = null;
+        }
+      });
+
+      function updateBrushPreview() {
+        const preview = document.getElementById("brushPreview");
+        preview.style.width = currentBrushSize + "px";
+        preview.style.height = currentBrushSize + "px";
+        preview.style.background = isEraser ? "#ff6b6b" : currentColor;
+      }
+
+      // Drawing functions
+      function startDrawing(e) {
+        isDrawing = true;
+        draw(e);
+      }
+
+      function stopDrawing() {
+        isDrawing = false;
+        ctx.beginPath();
+      }
+
+      function draw(e) {
+        if (!isDrawing) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if (currentStamp) {
+          // Draw stamp
+          ctx.font = currentBrushSize * 2 + "px Arial";
+          ctx.fillStyle = currentColor;
+          ctx.fillText(
+            currentStamp,
+            x - currentBrushSize,
+            y + currentBrushSize
+          );
+        } else if (isEraser) {
+          // Eraser mode
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.lineWidth = currentBrushSize;
+          ctx.lineCap = "round";
+          ctx.lineTo(x, y);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.globalCompositeOperation = "source-over";
+        } else {
+          // Normal drawing
+          ctx.lineWidth = currentBrushSize;
+          ctx.lineCap = "round";
+          ctx.strokeStyle = currentColor;
+          ctx.lineTo(x, y);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+        }
+      }
+
+      // Touch support for mobile
+      function handleTouch(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent("mousemove", {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        });
+        draw(mouseEvent);
+      }
+
+      // Event listeners
+      canvas.addEventListener("mousedown", startDrawing);
+      canvas.addEventListener("mousemove", draw);
+      canvas.addEventListener("mouseup", stopDrawing);
+      canvas.addEventListener("mouseout", stopDrawing);
+
+      // Enhanced touch and mouse drawing
+      function getPointerPosition(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        let clientX, clientY;
+
+        if (e.touches && e.touches[0]) {
+          // Touch event
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        } else {
+          // Mouse event
+          clientX = e.clientX;
+          clientY = e.clientY;
+        }
+
+        return {
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY,
+        };
+      }
+
+      function startDrawing(e) {
+        e.preventDefault();
+        isDrawing = true;
+        const pos = getPointerPosition(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+
+        if (currentStamp) {
+          drawStamp(pos.x, pos.y);
+        }
+      }
+
+      function draw(e) {
+        if (!isDrawing) return;
+        e.preventDefault();
+
+        const pos = getPointerPosition(e);
+
+        if (currentStamp) {
+          drawStamp(pos.x, pos.y);
+        } else if (isEraser) {
+          drawEraser(pos.x, pos.y);
+        } else {
+          drawLine(pos.x, pos.y);
+        }
+      }
+
+      function stopDrawing(e) {
+        e.preventDefault();
+        isDrawing = false;
+        ctx.beginPath();
+      }
+
+      function drawStamp(x, y) {
+        ctx.font = currentBrushSize * 2 + "px Arial";
+        ctx.fillStyle = currentColor;
+        ctx.fillText(currentStamp, x - currentBrushSize, y + currentBrushSize);
+      }
+
+      function drawEraser(x, y) {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.lineWidth = currentBrushSize;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "rgba(0,0,0,1)";
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.globalCompositeOperation = "source-over";
+      }
+
+      function drawLine(x, y) {
+        ctx.lineWidth = currentBrushSize;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = currentColor;
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+
+      // Mouse events
+      canvas.addEventListener("mousedown", startDrawing);
+      canvas.addEventListener("mousemove", draw);
+      canvas.addEventListener("mouseup", stopDrawing);
+      canvas.addEventListener("mouseout", stopDrawing);
+
+      // Touch events
+      canvas.addEventListener("touchstart", startDrawing, { passive: false });
+      canvas.addEventListener("touchmove", draw, { passive: false });
+      canvas.addEventListener("touchend", stopDrawing, { passive: false });
+      canvas.addEventListener("touchcancel", stopDrawing, { passive: false });
+
+      function clearCanvas() {
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function saveDrawing() {
+        const dataURL = canvas.toDataURL("image/png");
+        localStorage.setItem("savedDrawing", dataURL);
+        alert("Drawing saved! You can load it later.");
+      }
+
+      function loadDrawing() {
+        const savedDrawing = localStorage.getItem("savedDrawing");
+        if (savedDrawing) {
+          const img = new Image();
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+          };
+          img.src = savedDrawing;
+        }
+      }
+
+      function downloadDrawing() {
+        try {
+          // Create canvas data URL
+          const dataURL = canvas.toDataURL("image/png");
+
+          // For mobile browsers, we need a different approach
+          if (
+            /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+              navigator.userAgent
+            )
+          ) {
+            // Mobile approach - open in new tab and let user save manually
+            const newWindow = window.open();
+            newWindow.document.write(`
+              <html>
+                <head>
+                  <title>Download Drawing</title>
+                  <style>
+                    body { 
+                      font-family: Arial, sans-serif; 
+                      text-align: center; 
+                      padding: 20px; 
+                      background: #f0f0f0; 
+                    }
+                    .download-container {
+                      background: white;
+                      padding: 30px;
+                      border-radius: 10px;
+                      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                      max-width: 400px;
+                      margin: 50px auto;
+                    }
+                    .download-btn {
+                      background: #4ecdc4;
+                      color: white;
+                      padding: 15px 30px;
+                      border: none;
+                      border-radius: 25px;
+                      font-size: 18px;
+                      cursor: pointer;
+                      margin: 10px;
+                      text-decoration: none;
+                      display: inline-block;
+                    }
+                    .download-btn:hover {
+                      background: #44a08d;
+                    }
+                    img {
+                      max-width: 100%;
+                      border: 2px solid #ddd;
+                      border-radius: 8px;
+                      margin: 20px 0;
+                    }
+                    .instructions {
+                      color: #666;
+                      font-size: 14px;
+                      margin-top: 20px;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="download-container">
+                    <h2>🎨 Your Drawing</h2>
+                    <img src="${dataURL}" alt="Your drawing" />
+                    <br>
+                    <a href="${dataURL}" download="my-drawing.png" class="download-btn">
+                      💾 Download Drawing
+                    </a>
+                    <br>
+                    <a href="${dataURL}" target="_blank" class="download-btn">
+                      👁️ View Full Size
+                    </a>
+                    <div class="instructions">
+                      <p><strong>On mobile:</strong> Long press the image and select "Save Image"</p>
+                      <p><strong>On desktop:</strong> Right-click the image and select "Save Image As"</p>
+                    </div>
+                  </div>
+                </body>
+              </html>
+            `);
+            newWindow.document.close();
+          } else {
+            // Desktop approach - direct download
+            const link = document.createElement("a");
+            link.download = "my-drawing.png";
+            link.href = dataURL;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        } catch (error) {
+          console.error("Download failed:", error);
+          alert(
+            "Download failed. Please try again or take a screenshot of your drawing."
+          );
+        }
+      }
+
+      // Initialize
+      updateBrushPreview();
+
+      // Load saved drawing if exists
+      if (localStorage.getItem("savedDrawing")) {
+        if (confirm("Load your previous drawing?")) {
+          loadDrawing();
+        }
+      }
+    </script>
+  </body>
+</html>

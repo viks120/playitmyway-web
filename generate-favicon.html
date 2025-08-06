@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Generate Favicon</title>
+  </head>
+  <body>
+    <canvas
+      id="faviconCanvas"
+      width="32"
+      height="32"
+      style="border: 1px solid #ccc"
+    ></canvas>
+    <br />
+    <button onclick="downloadFavicon()">Download PNG Favicon</button>
+
+    <script>
+      const canvas = document.getElementById("faviconCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Background circle
+      ctx.fillStyle = "#ffa500";
+      ctx.beginPath();
+      ctx.arc(16, 16, 15, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Border
+      ctx.strokeStyle = "#ff6b6b";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Controller body
+      ctx.fillStyle = "#4ecdc4";
+      ctx.beginPath();
+      ctx.roundRect(8, 12, 16, 8, 4);
+      ctx.fill();
+
+      // Controller border
+      ctx.strokeStyle = "#333";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Left button
+      ctx.fillStyle = "#ff6b6b";
+      ctx.beginPath();
+      ctx.arc(11, 16, 2, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Right button
+      ctx.beginPath();
+      ctx.arc(21, 16, 2, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Center button
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(16, 16, 1.5, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // D-pad
+      ctx.fillStyle = "#333";
+      ctx.fillRect(13, 14, 6, 4);
+      ctx.fillRect(14.5, 12.5, 3, 7);
+
+      // Decorative stars
+      ctx.fillStyle = "#fff";
+      drawStar(ctx, 6, 8, 1.5);
+      drawStar(ctx, 26, 8, 1.5);
+
+      // Decorative circles
+      ctx.fillStyle = "#4ecdc4";
+      ctx.beginPath();
+      ctx.arc(6, 24, 1.5, 0, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(26, 24, 1.5, 0, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.fillStyle = "#ff6b6b";
+      ctx.beginPath();
+      ctx.arc(16, 26, 1, 0, 2 * Math.PI);
+      ctx.fill();
+
+      function drawStar(ctx, x, y, size) {
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+          const px = x + size * Math.cos(angle);
+          const py = y + size * Math.sin(angle);
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function downloadFavicon() {
+        const link = document.createElement("a");
+        link.download = "favicon.png";
+        link.href = canvas.toDataURL();
+        link.click();
+      }
+
+      // Polyfill for roundRect if not supported
+      if (!CanvasRenderingContext2D.prototype.roundRect) {
+        CanvasRenderingContext2D.prototype.roundRect = function (
+          x,
+          y,
+          width,
+          height,
+          radius
+        ) {
+          this.beginPath();
+          this.moveTo(x + radius, y);
+          this.lineTo(x + width - radius, y);
+          this.quadraticCurveTo(x + width, y, x + width, y + radius);
+          this.lineTo(x + width, y + height - radius);
+          this.quadraticCurveTo(
+            x + width,
+            y + height,
+            x + width - radius,
+            y + height
+          );
+          this.lineTo(x + radius, y + height);
+          this.quadraticCurveTo(x, y + height, x, y + height - radius);
+          this.lineTo(x, y + radius);
+          this.quadraticCurveTo(x, y, x + radius, y);
+          this.closePath();
+        };
+      }
+    </script>
+  </body>
+</html>
