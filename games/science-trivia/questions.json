@@ -1,0 +1,967 @@
+{
+  "chemistry": [
+    {
+      "question": "What is the chemical symbol for gold?",
+      "options": ["Au", "Ag", "Fe", "Cu"],
+      "correct": 0,
+      "explanation": "Au comes from the Latin word 'aurum' which means gold.",
+      "hint": "Think of the Latin word for gold"
+    },
+    {
+      "question": "What is the most abundant element in the Earth's atmosphere?",
+      "options": ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+      "correct": 1,
+      "explanation": "Nitrogen makes up about 78% of Earth's atmosphere.",
+      "hint": "It's a gas that makes up most of the air we breathe"
+    },
+    {
+      "question": "What is the chemical formula for water?",
+      "options": ["H2O", "CO2", "O2", "H2O2"],
+      "correct": 0,
+      "explanation": "Water is made of two hydrogen atoms and one oxygen atom.",
+      "hint": "Two hydrogen atoms plus one oxygen atom"
+    },
+    {
+      "question": "What is the pH of a neutral solution?",
+      "options": ["0", "7", "14", "10"],
+      "correct": 1,
+      "explanation": "A pH of 7 is neutral, below 7 is acidic, above 7 is basic.",
+      "hint": "It's in the middle of the pH scale"
+    },
+    {
+      "question": "Which gas do plants absorb from the air during photosynthesis?",
+      "options": ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+      "correct": 2,
+      "explanation": "Plants use carbon dioxide and sunlight to make food.",
+      "hint": "It's the gas we exhale"
+    },
+    {
+      "question": "What is the chemical symbol for iron?",
+      "options": ["Ir", "Fe", "In", "Fr"],
+      "correct": 1,
+      "explanation": "Fe comes from the Latin word 'ferrum'.",
+      "hint": "Think of the Latin word for iron"
+    },
+    {
+      "question": "What type of reaction produces heat?",
+      "options": ["Endothermic", "Exothermic", "Neutral", "Catalytic"],
+      "correct": 1,
+      "explanation": "Exothermic reactions release heat to the surroundings.",
+      "hint": "The prefix 'exo-' means 'out'"
+    },
+    {
+      "question": "What is the main component of natural gas?",
+      "options": ["Ethane", "Propane", "Methane", "Butane"],
+      "correct": 2,
+      "explanation": "Methane (CH4) is the primary component of natural gas.",
+      "hint": "It's the simplest hydrocarbon"
+    },
+    {
+      "question": "What is the chemical symbol for silver?",
+      "options": ["Si", "Ag", "Sr", "Au"],
+      "correct": 1,
+      "explanation": "Ag comes from the Latin word 'argentum'.",
+      "hint": "Think of the Latin word for silver"
+    },
+    {
+      "question": "What gas do humans breathe in?",
+      "options": ["Carbon dioxide", "Nitrogen", "Oxygen", "Hydrogen"],
+      "correct": 2,
+      "explanation": "Humans breathe in oxygen to survive.",
+      "hint": "It's the gas we need to live"
+    },
+    {
+      "question": "What is the chemical symbol for carbon?",
+      "options": ["Ca", "C", "Co", "Cr"],
+      "correct": 1,
+      "explanation": "C is the chemical symbol for carbon, the basis of organic chemistry.",
+      "hint": "It's the first letter of the element name"
+    },
+    {
+      "question": "What is the chemical formula for table salt?",
+      "options": ["NaCl", "H2O", "CO2", "CaCO3"],
+      "correct": 0,
+      "explanation": "Table salt is sodium chloride (NaCl).",
+      "hint": "Sodium plus chlorine"
+    },
+    {
+      "question": "What type of bond is formed when electrons are shared between atoms?",
+      "options": ["Ionic bond", "Covalent bond", "Metallic bond", "Hydrogen bond"],
+      "correct": 1,
+      "explanation": "Covalent bonds involve sharing of electrons between atoms.",
+      "hint": "Atoms share electrons equally"
+    },
+    {
+      "question": "What is the chemical symbol for helium?",
+      "options": ["H", "He", "Ha", "Hi"],
+      "correct": 1,
+      "explanation": "He is the chemical symbol for helium, a noble gas.",
+      "hint": "It's the first two letters of the element name"
+    },
+    {
+      "question": "What is the atomic number of hydrogen?",
+      "options": ["1", "2", "3", "4"],
+      "correct": 0,
+      "explanation": "Hydrogen has atomic number 1, making it the lightest element.",
+      "hint": "It's the first element in the periodic table"
+    },
+    {
+      "question": "What gas is produced during photosynthesis?",
+      "options": ["Carbon dioxide", "Nitrogen", "Oxygen", "Hydrogen"],
+      "correct": 2,
+      "explanation": "Plants produce oxygen as a byproduct of photosynthesis.",
+      "hint": "It's the gas we need to breathe"
+    },
+    {
+      "question": "What is the chemical symbol for nitrogen?",
+      "options": ["Ni", "N", "Na", "Ne"],
+      "correct": 1,
+      "explanation": "N is the chemical symbol for nitrogen.",
+      "hint": "It's the first letter of the element name"
+    },
+    {
+      "question": "What is the chemical formula for glucose?",
+      "options": ["C6H12O6", "C12H22O11", "CH3COOH", "NaHCO3"],
+      "correct": 0,
+      "explanation": "Glucose has the molecular formula C6H12O6.",
+      "hint": "It's a simple sugar with 6 carbon atoms"
+    },
+    {
+      "question": "What type of reaction breaks down compounds into simpler substances?",
+      "options": ["Synthesis", "Decomposition", "Single replacement", "Double replacement"],
+      "correct": 1,
+      "explanation": "Decomposition reactions break down compounds into simpler substances.",
+      "hint": "Think of breaking something down"
+    },
+    {
+      "question": "What is the chemical symbol for oxygen?",
+      "options": ["O", "Ox", "Og", "Oy"],
+      "correct": 0,
+      "explanation": "O is the chemical symbol for oxygen.",
+      "hint": "It's the first letter of the element name"
+    },
+    {
+      "question": "What is the pH of a strong acid?",
+      "options": ["0-3", "4-6", "7", "8-14"],
+      "correct": 0,
+      "explanation": "Strong acids have a pH between 0 and 3.",
+      "hint": "Very low pH values"
+    },
+    {
+      "question": "What is the chemical symbol for sodium?",
+      "options": ["S", "Sa", "Na", "So"],
+      "correct": 2,
+      "explanation": "Na is the chemical symbol for sodium, from Latin 'natrium'.",
+      "hint": "Think of the Latin word for sodium"
+    },
+    {
+      "question": "What gas causes acid rain?",
+      "options": ["Carbon dioxide", "Sulfur dioxide", "Nitrogen oxide", "Both B and C"],
+      "correct": 3,
+      "explanation": "Both sulfur dioxide and nitrogen oxides contribute to acid rain formation.",
+      "hint": "Industrial emissions contain these gases"
+    },
+    {
+      "question": "What is the chemical formula for carbon dioxide?",
+      "options": ["CO", "CO2", "C2O", "CO3"],
+      "correct": 1,
+      "explanation": "Carbon dioxide has the formula CO2 - one carbon atom and two oxygen atoms.",
+      "hint": "One carbon plus two oxygens"
+    },
+    {
+      "question": "What type of bond forms between water molecules?",
+      "options": ["Ionic bond", "Covalent bond", "Hydrogen bond", "Metallic bond"],
+      "correct": 2,
+      "explanation": "Water molecules are held together by hydrogen bonds.",
+      "hint": "It involves hydrogen atoms"
+    },
+    {
+      "question": "What is the chemical symbol for chlorine?",
+      "options": ["Cl", "Ch", "C", "Ca"],
+      "correct": 0,
+      "explanation": "Cl is the chemical symbol for chlorine.",
+      "hint": "It's the first two letters of the element name"
+    },
+    {
+      "question": "What is the atomic number of carbon?",
+      "options": ["4", "5", "6", "7"],
+      "correct": 2,
+      "explanation": "Carbon has atomic number 6, with 6 protons in its nucleus.",
+      "hint": "It's the sixth element in the periodic table"
+    },
+    {
+      "question": "What gas is known as the 'greenhouse gas'?",
+      "options": ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+      "correct": 2,
+      "explanation": "Carbon dioxide is a major greenhouse gas that traps heat in the atmosphere.",
+      "hint": "It's produced when we burn fossil fuels"
+    },
+    {
+      "question": "What is the chemical symbol for calcium?",
+      "options": ["Ca", "C", "Cl", "Cu"],
+      "correct": 0,
+      "explanation": "Ca is the chemical symbol for calcium.",
+      "hint": "It's the first two letters of the element name"
+    },
+    {
+      "question": "What is the chemical formula for sulfuric acid?",
+      "options": ["H2SO4", "HCl", "HNO3", "H3PO4"],
+      "correct": 0,
+      "explanation": "Sulfuric acid has the formula H2SO4.",
+      "hint": "Contains hydrogen, sulfur, and oxygen"
+    },
+    {
+      "question": "What is the chemical symbol for potassium?",
+      "options": ["P", "Po", "K", "Pt"],
+      "correct": 2,
+      "explanation": "K is the chemical symbol for potassium, from Latin 'kalium'.",
+      "hint": "Think of the Latin word for potassium"
+    },
+    {
+      "question": "What is the chemical formula for methane?",
+      "options": ["CH4", "C2H6", "C3H8", "C4H10"],
+      "correct": 0,
+      "explanation": "Methane has the formula CH4 - one carbon atom and four hydrogen atoms.",
+      "hint": "It's the simplest hydrocarbon"
+    },
+    {
+      "question": "What type of bond is formed when electrons are transferred between atoms?",
+      "options": ["Ionic bond", "Covalent bond", "Metallic bond", "Hydrogen bond"],
+      "correct": 0,
+      "explanation": "Ionic bonds involve the transfer of electrons from one atom to another.",
+      "hint": "Atoms give and take electrons"
+    },
+    {
+      "question": "What is the chemical symbol for magnesium?",
+      "options": ["Mg", "Mn", "Ma", "Mo"],
+      "correct": 0,
+      "explanation": "Mg is the chemical symbol for magnesium.",
+      "hint": "It's the first two letters of the element name"
+    },
+    {
+      "question": "What is the chemical formula for ethanol?",
+      "options": ["CH3OH", "C2H5OH", "C2H4", "C3H8"],
+      "correct": 1,
+      "explanation": "Ethanol (drinking alcohol) has the formula C2H5OH.",
+      "hint": "It's a two-carbon alcohol"
+    },
+    {
+      "question": "What is the atomic number of oxygen?",
+      "options": ["6", "7", "8", "9"],
+      "correct": 2,
+      "explanation": "Oxygen has atomic number 8, with 8 protons in its nucleus.",
+      "hint": "It's the eighth element in the periodic table"
+    },
+    {
+      "question": "What gas is responsible for the ozone layer?",
+      "options": ["Oxygen", "Ozone", "Carbon dioxide", "Nitrogen"],
+      "correct": 1,
+      "explanation": "Ozone (O3) forms the protective ozone layer in the atmosphere.",
+      "hint": "It's a form of oxygen with three atoms"
+    },
+    {
+      "question": "What is the chemical symbol for phosphorus?",
+      "options": ["P", "Ph", "Po", "Pt"],
+      "correct": 0,
+      "explanation": "P is the chemical symbol for phosphorus.",
+      "hint": "It's the first letter of the element name"
+    },
+    {
+      "question": "What is the chemical formula for ammonia?",
+      "options": ["NH3", "NO2", "N2O", "N2H4"],
+      "correct": 0,
+      "explanation": "Ammonia has the formula NH3 - one nitrogen atom and three hydrogen atoms.",
+      "hint": "One nitrogen plus three hydrogens"
+    },
+    {
+      "question": "What type of reaction combines two or more substances?",
+      "options": ["Synthesis", "Decomposition", "Single replacement", "Double replacement"],
+      "correct": 0,
+      "explanation": "Synthesis reactions combine two or more substances to form a new compound.",
+      "hint": "Think of putting things together"
+    },
+    {
+      "question": "What is the chemical symbol for sulfur?",
+      "options": ["S", "Su", "Sr", "Si"],
+      "correct": 0,
+      "explanation": "S is the chemical symbol for sulfur.",
+      "hint": "It's the first letter of the element name"
+    },
+    {
+      "question": "What is the chemical formula for nitric acid?",
+      "options": ["HNO3", "H2SO4", "HCl", "H3PO4"],
+      "correct": 0,
+      "explanation": "Nitric acid has the formula HNO3.",
+      "hint": "Contains hydrogen, nitrogen, and oxygen"
+    },
+    {
+      "question": "What is the pH of a strong base?",
+      "options": ["0-3", "4-6", "7", "11-14"],
+      "correct": 3,
+      "explanation": "Strong bases have a pH between 11 and 14.",
+      "hint": "Very high pH values"
+    },
+    {
+      "question": "What is the chemical symbol for aluminum?",
+      "options": ["Al", "Am", "Au", "Ag"],
+      "correct": 0,
+      "explanation": "Al is the chemical symbol for aluminum.",
+      "hint": "It's the first two letters of the element name"
+    },
+    {
+      "question": "What gas is produced during cellular respiration?",
+      "options": ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+      "correct": 2,
+      "explanation": "Carbon dioxide is produced as a waste product during cellular respiration.",
+      "hint": "It's the gas we exhale"
+    },
+    {
+      "question": "What is the chemical symbol for copper?",
+      "options": ["Co", "Cu", "Cp", "Cr"],
+      "correct": 1,
+      "explanation": "Cu is the chemical symbol for copper, from Latin 'cuprum'.",
+      "hint": "Think of the Latin word for copper"
+    },
+    {
+      "question": "What is the chemical formula for propane?",
+      "options": ["CH4", "C2H6", "C3H8", "C4H10"],
+      "correct": 2,
+      "explanation": "Propane has the formula C3H8 - three carbon atoms and eight hydrogen atoms.",
+      "hint": "It's a three-carbon hydrocarbon"
+    },
+    {
+      "question": "What type of bond forms between metal atoms?",
+      "options": ["Ionic bond", "Covalent bond", "Metallic bond", "Hydrogen bond"],
+      "correct": 2,
+      "explanation": "Metallic bonds form between metal atoms, allowing electrons to move freely.",
+      "hint": "It's what makes metals conductive"
+    },
+    {
+      "question": "What is the chemical symbol for zinc?",
+      "options": ["Zi", "Zn", "Z", "Zc"],
+      "correct": 1,
+      "explanation": "Zn is the chemical symbol for zinc.",
+      "hint": "It's the first two letters of the element name"
+    },
+    {
+      "question": "What is the chemical formula for hydrogen peroxide?",
+      "options": ["H2O", "H2O2", "HO2", "H2O3"],
+      "correct": 1,
+      "explanation": "Hydrogen peroxide has the formula H2O2 - two hydrogen atoms and two oxygen atoms.",
+      "hint": "It's water with an extra oxygen"
+    }
+  ],
+  "physics": [
+    {
+      "question": "What is the SI unit of force?",
+      "options": ["Joule", "Watt", "Newton", "Pascal"],
+      "correct": 2,
+      "explanation": "The newton (N) is the SI unit of force.",
+      "hint": "Named after a famous scientist"
+    },
+    {
+      "question": "What is the speed of light in a vacuum?",
+      "options": ["300,000 km/s", "200,000 km/s", "400,000 km/s", "500,000 km/s"],
+      "correct": 0,
+      "explanation": "Light travels at approximately 300,000 kilometers per second in a vacuum.",
+      "hint": "It's a very fast speed - 300 thousand"
+    },
+    {
+      "question": "What type of energy does a moving object have?",
+      "options": ["Potential energy", "Kinetic energy", "Thermal energy", "Chemical energy"],
+      "correct": 1,
+      "explanation": "Kinetic energy is the energy of motion.",
+      "hint": "Think of the word 'kinetic' - it means movement"
+    },
+    {
+      "question": "What is the law that states 'for every action there is an equal and opposite reaction'?",
+      "options": ["Newton's First Law", "Newton's Second Law", "Newton's Third Law", "Newton's Fourth Law"],
+      "correct": 2,
+      "explanation": "Newton's Third Law describes action-reaction pairs.",
+      "hint": "It's the third of Newton's three laws"
+    },
+    {
+      "question": "What is the unit of electrical resistance?",
+      "options": ["Volt", "Ampere", "Ohm", "Watt"],
+      "correct": 2,
+      "explanation": "The ohm (Ω) is the unit of electrical resistance.",
+      "hint": "Named after a German physicist"
+    },
+    {
+      "question": "What happens to the volume of a gas when temperature increases?",
+      "options": ["It decreases", "It increases", "It stays the same", "It becomes zero"],
+      "correct": 1,
+      "explanation": "Gases expand when heated (Charles's Law).",
+      "hint": "Think about what happens when you heat air"
+    },
+    {
+      "question": "What type of wave is sound?",
+      "options": ["Transverse wave", "Longitudinal wave", "Electromagnetic wave", "Surface wave"],
+      "correct": 1,
+      "explanation": "Sound waves are longitudinal waves that travel through air.",
+      "hint": "Sound waves compress and expand the medium"
+    },
+    {
+      "question": "What is the principle that explains why boats float?",
+      "options": ["Pascal's Principle", "Archimedes' Principle", "Bernoulli's Principle", "Hooke's Law"],
+      "correct": 1,
+      "explanation": "Archimedes' Principle states that buoyant force equals weight of displaced fluid.",
+      "hint": "Named after an ancient Greek scientist"
+    },
+    {
+      "question": "What is the SI unit of energy?",
+      "options": ["Watt", "Joule", "Newton", "Pascal"],
+      "correct": 1,
+      "explanation": "The joule (J) is the SI unit of energy.",
+      "hint": "Named after a British physicist"
+    },
+    {
+      "question": "What type of energy does a stretched rubber band have?",
+      "options": ["Kinetic energy", "Potential energy", "Thermal energy", "Chemical energy"],
+      "correct": 1,
+      "explanation": "A stretched rubber band has elastic potential energy.",
+      "hint": "It's stored energy that can be released"
+    },
+    {
+      "question": "What is the SI unit of power?",
+      "options": ["Joule", "Watt", "Newton", "Pascal"],
+      "correct": 1,
+      "explanation": "The watt (W) is the SI unit of power, measuring energy per unit time.",
+      "hint": "Named after a Scottish engineer"
+    },
+    {
+      "question": "What is the law that states 'an object at rest stays at rest unless acted upon by a force'?",
+      "options": ["Newton's First Law", "Newton's Second Law", "Newton's Third Law", "Newton's Fourth Law"],
+      "correct": 0,
+      "explanation": "Newton's First Law is also known as the Law of Inertia.",
+      "hint": "It's the first of Newton's three laws"
+    },
+    {
+      "question": "What is the unit of electrical current?",
+      "options": ["Volt", "Ampere", "Ohm", "Watt"],
+      "correct": 1,
+      "explanation": "The ampere (A) is the unit of electrical current.",
+      "hint": "Named after a French physicist"
+    },
+    {
+      "question": "What type of energy does a book on a shelf have?",
+      "options": ["Kinetic energy", "Potential energy", "Thermal energy", "Chemical energy"],
+      "correct": 1,
+      "explanation": "A book on a shelf has gravitational potential energy.",
+      "hint": "It's stored energy due to height"
+    },
+    {
+      "question": "What is the SI unit of pressure?",
+      "options": ["Joule", "Watt", "Newton", "Pascal"],
+      "correct": 3,
+      "explanation": "The pascal (Pa) is the SI unit of pressure.",
+      "hint": "Named after a French mathematician"
+    },
+    {
+      "question": "What happens to the pressure of a gas when volume decreases?",
+      "options": ["It decreases", "It increases", "It stays the same", "It becomes zero"],
+      "correct": 1,
+      "explanation": "Gas pressure increases when volume decreases (Boyle's Law).",
+      "hint": "Think about squeezing air into a smaller space"
+    },
+    {
+      "question": "What type of wave is light?",
+      "options": ["Transverse wave", "Longitudinal wave", "Sound wave", "Surface wave"],
+      "correct": 0,
+      "explanation": "Light is an electromagnetic transverse wave.",
+      "hint": "It can travel through a vacuum"
+    },
+    {
+      "question": "What is the principle that explains how airplanes fly?",
+      "options": ["Pascal's Principle", "Archimedes' Principle", "Bernoulli's Principle", "Hooke's Law"],
+      "correct": 2,
+      "explanation": "Bernoulli's Principle explains how faster air flow creates lower pressure above the wing.",
+      "hint": "It involves air flow and pressure differences"
+    },
+    {
+      "question": "What is the SI unit of frequency?",
+      "options": ["Meter", "Second", "Hertz", "Watt"],
+      "correct": 2,
+      "explanation": "The hertz (Hz) is the SI unit of frequency, measuring cycles per second.",
+      "hint": "Named after a German physicist"
+    },
+    {
+      "question": "What type of energy does a hot cup of coffee have?",
+      "options": ["Kinetic energy", "Potential energy", "Thermal energy", "Chemical energy"],
+      "correct": 2,
+      "explanation": "A hot cup of coffee has thermal energy due to its temperature.",
+      "hint": "It's related to heat and temperature"
+    },
+    {
+      "question": "What is the law that states 'force equals mass times acceleration'?",
+      "options": ["Newton's First Law", "Newton's Second Law", "Newton's Third Law", "Newton's Fourth Law"],
+      "correct": 1,
+      "explanation": "Newton's Second Law is F = ma.",
+      "hint": "It's the second of Newton's three laws"
+    },
+    {
+      "question": "What is the unit of electrical voltage?",
+      "options": ["Volt", "Ampere", "Ohm", "Watt"],
+      "correct": 0,
+      "explanation": "The volt (V) is the unit of electrical voltage.",
+      "hint": "Named after an Italian physicist"
+    },
+    {
+      "question": "What type of energy does a compressed spring have?",
+      "options": ["Kinetic energy", "Potential energy", "Thermal energy", "Chemical energy"],
+      "correct": 1,
+      "explanation": "A compressed spring has elastic potential energy.",
+      "hint": "It's stored energy that can be released"
+    },
+    {
+      "question": "What is the SI unit of mass?",
+      "options": ["Gram", "Kilogram", "Pound", "Ounce"],
+      "correct": 1,
+      "explanation": "The kilogram (kg) is the SI unit of mass.",
+      "hint": "It's the base unit for mass in the metric system"
+    },
+    {
+      "question": "What happens to the wavelength of light when frequency increases?",
+      "options": ["It increases", "It decreases", "It stays the same", "It becomes zero"],
+      "correct": 1,
+      "explanation": "Wavelength and frequency are inversely related - higher frequency means shorter wavelength.",
+      "hint": "They have an inverse relationship"
+    },
+    {
+      "question": "What type of wave is a radio wave?",
+      "options": ["Transverse wave", "Longitudinal wave", "Sound wave", "Surface wave"],
+      "correct": 0,
+      "explanation": "Radio waves are electromagnetic transverse waves.",
+      "hint": "It's part of the electromagnetic spectrum"
+    },
+    {
+      "question": "What is the principle that explains how hydraulic systems work?",
+      "options": ["Pascal's Principle", "Archimedes' Principle", "Bernoulli's Principle", "Hooke's Law"],
+      "correct": 0,
+      "explanation": "Pascal's Principle states that pressure is transmitted equally in all directions in a fluid.",
+      "hint": "It involves pressure transmission in fluids"
+    },
+    {
+      "question": "What is the SI unit of length?",
+      "options": ["Centimeter", "Meter", "Kilometer", "Mile"],
+      "correct": 1,
+      "explanation": "The meter (m) is the SI unit of length.",
+      "hint": "It's the base unit for length in the metric system"
+    },
+    {
+      "question": "What type of energy does a battery have?",
+      "options": ["Kinetic energy", "Potential energy", "Thermal energy", "Chemical energy"],
+      "correct": 3,
+      "explanation": "A battery stores chemical energy that can be converted to electrical energy.",
+      "hint": "It's stored in the chemical bonds"
+    },
+    {
+      "question": "What is the law that explains the relationship between force and spring extension?",
+      "options": ["Pascal's Principle", "Archimedes' Principle", "Bernoulli's Principle", "Hooke's Law"],
+      "correct": 3,
+      "explanation": "Hooke's Law states that force is proportional to spring extension (F = kx).",
+      "hint": "Named after a British physicist"
+    },
+    {
+      "question": "What is the unit of electrical charge?",
+      "options": ["Volt", "Ampere", "Ohm", "Coulomb"],
+      "correct": 3,
+      "explanation": "The coulomb (C) is the unit of electrical charge.",
+      "hint": "Named after a French physicist"
+    },
+    {
+      "question": "What type of energy does a falling object have?",
+      "options": ["Kinetic energy", "Potential energy", "Thermal energy", "Chemical energy"],
+      "correct": 0,
+      "explanation": "A falling object has kinetic energy due to its motion.",
+      "hint": "It's the energy of movement"
+    },
+    {
+      "question": "What is the SI unit of time?",
+      "options": ["Minute", "Hour", "Second", "Day"],
+      "correct": 2,
+      "explanation": "The second (s) is the SI unit of time.",
+      "hint": "It's the base unit for time in the metric system"
+    },
+    {
+      "question": "What is the principle that explains why objects fall at the same rate?",
+      "options": ["Galileo's Principle", "Newton's Principle", "Einstein's Principle", "Archimedes' Principle"],
+      "correct": 0,
+      "explanation": "Galileo discovered that objects fall at the same rate regardless of their mass (in a vacuum).",
+      "hint": "Named after an Italian scientist who dropped objects from the Leaning Tower"
+    },
+    {
+      "question": "What is the unit of electrical power?",
+      "options": ["Volt", "Ampere", "Ohm", "Watt"],
+      "correct": 3,
+      "explanation": "The watt (W) is the unit of electrical power.",
+      "hint": "It measures energy per unit time"
+    },
+    {
+      "question": "What type of energy does a charged battery have?",
+      "options": ["Kinetic energy", "Potential energy", "Thermal energy", "Electrical energy"],
+      "correct": 1,
+      "explanation": "A charged battery has electrical potential energy that can be converted to other forms.",
+      "hint": "It's stored energy that can be used later"
+    },
+    {
+      "question": "What is the SI unit of temperature?",
+      "options": ["Fahrenheit", "Celsius", "Kelvin", "Rankine"],
+      "correct": 2,
+      "explanation": "The kelvin (K) is the SI unit of temperature.",
+      "hint": "It's the absolute temperature scale"
+    },
+    {
+      "question": "What happens to the speed of sound when temperature increases?",
+      "options": ["It decreases", "It increases", "It stays the same", "It becomes zero"],
+      "correct": 1,
+      "explanation": "Sound travels faster in warmer air because the molecules move more quickly.",
+      "hint": "Think about how molecules move when heated"
+    },
+    {
+      "question": "What type of wave is an X-ray?",
+      "options": ["Transverse wave", "Longitudinal wave", "Sound wave", "Surface wave"],
+      "correct": 0,
+      "explanation": "X-rays are electromagnetic transverse waves with very short wavelengths.",
+      "hint": "It's part of the electromagnetic spectrum"
+    },
+    {
+      "question": "What is the principle that explains how submarines work?",
+      "options": ["Pascal's Principle", "Archimedes' Principle", "Bernoulli's Principle", "Hooke's Law"],
+      "correct": 1,
+      "explanation": "Submarines use Archimedes' Principle to control their buoyancy by changing their density.",
+      "hint": "It involves floating and sinking"
+    },
+    {
+      "question": "What is the SI unit of area?",
+      "options": ["Square meter", "Square centimeter", "Square kilometer", "Square mile"],
+      "correct": 0,
+      "explanation": "The square meter (m²) is the SI unit of area.",
+      "hint": "It's length squared"
+    },
+    {
+      "question": "What type of energy does a spinning top have?",
+      "options": ["Kinetic energy", "Potential energy", "Thermal energy", "Rotational energy"],
+      "correct": 3,
+      "explanation": "A spinning top has rotational kinetic energy due to its spinning motion.",
+      "hint": "It's energy due to rotation"
+    },
+    {
+      "question": "What is the law that explains the relationship between pressure and volume?",
+      "options": ["Charles's Law", "Boyle's Law", "Gay-Lussac's Law", "Avogadro's Law"],
+      "correct": 1,
+      "explanation": "Boyle's Law states that pressure and volume are inversely related (P₁V₁ = P₂V₂).",
+      "hint": "Named after an Irish chemist"
+    },
+    {
+      "question": "What is the unit of electrical capacitance?",
+      "options": ["Volt", "Ampere", "Ohm", "Farad"],
+      "correct": 3,
+      "explanation": "The farad (F) is the unit of electrical capacitance.",
+      "hint": "Named after a British scientist"
+    },
+    {
+      "question": "What type of energy does a stretched bow have?",
+      "options": ["Kinetic energy", "Potential energy", "Thermal energy", "Chemical energy"],
+      "correct": 1,
+      "explanation": "A stretched bow has elastic potential energy that can be converted to kinetic energy.",
+      "hint": "It's stored energy that can be released"
+    },
+    {
+      "question": "What is the SI unit of volume?",
+      "options": ["Liter", "Cubic meter", "Gallon", "Cubic centimeter"],
+      "correct": 1,
+      "explanation": "The cubic meter (m³) is the SI unit of volume.",
+      "hint": "It's length cubed"
+    },
+    {
+      "question": "What happens to the pitch of sound when frequency increases?",
+      "options": ["It decreases", "It increases", "It stays the same", "It becomes zero"],
+      "correct": 1,
+      "explanation": "Higher frequency sounds have higher pitch (higher notes).",
+      "hint": "Think about high and low musical notes"
+    },
+    {
+      "question": "What type of wave is a microwave?",
+      "options": ["Transverse wave", "Longitudinal wave", "Sound wave", "Surface wave"],
+      "correct": 0,
+      "explanation": "Microwaves are electromagnetic transverse waves with longer wavelengths than visible light.",
+      "hint": "It's part of the electromagnetic spectrum"
+    },
+    {
+      "question": "What is the principle that explains how water flows through pipes?",
+      "options": ["Pascal's Principle", "Archimedes' Principle", "Bernoulli's Principle", "Hooke's Law"],
+      "correct": 2,
+      "explanation": "Bernoulli's Principle explains how fluid pressure changes with flow speed in pipes.",
+      "hint": "It involves fluid flow and pressure"
+    },
+    {
+      "question": "What is the SI unit of density?",
+      "options": ["Gram per liter", "Kilogram per cubic meter", "Pound per gallon", "Ounce per cubic inch"],
+      "correct": 1,
+      "explanation": "The kilogram per cubic meter (kg/m³) is the SI unit of density.",
+      "hint": "It's mass divided by volume"
+    },
+    {
+      "question": "What type of energy does a hot air balloon have?",
+      "options": ["Kinetic energy", "Potential energy", "Thermal energy", "All of the above"],
+      "correct": 3,
+      "explanation": "A hot air balloon can have kinetic energy (if moving), potential energy (due to height), and thermal energy (due to hot air).",
+      "hint": "It can have multiple types of energy"
+    },
+    {
+      "question": "What is the law that explains the relationship between temperature and volume?",
+      "options": ["Charles's Law", "Boyle's Law", "Gay-Lussac's Law", "Avogadro's Law"],
+      "correct": 0,
+      "explanation": "Charles's Law states that volume and temperature are directly related (V₁/T₁ = V₂/T₂).",
+      "hint": "Named after a French scientist"
+    },
+    {
+      "question": "What is the unit of electrical inductance?",
+      "options": ["Volt", "Ampere", "Ohm", "Henry"],
+      "correct": 3,
+      "explanation": "The henry (H) is the unit of electrical inductance.",
+      "hint": "Named after an American scientist"
+    },
+    {
+      "question": "What type of energy does a rolling ball have?",
+      "options": ["Kinetic energy", "Potential energy", "Thermal energy", "Both A and B"],
+      "correct": 3,
+      "explanation": "A rolling ball has both kinetic energy (due to motion) and potential energy (due to height).",
+      "hint": "It can have multiple types of energy"
+    }
+  ],
+  "general": [
+    {
+      "question": "What is the largest volcano in the solar system?",
+      "options": ["Mount Everest", "Mauna Loa", "Olympus Mons", "Mount Kilimanjaro"],
+      "correct": 2,
+      "explanation": "Olympus Mons on Mars is the largest volcano in the solar system, about 22 km high.",
+      "hint": "It's not on Earth"
+    },
+    {
+      "question": "What is the study of the skin called?",
+      "options": ["Cardiology", "Neurology", "Dermatology", "Oncology"],
+      "correct": 2,
+      "explanation": "Dermatology is the study of the skin and its diseases.",
+      "hint": "Studies the skin specifically"
+    },
+    {
+      "question": "What is the largest river in the world by volume?",
+      "options": ["Nile River", "Amazon River", "Yangtze River", "Mississippi River"],
+      "correct": 1,
+      "explanation": "The Amazon River has the largest volume of water, discharging about 209,000 cubic meters per second.",
+      "hint": "It's in South America"
+    },
+    {
+      "question": "What is the study of the digestive system called?",
+      "options": ["Cardiology", "Gastroenterology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Gastroenterology is the study of the digestive system and its disorders.",
+      "hint": "Studies the stomach and intestines"
+    },
+    {
+      "question": "What is the largest canyon in the world?",
+      "options": ["Grand Canyon", "Fish River Canyon", "Copper Canyon", "Yarlung Tsangpo Canyon"],
+      "correct": 0,
+      "explanation": "The Grand Canyon in Arizona is the largest canyon, about 446 km long and up to 29 km wide.",
+      "hint": "It's in the United States"
+    },
+    {
+      "question": "What is the study of the respiratory system called?",
+      "options": ["Cardiology", "Pulmonology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Pulmonology is the study of the respiratory system and lung diseases.",
+      "hint": "Studies the lungs and breathing"
+    },
+    {
+      "question": "What is the largest waterfall in the world?",
+      "options": ["Niagara Falls", "Victoria Falls", "Angel Falls", "Iguazu Falls"],
+      "correct": 2,
+      "explanation": "Angel Falls in Venezuela is the highest waterfall at 979 meters tall.",
+      "hint": "It's the tallest, not the widest"
+    },
+    {
+      "question": "What is the study of the endocrine system called?",
+      "options": ["Cardiology", "Endocrinology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Endocrinology is the study of hormones and the endocrine system.",
+      "hint": "Studies hormones and glands"
+    },
+    {
+      "question": "What is the largest glacier in the world?",
+      "options": ["Lambert Glacier", "Hubbard Glacier", "Perito Moreno Glacier", "Vatnajökull Glacier"],
+      "correct": 0,
+      "explanation": "The Lambert Glacier in Antarctica is the largest glacier, covering about 400,000 square kilometers.",
+      "hint": "It's in Antarctica"
+    },
+    {
+      "question": "What is the study of the immune system called?",
+      "options": ["Cardiology", "Immunology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Immunology is the study of the immune system and how it protects the body.",
+      "hint": "Studies how the body fights disease"
+    },
+    {
+      "question": "What is the largest bay in the world?",
+      "options": ["Hudson Bay", "Bay of Bengal", "Gulf of Mexico", "Persian Gulf"],
+      "correct": 0,
+      "explanation": "Hudson Bay is the largest bay, covering about 1.23 million square kilometers.",
+      "hint": "It's in Canada"
+    },
+    {
+      "question": "What is the study of the reproductive system called?",
+      "options": ["Cardiology", "Gynecology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Gynecology is the study of the female reproductive system.",
+      "hint": "Studies women's health"
+    },
+    {
+      "question": "What is the largest peninsula in the world?",
+      "options": ["Arabian Peninsula", "Indian Peninsula", "Indochinese Peninsula", "Scandinavian Peninsula"],
+      "correct": 0,
+      "explanation": "The Arabian Peninsula is the largest, covering about 3.2 million square kilometers.",
+      "hint": "It's in the Middle East"
+    },
+    {
+      "question": "What is the study of the urinary system called?",
+      "options": ["Cardiology", "Urology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Urology is the study of the urinary system and male reproductive organs.",
+      "hint": "Studies the kidneys and bladder"
+    },
+    {
+      "question": "What is the largest gulf in the world?",
+      "options": ["Gulf of Mexico", "Persian Gulf", "Gulf of Guinea", "Gulf of Alaska"],
+      "correct": 0,
+      "explanation": "The Gulf of Mexico is the largest gulf, covering about 1.6 million square kilometers.",
+      "hint": "It's connected to the Atlantic Ocean"
+    },
+    {
+      "question": "What is the study of the skeletal system called?",
+      "options": ["Cardiology", "Orthopedics", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Orthopedics is the study of the skeletal system and musculoskeletal disorders.",
+      "hint": "Studies bones and joints"
+    },
+    {
+      "question": "What is the largest strait in the world?",
+      "options": ["Strait of Malacca", "Strait of Gibraltar", "Bering Strait", "Strait of Hormuz"],
+      "correct": 0,
+      "explanation": "The Strait of Malacca is the longest strait, about 800 km long.",
+      "hint": "It's between Malaysia and Indonesia"
+    },
+    {
+      "question": "What is the study of the lymphatic system called?",
+      "options": ["Cardiology", "Lymphology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Lymphology is the study of the lymphatic system and lymph nodes.",
+      "hint": "Studies the body's drainage system"
+    },
+    {
+      "question": "What is the largest archipelago in the world?",
+      "options": ["Indonesian Archipelago", "Philippine Archipelago", "Japanese Archipelago", "Malay Archipelago"],
+      "correct": 0,
+      "explanation": "The Indonesian Archipelago is the largest, consisting of over 17,000 islands.",
+      "hint": "It's in Southeast Asia"
+    },
+    {
+      "question": "What is the study of the muscular system called?",
+      "options": ["Cardiology", "Myology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Myology is the study of muscles and the muscular system.",
+      "hint": "Studies muscles specifically"
+    },
+    {
+      "question": "What is the largest delta in the world?",
+      "options": ["Nile Delta", "Ganges Delta", "Mississippi Delta", "Amazon Delta"],
+      "correct": 1,
+      "explanation": "The Ganges Delta is the largest delta, covering about 105,000 square kilometers.",
+      "hint": "It's in Bangladesh and India"
+    },
+    {
+      "question": "What is the study of the circulatory system called?",
+      "options": ["Cardiology", "Hematology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Hematology is the study of blood and the circulatory system.",
+      "hint": "Studies blood specifically"
+    },
+    {
+      "question": "What is the largest cave system in the world?",
+      "options": ["Mammoth Cave", "Son Doong Cave", "Reed Flute Cave", "Carlsbad Caverns"],
+      "correct": 0,
+      "explanation": "Mammoth Cave in Kentucky is the longest cave system, with over 400 miles of explored passages.",
+      "hint": "It's in the United States"
+    },
+    {
+      "question": "What is the study of the integumentary system called?",
+      "options": ["Cardiology", "Dermatology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Dermatology is the study of the integumentary system (skin, hair, nails).",
+      "hint": "Studies the body's outer covering"
+    },
+    {
+      "question": "What is the largest hot desert in the world?",
+      "options": ["Sahara Desert", "Arabian Desert", "Gobi Desert", "Kalahari Desert"],
+      "correct": 0,
+      "explanation": "The Sahara Desert is the largest hot desert, covering about 9.2 million square kilometers.",
+      "hint": "It's in Africa"
+    },
+    {
+      "question": "What is the study of the sensory system called?",
+      "options": ["Cardiology", "Ophthalmology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Ophthalmology is the study of the eyes and vision.",
+      "hint": "Studies the eyes specifically"
+    },
+    {
+      "question": "What is the largest cold desert in the world?",
+      "options": ["Sahara Desert", "Arabian Desert", "Gobi Desert", "Antarctic Desert"],
+      "correct": 3,
+      "explanation": "The Antarctic Desert is the largest cold desert, covering about 14 million square kilometers.",
+      "hint": "It's very cold and covered in ice"
+    },
+    {
+      "question": "What is the study of the excretory system called?",
+      "options": ["Cardiology", "Nephrology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Nephrology is the study of the kidneys and excretory system.",
+      "hint": "Studies the kidneys specifically"
+    },
+    {
+      "question": "What is the largest salt flat in the world?",
+      "options": ["Salar de Uyuni", "Bonneville Salt Flats", "Etosha Pan", "Chott el Djerid"],
+      "correct": 0,
+      "explanation": "Salar de Uyuni in Bolivia is the largest salt flat, covering about 10,582 square kilometers.",
+      "hint": "It's in South America"
+    },
+    {
+      "question": "What is the study of the reproductive health called?",
+      "options": ["Cardiology", "Obstetrics", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Obstetrics is the study of pregnancy, childbirth, and postpartum care.",
+      "hint": "Studies pregnancy and childbirth"
+    },
+    {
+      "question": "What is the largest freshwater lake by volume in the world?",
+      "options": ["Lake Superior", "Lake Victoria", "Lake Baikal", "Caspian Sea"],
+      "correct": 2,
+      "explanation": "Lake Baikal in Russia is the largest freshwater lake by volume, containing about 23,600 cubic kilometers of water.",
+      "hint": "It's in Russia and is very deep"
+    },
+    {
+      "question": "What is the study of the aging process called?",
+      "options": ["Cardiology", "Gerontology", "Neurology", "Oncology"],
+      "correct": 1,
+      "explanation": "Gerontology is the study of aging and the problems of the elderly.",
+      "hint": "Studies the aging process"
+    },
+    {
+      "question": "What is the largest active volcano on Earth?",
+      "options": ["Mauna Loa", "Mount Etna", "Kilauea", "Mount Vesuvius"],
+      "correct": 0,
+      "explanation": "Mauna Loa in Hawaii is the largest active volcano on Earth, covering about 5,271 square kilometers.",
+      "hint": "It's in Hawaii"
+    }
+  ]
+}

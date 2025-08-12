@@ -406,6 +406,8 @@
     </div>
 
     <div class="game-container">
+      <div class="feedback" id="feedback"></div>
+
       <div class="question-area">
         <div class="question-number" id="questionNumber">Question 1 of 10</div>
         <div class="question" id="question">
@@ -416,8 +418,6 @@
       <div class="answer-options" id="answerOptions">
         <!-- Answer options will be generated here -->
       </div>
-
-      <div class="feedback" id="feedback"></div>
 
       <div class="controls">
         <button class="btn" onclick="getHint()">Get Hint</button>
@@ -434,250 +434,51 @@
       let currentQuestionIndex = 0;
       let currentQuestions = [];
       let hintsUsed = 0;
+      let triviaDatabase = {};
+      let usedQuestions = new Set(); // Track used questions to prevent repetition
 
-      const triviaDatabase = {
-        chemistry: [
-          {
-            question: "What is the chemical symbol for gold?",
-            options: ["Au", "Ag", "Fe", "Cu"],
-            correct: 0,
-            explanation:
-              "Au comes from the Latin word 'aurum' which means gold.",
-            hint: "Think of the Latin word for gold",
-          },
-          {
-            question:
-              "What is the most abundant element in the Earth's atmosphere?",
-            options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
-            correct: 1,
-            explanation: "Nitrogen makes up about 78% of Earth's atmosphere.",
-            hint: "It's a gas that makes up most of the air we breathe",
-          },
-          {
-            question: "What is the chemical formula for water?",
-            options: ["H2O", "CO2", "O2", "H2O2"],
-            correct: 0,
-            explanation:
-              "Water is made of two hydrogen atoms and one oxygen atom.",
-            hint: "Two hydrogen atoms plus one oxygen atom",
-          },
-          {
-            question: "What is the pH of a neutral solution?",
-            options: ["0", "7", "14", "10"],
-            correct: 1,
-            explanation:
-              "A pH of 7 is neutral, below 7 is acidic, above 7 is basic.",
-            hint: "It's in the middle of the pH scale",
-          },
-          {
-            question:
-              "Which gas do plants absorb from the air during photosynthesis?",
-            options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
-            correct: 2,
-            explanation: "Plants use carbon dioxide and sunlight to make food.",
-            hint: "It's the gas we exhale",
-          },
-          {
-            question: "What is the chemical symbol for iron?",
-            options: ["Ir", "Fe", "In", "Fr"],
-            correct: 1,
-            explanation: "Fe comes from the Latin word 'ferrum'.",
-            hint: "Think of the Latin word for iron",
-          },
-          {
-            question: "What type of reaction produces heat?",
-            options: ["Endothermic", "Exothermic", "Neutral", "Catalytic"],
-            correct: 1,
-            explanation:
-              "Exothermic reactions release heat to the surroundings.",
-            hint: "The prefix 'exo-' means 'out'",
-          },
-          {
-            question: "What is the main component of natural gas?",
-            options: ["Ethane", "Propane", "Methane", "Butane"],
-            correct: 2,
-            explanation:
-              "Methane (CH4) is the primary component of natural gas.",
-            hint: "It's the simplest hydrocarbon",
-          },
-        ],
-        physics: [
-          {
-            question: "What is the SI unit of force?",
-            options: ["Joule", "Watt", "Newton", "Pascal"],
-            correct: 2,
-            explanation: "The newton (N) is the SI unit of force.",
-            hint: "Named after a famous scientist",
-          },
-          {
-            question: "What is the speed of light in a vacuum?",
-            options: [
-              "300,000 km/s",
-              "200,000 km/s",
-              "400,000 km/s",
-              "500,000 km/s",
+      // Load questions from JSON file
+      async function loadQuestions() {
+        try {
+          const response = await fetch("questions.json");
+          triviaDatabase = await response.json();
+          console.log("Questions loaded successfully");
+        } catch (error) {
+          console.error("Error loading questions:", error);
+          // Fallback to a few basic questions if JSON fails to load
+          triviaDatabase = {
+            chemistry: [
+              {
+                question: "What is the chemical symbol for gold?",
+                options: ["Au", "Ag", "Fe", "Cu"],
+                correct: 0,
+                explanation:
+                  "Au comes from the Latin word 'aurum' which means gold.",
+                hint: "Think of the Latin word for gold",
+              },
             ],
-            correct: 0,
-            explanation:
-              "Light travels at approximately 300,000 kilometers per second in a vacuum.",
-            hint: "It's a very fast speed - 300 thousand",
-          },
-          {
-            question: "What type of energy does a moving object have?",
-            options: [
-              "Potential energy",
-              "Kinetic energy",
-              "Thermal energy",
-              "Chemical energy",
+            physics: [
+              {
+                question: "What is the SI unit of force?",
+                options: ["Joule", "Watt", "Newton", "Pascal"],
+                correct: 2,
+                explanation: "The newton (N) is the SI unit of force.",
+                hint: "Named after a famous scientist",
+              },
             ],
-            correct: 1,
-            explanation: "Kinetic energy is the energy of motion.",
-            hint: "Think of the word 'kinetic' - it means movement",
-          },
-          {
-            question:
-              "What is the law that states 'for every action there is an equal and opposite reaction'?",
-            options: [
-              "Newton's First Law",
-              "Newton's Second Law",
-              "Newton's Third Law",
-              "Newton's Fourth Law",
+            general: [
+              {
+                question: "What is the largest organ in the human body?",
+                options: ["Heart", "Brain", "Liver", "Skin"],
+                correct: 3,
+                explanation:
+                  "The skin is the largest organ, covering the entire body.",
+                hint: "It covers your entire body",
+              },
             ],
-            correct: 2,
-            explanation: "Newton's Third Law describes action-reaction pairs.",
-            hint: "It's the third of Newton's three laws",
-          },
-          {
-            question: "What is the unit of electrical resistance?",
-            options: ["Volt", "Ampere", "Ohm", "Watt"],
-            correct: 2,
-            explanation: "The ohm (Ω) is the unit of electrical resistance.",
-            hint: "Named after a German physicist",
-          },
-          {
-            question:
-              "What happens to the volume of a gas when temperature increases?",
-            options: [
-              "It decreases",
-              "It increases",
-              "It stays the same",
-              "It becomes zero",
-            ],
-            correct: 1,
-            explanation: "Gases expand when heated (Charles's Law).",
-            hint: "Think about what happens when you heat air",
-          },
-          {
-            question: "What type of wave is sound?",
-            options: [
-              "Transverse wave",
-              "Longitudinal wave",
-              "Electromagnetic wave",
-              "Surface wave",
-            ],
-            correct: 1,
-            explanation:
-              "Sound waves are longitudinal waves that travel through air.",
-            hint: "Sound waves compress and expand the medium",
-          },
-          {
-            question: "What is the principle that explains why boats float?",
-            options: [
-              "Pascal's Principle",
-              "Archimedes' Principle",
-              "Bernoulli's Principle",
-              "Hooke's Law",
-            ],
-            correct: 1,
-            explanation:
-              "Archimedes' Principle states that buoyant force equals weight of displaced fluid.",
-            hint: "Named after an ancient Greek scientist",
-          },
-        ],
-        general: [
-          {
-            question: "What is the largest organ in the human body?",
-            options: ["Heart", "Brain", "Liver", "Skin"],
-            correct: 3,
-            explanation:
-              "The skin is the largest organ, covering the entire body.",
-            hint: "It covers your entire body",
-          },
-          {
-            question: "What is the closest planet to the Sun?",
-            options: ["Venus", "Mercury", "Earth", "Mars"],
-            correct: 1,
-            explanation:
-              "Mercury is the closest planet to the Sun in our solar system.",
-            hint: "It's the smallest planet",
-          },
-          {
-            question:
-              "What is the process by which plants make their own food?",
-            options: [
-              "Respiration",
-              "Photosynthesis",
-              "Digestion",
-              "Fermentation",
-            ],
-            correct: 1,
-            explanation:
-              "Photosynthesis uses sunlight, water, and CO2 to make glucose.",
-            hint: "Uses sunlight to make food",
-          },
-          {
-            question: "What is the hardest natural substance on Earth?",
-            options: ["Steel", "Diamond", "Granite", "Iron"],
-            correct: 1,
-            explanation:
-              "Diamond is the hardest natural substance, scoring 10 on the Mohs scale.",
-            hint: "It's a precious gemstone",
-          },
-          {
-            question: "What is the study of fossils called?",
-            options: ["Geology", "Paleontology", "Archaeology", "Biology"],
-            correct: 1,
-            explanation:
-              "Paleontology is the scientific study of fossils and ancient life.",
-            hint: "Studies ancient life forms",
-          },
-          {
-            question: "What is the main function of red blood cells?",
-            options: [
-              "Fight infection",
-              "Carry oxygen",
-              "Digest food",
-              "Produce energy",
-            ],
-            correct: 1,
-            explanation:
-              "Red blood cells carry oxygen from the lungs to the body tissues.",
-            hint: "They carry something we need to breathe",
-          },
-          {
-            question: "What is the largest ocean on Earth?",
-            options: [
-              "Atlantic Ocean",
-              "Indian Ocean",
-              "Arctic Ocean",
-              "Pacific Ocean",
-            ],
-            correct: 3,
-            explanation:
-              "The Pacific Ocean is the largest and deepest ocean on Earth.",
-            hint: "It's the biggest one",
-          },
-          {
-            question:
-              "What is the chemical element with the highest atomic number found in nature?",
-            options: ["Uranium", "Thorium", "Plutonium", "Radium"],
-            correct: 0,
-            explanation:
-              "Uranium (atomic number 92) is the heaviest naturally occurring element.",
-            hint: "It's used in nuclear power",
-          },
-        ],
-      };
+          };
+        }
+      }
 
       function setCategory(category) {
         currentCategory = category;
@@ -693,15 +494,46 @@
       }
 
       function generateQuiz() {
-        const questions = triviaDatabase[currentCategory];
-        currentQuestions = questions
+        const allQuestions = triviaDatabase[currentCategory];
+        if (!allQuestions || allQuestions.length === 0) {
+          console.error(
+            "No questions available for category:",
+            currentCategory
+          );
+          return;
+        }
+
+        // Filter out questions that have already been used in this session
+        const availableQuestions = allQuestions.filter(
+          (q) => !usedQuestions.has(q.question)
+        );
+
+        // If we've used most questions, reset the used questions set
+        if (availableQuestions.length < 5) {
+          usedQuestions.clear();
+          console.log(
+            "Resetting used questions - all questions available again"
+          );
+        }
+
+        // Shuffle and select questions
+        const shuffledQuestions = availableQuestions
           .sort(() => Math.random() - 0.5)
-          .slice(0, 10);
+          .slice(0, Math.min(10, availableQuestions.length));
+
+        currentQuestions = shuffledQuestions;
         currentQuestionIndex = 0;
         questionsAnswered = 0;
+        score = 0;
         hintsUsed = 0;
 
+        // Mark selected questions as used
+        shuffledQuestions.forEach((q) => usedQuestions.add(q.question));
+
         displayQuestion();
+        console.log(
+          `Generated quiz with ${currentQuestions.length} questions. Available: ${availableQuestions.length}`
+        );
       }
 
       function displayQuestion() {
@@ -808,6 +640,8 @@
       }
 
       function newQuiz() {
+        // Clear used questions when starting a completely new quiz
+        usedQuestions.clear();
         generateQuiz();
       }
 
@@ -835,7 +669,9 @@
       }
 
       // Initialize game
-      generateQuiz();
+      loadQuestions().then(() => {
+        generateQuiz();
+      });
     </script>
   </body>
 </html>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2048 Slider - Play It My Way</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .score-container {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .score-box {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px 25px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .score-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 5px;
+      }
+
+      .score-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .game-container {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        margin-bottom: 20px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        background: #bbada0;
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      .cell {
+        width: 80px;
+        height: 80px;
+        background: #cdc1b4;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #776e65;
+        transition: all 0.15s ease;
+        position: relative;
+      }
+
+      .cell[data-value="2"] {
+        background: #eee4da;
+      }
+      .cell[data-value="4"] {
+        background: #ede0c8;
+      }
+      .cell[data-value="8"] {
+        background: #f2b179;
+        color: #f9f6f2;
+      }
+      .cell[data-value="16"] {
+        background: #f59563;
+        color: #f9f6f2;
+      }
+      .cell[data-value="32"] {
+        background: #f67c5f;
+        color: #f9f6f2;
+      }
+      .cell[data-value="64"] {
+        background: #f65e3b;
+        color: #f9f6f2;
+      }
+      .cell[data-value="128"] {
+        background: #edcf72;
+        color: #f9f6f2;
+        font-size: 1.6rem;
+      }
+      .cell[data-value="256"] {
+        background: #edcc61;
+        color: #f9f6f2;
+        font-size: 1.6rem;
+      }
+      .cell[data-value="512"] {
+        background: #edc850;
+        color: #f9f6f2;
+        font-size: 1.6rem;
+      }
+      .cell[data-value="1024"] {
+        background: #edc53f;
+        color: #f9f6f2;
+        font-size: 1.4rem;
+      }
+      .cell[data-value="2048"] {
+        background: #edc22e;
+        color: #f9f6f2;
+        font-size: 1.4rem;
+      }
+
+      .cell.new {
+        animation: pop 0.3s ease;
+      }
+
+      .cell.merged {
+        animation: merge 0.3s ease;
+      }
+
+      @keyframes pop {
+        0% {
+          transform: scale(0);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes merge {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .controls {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .btn {
+        background: #8f7a66;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        margin: 0 10px;
+        transition: all 0.3s ease;
+      }
+
+      .btn:hover {
+        background: #7f6a56;
+        transform: translateY(-2px);
+      }
+
+      .game-over {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .game-over.show {
+        display: flex;
+      }
+
+      .game-over-content {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        text-align: center;
+        max-width: 400px;
+      }
+
+      .game-over h2 {
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .game-over p {
+        color: #666;
+        margin-bottom: 25px;
+      }
+
+      .back-link {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        text-decoration: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        z-index: 100;
+      }
+
+      .back-link:hover {
+        background: white;
+        transform: translateY(-2px);
+      }
+
+      @media (max-width: 600px) {
+        .cell {
+          width: 60px;
+          height: 60px;
+          font-size: 1.4rem;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .score-container {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../../index.html" class="back-link">← Back to Games</a>
+
+    <div class="header">
+      <h1>2048</h1>
+      <p>Slide tiles to reach 2048!</p>
+    </div>
+
+    <div class="score-container">
+      <div class="score-box">
+        <div class="score-label">Score</div>
+        <div class="score-value" id="score">0</div>
+      </div>
+      <div class="score-box">
+        <div class="score-label">Best</div>
+        <div class="score-value" id="best">0</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" onclick="newGame()">New Game</button>
+      <button class="btn" onclick="showInstructions()">How to Play</button>
+    </div>
+
+    <div class="game-container">
+      <div class="grid" id="grid"></div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+      <div class="game-over-content">
+        <h2 id="gameOverTitle">Game Over!</h2>
+        <p id="gameOverMessage">
+          Your final score: <span id="finalScore">0</span>
+        </p>
+        <button class="btn" onclick="newGame()">Play Again</button>
+      </div>
+    </div>
+
+    <script>
+      class Game2048 {
+        constructor() {
+          this.grid = Array(4)
+            .fill()
+            .map(() => Array(4).fill(0));
+          this.score = 0;
+          this.best = localStorage.getItem("2048-best") || 0;
+          this.gameOver = false;
+          this.init();
+        }
+
+        init() {
+          this.updateBest();
+          this.addRandomTile();
+          this.addRandomTile();
+          this.render();
+          this.setupEventListeners();
+        }
+
+        setupEventListeners() {
+          document.addEventListener("keydown", (e) => {
+            if (this.gameOver) return;
+
+            switch (e.key) {
+              case "ArrowUp":
+                e.preventDefault();
+                this.move("up");
+                break;
+              case "ArrowDown":
+                e.preventDefault();
+                this.move("down");
+                break;
+              case "ArrowLeft":
+                e.preventDefault();
+                this.move("left");
+                break;
+              case "ArrowRight":
+                e.preventDefault();
+                this.move("right");
+                break;
+            }
+          });
+
+          // Touch events for mobile
+          let startX, startY;
+          document.addEventListener("touchstart", (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+          });
+
+          document.addEventListener("touchend", (e) => {
+            if (!startX || !startY) return;
+
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+              if (diffX > 0) this.move("left");
+              else this.move("right");
+            } else {
+              if (diffY > 0) this.move("up");
+              else this.move("down");
+            }
+
+            startX = startY = null;
+          });
+        }
+
+        addRandomTile() {
+          const emptyCells = [];
+          for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+              if (this.grid[i][j] === 0) {
+                emptyCells.push({ i, j });
+              }
+            }
+          }
+
+          if (emptyCells.length > 0) {
+            const { i, j } =
+              emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            this.grid[i][j] = Math.random() < 0.9 ? 2 : 4;
+          }
+        }
+
+        move(direction) {
+          const oldGrid = JSON.stringify(this.grid);
+          let moved = false;
+
+          switch (direction) {
+            case "left":
+              moved = this.moveLeft();
+              break;
+            case "right":
+              moved = this.moveRight();
+              break;
+            case "up":
+              moved = this.moveUp();
+              break;
+            case "down":
+              moved = this.moveDown();
+              break;
+          }
+
+          if (moved) {
+            this.addRandomTile();
+            this.render();
+            this.checkGameOver();
+          }
+        }
+
+        moveLeft() {
+          let moved = false;
+          for (let i = 0; i < 4; i++) {
+            const row = this.grid[i].filter((x) => x !== 0);
+            for (let j = 0; j < row.length - 1; j++) {
+              if (row[j] === row[j + 1]) {
+                row[j] *= 2;
+                this.score += row[j];
+                row.splice(j + 1, 1);
+                moved = true;
+              }
+            }
+            const newRow = row.concat(Array(4 - row.length).fill(0));
+            if (JSON.stringify(this.grid[i]) !== JSON.stringify(newRow)) {
+              moved = true;
+            }
+            this.grid[i] = newRow;
+          }
+          return moved;
+        }
+
+        moveRight() {
+          let moved = false;
+          for (let i = 0; i < 4; i++) {
+            const row = this.grid[i].filter((x) => x !== 0);
+            for (let j = row.length - 1; j > 0; j--) {
+              if (row[j] === row[j - 1]) {
+                row[j] *= 2;
+                this.score += row[j];
+                row.splice(j - 1, 1);
+                moved = true;
+              }
+            }
+            const newRow = Array(4 - row.length)
+              .fill(0)
+              .concat(row);
+            if (JSON.stringify(this.grid[i]) !== JSON.stringify(newRow)) {
+              moved = true;
+            }
+            this.grid[i] = newRow;
+          }
+          return moved;
+        }
+
+        moveUp() {
+          let moved = false;
+          for (let j = 0; j < 4; j++) {
+            const col = [];
+            for (let i = 0; i < 4; i++) {
+              if (this.grid[i][j] !== 0) col.push(this.grid[i][j]);
+            }
+            for (let i = 0; i < col.length - 1; i++) {
+              if (col[i] === col[i + 1]) {
+                col[i] *= 2;
+                this.score += col[i];
+                col.splice(i + 1, 1);
+                moved = true;
+              }
+            }
+            const newCol = col.concat(Array(4 - col.length).fill(0));
+            for (let i = 0; i < 4; i++) {
+              if (this.grid[i][j] !== newCol[i]) {
+                moved = true;
+              }
+              this.grid[i][j] = newCol[i];
+            }
+          }
+          return moved;
+        }
+
+        moveDown() {
+          let moved = false;
+          for (let j = 0; j < 4; j++) {
+            const col = [];
+            for (let i = 0; i < 4; i++) {
+              if (this.grid[i][j] !== 0) col.push(this.grid[i][j]);
+            }
+            for (let i = col.length - 1; i > 0; i--) {
+              if (col[i] === col[i - 1]) {
+                col[i] *= 2;
+                this.score += col[i];
+                col.splice(i - 1, 1);
+                moved = true;
+              }
+            }
+            const newCol = Array(4 - col.length)
+              .fill(0)
+              .concat(col);
+            for (let i = 0; i < 4; i++) {
+              if (this.grid[i][j] !== newCol[i]) {
+                moved = true;
+              }
+              this.grid[i][j] = newCol[i];
+            }
+          }
+          return moved;
+        }
+
+        render() {
+          const gridElement = document.getElementById("grid");
+          gridElement.innerHTML = "";
+
+          for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+              const cell = document.createElement("div");
+              cell.className = "cell";
+              const value = this.grid[i][j];
+
+              if (value !== 0) {
+                cell.textContent = value;
+                cell.setAttribute("data-value", value);
+              }
+
+              gridElement.appendChild(cell);
+            }
+          }
+
+          document.getElementById("score").textContent = this.score;
+          this.updateBest();
+        }
+
+        updateBest() {
+          if (this.score > this.best) {
+            this.best = this.score;
+            localStorage.setItem("2048-best", this.best);
+          }
+          document.getElementById("best").textContent = this.best;
+        }
+
+        checkGameOver() {
+          // Check if 2048 is reached
+          for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+              if (this.grid[i][j] === 2048) {
+                this.showGameOver(
+                  "You Win!",
+                  "Congratulations! You reached 2048!"
+                );
+                return;
+              }
+            }
+          }
+
+          // Check if no moves are possible
+          if (!this.canMove()) {
+            this.showGameOver("Game Over!", "No more moves possible!");
+          }
+        }
+
+        canMove() {
+          // Check for empty cells
+          for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+              if (this.grid[i][j] === 0) return true;
+            }
+          }
+
+          // Check for possible merges
+          for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+              const current = this.grid[i][j];
+              if (j < 3 && this.grid[i][j + 1] === current) return true;
+              if (i < 3 && this.grid[i + 1][j] === current) return true;
+            }
+          }
+
+          return false;
+        }
+
+        showGameOver(title, message) {
+          this.gameOver = true;
+          document.getElementById("gameOverTitle").textContent = title;
+          document.getElementById("gameOverMessage").textContent = message;
+          document.getElementById("finalScore").textContent = this.score;
+          document.getElementById("gameOver").classList.add("show");
+        }
+
+        reset() {
+          this.grid = Array(4)
+            .fill()
+            .map(() => Array(4).fill(0));
+          this.score = 0;
+          this.gameOver = false;
+          document.getElementById("gameOver").classList.remove("show");
+          this.init();
+        }
+      }
+
+      let game;
+
+      function newGame() {
+        if (game) {
+          game.reset();
+        } else {
+          game = new Game2048();
+        }
+      }
+
+      function showInstructions() {
+        alert(`How to play 2048:
+
+• Use arrow keys or swipe to move tiles
+• Tiles with the same number merge when they touch
+• Try to reach the 2048 tile!
+• Game ends when no more moves are possible
+
+Good luck!`);
+      }
+
+      // Initialize game when page loads
+      window.addEventListener("load", () => {
+        game = new Game2048();
+      });
+    </script>
+  </body>
+</html>
