@@ -394,6 +394,139 @@
         user-select: none;
         touch-action: manipulation;
       }
+
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .modal-overlay.show {
+        display: flex;
+      }
+
+      .modal {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: scaleIn 0.3s ease;
+      }
+
+      .modal h2 {
+        font-size: 2em;
+        margin-bottom: 15px;
+        color: #333;
+      }
+
+      .modal .stats-display {
+        background: linear-gradient(45deg, #a8e6cf, #88d8c0);
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+      }
+
+      .modal .stats-display p {
+        margin: 5px 0;
+        color: #2d5a3d;
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+
+      .modal .high-score {
+        color: #ff6b6b;
+        font-weight: bold;
+        font-size: 1.2em;
+      }
+
+      .modal-btn {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 10px;
+        transition: transform 0.2s;
+      }
+
+      .modal-btn:hover {
+        transform: scale(1.05);
+      }
+
+      /* Confetti */
+      .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        top: -10px;
+        z-index: 1001;
+        animation: confettiFall 3s linear forwards;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes scaleIn {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+
+      @keyframes confettiFall {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+      }
+
+      /* Star Rating */
+      .stars {
+        font-size: 2.5em;
+        margin: 10px 0;
+      }
+
+      .star {
+        color: #ddd;
+        transition: color 0.3s;
+      }
+
+      .star.filled {
+        color: #ffd700;
+      }
+
+      /* Streak indicator */
+      .streak-indicator {
+        background: linear-gradient(45deg, #ffd700, #ffaa00);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        display: none;
+        animation: pulse 0.5s ease;
+      }
+
+      .streak-indicator.show {
+        display: inline-block;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+      }
     </style>
   </head>
   <body>
@@ -408,6 +541,7 @@
       <div>Score: <span id="score">0</span></div>
       <div>Level: <span id="level">1</span></div>
       <div>Words Solved: <span id="solved">0</span></div>
+      <div class="streak-indicator" id="streakIndicator">🔥 Streak: <span id="streak">0</span></div>
     </div>
 
     <div class="difficulty-selector">
@@ -446,7 +580,155 @@
       </div>
     </div>
 
+    <!-- Level Up Modal -->
+    <div class="modal-overlay" id="levelModal">
+      <div class="modal">
+        <h2 id="modalTitle">🎊 Level Up!</h2>
+        <div class="stars" id="starRating">
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+        </div>
+        <div class="stats-display">
+          <p>Score: <span id="modalScore">0</span></p>
+          <p>Level: <span id="modalLevel">1</span></p>
+          <p>Words Solved: <span id="modalSolved">0</span></p>
+          <p>Best Streak: <span id="modalStreak">0</span></p>
+        </div>
+        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New High Score!</p>
+        <button class="modal-btn" onclick="closeModal()">Continue</button>
+      </div>
+    </div>
+
     <script>
+      // Sound effects using Web Audio API
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      let audioCtx = null;
+
+      function initAudio() {
+        if (!audioCtx) {
+          audioCtx = new AudioContext();
+        }
+      }
+
+      function playSound(type) {
+        initAudio();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        switch(type) {
+          case 'correct':
+            const notes = [523, 659, 784];
+            notes.forEach((freq, i) => {
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.connect(gain);
+              gain.connect(audioCtx.destination);
+              osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.1);
+              osc.type = 'sine';
+              gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.1);
+              gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.2);
+              osc.start(audioCtx.currentTime + i * 0.1);
+              osc.stop(audioCtx.currentTime + i * 0.1 + 0.2);
+            });
+            return;
+          case 'wrong':
+            oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(150, audioCtx.currentTime + 0.1);
+            oscillator.type = 'square';
+            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.2);
+            break;
+          case 'levelUp':
+            const levelNotes = [523, 659, 784, 1047];
+            levelNotes.forEach((freq, i) => {
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.connect(gain);
+              gain.connect(audioCtx.destination);
+              osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.15);
+              osc.type = 'sine';
+              gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.15);
+              gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.3);
+              osc.start(audioCtx.currentTime + i * 0.15);
+              osc.stop(audioCtx.currentTime + i * 0.15 + 0.3);
+            });
+            return;
+          case 'click':
+            oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.05);
+            break;
+        }
+      }
+
+      function createConfetti() {
+        const colors = ['#ff6b6b', '#4ecdc4', '#ffd700', '#a8e6cf', '#ff9ff3', '#54a0ff'];
+        for (let i = 0; i < 50; i++) {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 2 + 's';
+          confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          document.body.appendChild(confetti);
+          setTimeout(() => confetti.remove(), 5000);
+        }
+      }
+
+      function displayStars(count) {
+        const stars = document.querySelectorAll('#starRating .star');
+        stars.forEach((star, i) => {
+          star.classList.toggle('filled', i < count);
+        });
+      }
+
+      function getHighScore(difficulty) {
+        const key = `wordscramble_highscore_${difficulty}`;
+        return parseInt(localStorage.getItem(key)) || 0;
+      }
+
+      function setHighScore(difficulty, score) {
+        const key = `wordscramble_highscore_${difficulty}`;
+        localStorage.setItem(key, score);
+      }
+
+      function showLevelModal() {
+        const modal = document.getElementById('levelModal');
+        document.getElementById('modalTitle').textContent = `🎊 Level ${level}!`;
+        document.getElementById('modalScore').textContent = score;
+        document.getElementById('modalLevel').textContent = level;
+        document.getElementById('modalSolved').textContent = wordsSolved;
+        document.getElementById('modalStreak').textContent = bestStreak;
+
+        const starCount = Math.min(3, level);
+        displayStars(starCount);
+
+        const highScore = getHighScore(currentDifficulty);
+        const highScoreMsg = document.getElementById('highScoreMsg');
+        if (score > highScore) {
+          setHighScore(currentDifficulty, score);
+          highScoreMsg.style.display = 'block';
+        } else {
+          highScoreMsg.style.display = 'none';
+        }
+
+        modal.classList.add('show');
+        playSound('levelUp');
+        createConfetti();
+      }
+
+      function closeModal() {
+        document.getElementById('levelModal').classList.remove('show');
+        newWord();
+      }
       let currentDifficulty = "easy";
       let currentWord = "";
       let scrambledLetters = [];
@@ -455,6 +737,8 @@
       let level = 1;
       let wordsSolved = 0;
       let hintsUsed = 0;
+      let streak = 0;
+      let bestStreak = 0;
 
       const wordDatabase = {
         easy: [
@@ -594,7 +878,8 @@
         });
         event.target.classList.add("active");
 
-        // Reset game and start new word
+        // Reset streak and start new word
+        resetStreak();
         newWord();
       }
 
@@ -695,27 +980,47 @@
 
         if (currentAnswer === currentWord) {
           // Correct answer
-          const points = currentWord.length * 10 - hintsUsed * 5;
+          playSound('correct');
+          streak++;
+          if (streak > bestStreak) bestStreak = streak;
+          document.getElementById('streak').textContent = streak;
+          if (streak >= 2) {
+            document.getElementById('streakIndicator').classList.add('show');
+          }
+
+          const basePoints = currentWord.length * 10 - hintsUsed * 5;
+          const streakBonus = streak >= 3 ? streak * 5 : 0;
+          const points = basePoints + streakBonus;
           score += points;
           wordsSolved++;
 
+          const previousLevel = level;
           if (wordsSolved >= level * 5) {
             level++;
           }
 
           updateStats();
 
-          document.getElementById(
-            "feedback"
-          ).textContent = `🎉 Correct! +${points} points`;
+          const feedbackText = streak >= 3 
+            ? `🔥 ${streak} in a row! +${points} points!` 
+            : `🎉 Correct! +${points} points`;
+          document.getElementById("feedback").textContent = feedbackText;
           document.getElementById("feedback").className = "feedback correct";
           document.getElementById("feedback").style.display = "block";
 
-          setTimeout(() => {
-            newWord();
-          }, 2000);
+          if (level > previousLevel) {
+            setTimeout(() => showLevelModal(), 1500);
+          } else {
+            setTimeout(() => {
+              newWord();
+            }, 2000);
+          }
         } else {
           // Incorrect answer
+          playSound('wrong');
+          streak = 0;
+          document.getElementById('streak').textContent = streak;
+          document.getElementById('streakIndicator').classList.remove('show');
           document.getElementById("feedback").textContent = "😅 Try again!";
           document.getElementById("feedback").className = "feedback incorrect";
           document.getElementById("feedback").style.display = "block";
@@ -742,6 +1047,13 @@
       function newWord() {
         hintsUsed = 0;
         generateNewWord();
+      }
+
+      function resetStreak() {
+        streak = 0;
+        bestStreak = 0;
+        document.getElementById('streak').textContent = 0;
+        document.getElementById('streakIndicator').classList.remove('show');
       }
 
       function updateStats() {

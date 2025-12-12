@@ -413,6 +413,118 @@
         user-select: none;
         touch-action: manipulation;
       }
+
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .modal-overlay.show {
+        display: flex;
+      }
+
+      .modal {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: scaleIn 0.3s ease;
+      }
+
+      .modal h2 {
+        font-size: 2em;
+        margin-bottom: 15px;
+        color: #333;
+      }
+
+      .modal .stats-display {
+        background: linear-gradient(45deg, #a8e6cf, #88d8c0);
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+      }
+
+      .modal .stats-display p {
+        margin: 5px 0;
+        color: #2d5a3d;
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+
+      .modal .high-score {
+        color: #ff6b6b;
+        font-weight: bold;
+        font-size: 1.2em;
+      }
+
+      .modal-btn {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 10px;
+        transition: transform 0.2s;
+      }
+
+      .modal-btn:hover {
+        transform: scale(1.05);
+      }
+
+      /* Confetti */
+      .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        top: -10px;
+        z-index: 1001;
+        animation: confettiFall 3s linear forwards;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes scaleIn {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+
+      @keyframes confettiFall {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+      }
+
+      .stars {
+        font-size: 2.5em;
+        margin: 10px 0;
+      }
+
+      .star {
+        color: #ddd;
+        transition: color 0.3s;
+      }
+
+      .star.filled {
+        color: #ffd700;
+      }
     </style>
   </head>
   <body>
@@ -460,7 +572,147 @@
       </div>
     </div>
 
+    <!-- Level Up Modal -->
+    <div class="modal-overlay" id="levelModal">
+      <div class="modal">
+        <h2 id="modalTitle">🎊 Level Up!</h2>
+        <div class="stars" id="starRating">
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+        </div>
+        <div class="stats-display">
+          <p>Score: <span id="modalScore">0</span></p>
+          <p>Level: <span id="modalLevel">1</span></p>
+          <p>Countries Found: <span id="modalFound">0</span></p>
+        </div>
+        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New High Score!</p>
+        <button class="modal-btn" onclick="closeModal()">Continue</button>
+      </div>
+    </div>
+
     <script>
+      // Sound effects using Web Audio API
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      let audioCtx = null;
+
+      function initAudio() {
+        if (!audioCtx) {
+          audioCtx = new AudioContext();
+        }
+      }
+
+      function playSound(type) {
+        initAudio();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        switch(type) {
+          case 'correct':
+            const notes = [523, 659, 784];
+            notes.forEach((freq, i) => {
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.connect(gain);
+              gain.connect(audioCtx.destination);
+              osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.1);
+              osc.type = 'sine';
+              gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.1);
+              gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.2);
+              osc.start(audioCtx.currentTime + i * 0.1);
+              osc.stop(audioCtx.currentTime + i * 0.1 + 0.2);
+            });
+            return;
+          case 'wrong':
+            oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(150, audioCtx.currentTime + 0.1);
+            oscillator.type = 'square';
+            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.2);
+            break;
+          case 'levelUp':
+            const levelNotes = [523, 659, 784, 1047];
+            levelNotes.forEach((freq, i) => {
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.connect(gain);
+              gain.connect(audioCtx.destination);
+              osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.15);
+              osc.type = 'sine';
+              gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.15);
+              gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.3);
+              osc.start(audioCtx.currentTime + i * 0.15);
+              osc.stop(audioCtx.currentTime + i * 0.15 + 0.3);
+            });
+            return;
+        }
+      }
+
+      function createConfetti() {
+        const colors = ['#ff6b6b', '#4ecdc4', '#ffd700', '#a8e6cf', '#ff9ff3', '#54a0ff'];
+        for (let i = 0; i < 50; i++) {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 2 + 's';
+          confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          document.body.appendChild(confetti);
+          setTimeout(() => confetti.remove(), 5000);
+        }
+      }
+
+      function displayStars(count) {
+        const stars = document.querySelectorAll('#starRating .star');
+        stars.forEach((star, i) => {
+          star.classList.toggle('filled', i < count);
+        });
+      }
+
+      function getHighScore(mode) {
+        const key = `geography_highscore_${mode}`;
+        return parseInt(localStorage.getItem(key)) || 0;
+      }
+
+      function saveHighScore() {
+        const key = `geography_highscore_${currentMode}`;
+        const highScore = getHighScore(currentMode);
+        if (score > highScore) {
+          localStorage.setItem(key, score);
+        }
+      }
+
+      function showLevelModal() {
+        const modal = document.getElementById('levelModal');
+        document.getElementById('modalTitle').textContent = `🎊 Level ${level}!`;
+        document.getElementById('modalScore').textContent = score;
+        document.getElementById('modalLevel').textContent = level;
+        document.getElementById('modalFound').textContent = countriesFound;
+
+        const starCount = Math.min(3, level);
+        displayStars(starCount);
+
+        const highScore = getHighScore(currentMode);
+        const highScoreMsg = document.getElementById('highScoreMsg');
+        if (score > highScore) {
+          highScoreMsg.style.display = 'block';
+        } else {
+          highScoreMsg.style.display = 'none';
+        }
+
+        modal.classList.add('show');
+        playSound('levelUp');
+        createConfetti();
+      }
+
+      function closeModal() {
+        document.getElementById('levelModal').classList.remove('show');
+        newChallenge();
+      }
       let currentMode = "countries";
       let currentChallenge = {};
       let score = 0;
@@ -776,14 +1028,17 @@
 
         if (isCorrect) {
           // Correct answer
+          playSound('correct');
           score += points;
           countriesFound++;
 
+          const previousLevel = level;
           if (countriesFound >= level * 5) {
             level++;
           }
 
           updateStats();
+          saveHighScore();
 
           document.getElementById(
             "feedback"
@@ -794,11 +1049,16 @@
           // Highlight correct answer
           event.target.classList.add("correct");
 
-          setTimeout(() => {
-            newChallenge();
-          }, 2000);
+          if (level > previousLevel) {
+            setTimeout(() => showLevelModal(), 1500);
+          } else {
+            setTimeout(() => {
+              newChallenge();
+            }, 2000);
+          }
         } else {
           // Incorrect answer
+          playSound('wrong');
           document.getElementById("feedback").textContent = "😅 Try again!";
           document.getElementById("feedback").className = "feedback incorrect";
           document.getElementById("feedback").style.display = "block";

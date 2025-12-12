@@ -216,16 +216,65 @@
         border-radius: 15px;
         text-align: center;
         max-width: 400px;
+        animation: scaleIn 0.3s ease;
       }
 
       .game-over h2 {
         color: #333;
         margin-bottom: 20px;
+        font-size: 2em;
       }
 
       .game-over p {
         color: #666;
         margin-bottom: 25px;
+        font-size: 1.2em;
+      }
+
+      .stars {
+        font-size: 2.5em;
+        margin: 15px 0;
+      }
+
+      .star {
+        color: #ddd;
+        transition: color 0.3s;
+      }
+
+      .star.filled {
+        color: #ffd700;
+      }
+
+      .high-score-msg {
+        color: #ff6b6b;
+        font-weight: bold;
+        font-size: 1.2em;
+        margin-bottom: 15px;
+      }
+
+      /* Confetti */
+      .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        top: -10px;
+        z-index: 1001;
+        animation: confettiFall 3s linear forwards;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes scaleIn {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+
+      @keyframes confettiFall {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
       }
 
       .back-link {
@@ -296,22 +345,114 @@
     <div class="game-over" id="gameOver">
       <div class="game-over-content">
         <h2 id="gameOverTitle">Game Over!</h2>
+        <div class="stars" id="starRating">
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+        </div>
         <p id="gameOverMessage">
           Your final score: <span id="finalScore">0</span>
         </p>
+        <p id="highScoreMsg" class="high-score-msg" style="display: none;">🏆 New High Score!</p>
         <button class="btn" onclick="newGame()">Play Again</button>
       </div>
     </div>
 
     <script>
+      // Sound effects using Web Audio API
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      let audioCtx = null;
+
+      function initAudio() {
+        if (!audioCtx) {
+          audioCtx = new AudioContext();
+        }
+      }
+
+      function playSound(type) {
+        initAudio();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        switch(type) {
+          case 'move':
+            oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.05);
+            break;
+          case 'merge':
+            oscillator.frequency.setValueAtTime(400, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(500, audioCtx.currentTime + 0.05);
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
+            break;
+          case 'win':
+            const winNotes = [523, 659, 784, 1047];
+            winNotes.forEach((freq, i) => {
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.connect(gain);
+              gain.connect(audioCtx.destination);
+              osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.15);
+              osc.type = 'sine';
+              gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.15);
+              gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.3);
+              osc.start(audioCtx.currentTime + i * 0.15);
+              osc.stop(audioCtx.currentTime + i * 0.15 + 0.3);
+            });
+            return;
+          case 'gameOver':
+            oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(200, audioCtx.currentTime + 0.2);
+            oscillator.frequency.setValueAtTime(150, audioCtx.currentTime + 0.4);
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.6);
+            break;
+        }
+      }
+
+      function createConfetti() {
+        const colors = ['#ff6b6b', '#4ecdc4', '#ffd700', '#a8e6cf', '#ff9ff3', '#54a0ff'];
+        for (let i = 0; i < 50; i++) {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 2 + 's';
+          confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          document.body.appendChild(confetti);
+          setTimeout(() => confetti.remove(), 5000);
+        }
+      }
+
+      function displayStars(score) {
+        const stars = document.querySelectorAll('#starRating .star');
+        const starCount = score >= 10000 ? 3 : score >= 5000 ? 2 : 1;
+        stars.forEach((star, i) => {
+          star.classList.toggle('filled', i < starCount);
+        });
+      }
+
       class Game2048 {
         constructor() {
           this.grid = Array(4)
             .fill()
             .map(() => Array(4).fill(0));
           this.score = 0;
-          this.best = localStorage.getItem("2048-best") || 0;
+          this.best = parseInt(localStorage.getItem("2048-best")) || 0;
           this.gameOver = false;
+          this.eventListenersAdded = false;
           this.init();
         }
 
@@ -320,7 +461,10 @@
           this.addRandomTile();
           this.addRandomTile();
           this.render();
-          this.setupEventListeners();
+          if (!this.eventListenersAdded) {
+            this.setupEventListeners();
+            this.eventListenersAdded = true;
+          }
         }
 
         setupEventListeners() {
@@ -349,19 +493,27 @@
 
           // Touch events for mobile
           let startX, startY;
+          const minSwipeDistance = 30; // Minimum distance for a swipe
+
           document.addEventListener("touchstart", (e) => {
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
           });
 
           document.addEventListener("touchend", (e) => {
-            if (!startX || !startY) return;
+            if (!startX || !startY || this.gameOver) return;
 
             const endX = e.changedTouches[0].clientX;
             const endY = e.changedTouches[0].clientY;
 
             const diffX = startX - endX;
             const diffY = startY - endY;
+
+            // Only register swipe if it's longer than minimum distance
+            if (Math.abs(diffX) < minSwipeDistance && Math.abs(diffY) < minSwipeDistance) {
+              startX = startY = null;
+              return;
+            }
 
             if (Math.abs(diffX) > Math.abs(diffY)) {
               if (diffX > 0) this.move("left");
@@ -412,6 +564,7 @@
           }
 
           if (moved) {
+            playSound('move');
             this.addRandomTile();
             this.render();
             this.checkGameOver();
@@ -590,9 +743,27 @@
         showGameOver(title, message) {
           this.gameOver = true;
           document.getElementById("gameOverTitle").textContent = title;
-          document.getElementById("gameOverMessage").textContent = message;
-          document.getElementById("finalScore").textContent = this.score;
+          document.getElementById("gameOverMessage").innerHTML = `Your final score: <span id="finalScore">${this.score}</span>`;
+          
+          displayStars(this.score);
+          
+          // Check for new high score (must be strictly greater than previous best)
+          const previousBest = parseInt(localStorage.getItem("2048-best")) || 0;
+          const highScoreMsg = document.getElementById("highScoreMsg");
+          if (this.score > previousBest && this.score > 0) {
+            highScoreMsg.style.display = "block";
+          } else {
+            highScoreMsg.style.display = "none";
+          }
+          
           document.getElementById("gameOver").classList.add("show");
+          
+          if (title === "You Win!") {
+            playSound('win');
+            createConfetti();
+          } else {
+            playSound('gameOver');
+          }
         }
 
         reset() {
