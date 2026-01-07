@@ -1,0 +1,19 @@
+# robots.txt for Play It My Way
+# https://playitmyway.com
+
+User-agent: *
+Allow: /
+
+# Allow all crawlers to access all pages
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Sitemap location
+Sitemap: https://playitmyway.com/sitemap.xml
+
+# Crawl-delay (optional, be nice to servers)
+# Crawl-delay: 1
+

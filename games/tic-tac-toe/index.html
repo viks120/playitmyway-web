@@ -2,11 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#667eea" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <title>Tic Tac Toe - Play It My Way</title>
-    <meta name="description" content="Free Tic Tac Toe game for kids ages 5+. Play against a friend or the computer. Fun and educational game for children." />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <!-- SEO Meta Tags -->
+    <title>Free Tic Tac Toe Game Online | Classic XO Game for Kids | Play It My Way</title>
+    <meta name="description" content="Play free Tic Tac Toe online! Classic X and O game for kids ages 5+. 2 player mode - play with friends or family. Fun strategy game for children. No download needed!" />
+    <meta name="keywords" content="tic tac toe online, free tic tac toe game, XO game for kids, noughts and crosses, two player games, strategy games for kids, classic games online, brain games for children, tic tac toe 2 player, free online games kids" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta property="og:title" content="Free Tic Tac Toe Game Online | Play It My Way" />
+    <meta property="og:description" content="Classic Tic Tac Toe for kids. 2 player XO game - play free online!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/tic-tac-toe/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <link rel="canonical" href="https://playitmyway.com/games/tic-tac-toe/" />
     <style>
       * {
         box-sizing: border-box;
@@ -276,9 +286,16 @@
       }
 
       @media (max-width: 480px) {
-        body { padding-top: 50px; }
-        .cell { width: 75px; height: 75px; font-size: 2.5em; }
-        .stats { flex-direction: column; gap: 5px; }
+        body { padding: 5px; padding-top: 35px; }
+        .header { margin-bottom: 5px; }
+        .header h1 { font-size: 1.2em; }
+        .header p { font-size: 0.85em; margin: 3px 0; }
+        .cell { width: 70px; height: 70px; font-size: 2.2em; }
+        .stats { flex-direction: row; gap: 10px; font-size: 0.85em; margin-bottom: 8px; }
+        .back-link { top: 5px; left: 5px; padding: 5px 8px; font-size: 0.75em; }
+        .game-board { gap: 8px; }
+        .controls { margin-top: 10px; }
+        .btn { padding: 10px 18px; font-size: 0.9em; }
       }
     </style>
   </head>
