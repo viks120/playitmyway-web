@@ -238,6 +238,24 @@
         transform: scale(1.05);
       }
 
+      .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 1.5em;
+        color: #999;
+        cursor: pointer;
+        line-height: 1;
+      }
+
+      .modal-close:hover {
+        color: #333;
+      }
+
+      .modal {
+        position: relative;
+      }
+
       .confetti {
         position: fixed;
         width: 10px;
@@ -291,8 +309,9 @@
       </div>
     </div>
 
-    <div class="modal-overlay" id="modal">
+    <div class="modal-overlay" id="modal" onclick="closeModalOnOverlay(event)">
       <div class="modal">
+        <span class="modal-close" onclick="closeModalOnly()">✕</span>
         <h2 id="modalTitle">🎉 Winner!</h2>
         <p id="modalMessage">Player X wins!</p>
         <button class="modal-btn" onclick="closeModal()">Play Again</button>
@@ -485,8 +504,18 @@
         }
       }
 
-      function closeModal() {
+      function closeModalOnly() {
         document.getElementById('modal').classList.remove('show');
+      }
+
+      function closeModalOnOverlay(event) {
+        if (event.target === event.currentTarget) {
+          closeModalOnly();
+        }
+      }
+
+      function closeModal() {
+        closeModalOnly();
         resetGame();
       }
 

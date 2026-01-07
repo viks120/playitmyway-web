@@ -15,6 +15,25 @@ body {
   line-height: 1.6;
 }
 
+.support-banner {
+  background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+  color: white;
+  text-align: center;
+  padding: 8px 15px;
+  font-size: clamp(0.8em, 2.5vw, 0.95em);
+  font-weight: bold;
+}
+
+.support-banner a {
+  color: #fff;
+  text-decoration: underline;
+  margin-left: 5px;
+}
+
+.support-banner a:hover {
+  text-decoration: none;
+}
+
 header {
   background-color: #ffa500;
   padding: 1.2em 0;
@@ -308,7 +327,11 @@ h2 {
 @media (max-width: 768px) {
   body {
     padding: 0;
-    padding-top: 60px;
+  }
+
+  .support-banner {
+    padding: 5px 10px;
+    font-size: 0.8em;
   }
 
   header {
@@ -332,8 +355,23 @@ h2 {
 }
 
 @media (max-width: 480px) {
-  body {
-    padding-top: 50px;
+  .support-banner {
+    padding: 4px 8px;
+    font-size: 0.75em;
+  }
+
+  .hide-mobile {
+    display: none;
+  }
+
+  header {
+    padding: 0.5em 0;
+    font-size: 1.4em;
+  }
+
+  h2 {
+    font-size: 1.1em;
+    margin: 10px 0;
   }
 
   .game-grid {

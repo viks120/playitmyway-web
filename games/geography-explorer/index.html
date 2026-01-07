@@ -487,6 +487,24 @@
         transform: scale(1.05);
       }
 
+      .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 1.5em;
+        color: #999;
+        cursor: pointer;
+        line-height: 1;
+      }
+
+      .modal-close:hover {
+        color: #333;
+      }
+
+      .modal {
+        position: relative;
+      }
+
       /* Confetti */
       .confetti {
         position: fixed;
@@ -573,8 +591,9 @@
     </div>
 
     <!-- Level Up Modal -->
-    <div class="modal-overlay" id="levelModal">
+    <div class="modal-overlay" id="levelModal" onclick="closeModalOnOverlay(event)">
       <div class="modal">
+        <span class="modal-close" onclick="closeModal()">✕</span>
         <h2 id="modalTitle">🎊 Level Up!</h2>
         <div class="stars" id="starRating">
           <span class="star">★</span>
@@ -712,6 +731,12 @@
       function closeModal() {
         document.getElementById('levelModal').classList.remove('show');
         newChallenge();
+      }
+
+      function closeModalOnOverlay(event) {
+        if (event.target === event.currentTarget) {
+          closeModal();
+        }
       }
       let currentMode = "countries";
       let currentChallenge = {};

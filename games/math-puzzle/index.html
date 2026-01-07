@@ -479,6 +479,24 @@
         transform: scale(1.05);
       }
 
+      .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 1.5em;
+        color: #999;
+        cursor: pointer;
+        line-height: 1;
+      }
+
+      .modal-close:hover {
+        color: #333;
+      }
+
+      .modal {
+        position: relative;
+      }
+
       /* Confetti */
       .confetti {
         position: fixed;
@@ -562,8 +580,9 @@
     </div>
 
     <!-- Milestone Modal -->
-    <div class="modal-overlay" id="milestoneModal">
+    <div class="modal-overlay" id="milestoneModal" onclick="closeModalOnOverlay(event)">
       <div class="modal">
+        <span class="modal-close" onclick="closeModal()">✕</span>
         <h2 id="milestoneTitle">🎉 Level Up!</h2>
         <div class="stars" id="starRating">
           <span class="star">★</span>
@@ -702,6 +721,12 @@
       function closeModal() {
         document.getElementById('milestoneModal').classList.remove('show');
         newPuzzle();
+      }
+
+      function closeModalOnOverlay(event) {
+        if (event.target === event.currentTarget) {
+          closeModal();
+        }
       }
       let currentMode = "equations";
       let currentPuzzle = {};

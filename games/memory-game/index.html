@@ -440,6 +440,24 @@
         transform: scale(1.05);
       }
 
+      .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 1.5em;
+        color: #999;
+        cursor: pointer;
+        line-height: 1;
+      }
+
+      .modal-close:hover {
+        color: #333;
+      }
+
+      .modal {
+        position: relative;
+      }
+
       /* Confetti */
       .confetti {
         position: fixed;
@@ -518,8 +536,9 @@
     </div>
 
     <!-- Win Modal -->
-    <div class="modal-overlay" id="winModal">
+    <div class="modal-overlay" id="winModal" onclick="closeModalOnOverlay(event)">
       <div class="modal">
+        <span class="modal-close" onclick="closeModal()">✕</span>
         <h2>🎉 You Won!</h2>
         <div class="stars" id="starRating">
           <span class="star">★</span>
@@ -668,8 +687,18 @@
         createConfetti();
       }
 
-      function closeModalAndRestart() {
+      function closeModal() {
         document.getElementById('winModal').classList.remove('show');
+      }
+
+      function closeModalOnOverlay(event) {
+        if (event.target === event.currentTarget) {
+          closeModal();
+        }
+      }
+
+      function closeModalAndRestart() {
+        closeModal();
         resetGame();
       }
       const emojis = [
