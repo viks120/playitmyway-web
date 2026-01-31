@@ -1,0 +1,772 @@
+{
+  "easy": [
+    {
+      "words": ["The", "cat", "is", "sleeping"],
+      "hint": "What is the cat doing?",
+      "explanation": "Subject (The cat) + Verb (is sleeping)"
+    },
+    {
+      "words": ["I", "like", "ice", "cream"],
+      "hint": "What do you enjoy eating?",
+      "explanation": "Subject (I) + Verb (like) + Object (ice cream)"
+    },
+    {
+      "words": ["The", "dog", "runs", "fast"],
+      "hint": "How does the dog move?",
+      "explanation": "Subject (The dog) + Verb (runs) + Adverb (fast)"
+    },
+    {
+      "words": ["She", "reads", "a", "book"],
+      "hint": "What is she doing?",
+      "explanation": "Subject (She) + Verb (reads) + Object (a book)"
+    },
+    {
+      "words": ["Birds", "can", "fly", "high"],
+      "hint": "What can birds do?",
+      "explanation": "Subject + Modal verb (can) + Verb + Adverb"
+    },
+    {
+      "words": ["The", "sun", "is", "bright"],
+      "hint": "Describe the sun",
+      "explanation": "Subject (The sun) + Verb (is) + Adjective (bright)"
+    },
+    {
+      "words": ["He", "plays", "with", "toys"],
+      "hint": "What does he do?",
+      "explanation": "Subject + Verb + Preposition phrase"
+    },
+    {
+      "words": ["We", "eat", "lunch", "together"],
+      "hint": "What do we do at noon?",
+      "explanation": "Subject + Verb + Object + Adverb"
+    },
+    {
+      "words": ["The", "baby", "is", "crying"],
+      "hint": "What is the baby doing?",
+      "explanation": "Subject + Verb (present continuous)"
+    },
+    {
+      "words": ["My", "mom", "cooks", "dinner"],
+      "hint": "What does mom do?",
+      "explanation": "Subject + Verb + Object"
+    }
+,
+    {
+      "words": ["The", "flower", "smells", "nice"],
+      "hint": "Describe the flower",
+      "explanation": "Subject + Verb + Adjective"
+    },
+    {
+      "words": ["They", "are", "playing", "outside"],
+      "hint": "Where are they playing?",
+      "explanation": "Subject + Verb + Adverb of place"
+    },
+    {
+      "words": ["I", "have", "two", "hands"],
+      "hint": "What do you have?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "water", "is", "cold"],
+      "hint": "Describe the water",
+      "explanation": "Subject + Verb + Adjective"
+    },
+    {
+      "words": ["Dad", "drives", "the", "car"],
+      "hint": "What does dad do?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["Fish", "swim", "in", "water"],
+      "hint": "Where do fish live?",
+      "explanation": "Subject + Verb + Preposition phrase"
+    },
+    {
+      "words": ["The", "moon", "shines", "brightly"],
+      "hint": "How does the moon shine?",
+      "explanation": "Subject + Verb + Adverb"
+    },
+    {
+      "words": ["She", "sings", "a", "song"],
+      "hint": "What is she doing?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "tree", "is", "tall"],
+      "hint": "Describe the tree",
+      "explanation": "Subject + Verb + Adjective"
+    },
+    {
+      "words": ["He", "kicks", "the", "ball"],
+      "hint": "What does he do?",
+      "explanation": "Subject + Verb + Object"
+    }
+,
+    {
+      "words": ["We", "love", "our", "family"],
+      "hint": "Who do we love?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "apple", "is", "red"],
+      "hint": "What color is the apple?",
+      "explanation": "Subject + Verb + Adjective"
+    },
+    {
+      "words": ["I", "drink", "milk", "daily"],
+      "hint": "What do you drink?",
+      "explanation": "Subject + Verb + Object + Adverb"
+    },
+    {
+      "words": ["The", "bird", "sings", "sweetly"],
+      "hint": "How does the bird sing?",
+      "explanation": "Subject + Verb + Adverb"
+    },
+    {
+      "words": ["She", "wears", "a", "dress"],
+      "hint": "What is she wearing?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "sky", "is", "blue"],
+      "hint": "What color is the sky?",
+      "explanation": "Subject + Verb + Adjective"
+    },
+    {
+      "words": ["He", "writes", "a", "letter"],
+      "hint": "What is he writing?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["We", "go", "to", "school"],
+      "hint": "Where do we go?",
+      "explanation": "Subject + Verb + Preposition phrase"
+    },
+    {
+      "words": ["The", "rabbit", "hops", "quickly"],
+      "hint": "How does the rabbit move?",
+      "explanation": "Subject + Verb + Adverb"
+    },
+    {
+      "words": ["I", "see", "a", "rainbow"],
+      "hint": "What do you see?",
+      "explanation": "Subject + Verb + Object"
+    }
+,
+    {
+      "words": ["The", "grass", "is", "green"],
+      "hint": "What color is the grass?",
+      "explanation": "Subject + Verb + Adjective"
+    },
+    {
+      "words": ["She", "draws", "a", "picture"],
+      "hint": "What is she drawing?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "clock", "ticks", "loudly"],
+      "hint": "How does the clock tick?",
+      "explanation": "Subject + Verb + Adverb"
+    },
+    {
+      "words": ["He", "eats", "an", "apple"],
+      "hint": "What is he eating?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "horse", "runs", "wild"],
+      "hint": "How does the horse run?",
+      "explanation": "Subject + Verb + Adverb"
+    },
+    {
+      "words": ["I", "brush", "my", "teeth"],
+      "hint": "What do you brush?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "rain", "falls", "softly"],
+      "hint": "How does the rain fall?",
+      "explanation": "Subject + Verb + Adverb"
+    },
+    {
+      "words": ["She", "hugs", "her", "teddy"],
+      "hint": "What does she hug?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["We", "play", "every", "day"],
+      "hint": "How often do we play?",
+      "explanation": "Subject + Verb + Time phrase"
+    },
+    {
+      "words": ["The", "frog", "jumps", "high"],
+      "hint": "How does the frog jump?",
+      "explanation": "Subject + Verb + Adverb"
+    }
+,
+    {
+      "words": ["He", "throws", "the", "frisbee"],
+      "hint": "What does he throw?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "wind", "blows", "gently"],
+      "hint": "How does the wind blow?",
+      "explanation": "Subject + Verb + Adverb"
+    },
+    {
+      "words": ["I", "wash", "my", "hands"],
+      "hint": "What do you wash?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "duck", "swims", "slowly"],
+      "hint": "How does the duck swim?",
+      "explanation": "Subject + Verb + Adverb"
+    },
+    {
+      "words": ["She", "opens", "the", "door"],
+      "hint": "What does she open?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["We", "share", "our", "toys"],
+      "hint": "What do we share?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "bee", "buzzes", "loudly"],
+      "hint": "How does the bee buzz?",
+      "explanation": "Subject + Verb + Adverb"
+    },
+    {
+      "words": ["He", "climbs", "the", "tree"],
+      "hint": "What does he climb?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["I", "love", "my", "pet"],
+      "hint": "What do you love?",
+      "explanation": "Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "snow", "is", "white"],
+      "hint": "What color is the snow?",
+      "explanation": "Subject + Verb + Adjective"
+    }
+  ],
+
+  "medium": [
+    {
+      "words": ["The", "happy", "children", "play", "in", "the", "park"],
+      "hint": "Where do the children play?",
+      "explanation": "Article + Adjective + Subject + Verb + Prepositional phrase"
+    },
+    {
+      "words": ["My", "little", "sister", "loves", "chocolate", "cake"],
+      "hint": "What does your sister love?",
+      "explanation": "Possessive + Adjective + Subject + Verb + Object"
+    },
+    {
+      "words": ["The", "big", "elephant", "drinks", "water", "slowly"],
+      "hint": "How does the elephant drink?",
+      "explanation": "Subject with adjective + Verb + Object + Adverb"
+    },
+    {
+      "words": ["She", "always", "does", "her", "homework", "carefully"],
+      "hint": "How does she do homework?",
+      "explanation": "Subject + Adverb + Verb + Object + Adverb"
+    },
+    {
+      "words": ["The", "teacher", "explains", "the", "lesson", "clearly"],
+      "hint": "How does the teacher explain?",
+      "explanation": "Subject + Verb + Object + Adverb"
+    },
+    {
+      "words": ["We", "went", "to", "the", "beach", "yesterday"],
+      "hint": "When did we go to the beach?",
+      "explanation": "Subject + Past tense verb + Prepositional phrase + Time adverb"
+    },
+    {
+      "words": ["The", "brown", "dog", "chases", "the", "white", "cat"],
+      "hint": "What does the dog chase?",
+      "explanation": "Subject with adjective + Verb + Object with adjective"
+    },
+    {
+      "words": ["My", "grandmother", "bakes", "delicious", "cookies", "often"],
+      "hint": "What does grandmother bake?",
+      "explanation": "Subject + Verb + Adjective + Object + Adverb"
+    },
+    {
+      "words": ["The", "students", "study", "hard", "for", "their", "exams"],
+      "hint": "Why do students study hard?",
+      "explanation": "Subject + Verb + Adverb + Prepositional phrase"
+    },
+    {
+      "words": ["He", "quickly", "finished", "his", "breakfast", "this", "morning"],
+      "hint": "When did he finish breakfast?",
+      "explanation": "Subject + Adverb + Verb + Object + Time phrase"
+    }
+,
+    {
+      "words": ["The", "colorful", "butterfly", "flies", "around", "the", "garden"],
+      "hint": "Where does the butterfly fly?",
+      "explanation": "Subject with adjective + Verb + Prepositional phrase"
+    },
+    {
+      "words": ["My", "best", "friend", "lives", "in", "a", "big", "house"],
+      "hint": "Where does your friend live?",
+      "explanation": "Subject + Verb + Prepositional phrase with adjective"
+    },
+    {
+      "words": ["The", "children", "happily", "opened", "their", "birthday", "presents"],
+      "hint": "How did the children open presents?",
+      "explanation": "Subject + Adverb + Verb + Object"
+    },
+    {
+      "words": ["She", "carefully", "waters", "the", "beautiful", "flowers", "daily"],
+      "hint": "How often does she water flowers?",
+      "explanation": "Subject + Adverb + Verb + Object + Frequency adverb"
+    },
+    {
+      "words": ["The", "hungry", "lion", "hunts", "for", "food", "at", "night"],
+      "hint": "When does the lion hunt?",
+      "explanation": "Subject with adjective + Verb + Prepositional phrase + Time phrase"
+    },
+    {
+      "words": ["My", "father", "works", "very", "hard", "every", "day"],
+      "hint": "How often does father work?",
+      "explanation": "Subject + Verb + Adverb phrase + Time phrase"
+    },
+    {
+      "words": ["The", "young", "boy", "rides", "his", "new", "bicycle"],
+      "hint": "What does the boy ride?",
+      "explanation": "Subject with adjective + Verb + Object with adjective"
+    },
+    {
+      "words": ["She", "quietly", "reads", "her", "favorite", "book", "at", "night"],
+      "hint": "When does she read?",
+      "explanation": "Subject + Adverb + Verb + Object + Time phrase"
+    },
+    {
+      "words": ["The", "tall", "giraffe", "eats", "leaves", "from", "the", "tree"],
+      "hint": "Where does the giraffe eat from?",
+      "explanation": "Subject with adjective + Verb + Object + Prepositional phrase"
+    },
+    {
+      "words": ["My", "mother", "always", "makes", "breakfast", "for", "us"],
+      "hint": "Who does mother make breakfast for?",
+      "explanation": "Subject + Adverb + Verb + Object + Prepositional phrase"
+    }
+,
+    {
+      "words": ["The", "smart", "student", "answers", "all", "the", "questions", "correctly"],
+      "hint": "How does the student answer?",
+      "explanation": "Subject with adjective + Verb + Object + Adverb"
+    },
+    {
+      "words": ["He", "usually", "plays", "football", "with", "his", "friends"],
+      "hint": "Who does he play with?",
+      "explanation": "Subject + Adverb + Verb + Object + Prepositional phrase"
+    },
+    {
+      "words": ["The", "old", "man", "walks", "slowly", "in", "the", "park"],
+      "hint": "Where does the man walk?",
+      "explanation": "Subject with adjective + Verb + Adverb + Prepositional phrase"
+    },
+    {
+      "words": ["My", "sister", "loves", "to", "dance", "at", "parties"],
+      "hint": "Where does your sister dance?",
+      "explanation": "Subject + Verb + Infinitive + Prepositional phrase"
+    },
+    {
+      "words": ["The", "kind", "doctor", "helps", "sick", "people", "every", "day"],
+      "hint": "Who does the doctor help?",
+      "explanation": "Subject with adjective + Verb + Object + Time phrase"
+    },
+    {
+      "words": ["She", "sometimes", "visits", "her", "grandparents", "on", "weekends"],
+      "hint": "When does she visit grandparents?",
+      "explanation": "Subject + Adverb + Verb + Object + Time phrase"
+    },
+    {
+      "words": ["The", "brave", "firefighter", "saves", "people", "from", "fires"],
+      "hint": "What does the firefighter save people from?",
+      "explanation": "Subject with adjective + Verb + Object + Prepositional phrase"
+    },
+    {
+      "words": ["My", "brother", "enjoys", "playing", "video", "games", "after", "school"],
+      "hint": "When does your brother play games?",
+      "explanation": "Subject + Verb + Gerund phrase + Time phrase"
+    },
+    {
+      "words": ["The", "beautiful", "princess", "lives", "in", "a", "tall", "castle"],
+      "hint": "Where does the princess live?",
+      "explanation": "Subject with adjective + Verb + Prepositional phrase"
+    },
+    {
+      "words": ["He", "never", "forgets", "to", "brush", "his", "teeth"],
+      "hint": "What does he never forget?",
+      "explanation": "Subject + Adverb + Verb + Infinitive phrase"
+    }
+,
+    {
+      "words": ["The", "funny", "clown", "makes", "everyone", "laugh", "at", "the", "circus"],
+      "hint": "Where does the clown perform?",
+      "explanation": "Subject with adjective + Verb + Object + Prepositional phrase"
+    },
+    {
+      "words": ["My", "pet", "hamster", "runs", "on", "its", "wheel", "all", "night"],
+      "hint": "When does the hamster run?",
+      "explanation": "Subject + Verb + Prepositional phrase + Time phrase"
+    },
+    {
+      "words": ["The", "excited", "puppy", "wags", "its", "tail", "very", "fast"],
+      "hint": "How does the puppy wag its tail?",
+      "explanation": "Subject with adjective + Verb + Object + Adverb phrase"
+    },
+    {
+      "words": ["She", "carefully", "paints", "a", "beautiful", "sunset", "picture"],
+      "hint": "What does she paint?",
+      "explanation": "Subject + Adverb + Verb + Object with adjectives"
+    },
+    {
+      "words": ["The", "lazy", "cat", "sleeps", "on", "the", "soft", "couch"],
+      "hint": "Where does the cat sleep?",
+      "explanation": "Subject with adjective + Verb + Prepositional phrase"
+    },
+    {
+      "words": ["My", "uncle", "drives", "his", "red", "car", "very", "carefully"],
+      "hint": "How does your uncle drive?",
+      "explanation": "Subject + Verb + Object + Adverb phrase"
+    },
+    {
+      "words": ["The", "cheerful", "birds", "sing", "beautiful", "songs", "every", "morning"],
+      "hint": "When do the birds sing?",
+      "explanation": "Subject with adjective + Verb + Object + Time phrase"
+    },
+    {
+      "words": ["He", "always", "helps", "his", "mother", "with", "the", "dishes"],
+      "hint": "What does he help with?",
+      "explanation": "Subject + Adverb + Verb + Object + Prepositional phrase"
+    },
+    {
+      "words": ["The", "tiny", "mouse", "hides", "behind", "the", "big", "bookshelf"],
+      "hint": "Where does the mouse hide?",
+      "explanation": "Subject with adjective + Verb + Prepositional phrase"
+    },
+    {
+      "words": ["My", "cousin", "plays", "the", "piano", "beautifully", "every", "evening"],
+      "hint": "When does your cousin play piano?",
+      "explanation": "Subject + Verb + Object + Adverb + Time phrase"
+    }
+,
+    {
+      "words": ["The", "strong", "wind", "blows", "the", "autumn", "leaves", "away"],
+      "hint": "What does the wind blow?",
+      "explanation": "Subject with adjective + Verb + Object + Adverb"
+    },
+    {
+      "words": ["She", "happily", "shares", "her", "lunch", "with", "her", "friends"],
+      "hint": "Who does she share with?",
+      "explanation": "Subject + Adverb + Verb + Object + Prepositional phrase"
+    },
+    {
+      "words": ["The", "clever", "fox", "runs", "quickly", "through", "the", "forest"],
+      "hint": "Where does the fox run?",
+      "explanation": "Subject with adjective + Verb + Adverb + Prepositional phrase"
+    },
+    {
+      "words": ["My", "neighbor", "grows", "fresh", "vegetables", "in", "her", "garden"],
+      "hint": "Where does your neighbor grow vegetables?",
+      "explanation": "Subject + Verb + Object + Prepositional phrase"
+    },
+    {
+      "words": ["The", "playful", "dolphins", "jump", "high", "above", "the", "water"],
+      "hint": "Where do the dolphins jump?",
+      "explanation": "Subject with adjective + Verb + Adverb + Prepositional phrase"
+    },
+    {
+      "words": ["He", "patiently", "waits", "for", "the", "school", "bus", "outside"],
+      "hint": "What does he wait for?",
+      "explanation": "Subject + Adverb + Verb + Prepositional phrase + Adverb"
+    },
+    {
+      "words": ["The", "sweet", "grandmother", "tells", "wonderful", "stories", "at", "bedtime"],
+      "hint": "When does grandmother tell stories?",
+      "explanation": "Subject with adjective + Verb + Object + Time phrase"
+    },
+    {
+      "words": ["My", "dog", "loves", "to", "chase", "squirrels", "in", "the", "yard"],
+      "hint": "Where does your dog chase squirrels?",
+      "explanation": "Subject + Verb + Infinitive phrase + Prepositional phrase"
+    },
+    {
+      "words": ["The", "busy", "bees", "collect", "sweet", "nectar", "from", "flowers"],
+      "hint": "Where do bees collect nectar?",
+      "explanation": "Subject with adjective + Verb + Object + Prepositional phrase"
+    },
+    {
+      "words": ["She", "eagerly", "opens", "her", "birthday", "presents", "with", "excitement"],
+      "hint": "How does she open presents?",
+      "explanation": "Subject + Adverb + Verb + Object + Prepositional phrase"
+    }
+  ],
+
+  "hard": [
+    {
+      "words": ["Although", "it", "was", "raining", "we", "still", "went", "outside"],
+      "hint": "What did we do despite the rain?",
+      "explanation": "Complex sentence with subordinate clause (Although...) + main clause"
+    },
+    {
+      "words": ["The", "scientist", "who", "discovered", "the", "cure", "won", "an", "award"],
+      "hint": "Who won an award?",
+      "explanation": "Subject + Relative clause (who discovered...) + Verb + Object"
+    },
+    {
+      "words": ["Before", "going", "to", "bed", "she", "always", "brushes", "her", "teeth"],
+      "hint": "What does she do before bed?",
+      "explanation": "Time clause (Before...) + Subject + Adverb + Verb + Object"
+    },
+    {
+      "words": ["The", "book", "that", "I", "borrowed", "from", "the", "library", "is", "interesting"],
+      "hint": "Describe the book from the library",
+      "explanation": "Subject + Relative clause (that I borrowed...) + Verb + Adjective"
+    },
+    {
+      "words": ["If", "you", "study", "hard", "you", "will", "pass", "the", "test"],
+      "hint": "What happens if you study hard?",
+      "explanation": "Conditional sentence: If clause + Result clause"
+    },
+    {
+      "words": ["The", "movie", "which", "we", "watched", "last", "night", "was", "very", "exciting"],
+      "hint": "Describe the movie from last night",
+      "explanation": "Subject + Relative clause + Verb + Adverb + Adjective"
+    },
+    {
+      "words": ["Because", "he", "practiced", "every", "day", "he", "became", "a", "great", "player"],
+      "hint": "Why did he become a great player?",
+      "explanation": "Cause clause (Because...) + Effect clause"
+    },
+    {
+      "words": ["The", "girl", "whose", "painting", "won", "first", "prize", "is", "my", "cousin"],
+      "hint": "Who is the girl with the winning painting?",
+      "explanation": "Subject + Possessive relative clause (whose...) + Verb + Object"
+    },
+    {
+      "words": ["After", "finishing", "his", "homework", "Tom", "played", "video", "games", "with", "friends"],
+      "hint": "What did Tom do after homework?",
+      "explanation": "Time clause + Subject + Verb + Object + Prepositional phrase"
+    },
+    {
+      "words": ["The", "restaurant", "where", "we", "had", "dinner", "serves", "delicious", "Italian", "food"],
+      "hint": "What kind of food does the restaurant serve?",
+      "explanation": "Subject + Relative clause (where...) + Verb + Object"
+    }
+,
+    {
+      "words": ["Unless", "you", "hurry", "up", "we", "will", "miss", "the", "school", "bus"],
+      "hint": "What happens if you don't hurry?",
+      "explanation": "Conditional with 'unless' + Result clause"
+    },
+    {
+      "words": ["The", "athlete", "who", "trained", "the", "hardest", "won", "the", "gold", "medal"],
+      "hint": "Who won the gold medal?",
+      "explanation": "Subject + Relative clause + Verb + Object"
+    },
+    {
+      "words": ["While", "mom", "was", "cooking", "dinner", "dad", "was", "helping", "with", "homework"],
+      "hint": "What was happening at the same time?",
+      "explanation": "Simultaneous actions: While clause + Main clause"
+    },
+    {
+      "words": ["The", "house", "that", "they", "built", "last", "year", "has", "a", "beautiful", "garden"],
+      "hint": "Describe the house they built",
+      "explanation": "Subject + Relative clause + Verb + Object"
+    },
+    {
+      "words": ["Even", "though", "she", "was", "tired", "she", "finished", "all", "her", "chores"],
+      "hint": "What did she do despite being tired?",
+      "explanation": "Concessive clause (Even though...) + Main clause"
+    },
+    {
+      "words": ["When", "the", "bell", "rings", "all", "the", "students", "go", "to", "class"],
+      "hint": "What happens when the bell rings?",
+      "explanation": "Time clause (When...) + Main clause"
+    },
+    {
+      "words": ["The", "teacher", "whom", "everyone", "respects", "retired", "after", "thirty", "years"],
+      "hint": "Who retired after thirty years?",
+      "explanation": "Subject + Relative clause (whom...) + Verb + Time phrase"
+    },
+    {
+      "words": ["Since", "it", "was", "sunny", "we", "decided", "to", "have", "a", "picnic"],
+      "hint": "Why did we have a picnic?",
+      "explanation": "Cause clause (Since...) + Main clause with infinitive"
+    },
+    {
+      "words": ["The", "dog", "that", "barks", "at", "night", "belongs", "to", "our", "neighbor"],
+      "hint": "Whose dog barks at night?",
+      "explanation": "Subject + Relative clause + Verb + Prepositional phrase"
+    },
+    {
+      "words": ["If", "it", "rains", "tomorrow", "we", "will", "stay", "inside", "and", "play", "games"],
+      "hint": "What will we do if it rains?",
+      "explanation": "Conditional: If clause + Result clause with compound verb"
+    }
+,
+    {
+      "words": ["The", "children", "who", "finished", "early", "were", "allowed", "to", "play", "outside"],
+      "hint": "Who was allowed to play outside?",
+      "explanation": "Subject + Relative clause + Passive verb + Infinitive"
+    },
+    {
+      "words": ["Although", "the", "test", "was", "difficult", "most", "students", "passed", "it"],
+      "hint": "What happened despite the difficult test?",
+      "explanation": "Concessive clause + Main clause"
+    },
+    {
+      "words": ["The", "cake", "which", "my", "mother", "baked", "for", "my", "birthday", "was", "delicious"],
+      "hint": "Describe the birthday cake",
+      "explanation": "Subject + Relative clause + Verb + Adjective"
+    },
+    {
+      "words": ["Before", "the", "game", "started", "the", "players", "warmed", "up", "on", "the", "field"],
+      "hint": "What did players do before the game?",
+      "explanation": "Time clause + Main clause with prepositional phrase"
+    },
+    {
+      "words": ["The", "man", "whose", "car", "broke", "down", "called", "for", "help", "immediately"],
+      "hint": "What did the man do when his car broke?",
+      "explanation": "Subject + Possessive relative clause + Verb + Adverb"
+    },
+    {
+      "words": ["Because", "she", "studied", "very", "hard", "she", "got", "the", "highest", "score"],
+      "hint": "Why did she get the highest score?",
+      "explanation": "Cause clause + Effect clause"
+    },
+    {
+      "words": ["The", "park", "where", "we", "play", "every", "weekend", "has", "a", "new", "playground"],
+      "hint": "What does the park have?",
+      "explanation": "Subject + Relative clause + Verb + Object"
+    },
+    {
+      "words": ["Unless", "you", "eat", "your", "vegetables", "you", "cannot", "have", "any", "dessert"],
+      "hint": "What must you do to get dessert?",
+      "explanation": "Conditional with 'unless' + Negative result clause"
+    },
+    {
+      "words": ["While", "I", "was", "reading", "my", "book", "my", "phone", "started", "to", "ring"],
+      "hint": "What happened while you were reading?",
+      "explanation": "Simultaneous actions: While clause + Main clause"
+    },
+    {
+      "words": ["The", "story", "that", "grandma", "told", "us", "was", "about", "a", "brave", "knight"],
+      "hint": "What was grandma's story about?",
+      "explanation": "Subject + Relative clause + Verb + Prepositional phrase"
+    }
+,
+    {
+      "words": ["If", "you", "practice", "every", "day", "you", "will", "become", "a", "better", "musician"],
+      "hint": "How can you become a better musician?",
+      "explanation": "Conditional: If clause + Result clause"
+    },
+    {
+      "words": ["The", "artist", "who", "painted", "this", "picture", "is", "famous", "around", "the", "world"],
+      "hint": "Who painted this famous picture?",
+      "explanation": "Subject + Relative clause + Verb + Adjective + Prepositional phrase"
+    },
+    {
+      "words": ["After", "the", "rain", "stopped", "a", "beautiful", "rainbow", "appeared", "in", "the", "sky"],
+      "hint": "What appeared after the rain?",
+      "explanation": "Time clause + Main clause with prepositional phrase"
+    },
+    {
+      "words": ["The", "student", "who", "studies", "the", "most", "usually", "gets", "the", "best", "grades"],
+      "hint": "Who gets the best grades?",
+      "explanation": "Subject + Relative clause + Adverb + Verb + Object"
+    },
+    {
+      "words": ["Because", "the", "weather", "was", "nice", "we", "decided", "to", "go", "hiking"],
+      "hint": "Why did we go hiking?",
+      "explanation": "Cause clause + Main clause with infinitive"
+    },
+    {
+      "words": ["The", "toy", "that", "my", "dad", "bought", "me", "is", "my", "favorite", "one"],
+      "hint": "Describe the toy your dad bought",
+      "explanation": "Subject + Relative clause + Verb + Object"
+    },
+    {
+      "words": ["When", "winter", "comes", "the", "birds", "fly", "south", "to", "warmer", "places"],
+      "hint": "What do birds do in winter?",
+      "explanation": "Time clause + Main clause with prepositional phrase"
+    },
+    {
+      "words": ["Although", "he", "was", "young", "he", "could", "play", "the", "piano", "very", "well"],
+      "hint": "What could he do despite being young?",
+      "explanation": "Concessive clause + Main clause with modal verb"
+    },
+    {
+      "words": ["The", "library", "where", "I", "study", "has", "thousands", "of", "interesting", "books"],
+      "hint": "What does the library have?",
+      "explanation": "Subject + Relative clause + Verb + Object"
+    },
+    {
+      "words": ["If", "we", "work", "together", "we", "can", "finish", "this", "project", "on", "time"],
+      "hint": "What happens if we work together?",
+      "explanation": "Conditional: If clause + Result clause with modal"
+    }
+,
+    {
+      "words": ["The", "doctor", "who", "treated", "my", "grandmother", "was", "very", "kind", "and", "caring"],
+      "hint": "Describe the doctor",
+      "explanation": "Subject + Relative clause + Verb + Adjectives with conjunction"
+    },
+    {
+      "words": ["Before", "you", "cross", "the", "street", "you", "must", "look", "both", "ways"],
+      "hint": "What must you do before crossing?",
+      "explanation": "Time clause + Main clause with modal verb"
+    },
+    {
+      "words": ["The", "cookies", "that", "she", "baked", "for", "the", "party", "were", "absolutely", "delicious"],
+      "hint": "Describe the cookies she baked",
+      "explanation": "Subject + Relative clause + Verb + Adverb + Adjective"
+    },
+    {
+      "words": ["Since", "he", "forgot", "his", "umbrella", "he", "got", "completely", "wet", "in", "the", "rain"],
+      "hint": "What happened because he forgot his umbrella?",
+      "explanation": "Cause clause + Effect clause with adverb"
+    },
+    {
+      "words": ["The", "museum", "where", "we", "saw", "the", "dinosaurs", "was", "really", "amazing"],
+      "hint": "Describe the museum",
+      "explanation": "Subject + Relative clause + Verb + Adverb + Adjective"
+    },
+    {
+      "words": ["Unless", "you", "finish", "your", "homework", "you", "cannot", "watch", "television", "tonight"],
+      "hint": "What must you do to watch TV?",
+      "explanation": "Conditional with 'unless' + Negative result clause"
+    },
+    {
+      "words": ["While", "the", "children", "were", "sleeping", "their", "parents", "prepared", "a", "surprise", "party"],
+      "hint": "What did the parents do while children slept?",
+      "explanation": "Simultaneous actions: While clause + Main clause"
+    },
+    {
+      "words": ["The", "song", "that", "she", "sang", "at", "the", "concert", "made", "everyone", "cry"],
+      "hint": "What effect did the song have?",
+      "explanation": "Subject + Relative clause + Verb + Object + Infinitive"
+    },
+    {
+      "words": ["Even", "though", "it", "was", "late", "they", "continued", "working", "on", "the", "project"],
+      "hint": "What did they do despite it being late?",
+      "explanation": "Concessive clause + Main clause with gerund"
+    },
+    {
+      "words": ["The", "boy", "whose", "dog", "won", "the", "competition", "was", "extremely", "proud"],
+      "hint": "How did the boy feel?",
+      "explanation": "Subject + Possessive relative clause + Verb + Adverb + Adjective"
+    }
+  ]
+}
