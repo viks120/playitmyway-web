@@ -35,7 +35,7 @@ body {
 }
 
 header {
-  background-color: #ffa500;
+  background-color: #9a3412;
   padding: 1.2em 0;
   color: white;
   font-size: clamp(2em, 6vw, 2.5em);
@@ -44,7 +44,7 @@ header {
   top: 0;
   z-index: 100;
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 h2 {
@@ -220,7 +220,7 @@ h2 {
 }
 
 .footer-links a {
-  color: #ffa500;
+  color: #b45309;
   text-decoration: none;
   font-weight: bold;
   transition: color 0.3s;
@@ -228,27 +228,28 @@ h2 {
 }
 
 .footer-links a:hover {
-  color: #ff6b6b;
+  color: #c0392b;
+  text-decoration: underline;
 }
 
 .footer-contact {
   margin-top: 10px;
-  opacity: 0.7;
 }
 
 .footer-contact small {
   font-size: clamp(0.7em, 2vw, 0.9em);
-  color: #666;
+  color: #444;
 }
 
 .footer-contact a {
-  color: #ffa500;
+  color: #b45309;
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .footer-contact a:hover {
-  color: #ff6b6b;
+  color: #c0392b;
+  text-decoration: underline;
 }
 
 /* Cookie Banner */
@@ -301,12 +302,12 @@ h2 {
 }
 
 .cookie-btn.accept {
-  background: #4ecdc4;
+  background: #0d7377;
   color: white;
 }
 
 .cookie-btn.reject {
-  background: #ff6b6b;
+  background: #c0392b;
   color: white;
 }
 
