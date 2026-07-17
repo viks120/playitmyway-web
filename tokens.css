@@ -34,7 +34,7 @@
   --color-focus: #2563eb;
 
   /* Age-band accents (AA-safe as text on white/tint) + soft tints */
-  --color-teal: #0d9488;
+  --color-teal: #0f766e;
   --color-teal-tint: #ccfbf1;
   --color-amber: #b45309;
   --color-amber-tint: #fef3c7;
@@ -75,6 +75,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Disables ALL motion. Game pages with gameplay-critical animation must override deliberately. */
   *,
   *::before,
   *::after {
