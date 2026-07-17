@@ -37,7 +37,7 @@ body {
 .hero {
   text-align: center;
   color: #fff;
-  background: linear-gradient(135deg, #ea580c 0%, #ef4444 45%, #7c3aed 100%);
+  background: linear-gradient(135deg, #c2410c 0%, #ef4444 45%, #7c3aed 100%);
   padding: var(--space-7) var(--space-4) var(--space-6);
   border-radius: 0 0 32px 32px;
 }
@@ -191,7 +191,7 @@ body {
   padding: var(--space-6) var(--space-4);
   text-align: center;
   color: #fff;
-  background: linear-gradient(135deg, #ea580c, #dc2626);
+  background: linear-gradient(135deg, #c2410c, #dc2626);
   border-radius: var(--radius-lg);
 }
 
