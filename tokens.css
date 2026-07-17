@@ -1,0 +1,86 @@
+/* ==========================================================================
+   Play It My Way — shared design tokens
+   Link BEFORE the page stylesheet:
+     homepage:   <link rel="stylesheet" href="tokens.css" />
+     game pages: <link rel="stylesheet" href="../../tokens.css" />
+   Font paths are relative to this file, so they work from any page.
+   No page-specific rules belong in this file.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Fredoka";
+  src: url("fonts/fredoka-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fredoka";
+  src: url("fonts/fredoka-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Base colors */
+  --color-bg: #fff8ef;
+  --color-surface: #ffffff;
+  --color-ink: #33302e;
+  --color-ink-soft: #5f5751;
+  --color-primary: #ff6b57;
+  --color-primary-deep: #9a3412;
+  --color-focus: #2563eb;
+
+  /* Age-band accents (AA-safe as text on white/tint) + soft tints */
+  --color-teal: #0f766e;
+  --color-teal-tint: #ccfbf1;
+  --color-amber: #b45309;
+  --color-amber-tint: #fef3c7;
+  --color-violet: #7c3aed;
+  --color-violet-tint: #ede9fe;
+  --color-green: #15803d;
+  --color-green-tint: #dcfce7;
+
+  /* Typography */
+  --font-display: "Fredoka", "Comic Sans MS", "Segoe UI", system-ui, sans-serif;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Corner radius */
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* Shadows */
+  --shadow-rest: 0 2px 8px rgba(51, 48, 46, 0.08);
+  --shadow-lift: 0 10px 24px rgba(51, 48, 46, 0.16);
+
+  /* Motion */
+  --ease-quick: 150ms ease;
+  --ease-move: 250ms ease;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Disables ALL motion. Game pages with gameplay-critical animation must override deliberately. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
