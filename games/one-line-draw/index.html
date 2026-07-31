@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#7c3aed" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>One Line Draw – Free One-Stroke Puzzle Game for Kids | Play It My Way</title>
+    <meta name="description" content="Play One Line Draw free online! Trace fun shapes — stars, rockets, castles — in one single stroke without lifting your finger. 36 brain-teasing puzzle levels for kids ages 7+. No ads, no download!" />
+    <meta name="keywords" content="one line draw game, one stroke puzzle, single line drawing game for kids, dot to dot puzzle game, brain games for kids, free puzzle games for children, logic games for kids online, trace shapes game, kids brain teaser, connect the dots game free" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="One Line Draw – Free One-Stroke Puzzle Game for Kids" />
+    <meta property="og:description" content="Trace fun shapes in one single line! 36 free puzzle levels for kids ages 7+. Play online — no ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/one-line-draw/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="One Line Draw – Free Puzzle Game for Kids" />
+    <meta name="twitter:description" content="Trace shapes in one stroke! 36 free levels for ages 7+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/one-line-draw/" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <style>
+      :root {
+        --bg: var(--color-bg);
+        --surface: var(--color-surface);
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --coral: var(--color-primary);
+        --coral-deep: var(--color-primary-deep);
+        --violet: var(--color-violet);
+        --violet-tint: var(--color-violet-tint);
+        --teal: var(--color-teal);
+        --teal-tint: var(--color-teal-tint);
+        --amber: var(--color-amber);
+        --amber-tint: var(--color-amber-tint);
+        --green: var(--color-green);
+        --green-tint: var(--color-green-tint);
+        --focus: var(--color-focus);
+        --line-idle: #ddd2c4;
+        --font: var(--font-display);
+      }
+    
+      html, body { background: var(--bg); }
+      body {
+        font-family: var(--font);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+      *, *::before, *::after { box-sizing: border-box; }
+      button { font-family: var(--font); }
+      .back-link {
+        color: var(--violet); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 8px 12px; border-radius: var(--radius-pill);
+        background: var(--violet-tint);
+        align-self: flex-start;
+        margin-bottom: 6px;
+      }
+    
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 {
+        font-size: clamp(26px, 7vw, 34px); font-weight: 600; margin: 0 0 4px;
+        text-wrap: balance;
+      }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+    
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        width: 100%; max-width: 520px;
+        padding: 14px 14px 18px;
+      }
+    
+      .level-row {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 8px; margin-bottom: 6px; flex-wrap: wrap;
+      }
+      .level-name {
+        font-weight: 600; font-size: 20px; margin: 0;
+        display: flex; align-items: center; gap: 8px;
+      }
+      .level-chip {
+        background: var(--violet-tint); color: var(--violet);
+        font-weight: 600; font-size: 14px;
+        padding: 5px 12px; border-radius: var(--radius-pill);
+        white-space: nowrap;
+      }
+      .lines-chip {
+        background: var(--teal-tint); color: var(--teal);
+        font-weight: 600; font-size: 14px;
+        padding: 5px 12px; border-radius: var(--radius-pill);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+    
+      .helper {
+        min-height: 26px; text-align: center; color: var(--ink-soft);
+        font-size: 16.5px; margin: 2px 0 6px;
+      }
+      .helper.excited { color: var(--teal); font-weight: 600; }
+      .helper.warn { color: var(--amber); font-weight: 600; }
+    
+      .board-wrap { position: relative; width: 100%; }
+      svg.board {
+        display: block; width: 100%; aspect-ratio: 1 / 1;
+        touch-action: none; user-select: none; -webkit-user-select: none;
+        border-radius: var(--radius-md);
+        background:
+          radial-gradient(circle at 20% 15%, rgba(124, 58, 237, 0.05), transparent 45%),
+          radial-gradient(circle at 85% 85%, rgba(255, 107, 87, 0.06), transparent 45%),
+          #fffdf9;
+      }
+    
+      .edge-idle {
+        stroke: var(--line-idle); stroke-width: 2.1;
+        stroke-dasharray: 3.4 2.6; stroke-linecap: round;
+      }
+      .edge-done {
+        stroke: var(--coral); stroke-width: 3.1; stroke-linecap: round;
+        filter: drop-shadow(0 0.6px 0.6px rgba(154, 52, 18, 0.25));
+      }
+      .edge-hint { stroke: var(--teal); stroke-width: 3.4; stroke-linecap: round; opacity: 0; }
+      .edge-hint.show { animation: hintFlash 1.6s ease; }
+      @keyframes hintFlash { 0%, 100% { opacity: 0; } 20%, 70% { opacity: 0.85; } }
+    
+      .rubber { stroke: var(--coral); stroke-width: 2.4; stroke-linecap: round; opacity: 0.45; }
+    
+      g.dot { cursor: pointer; }
+      g.dot .hit { fill: transparent; }
+      g.dot .vis {
+        fill: #ffffff; stroke: #b3a698; stroke-width: 1.6;
+        transition: fill 150ms ease, stroke 150ms ease;
+      }
+      g.dot.visited .vis { fill: #ffd9d2; stroke: var(--coral); }
+      g.dot.current .vis { fill: var(--teal); stroke: #0b5d56; }
+      g.dot.current .ring {
+        fill: none; stroke: var(--teal); stroke-width: 1;
+        animation: pulse 1.4s ease infinite;
+      }
+      g.dot .ring { fill: none; stroke: none; }
+      g.dot.start-glow .ring {
+        stroke: var(--teal); stroke-width: 1.2;
+        animation: pulse 1.1s ease 3;
+      }
+      @keyframes pulse {
+        0% { r: 4.6; opacity: 0.9; }
+        80% { r: 8.5; opacity: 0; }
+        100% { r: 8.5; opacity: 0; }
+      }
+      g.dot.wiggle { animation: wiggle 0.4s ease; }
+      @keyframes wiggle {
+        0%, 100% { transform: translate(0, 0); }
+        25% { transform: translate(-1.2px, 0); }
+        50% { transform: translate(1.2px, 0); }
+        75% { transform: translate(-0.8px, 0); }
+      }
+    
+      .controls {
+        display: flex; gap: 10px; justify-content: center;
+        margin-top: 12px; flex-wrap: wrap;
+      }
+      .btn {
+        border: none; cursor: pointer; font-weight: 600; font-size: 16px;
+        padding: 12px 20px; border-radius: var(--radius-pill);
+        min-height: 48px; transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn:active { transform: translateY(0); }
+      .btn-outline { background: var(--violet-tint); color: var(--violet); }
+      .btn-hint { background: var(--amber-tint); color: var(--amber); }
+    
+      .win-overlay {
+        position: absolute; inset: 0; border-radius: var(--radius-md);
+        background: rgba(255, 253, 249, 0.94);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 10px; text-align: center; padding: 20px;
+        animation: fadeIn 300ms ease;
+      }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      .win-overlay h2 { margin: 0; font-size: clamp(26px, 6vw, 34px); color: var(--green); }
+      .win-overlay p { margin: 0; color: var(--ink-soft); font-size: 17px; }
+      .btn-next {
+        background: var(--coral-deep); color: #fff; font-size: 18px;
+        box-shadow: var(--shadow-rest);
+      }
+      .btn-again { background: var(--green-tint); color: var(--green); }
+      .hidden { display: none !important; }
+    
+      .picker { width: 100%; max-width: 520px; margin-top: 18px; }
+      .picker h2 { font-size: 19px; margin: 0 0 8px; }
+      .tier-label {
+        font-size: 15px; font-weight: 600; margin: 12px 0 6px;
+        display: flex; align-items: center; gap: 6px;
+      }
+      .tier-easy { color: var(--teal); }
+      .tier-medium { color: var(--amber); }
+      .tier-hard { color: var(--violet); }
+      .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+      .lvl-chip {
+        border: 2px solid var(--line-idle); background: var(--surface);
+        color: var(--ink); cursor: pointer;
+        border-radius: var(--radius-md); padding: 7px 10px;
+        font-size: 15px; font-weight: 600; min-width: 52px; min-height: 44px;
+        display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+        transition: transform 150ms ease, border-color 150ms ease;
+      }
+      .lvl-chip:hover { transform: translateY(-2px); }
+      .lvl-chip.active { border-color: var(--violet); background: var(--violet-tint); color: var(--violet); }
+      .lvl-chip .done-mark { color: var(--green); }
+    
+      .how-to {
+        width: 100%; max-width: 520px; margin-top: 18px;
+        background: var(--surface); border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest); padding: 16px 18px;
+      }
+      .how-to h2 { font-size: 19px; margin: 0 0 8px; }
+      .how-to ol { margin: 0; padding-left: 22px; color: var(--ink-soft); font-size: 16px; line-height: 1.65; }
+      .how-to li::marker { color: var(--coral); font-weight: 600; }
+    
+    
+      .confetti-bit {
+        position: fixed; top: -14px; width: 10px; height: 14px;
+        border-radius: 3px; pointer-events: none; z-index: 50;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall {
+        to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; }
+      }
+    
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .confetti-bit { display: none; }
+        /* hint visibility must not depend on the animation */
+        .edge-hint.show { animation: none; opacity: 0.85; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+    
+    <header class="game-head">
+      <h1>✏️ One Line Draw</h1>
+      <p>Draw the whole shape in one line — cover every line, no repeats!</p>
+    </header>
+    
+    <main class="card">
+      <div class="level-row">
+        <span class="level-chip" id="levelChip">Level 1 of 24</span>
+        <h2 class="level-name" id="levelName"><span aria-hidden="true">🔺</span> Triangle</h2>
+        <span class="lines-chip" id="linesChip">0 / 3 lines</span>
+      </div>
+    
+      <p class="helper" id="helper" aria-live="polite">Tap a dot to start drawing!</p>
+    
+      <div class="board-wrap">
+        <svg class="board" id="board" viewBox="0 0 100 100" role="application"
+             aria-label="Puzzle board. Use Tab to reach dots, Enter to draw."></svg>
+        <div class="win-overlay hidden" id="winOverlay" role="dialog" aria-label="Puzzle complete">
+          <h2 id="winTitle">🎉 You did it!</h2>
+          <p id="winSub">You drew it in one line!</p>
+          <div class="controls">
+            <button class="btn btn-again" id="againBtn">🔄 Play again</button>
+            <button class="btn btn-next" id="nextBtn">Next puzzle →</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="controls">
+        <button class="btn btn-outline" id="undoBtn">↩️ Undo</button>
+        <button class="btn btn-outline" id="restartBtn">🔄 Restart</button>
+        <button class="btn btn-hint" id="hintBtn">💡 Hint</button>
+      </div>
+    </main>
+    
+    <nav class="picker" aria-label="Choose a puzzle">
+      <h2>🗺️ Pick a puzzle</h2>
+      <div id="pickerGroups"></div>
+    </nav>
+    
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Tap any dot to start. On tricky shapes, where you start matters!</li>
+        <li>Drag (or tap dot after dot) to draw along the lines.</li>
+        <li>Cover <strong>every line exactly once</strong> to win. You can't draw the same line twice!</li>
+        <li>Stuck? Use <strong>Undo</strong>, <strong>Restart</strong>, or a <strong>Hint</strong> 💡</li>
+      </ol>
+    </section>
+    
+    
+    <script>
+    (function () {
+      "use strict";
+      var LEVELS = [{"n":"Triangle","e":"🔺","t":"easy","d":[[50,14],[14,82],[86,82]],"g":[[0,1],[1,2],[2,0]]},{"n":"Lightning","e":"⚡","t":"easy","d":[[22,16],[78,16],[22,84],[78,84]],"g":[[0,1],[1,2],[2,3]]},{"n":"Mountain","e":"⛰️","t":"easy","d":[[10,80],[30,25],[50,62],[70,25],[90,80]],"g":[[0,1],[1,2],[2,3],[3,4]]},{"n":"Sandwich","e":"🥪","t":"easy","d":[[22,22],[78,22],[78,78],[22,78]],"g":[[0,1],[1,2],[2,3],[3,0],[0,2]]},{"n":"Ice Cream","e":"🍦","t":"easy","d":[[30,45],[70,45],[50,92],[50,8]],"g":[[0,2],[1,2],[0,1],[0,3],[3,1]]},{"n":"Flag","e":"🚩","t":"easy","d":[[30,10],[78,25],[30,40],[30,90]],"g":[[0,1],[1,2],[0,2],[2,3]]},{"n":"House","e":"🏠","t":"easy","d":[[25,44],[75,44],[75,90],[25,90],[50,12]],"g":[[0,1],[1,2],[2,3],[3,0],[0,4],[4,1]]},{"n":"Heart","e":"❤️","t":"easy","d":[[50,32],[32,10],[10,34],[50,92],[90,34],[68,10]],"g":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0]]},{"n":"Bowtie","e":"🎀","t":"easy","d":[[13,24],[13,76],[50,50],[87,24],[87,76]],"g":[[0,1],[1,2],[2,0],[2,3],[3,4],[4,2]]},{"n":"Envelope","e":"✉️","t":"easy","d":[[16,28],[84,28],[84,76],[16,76],[50,56]],"g":[[0,1],[1,2],[2,3],[3,0],[0,4],[1,4]]},{"n":"Fish","e":"🐟","t":"easy","d":[[12,50],[58,26],[58,74],[90,26],[90,74]],"g":[[0,1],[1,2],[2,0],[1,4],[2,3],[3,4]]},{"n":"Crown","e":"👑","t":"easy","d":[[15,86],[85,86],[15,54],[85,54],[31,20],[50,50],[69,20]],"g":[[0,1],[0,2],[1,3],[2,4],[4,5],[5,6],[6,3]]},{"n":"Arrow","e":"🏹","t":"medium","d":[[8,50],[58,50],[58,26],[58,74],[92,50]],"g":[[0,1],[2,1],[1,3],[2,4],[4,3]]},{"n":"Star","e":"⭐","t":"medium","d":[[50,8],[88,36],[74,84],[26,84],[12,36]],"g":[[0,2],[2,4],[4,1],[1,3],[3,0]]},{"n":"Key","e":"🔑","t":"medium","d":[[12,34],[26,20],[40,34],[26,48],[88,34],[88,52]],"g":[[0,1],[1,2],[2,3],[3,0],[2,4],[4,5]]},{"n":"Gem","e":"💎","t":"medium","d":[[13,38],[32,12],[68,12],[87,38],[50,90],[50,34]],"g":[[0,1],[1,2],[2,3],[3,4],[4,0],[1,5],[5,2]]},{"n":"Open Book","e":"📖","t":"medium","d":[[50,14],[50,78],[12,26],[12,90],[88,26],[88,90]],"g":[[0,1],[0,2],[2,3],[3,1],[0,4],[4,5],[5,1]]},{"n":"Tent","e":"⛺","t":"medium","d":[[50,10],[12,86],[88,86],[40,86],[60,86],[50,56]],"g":[[0,1],[0,2],[1,3],[3,4],[4,2],[3,5],[5,4]]},{"n":"Kite","e":"🪁","t":"medium","d":[[50,6],[78,36],[50,66],[22,36],[60,80],[44,92]],"g":[[0,1],[1,2],[2,3],[3,0],[0,2],[2,4],[4,5]]},{"n":"Shooting Star","e":"🌠","t":"medium","d":[[50,8],[88,36],[74,84],[26,84],[12,36],[72,14],[92,20]],"g":[[0,2],[2,4],[4,1],[1,3],[3,0],[0,5],[5,6]]},{"n":"Umbrella","e":"☂️","t":"medium","d":[[50,8],[10,46],[30,40],[50,44],[70,40],[90,46],[50,86]],"g":[[0,1],[0,3],[0,5],[1,2],[2,3],[3,4],[4,5],[3,6]]},{"n":"Sailboat","e":"⛵","t":"medium","d":[[20,68],[50,68],[80,68],[68,88],[32,88],[50,12],[74,52]],"g":[[0,1],[1,2],[2,3],[3,4],[4,0],[1,5],[5,6],[6,1]]},{"n":"Ring","e":"💍","t":"medium","d":[[50,40],[75,55],[75,80],[50,95],[25,80],[25,55],[35,24],[50,8],[65,24]],"g":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[0,6],[6,7],[7,8],[8,0]]},{"n":"Rocket","e":"🚀","t":"medium","d":[[50,6],[35,32],[65,32],[35,72],[65,72],[17,92],[35,92],[83,92],[65,92]],"g":[[0,1],[0,2],[1,3],[2,4],[3,4],[3,5],[5,6],[6,3],[4,7],[7,8],[8,4]]},{"n":"Santa's House","e":"🎅","t":"hard","d":[[25,40],[75,40],[75,90],[25,90],[50,10]],"g":[[0,1],[1,2],[2,3],[3,0],[0,4],[4,1],[0,2],[1,3]]},{"n":"Crystal","e":"💠","t":"hard","d":[[50,6],[85,28],[85,72],[50,94],[15,72],[15,28]],"g":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[0,2],[0,4]]},{"n":"Super Star","e":"🌟","t":"hard","d":[[50,8],[88,36],[74,84],[26,84],[12,36]],"g":[[0,1],[1,2],[2,3],[3,4],[4,0],[0,2],[2,4],[4,1],[1,3],[3,0]]},{"n":"Fox","e":"🦊","t":"hard","d":[[20,38],[80,38],[50,92],[38,38],[62,38],[12,8],[88,8]],"g":[[0,3],[3,4],[4,1],[0,2],[1,2],[0,5],[5,3],[1,6],[6,4],[3,2],[4,2]]},{"n":"Tulip","e":"🌷","t":"hard","d":[[32,30],[41,12],[50,26],[59,12],[68,30],[50,52],[50,72],[50,90],[28,62],[24,76]],"g":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[5,6],[6,7],[6,8],[8,9],[9,6]]},{"n":"Butterfly","e":"🦋","t":"hard","d":[[50,30],[50,70],[14,8],[6,40],[86,8],[94,40],[6,60],[14,92],[94,60],[86,92]],"g":[[0,1],[0,2],[2,3],[3,0],[0,4],[4,5],[5,0],[1,6],[6,7],[7,1],[1,8],[8,9],[9,1]]},{"n":"Flower","e":"🌸","t":"hard","d":[[50,50],[38,16],[62,16],[84,38],[84,62],[62,84],[38,84],[16,62],[16,38]],"g":[[0,1],[1,2],[2,0],[0,3],[3,4],[4,0],[0,5],[5,6],[6,0],[0,7],[7,8],[8,0]]},{"n":"Pinwheel","e":"🌀","t":"hard","d":[[50,50],[50,10],[80,24],[90,50],[76,80],[50,90],[20,76],[10,50],[24,20]],"g":[[0,1],[1,2],[2,0],[0,3],[3,4],[4,0],[0,5],[5,6],[6,0],[0,7],[7,8],[8,0]]},{"n":"Snowflake","e":"❄️","t":"hard","d":[[50,50],[43,22],[50,6],[57,22],[78,58],[88,72],[71,70],[22,58],[12,72],[29,70]],"g":[[0,1],[1,2],[2,3],[3,0],[0,4],[4,5],[5,6],[6,0],[0,7],[7,8],[8,9],[9,0]]},{"n":"Twin Houses","e":"🏘️","t":"hard","d":[[15,40],[50,40],[85,40],[15,90],[50,90],[85,90],[32,12],[68,12]],"g":[[0,1],[1,2],[0,3],[2,5],[3,4],[4,5],[1,4],[0,6],[6,1],[1,7],[7,2],[0,4],[2,4]]},{"n":"Castle","e":"🏰","t":"hard","d":[[15,45],[15,25],[29,25],[29,45],[43,45],[43,25],[57,25],[57,45],[71,45],[71,25],[85,25],[85,45],[15,88],[85,88],[29,6],[49,8],[39,14]],"g":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[0,12],[12,13],[13,11],[2,14],[14,15],[15,16],[16,14]]},{"n":"Twinkle","e":"✨","t":"hard","d":[[50,4],[10.8,72],[89.2,72],[50,96],[10.8,28],[89.2,28],[36.2,28],[23.5,50],[36.2,72],[63.8,72],[76.5,50],[63.8,28]],"g":[[0,6],[6,7],[7,1],[1,8],[8,9],[9,2],[2,10],[10,11],[11,0],[3,8],[8,7],[7,4],[4,6],[6,11],[11,5],[5,10],[10,9],[9,3]]}];
+    
+      var svg = document.getElementById("board");
+      var helper = document.getElementById("helper");
+      var levelChip = document.getElementById("levelChip");
+      var levelName = document.getElementById("levelName");
+      var linesChip = document.getElementById("linesChip");
+      var winOverlay = document.getElementById("winOverlay");
+      var winTitle = document.getElementById("winTitle");
+      var winSub = document.getElementById("winSub");
+      var pickerGroups = document.getElementById("pickerGroups");
+      var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    
+      var TIERS = [
+        { key: "easy", label: "🌱 Easy" },
+        { key: "medium", label: "🌟 Medium" },
+        { key: "hard", label: "🚀 Hard" }
+      ];
+    
+      // ---------- state ----------
+      var li = 0;                // current level index
+      var stroke = [];           // dot indices along the drawn path
+      var traced = [];           // per-edge boolean
+      var tracedCount = 0;
+      var completed = {};        // session-only: levelIndex -> true
+      var dragging = false;
+      var activePointerId = null;
+      var hintFlashTimer = 0;
+      var lastWiggle = -1;
+    
+      var lvl, adj, edgeEls, dotEls, rubber, hintEdgeEl;
+    
+      function edgesOf(l) { return l.g; }
+      function dotsOf(l) { return l.d; }
+    
+      function buildAdj(l) {
+        var a = l.d.map(function () { return []; });
+        l.g.forEach(function (e, i) {
+          a[e[0]].push({ to: e[1], ei: i });
+          a[e[1]].push({ to: e[0], ei: i });
+        });
+        return a;
+      }
+    
+      function oddDots(l) {
+        var deg = l.d.map(function () { return 0; });
+        l.g.forEach(function (e) { deg[e[0]]++; deg[e[1]]++; });
+        var out = [];
+        deg.forEach(function (d, i) { if (d % 2) out.push(i); });
+        return out;
+      }
+    
+      // Can we still finish (trace all remaining edges) starting from dot v?
+      function completableFrom(v) {
+        var remaining = [];
+        lvl.g.forEach(function (e, i) { if (!traced[i]) remaining.push([e[0], e[1]]); });
+        if (!remaining.length) return true;
+        var deg = {};
+        remaining.forEach(function (e) {
+          deg[e[0]] = (deg[e[0]] || 0) + 1;
+          deg[e[1]] = (deg[e[1]] || 0) + 1;
+        });
+        if (!deg[v]) return false;
+        // connectivity over remaining edges from v
+        var seen = {}; seen[v] = true;
+        var stack = [v];
+        var radj = {};
+        remaining.forEach(function (e) {
+          (radj[e[0]] = radj[e[0]] || []).push(e[1]);
+          (radj[e[1]] = radj[e[1]] || []).push(e[0]);
+        });
+        while (stack.length) {
+          var u = stack.pop();
+          (radj[u] || []).forEach(function (w) {
+            if (!seen[w]) { seen[w] = true; stack.push(w); }
+          });
+        }
+        for (var k in deg) if (!seen[k]) return false;
+        var odd = [];
+        for (var k2 in deg) if (deg[k2] % 2) odd.push(+k2);
+        if (odd.length === 0) return true;
+        if (odd.length === 2) return odd.indexOf(v) !== -1;
+        return false;
+      }
+    
+      // ---------- rendering ----------
+      function el(name, attrs) {
+        var n = document.createElementNS("http://www.w3.org/2000/svg", name);
+        for (var k in attrs) n.setAttribute(k, attrs[k]);
+        return n;
+      }
+    
+      function loadLevel(i) {
+        li = i;
+        lvl = LEVELS[i];
+        adj = buildAdj(lvl);
+        stroke = [];
+        traced = lvl.g.map(function () { return false; });
+        tracedCount = 0;
+        dragging = false;
+        winOverlay.classList.add("hidden");
+        svg.innerHTML = "";
+        edgeEls = []; dotEls = [];
+    
+        levelChip.textContent = "Level " + (i + 1) + " of " + LEVELS.length;
+        levelName.innerHTML = "";
+        var em = document.createElement("span");
+        em.setAttribute("aria-hidden", "true");
+        em.textContent = lvl.e;
+        levelName.appendChild(em);
+        levelName.appendChild(document.createTextNode(" " + lvl.n));
+    
+        // edges: idle layer, done layer, hint layer
+        lvl.g.forEach(function (e) {
+          var a = lvl.d[e[0]], b = lvl.d[e[1]];
+          var idle = el("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], "class": "edge-idle" });
+          svg.appendChild(idle);
+          edgeEls.push({ idle: idle, done: null, a: a, b: b });
+        });
+        lvl.g.forEach(function (e, i2) {
+          var a = lvl.d[e[0]], b = lvl.d[e[1]];
+          var done = el("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], "class": "edge-done" });
+          done.style.display = "none";
+          svg.appendChild(done);
+          edgeEls[i2].done = done;
+        });
+        hintEdgeEl = el("line", { x1: 0, y1: 0, x2: 0, y2: 0, "class": "edge-hint" });
+        svg.appendChild(hintEdgeEl);
+    
+        rubber = el("line", { x1: 0, y1: 0, x2: 0, y2: 0, "class": "rubber" });
+        rubber.style.display = "none";
+        svg.appendChild(rubber);
+    
+        lvl.d.forEach(function (p, di) {
+          var g = el("g", { "class": "dot", tabindex: "0", role: "button" });
+          g.setAttribute("aria-label", "Dot " + (di + 1));
+          var ring = el("circle", { cx: p[0], cy: p[1], r: 4.6, "class": "ring" });
+          var hit = el("circle", { cx: p[0], cy: p[1], r: 8.5, "class": "hit" });
+          var vis = el("circle", { cx: p[0], cy: p[1], r: 3.4, "class": "vis" });
+          g.appendChild(ring); g.appendChild(hit); g.appendChild(vis);
+          g.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter" || ev.key === " ") {
+              ev.preventDefault();
+              tapDot(di);
+            }
+          });
+          svg.appendChild(g);
+          dotEls.push(g);
+        });
+    
+        setHelper("Tap a dot to start drawing!", "");
+        updateHud();
+      }
+    
+      function updateHud() {
+        linesChip.textContent = tracedCount + " / " + lvl.g.length + " lines";
+        dotEls.forEach(function (g, di) {
+          g.classList.toggle("current", stroke.length > 0 && di === stroke[stroke.length - 1]);
+          g.classList.toggle("visited", stroke.indexOf(di) !== -1);
+        });
+        edgeEls.forEach(function (e, i) {
+          e.done.style.display = traced[i] ? "" : "none";
+        });
+      }
+    
+      function setHelper(msg, mood) {
+        helper.textContent = msg;
+        helper.className = "helper" + (mood ? " " + mood : "");
+      }
+    
+      function wiggleDot(di) {
+        var now = Date.now();
+        if (now - lastWiggle < 450) return;
+        lastWiggle = now;
+        var g = dotEls[di];
+        g.classList.remove("wiggle");
+        requestAnimationFrame(function () { g.classList.add("wiggle"); });
+        setTimeout(function () { g.classList.remove("wiggle"); }, 450);
+      }
+    
+      // ---------- game moves ----------
+      function currentDot() { return stroke.length ? stroke[stroke.length - 1] : -1; }
+    
+      function findEdge(a, b) {
+        var list = adj[a];
+        for (var i = 0; i < list.length; i++)
+          if (list[i].to === b) return list[i].ei;
+        return -1;
+      }
+    
+      function tapDot(di) {
+        if (!winOverlay.classList.contains("hidden")) return;
+        var cur = currentDot();
+        if (cur === -1) {
+          stroke.push(di);
+          setHelper("Great! Now drag or tap the next dot.", "excited");
+          updateHud();
+          return;
+        }
+        if (di === cur) return;
+        var ei = findEdge(cur, di);
+        if (ei === -1) {
+          setHelper("That dot isn't connected from here!", "warn");
+          wiggleDot(di);
+          return;
+        }
+        if (traced[ei]) {
+          setHelper("You already drew that line!", "warn");
+          wiggleDot(di);
+          return;
+        }
+        commitEdge(ei, di);
+      }
+    
+      function commitEdge(ei, to) {
+        traced[ei] = true;
+        tracedCount++;
+        stroke.push(to);
+        updateHud();
+    
+        if (tracedCount === lvl.g.length) { win(); return; }
+    
+        var hasNext = adj[to].some(function (n) { return !traced[n.ei]; });
+        if (!hasNext) {
+          setHelper("Oh no, dead end! Try Undo ↩️ or Restart 🔄", "warn");
+          return;
+        }
+        if (!completableFrom(to)) {
+          setHelper("Hmm, this way can't finish. Undo or Restart!", "warn");
+          return;
+        }
+        var left = lvl.g.length - tracedCount;
+        setHelper(left === 1 ? "One line left — you've got this!" : "Keep going! " + left + " lines to go.", left <= 2 ? "excited" : "");
+      }
+    
+      function undo() {
+        if (!winOverlay.classList.contains("hidden")) return;
+        if (!stroke.length) return;
+        if (stroke.length === 1) {
+          endDrag();
+          stroke = [];
+          setHelper("Tap a dot to start drawing!", "");
+          updateHud();
+          return;
+        }
+        var to = stroke[stroke.length - 1];
+        var from = stroke[stroke.length - 2];
+        var ei = findEdge(from, to);
+        if (ei !== -1 && traced[ei]) { traced[ei] = false; tracedCount--; }
+        stroke.pop();
+        setHelper("Undone! Keep drawing from the glowing dot.", "");
+        updateHud();
+      }
+    
+      function restart() {
+        endDrag();
+        stroke = [];
+        traced = lvl.g.map(function () { return false; });
+        tracedCount = 0;
+        setHelper("Fresh start! Tap a dot to begin.", "");
+        winOverlay.classList.add("hidden");
+        updateHud();
+      }
+    
+      function hint() {
+        if (!winOverlay.classList.contains("hidden")) return;
+        var cur = currentDot();
+        if (cur === -1) {
+          var odd = oddDots(lvl);
+          var starts = odd.length ? odd : lvl.d.map(function (_, i) { return i; });
+          starts.forEach(function (di) {
+            var g = dotEls[di];
+            clearTimeout(g._glowTimer);
+            g.classList.remove("start-glow");
+            requestAnimationFrame(function () { g.classList.add("start-glow"); });
+            g._glowTimer = setTimeout(function () { g.classList.remove("start-glow"); }, 3600);
+          });
+          setHelper(odd.length ? "Start on a glowing dot!" : "This one is a loop — start anywhere!", "excited");
+          return;
+        }
+        // Fleury step: find a next edge that keeps the puzzle finishable
+        var options = adj[cur].filter(function (n) { return !traced[n.ei]; });
+        if (!options.length) {
+          setHelper("No lines left here — Undo or Restart!", "warn");
+          return;
+        }
+        if (!completableFrom(cur)) {
+          setHelper("This path can't finish. Try Restart, then a glowing dot!", "warn");
+          return;
+        }
+        var pick = options[0];
+        for (var i = 0; i < options.length; i++) {
+          traced[options[i].ei] = true;
+          var ok = completableFrom(options[i].to);
+          traced[options[i].ei] = false;
+          if (ok) { pick = options[i]; break; }
+        }
+        var e = lvl.g[pick.ei];
+        var a = lvl.d[e[0]], b = lvl.d[e[1]];
+        hintEdgeEl.setAttribute("x1", a[0]); hintEdgeEl.setAttribute("y1", a[1]);
+        hintEdgeEl.setAttribute("x2", b[0]); hintEdgeEl.setAttribute("y2", b[1]);
+        clearTimeout(hintFlashTimer);
+        hintEdgeEl.classList.remove("show");
+        requestAnimationFrame(function () { hintEdgeEl.classList.add("show"); });
+        hintFlashTimer = setTimeout(function () { hintEdgeEl.classList.remove("show"); }, 1700);
+        setHelper("Try the flashing line!", "excited");
+      }
+    
+      function win() {
+        completed[li] = true;
+        rubber.style.display = "none";
+        dragging = false;
+        var allDone = LEVELS.every(function (_, i) { return completed[i]; });
+        winTitle.textContent = allDone ? "🏆 WOW! All puzzles done!" : "🎉 You did it!";
+        winSub.textContent = allDone
+          ? "You finished every single puzzle. Amazing!"
+          : "You drew " + lvl.n + " in one line!";
+        document.getElementById("nextBtn").classList.toggle("hidden", li === LEVELS.length - 1);
+        winOverlay.classList.remove("hidden");
+        setHelper("Puzzle complete! 🎉", "excited");
+        buildPicker();
+        confetti();
+      }
+    
+      function confetti() {
+        if (reducedMotion) return;
+        var colors = ["#ff6b57", "#7c3aed", "#0f766e", "#b45309", "#15803d"];
+        for (var i = 0; i < 70; i++) {
+          var bit = document.createElement("div");
+          bit.className = "confetti-bit";
+          bit.style.left = Math.random() * 100 + "vw";
+          bit.style.background = colors[i % colors.length];
+          bit.style.animationDuration = 1.6 + Math.random() * 1.6 + "s";
+          bit.style.animationDelay = Math.random() * 0.5 + "s";
+          bit.style.transform = "rotate(" + Math.random() * 360 + "deg)";
+          document.body.appendChild(bit);
+          (function (b) { setTimeout(function () { b.remove(); }, 4000); })(bit);
+        }
+      }
+    
+      // ---------- pointer input ----------
+      function svgPoint(ev) {
+        var r = svg.getBoundingClientRect();
+        return [
+          ((ev.clientX - r.left) / r.width) * 100,
+          ((ev.clientY - r.top) / r.height) * 100
+        ];
+      }
+    
+      function nearestDot(p, maxDist) {
+        var best = -1, bd = maxDist;
+        lvl.d.forEach(function (d, i) {
+          var dd = Math.hypot(d[0] - p[0], d[1] - p[1]);
+          if (dd < bd) { bd = dd; best = i; }
+        });
+        return best;
+      }
+    
+      svg.addEventListener("contextmenu", function (ev) { ev.preventDefault(); });
+    
+      svg.addEventListener("pointerdown", function (ev) {
+        if (!winOverlay.classList.contains("hidden")) return;
+        if (dragging) return;
+        if (ev.pointerType === "mouse" && ev.button !== 0) return;
+        ev.preventDefault();
+        var p = svgPoint(ev);
+        var di = nearestDot(p, 9);
+        if (di === -1) return;
+        svg.setPointerCapture(ev.pointerId);
+        activePointerId = ev.pointerId;
+        dragging = true;
+        tapDot(di);
+        if (currentDot() !== -1) {
+          var c = lvl.d[currentDot()];
+          rubber.setAttribute("x1", c[0]); rubber.setAttribute("y1", c[1]);
+          rubber.setAttribute("x2", p[0]); rubber.setAttribute("y2", p[1]);
+          rubber.style.display = "";
+        }
+      });
+    
+      svg.addEventListener("pointermove", function (ev) {
+        if (!dragging || ev.pointerId !== activePointerId || currentDot() === -1) return;
+        var p = svgPoint(ev);
+        var cur = currentDot();
+        var c = lvl.d[cur];
+        rubber.setAttribute("x1", c[0]); rubber.setAttribute("y1", c[1]);
+        rubber.setAttribute("x2", p[0]); rubber.setAttribute("y2", p[1]);
+    
+        var di = nearestDot(p, 7);
+        if (di === -1 || di === cur) return;
+        var ei = findEdge(cur, di);
+        if (ei !== -1 && !traced[ei]) {
+          commitEdge(ei, di);
+          var nc = lvl.d[di];
+          rubber.setAttribute("x1", nc[0]); rubber.setAttribute("y1", nc[1]);
+        }
+      });
+    
+      function endDrag(ev) {
+        if (ev && ev.pointerId !== activePointerId) return;
+        dragging = false;
+        activePointerId = null;
+        rubber.style.display = "none";
+      }
+      svg.addEventListener("pointerup", endDrag);
+      svg.addEventListener("pointercancel", endDrag);
+    
+      // ---------- picker ----------
+      function buildPicker() {
+        pickerGroups.innerHTML = "";
+        TIERS.forEach(function (tier) {
+          var label = document.createElement("p");
+          label.className = "tier-label tier-" + tier.key;
+          label.textContent = tier.label;
+          pickerGroups.appendChild(label);
+          var grid = document.createElement("div");
+          grid.className = "chip-grid";
+          LEVELS.forEach(function (l, i) {
+            if (l.t !== tier.key) return;
+            var b = document.createElement("button");
+            b.className = "lvl-chip" + (i === li ? " active" : "");
+            b.setAttribute("aria-label", "Level " + (i + 1) + ": " + l.n + (completed[i] ? " (completed)" : ""));
+            b.innerHTML = "<span aria-hidden='true'>" + l.e + "</span> " + (i + 1) +
+              (completed[i] ? " <span class='done-mark' aria-hidden='true'>✓</span>" : "");
+            b.addEventListener("click", function () {
+              loadLevel(i);
+              buildPicker();
+              document.querySelector(".card").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+            });
+            grid.appendChild(b);
+          });
+          pickerGroups.appendChild(grid);
+        });
+      }
+    
+      // ---------- buttons ----------
+      document.getElementById("undoBtn").addEventListener("click", undo);
+      document.getElementById("restartBtn").addEventListener("click", restart);
+      document.getElementById("hintBtn").addEventListener("click", hint);
+      document.getElementById("againBtn").addEventListener("click", restart);
+      document.getElementById("nextBtn").addEventListener("click", function () {
+        if (li < LEVELS.length - 1) { loadLevel(li + 1); buildPicker(); }
+      });
+    
+      // ---------- go ----------
+      loadLevel(0);
+      buildPicker();
+    })();
+    </script>
+  </body>
+</html>
