@@ -54,7 +54,11 @@
       }
 
       *, *::before, *::after { box-sizing: border-box; }
-      html, body { background: var(--bg); }
+      html, body {
+        background: var(--bg);
+        /* an accidental pull-to-refresh would wipe the stats and streak */
+        overscroll-behavior-y: contain;
+      }
       body {
         font-family: var(--font);
         color: var(--ink);
