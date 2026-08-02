@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0f766e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Dot to Dot Numbers – Free Connect the Dots Game for Kids | Play It My Way</title>
+    <meta name="description" content="Free online dot to dot game for kids! Tap the numbers 1, 2, 3 in order to reveal 21 fun pictures — a cat, a rocket, a butterfly and more. Counting practice for toddlers and preschoolers ages 3+. No ads, no download!" />
+    <meta name="keywords" content="dot to dot game for kids, connect the dots online, free counting game for toddlers, number order game, preschool counting activity, learn numbers 1 to 20, kids number game free, toddler educational game, connect the dots for preschoolers, counting practice online" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Dot to Dot Numbers – Free Connect the Dots Game for Kids" />
+    <meta property="og:description" content="Tap numbers in order to reveal 21 fun pictures! Counting practice for ages 3+. Free, no ads, no download." />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/dot-to-dot/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Dot to Dot Numbers – Free Kids Counting Game" />
+    <meta name="twitter:description" content="Connect numbered dots to reveal 21 pictures. Free counting game for ages 3+." />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/dot-to-dot/" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <style>
+      :root {
+        --bg: var(--color-bg);
+        --surface: var(--color-surface);
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --band: var(--color-teal);
+        --band-tint: var(--color-teal-tint);
+        --coral: var(--color-primary);
+        --coral-deep: var(--color-primary-deep);
+        --amber: var(--color-amber);
+        --amber-tint: var(--color-amber-tint);
+        --green: var(--color-green);
+        --green-tint: var(--color-green-tint);
+        --dot-idle: #c8bcae;
+        --font: var(--font-display);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { background: var(--bg); }
+      body {
+        font-family: var(--font);
+        color: var(--ink);
+        margin: 0;
+        padding: 14px 12px 44px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: var(--font); }
+
+      .back-link {
+        align-self: flex-start;
+        color: var(--band);
+        background: var(--band-tint);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      header.game-head { text-align: center; margin: 10px 0 12px; }
+      header.game-head h1 {
+        font-size: clamp(26px, 7vw, 34px);
+        font-weight: 600;
+        margin: 0 0 4px;
+        text-wrap: balance;
+      }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        width: 100%;
+        max-width: 520px;
+        padding: 14px 14px 18px;
+      }
+
+      .status-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+      .chip {
+        font-weight: 600;
+        font-size: 14px;
+        padding: 6px 12px;
+        border-radius: var(--radius-pill);
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+      .chip-picture { background: var(--band-tint); color: var(--band); }
+      .chip-dots { background: var(--amber-tint); color: var(--amber); }
+
+      .prompt {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin: 4px 0 12px;
+        min-height: 66px;
+      }
+      .prompt-label { font-size: 20px; font-weight: 600; color: var(--ink-soft); }
+      .prompt-number {
+        font-size: 46px;
+        font-weight: 600;
+        line-height: 1;
+        color: #fff;
+        background: var(--band);
+        border-radius: var(--radius-md);
+        padding: 8px 18px;
+        font-variant-numeric: tabular-nums;
+        box-shadow: var(--shadow-rest);
+      }
+      .prompt.done .prompt-number { background: var(--green); padding: 8px 16px; font-size: 34px; }
+
+      .board-wrap { position: relative; width: 100%; }
+      svg.board {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        border-radius: var(--radius-md);
+        background:
+          radial-gradient(circle at 22% 18%, rgba(15, 118, 110, 0.05), transparent 46%),
+          radial-gradient(circle at 82% 84%, rgba(255, 107, 87, 0.06), transparent 46%),
+          #fffdf9;
+      }
+
+      .fill-shape { opacity: 0; transition: opacity 400ms ease; }
+      .fill-shape.show { opacity: 0.28; }
+
+      .link-line { stroke-width: 2.6; stroke-linecap: round; fill: none; }
+
+      g.dot .hit { fill: transparent; }
+      g.dot .disc {
+        fill: #fff;
+        stroke: var(--dot-idle);
+        stroke-width: 1.6;
+        transition: fill 150ms ease, stroke 150ms ease;
+      }
+      g.dot .num {
+        font-size: 7.6px;
+        font-weight: 600;
+        fill: var(--ink-soft);
+        text-anchor: middle;
+        dominant-baseline: central;
+        pointer-events: none;
+      }
+      g.dot.linked .disc { fill: currentColor; stroke: currentColor; }
+      g.dot.linked .num { fill: var(--ink-soft); opacity: 0.7; }
+      g.dot.next { cursor: pointer; }
+      g.dot.next .disc { fill: #fff; stroke: currentColor; stroke-width: 2.4; }
+      g.dot.next .num { fill: var(--ink); font-size: 9.2px; }
+      g.dot.next .halo {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.2;
+        animation: ping 1.5s ease infinite;
+      }
+      g.dot .halo { fill: none; stroke: none; }
+      @keyframes ping {
+        0% { r: 6; opacity: 0.85; }
+        75% { r: 12; opacity: 0; }
+        100% { r: 12; opacity: 0; }
+      }
+      g.dot.nudge { animation: nudge 0.42s ease; }
+      @keyframes nudge {
+        0%, 100% { transform: translate(0, 0); }
+        30% { transform: translate(-1.4px, 0); }
+        60% { transform: translate(1.4px, 0); }
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 14px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 12px 20px;
+        border-radius: var(--radius-pill);
+        min-height: 48px;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn:active { transform: translateY(0); }
+      .btn-soft { background: var(--band-tint); color: var(--band); }
+      .btn-go { background: var(--coral-deep); color: #fff; font-size: 18px; box-shadow: var(--shadow-rest); }
+      .btn-again { background: var(--green-tint); color: var(--green); }
+
+      .win-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius-md);
+        background: rgba(255, 253, 249, 0.95);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        text-align: center;
+        padding: 20px;
+        animation: fadeIn 300ms ease;
+      }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      .win-emoji { font-size: clamp(56px, 18vw, 88px); line-height: 1; }
+      .win-overlay h2 { margin: 4px 0 0; font-size: clamp(24px, 6vw, 32px); color: var(--green); }
+      .win-overlay p { margin: 0; color: var(--ink-soft); font-size: 17px; }
+      .hidden { display: none !important; }
+
+      .picker { width: 100%; max-width: 520px; margin-top: 18px; }
+      .picker h2 { font-size: 19px; margin: 0 0 10px; }
+      .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+      .pic-chip {
+        border: 2px solid #e4dbcf;
+        background: var(--surface);
+        color: var(--ink);
+        cursor: pointer;
+        border-radius: var(--radius-md);
+        padding: 6px 10px;
+        font-size: 19px;
+        min-width: 52px;
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        transition: transform 150ms ease, border-color 150ms ease;
+      }
+      .pic-chip:hover { transform: translateY(-2px); }
+      .pic-chip.active { border-color: var(--band); background: var(--band-tint); }
+      .pic-chip .tick { font-size: 13px; color: var(--green); }
+
+      .how-to {
+        width: 100%;
+        max-width: 520px;
+        margin-top: 18px;
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 16px 18px;
+      }
+      .how-to h2 { font-size: 19px; margin: 0 0 8px; }
+      .how-to ol { margin: 0; padding-left: 22px; color: var(--ink-soft); font-size: 16px; line-height: 1.65; }
+      .how-to li::marker { color: var(--band); font-weight: 600; }
+
+      .confetti-bit {
+        position: fixed;
+        top: -14px;
+        width: 10px;
+        height: 14px;
+        border-radius: 3px;
+        pointer-events: none;
+        z-index: 50;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall { to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .confetti-bit { display: none; }
+        g.dot.next .halo { stroke-width: 1.6; opacity: 0.9; r: 8; }
+        .fill-shape.show { opacity: 0.28; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🔢 Dot to Dot</h1>
+      <p>Tap the numbers in order and see what picture appears!</p>
+    </header>
+
+    <main class="card">
+      <div class="status-row">
+        <span class="chip chip-picture" id="pictureChip">Picture 1 of 21</span>
+        <span class="chip chip-dots" id="dotsChip">0 of 4 dots</span>
+      </div>
+
+      <p class="prompt" id="prompt" aria-live="polite">
+        <span class="prompt-label">Tap number</span>
+        <span class="prompt-number" id="promptNumber">1</span>
+      </p>
+
+      <div class="board-wrap">
+        <svg class="board" id="board" viewBox="-9 -9 118 118" role="application"
+             aria-label="Dot to dot board. Tap the numbered dots in order."></svg>
+        <div class="win-overlay hidden" id="winOverlay" role="dialog" aria-label="Picture finished">
+          <span class="win-emoji" id="winEmoji" aria-hidden="true">🪁</span>
+          <h2 id="winTitle">It's a Kite!</h2>
+          <p id="winSub">You counted all the way to 4! 🎉</p>
+          <div class="controls">
+            <button class="btn btn-again" id="againBtn">🔄 Again</button>
+            <button class="btn btn-go" id="nextBtn">Next picture →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-soft" id="undoBtn">↩️ Undo</button>
+        <button class="btn btn-soft" id="restartBtn">🔄 Start over</button>
+      </div>
+    </main>
+
+    <nav class="picker" aria-label="Choose a picture">
+      <h2>🖼️ Pick a picture</h2>
+      <div class="chip-grid" id="pickerGrid"></div>
+    </nav>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Find the dot with the number <strong>1</strong> and tap it.</li>
+        <li>Then tap <strong>2</strong>, then <strong>3</strong> — count out loud as you go!</li>
+        <li>The glowing dot is always the next one. Tapping a wrong dot is fine, nothing breaks.</li>
+        <li>Join every dot to finish the picture and see what it is 🎉</li>
+      </ol>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+        var PICTURES = [{"n":"Kite","e":"🪁","c":"#7c3aed","d":[[50,8],[82,42],[50,92],[18,42]]},{"n":"House","e":"🏠","c":"#b45309","d":[[50,10],[88,42],[88,90],[12,90],[12,42]]},{"n":"Flag","e":"🚩","c":"#ff6b57","d":[[20,6],[32,6],[86,24],[32,42],[32,94],[20,94]]},{"n":"Tree","e":"🌲","c":"#15803d","d":[[50,6],[84,66],[58,66],[58,92],[42,92],[42,66],[16,66]]},{"n":"Pencil","e":"✏️","c":"#b45309","d":[[50,4],[66,28],[66,72],[72,92],[28,92],[34,72],[34,28]]},{"n":"Fish","e":"🐟","c":"#0f766e","d":[[14,50],[40,26],[70,34],[88,16],[88,84],[70,66],[40,74]]},{"n":"Ice Cream","e":"🍦","c":"#b45309","d":[[50,8],[74,18],[80,40],[70,52],[50,92],[30,52],[20,40],[26,18]]},{"n":"Crown","e":"👑","c":"#b45309","d":[[10,30],[26,58],[38,26],[50,54],[62,26],[74,58],[90,30],[86,86],[14,86]]},{"n":"Cupcake","e":"🧁","c":"#7c3aed","d":[[50,8],[72,22],[80,46],[88,54],[72,92],[28,92],[12,54],[20,46],[28,22]]},{"n":"Star","e":"⭐","c":"#b45309","d":[[50,6],[60.6,35.4],[91.8,36.4],[67.1,55.6],[75.9,85.6],[50,68],[24.1,85.6],[32.9,55.6],[8.2,36.4],[39.4,35.4]]},{"n":"Cat","e":"🐱","c":"#7c3aed","d":[[16,8],[34,30],[66,30],[84,8],[88,44],[84,72],[62,90],[38,90],[16,72],[12,44]]},{"n":"Moon","e":"🌙","c":"#b45309","d":[[50,6],[24.8,13.9],[8.7,34.9],[6,50],[8.7,65.1],[24.8,86],[50,94],[31.2,75.3],[24.4,50],[31.2,24.7]]},{"n":"Balloon","e":"🎈","c":"#ff6b57","d":[[50,4],[74,14],[86,36],[78,58],[58,74],[56,88],[44,88],[42,74],[22,58],[14,36],[26,14]]},{"n":"Mushroom","e":"🍄","c":"#ff6b57","d":[[50,10],[76,18],[90,44],[66,50],[64,80],[70,90],[30,90],[36,80],[34,50],[10,44],[24,18]]},{"n":"Rocket","e":"🚀","c":"#7c3aed","d":[[50,4],[66,30],[66,62],[86,84],[66,80],[58,94],[42,94],[34,80],[14,84],[34,62],[34,30]]},{"n":"Heart","e":"❤️","c":"#ff6b57","d":[[50,92],[22,68],[8,48],[8,30],[20,18],[36,20],[50,34],[64,20],[80,18],[92,30],[92,48],[78,68]]},{"n":"Butterfly","e":"🦋","c":"#7c3aed","d":[[50,10],[72,4],[92,26],[74,46],[94,66],[70,92],[50,78],[30,92],[6,66],[26,46],[8,26],[28,4]]},{"n":"Flower","e":"🌸","c":"#ff6b57","d":[[50,8],[60,32.7],[86.4,29],[70,50],[86.4,71],[60,67.3],[50,92],[40,67.3],[13.6,71],[30,50],[13.6,29],[40,32.7]]},{"n":"Apple","e":"🍎","c":"#ff6b57","d":[[40,26],[44,4],[58,8],[54,28],[74,18],[90,36],[88,62],[70,88],[50,94],[30,88],[12,62],[10,36],[26,18]]},{"n":"Duck","e":"🦆","c":"#b45309","d":[[58,8],[74,18],[92,26],[74,34],[68,46],[72,58],[78,74],[50,88],[22,80],[8,62],[26,56],[44,44],[50,26]]},{"n":"Sun","e":"☀️","c":"#b45309","d":[[50,4],[59.9,26],[82.5,17.5],[74,40.1],[96,50],[74,59.9],[82.5,82.5],[59.9,74],[50,96],[40.1,74],[17.5,82.5],[26,59.9],[4,50],[26,40.1],[17.5,17.5],[40.1,26]]}];
+
+        var svg = document.getElementById("board");
+        var promptEl = document.getElementById("prompt");
+        var promptNumber = document.getElementById("promptNumber");
+        var pictureChip = document.getElementById("pictureChip");
+        var dotsChip = document.getElementById("dotsChip");
+        var winOverlay = document.getElementById("winOverlay");
+        var winEmoji = document.getElementById("winEmoji");
+        var winTitle = document.getElementById("winTitle");
+        var winSub = document.getElementById("winSub");
+        var pickerGrid = document.getElementById("pickerGrid");
+        var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        var pi = 0;          // picture index
+        var joined = 0;      // how many dots are connected (0 = none tapped yet)
+        var done = {};       // session-only completion marks
+        var dragging = false;
+        var activePointerId = null;
+        var lastNudge = 0;
+        var winTimer = 0;
+        var pic, dotEls, lineEls, fillEl;
+
+        function el(name, attrs) {
+          var n = document.createElementNS("http://www.w3.org/2000/svg", name);
+          for (var k in attrs) n.setAttribute(k, attrs[k]);
+          return n;
+        }
+
+        function centroid(pts) {
+          var x = 0, y = 0;
+          pts.forEach(function (p) { x += p[0]; y += p[1]; });
+          return [x / pts.length, y / pts.length];
+        }
+
+        function norm(v) {
+          var l = Math.hypot(v[0], v[1]) || 1;
+          return [v[0] / l, v[1] / l];
+        }
+
+        function insidePoly(pt, poly) {
+          var c = false;
+          for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+            var xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+            if ((yi > pt[1]) !== (yj > pt[1]) &&
+                pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi) c = !c;
+          }
+          return c;
+        }
+
+        // Number labels sit along the outward corner bisector rather than
+        // straight out from the middle: on shapes with narrow parts (the
+        // mushroom stem) a radial push drops a label onto the next dot.
+        function labelSpots(pts, off) {
+          var n = pts.length;
+          var c = centroid(pts);
+          return pts.map(function (p, i) {
+            var prev = pts[(i - 1 + n) % n], next = pts[(i + 1) % n];
+            var a = norm([p[0] - prev[0], p[1] - prev[1]]);
+            var b = norm([p[0] - next[0], p[1] - next[1]]);
+            var d = [a[0] + b[0], a[1] + b[1]];
+            if (Math.hypot(d[0], d[1]) < 0.15) d = [p[0] - c[0], p[1] - c[1]];
+            d = norm(d);
+            if (insidePoly([p[0] + d[0] * 3, p[1] + d[1] * 3], pts)) d = [-d[0], -d[1]];
+            return [
+              Math.min(106, Math.max(-6, p[0] + d[0] * off)),
+              Math.min(106, Math.max(-5, p[1] + d[1] * off)),
+            ];
+          });
+        }
+
+        function loadPicture(i) {
+          clearTimeout(winTimer);
+          pi = i;
+          pic = PICTURES[i];
+          joined = 0;
+          endDrag();
+          winOverlay.classList.add("hidden");
+          promptEl.classList.remove("done");
+          svg.innerHTML = "";
+          dotEls = [];
+          lineEls = [];
+
+          var pts = pic.d;
+          var spots = labelSpots(pts, 8.5);
+
+          fillEl = el("polygon", {
+            points: pts.map(function (p) { return p[0] + "," + p[1]; }).join(" "),
+            fill: pic.c,
+            "class": "fill-shape",
+          });
+          svg.appendChild(fillEl);
+
+          // one line per edge, including the closing edge back to dot 1
+          for (var k = 0; k < pts.length; k++) {
+            var a = pts[k], b = pts[(k + 1) % pts.length];
+            var ln = el("line", {
+              x1: a[0], y1: a[1], x2: b[0], y2: b[1],
+              stroke: pic.c, "class": "link-line",
+            });
+            ln.style.display = "none";
+            svg.appendChild(ln);
+            lineEls.push(ln);
+          }
+
+          pts.forEach(function (p, di) {
+            var g = el("g", { "class": "dot", tabindex: "0", role: "button" });
+            g.style.color = pic.c;
+            g.setAttribute("aria-label", "Dot number " + (di + 1));
+            var halo = el("circle", { cx: p[0], cy: p[1], r: 6, "class": "halo" });
+            var hit = el("circle", { cx: p[0], cy: p[1], r: 9, "class": "hit" });
+            var disc = el("circle", { cx: p[0], cy: p[1], r: 3.9, "class": "disc" });
+
+            var num = el("text", { x: spots[di][0], y: spots[di][1], "class": "num" });
+            num.textContent = String(di + 1);
+
+            g.appendChild(halo);
+            g.appendChild(hit);
+            g.appendChild(disc);
+            g.appendChild(num);
+            g.addEventListener("keydown", function (ev) {
+              if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); tapDot(di); }
+            });
+            svg.appendChild(g);
+            dotEls.push(g);
+          });
+
+          update();
+        }
+
+        function nextIndex() {
+          // joined === 0 -> waiting for dot 1 (index 0)
+          return joined === 0 ? 0 : joined % pic.d.length;
+        }
+
+        function isFinished() { return joined === pic.d.length + 1; }
+
+        function update() {
+          pictureChip.textContent = "Picture " + (pi + 1) + " of " + PICTURES.length;
+          var totalDots = pic.d.length;
+          var tapped = Math.min(joined, totalDots);
+          dotsChip.textContent = tapped + " of " + totalDots + " dots";
+
+          lineEls.forEach(function (ln, k) {
+            // line k connects dot k -> dot k+1, drawn once both ends are joined
+            ln.style.display = joined >= k + 2 ? "" : "none";
+          });
+
+          var nxt = isFinished() ? -1 : nextIndex();
+          dotEls.forEach(function (g, di) {
+            var linked = joined > 0 && (di < joined || isFinished());
+            g.classList.toggle("linked", linked);
+            g.classList.toggle("next", di === nxt);
+            g.setAttribute("tabindex", di === nxt ? "0" : "-1");
+          });
+
+          if (isFinished()) {
+            promptEl.classList.add("done");
+            promptEl.querySelector(".prompt-label").textContent = "All done!";
+            promptNumber.textContent = "🎉";
+          } else if (joined === pic.d.length) {
+            promptNumber.textContent = "1";
+            promptEl.querySelector(".prompt-label").textContent = "Last one! Back to";
+          } else {
+            promptEl.querySelector(".prompt-label").textContent = "Tap number";
+            promptNumber.textContent = String(nxt + 1);
+          }
+        }
+
+        function nudgeDot(di) {
+          var now = Date.now();
+          if (now - lastNudge < 420) return;
+          lastNudge = now;
+          var g = dotEls[di];
+          g.classList.remove("nudge");
+          requestAnimationFrame(function () { g.classList.add("nudge"); });
+          setTimeout(function () { g.classList.remove("nudge"); }, 440);
+        }
+
+        function tapDot(di) {
+          if (!winOverlay.classList.contains("hidden") || isFinished()) return;
+          if (di !== nextIndex()) { nudgeDot(di); return; }
+          joined++;
+          update();
+          if (isFinished()) finish();
+        }
+
+        function finish() {
+          fillEl.classList.add("show");
+          done[pi] = true;
+          winEmoji.textContent = pic.e;
+          winTitle.textContent = "It's a " + pic.n + "!";
+          winSub.textContent = "You counted all the way to " + pic.d.length + "! 🎉";
+          document.getElementById("nextBtn").classList.toggle("hidden", pi === PICTURES.length - 1);
+          buildPicker();
+          confetti();
+          clearTimeout(winTimer);
+          winTimer = setTimeout(function () {
+            winOverlay.classList.remove("hidden");
+            document.getElementById("againBtn").focus();
+          }, reducedMotion ? 300 : 900);
+        }
+
+        function undo() {
+          if (!winOverlay.classList.contains("hidden") || isFinished() || joined === 0) return;
+          joined--;
+          fillEl.classList.remove("show");
+          update();
+        }
+
+        function restart() {
+          clearTimeout(winTimer);
+          joined = 0;
+          fillEl.classList.remove("show");
+          winOverlay.classList.add("hidden");
+          promptEl.classList.remove("done");
+          endDrag();
+          update();
+        }
+
+        function confetti() {
+          if (reducedMotion) return;
+          var colors = ["#ff6b57", "#7c3aed", "#0f766e", "#b45309", "#15803d"];
+          for (var i = 0; i < 60; i++) {
+            var bit = document.createElement("div");
+            bit.className = "confetti-bit";
+            bit.style.left = Math.random() * 100 + "vw";
+            bit.style.background = colors[i % colors.length];
+            bit.style.animationDuration = 1.6 + Math.random() * 1.6 + "s";
+            bit.style.animationDelay = Math.random() * 0.4 + "s";
+            document.body.appendChild(bit);
+            (function (b) { setTimeout(function () { b.remove(); }, 4000); })(bit);
+          }
+        }
+
+        // ---------- pointer ----------
+        // must match the board's viewBox so hit radii stay in picture units
+        var VB = { x: -9, y: -9, w: 118, h: 118 };
+        function svgPoint(ev) {
+          var r = svg.getBoundingClientRect();
+          return [
+            VB.x + ((ev.clientX - r.left) / r.width) * VB.w,
+            VB.y + ((ev.clientY - r.top) / r.height) * VB.h,
+          ];
+        }
+
+        function hitDot(p) {
+          var best = -1, bd = 9;
+          pic.d.forEach(function (d, i) {
+            var dd = Math.hypot(d[0] - p[0], d[1] - p[1]);
+            if (dd < bd) { bd = dd; best = i; }
+          });
+          return best;
+        }
+
+        svg.addEventListener("contextmenu", function (ev) { ev.preventDefault(); });
+
+        svg.addEventListener("pointerdown", function (ev) {
+          if (!winOverlay.classList.contains("hidden")) return;
+          if (dragging) return;
+          if (ev.pointerType === "mouse" && ev.button !== 0) return;
+          var di = hitDot(svgPoint(ev));
+          if (di === -1) return;
+          ev.preventDefault();
+          svg.setPointerCapture(ev.pointerId);
+          activePointerId = ev.pointerId;
+          dragging = true;
+          tapDot(di);
+        });
+
+        svg.addEventListener("pointermove", function (ev) {
+          if (!dragging || ev.pointerId !== activePointerId) return;
+          if (isFinished()) return;
+          var di = hitDot(svgPoint(ev));
+          if (di !== -1 && di === nextIndex()) tapDot(di);
+        });
+
+        function endDrag(ev) {
+          if (ev && ev.pointerId !== activePointerId) return;
+          dragging = false;
+          activePointerId = null;
+        }
+        svg.addEventListener("pointerup", endDrag);
+        svg.addEventListener("pointercancel", endDrag);
+
+        // ---------- picker ----------
+        function buildPicker() {
+          pickerGrid.innerHTML = "";
+          PICTURES.forEach(function (p, i) {
+            var b = document.createElement("button");
+            b.className = "pic-chip" + (i === pi ? " active" : "");
+            b.setAttribute("aria-label", "Picture " + (i + 1) + ": " + p.n +
+              " (" + p.d.length + " dots)" + (done[i] ? ", finished" : ""));
+            b.innerHTML = "<span aria-hidden='true'>" + p.e + "</span>" +
+              (done[i] ? "<span class='tick' aria-hidden='true'>✓</span>" : "");
+            b.addEventListener("click", function () {
+              loadPicture(i);
+              buildPicker();
+              document.querySelector(".card").scrollIntoView({
+                behavior: reducedMotion ? "auto" : "smooth", block: "start",
+              });
+            });
+            pickerGrid.appendChild(b);
+          });
+        }
+
+        document.getElementById("undoBtn").addEventListener("click", undo);
+        document.getElementById("restartBtn").addEventListener("click", restart);
+        document.getElementById("againBtn").addEventListener("click", restart);
+        document.getElementById("nextBtn").addEventListener("click", function () {
+          if (pi < PICTURES.length - 1) { loadPicture(pi + 1); buildPicker(); }
+        });
+
+        loadPicture(0);
+        buildPicker();
+      })();
+    </script>
+  </body>
+</html>

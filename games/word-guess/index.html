@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#15803d" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Word Guess – Free 5 Letter Word Puzzle Game Online | Play It My Way</title>
+    <meta name="description" content="Play Word Guess free online! Crack the hidden five-letter word in six tries — green means right spot, yellow means right letter, wrong spot. Over 500 hidden words, a fresh one every round. No ads, no download!" />
+    <meta name="keywords" content="word guess game, 5 letter word game, five letter word puzzle, guess the word online, free word puzzle game, daily word game free, letter guessing game, brain word game online, vocabulary game free, word deduction puzzle" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Word Guess – Free 5 Letter Word Puzzle Game" />
+    <meta property="og:description" content="Crack the hidden five-letter word in six tries. Over 500 words, a fresh puzzle every round. Free, no ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/word-guess/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Word Guess – Free 5 Letter Word Puzzle" />
+    <meta name="twitter:description" content="Guess the hidden five-letter word in six tries. Free, unlimited rounds, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/word-guess/" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <style>
+      :root {
+        --bg: var(--color-bg);
+        --surface: var(--color-surface);
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --band: var(--color-green);
+        --band-tint: var(--color-green-tint);
+        --coral-deep: var(--color-primary-deep);
+        --font: var(--font-display);
+
+        --tile-empty-border: #ded4c7;
+        --tile-filled-border: #a89a8b;
+        --state-correct: #15803d;
+        --state-present: #b45309;
+        --state-absent: #6b6157;
+        --key-bg: #ece3d8;
+      }
+      :root.cb {
+        /* colour-blind friendly: blue = right spot, orange = wrong spot */
+        --state-correct: #1d4ed8;
+        --state-present: #c2410c;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { background: var(--bg); }
+      body {
+        font-family: var(--font);
+        color: var(--ink);
+        margin: 0;
+        padding: 14px 12px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: var(--font); }
+
+      .back-link {
+        align-self: flex-start;
+        color: var(--band);
+        background: var(--band-tint);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      header.game-head { text-align: center; margin: 10px 0 10px; }
+      header.game-head h1 {
+        font-size: clamp(26px, 7vw, 34px);
+        font-weight: 600;
+        margin: 0 0 4px;
+        text-wrap: balance;
+      }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        width: 100%;
+        max-width: 460px;
+        padding: 14px 12px 16px;
+      }
+
+      .stats-row {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+      }
+      .stat {
+        background: var(--band-tint);
+        color: var(--band);
+        font-weight: 600;
+        font-size: 13.5px;
+        padding: 6px 12px;
+        border-radius: var(--radius-pill);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .board {
+        display: grid;
+        grid-template-rows: repeat(6, 1fr);
+        gap: 6px;
+        width: 100%;
+        max-width: 330px;
+        margin: 0 auto;
+      }
+      .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+      .row.shake { animation: rowShake 0.5s ease; }
+      @keyframes rowShake {
+        10%, 90% { transform: translateX(-3px); }
+        20%, 80% { transform: translateX(5px); }
+        30%, 50%, 70% { transform: translateX(-7px); }
+        40%, 60% { transform: translateX(7px); }
+      }
+
+      .tile {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(24px, 8vw, 31px);
+        font-weight: 600;
+        text-transform: uppercase;
+        border: 2px solid var(--tile-empty-border);
+        border-radius: 10px;
+        background: var(--surface);
+        color: var(--ink);
+        user-select: none;
+        transition: transform 120ms ease;
+      }
+      .tile.filled { border-color: var(--tile-filled-border); }
+      .tile.pop { animation: tilePop 130ms ease; }
+      @keyframes tilePop { 50% { transform: scale(1.09); } }
+      .tile.flip { animation: tileFlip 520ms ease forwards; }
+      @keyframes tileFlip {
+        0% { transform: rotateX(0deg); }
+        50% { transform: rotateX(90deg); }
+        100% { transform: rotateX(0deg); }
+      }
+      .tile.correct { background: var(--state-correct); border-color: var(--state-correct); color: #fff; }
+      .tile.present { background: var(--state-present); border-color: var(--state-present); color: #fff; }
+      .tile.absent { background: var(--state-absent); border-color: var(--state-absent); color: #fff; }
+
+      .message {
+        text-align: center;
+        min-height: 46px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        margin: 12px 0 6px;
+        font-size: 17px;
+        font-weight: 600;
+      }
+      .message .sub { font-size: 14.5px; font-weight: 400; color: var(--ink-soft); }
+      .message.good { color: var(--band); }
+      .message.bad { color: var(--coral-deep); }
+      .message.info { color: var(--ink-soft); font-weight: 400; }
+
+      .keyboard { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+      .kb-row { display: flex; gap: 5px; justify-content: center; }
+      .key {
+        flex: 1 1 auto;
+        min-width: 0;
+        min-height: 50px;
+        border: none;
+        border-radius: 8px;
+        background: var(--key-bg);
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        cursor: pointer;
+        padding: 4px 2px;
+        transition: transform 120ms ease, background 150ms ease;
+      }
+      .key:hover:not(:disabled) { transform: translateY(-2px); }
+      .key.wide { flex: 1.6 1 auto; font-size: 12.5px; letter-spacing: 0.02em; }
+      .key.correct { background: var(--state-correct); color: #fff; }
+      .key.present { background: var(--state-present); color: #fff; }
+      .key.absent { background: var(--state-absent); color: #fff; opacity: 0.85; }
+
+      .controls { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+      .btn {
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 15.5px;
+        padding: 11px 18px;
+        border-radius: var(--radius-pill);
+        min-height: 46px;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn-soft { background: var(--band-tint); color: var(--band); }
+      .btn-go { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
+      .btn[aria-pressed="true"] { outline: 2px solid var(--band); outline-offset: 1px; }
+
+      .how-to {
+        width: 100%;
+        max-width: 460px;
+        margin-top: 18px;
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 16px 18px;
+      }
+      .how-to h2 { font-size: 19px; margin: 0 0 8px; }
+      .how-to ul { margin: 0; padding-left: 20px; color: var(--ink-soft); font-size: 15.5px; line-height: 1.7; }
+      .how-to li::marker { color: var(--band); }
+      .swatch {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border-radius: 4px;
+        vertical-align: -2px;
+        margin-right: 3px;
+      }
+      .sw-correct { background: var(--state-correct); }
+      .sw-present { background: var(--state-present); }
+      .sw-absent { background: var(--state-absent); }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .confetti-bit {
+        position: fixed;
+        top: -14px;
+        width: 10px;
+        height: 14px;
+        border-radius: 3px;
+        pointer-events: none;
+        z-index: 50;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall { to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .confetti-bit { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🔠 Word Guess</h1>
+      <p>Crack the hidden five-letter word in six tries.</p>
+    </header>
+
+    <main class="card">
+      <div class="stats-row">
+        <span class="stat" id="statRound">Try 1 of 6</span>
+        <span class="stat" id="statWon">Won 0 of 0</span>
+        <span class="stat" id="statStreak">Streak 0</span>
+      </div>
+
+      <div class="board" id="board" aria-label="Guess grid"></div>
+
+      <p class="message info" id="message" aria-live="polite">Type or tap a five-letter word, then press Enter.</p>
+
+      <div class="keyboard" id="keyboard"></div>
+
+      <div class="controls">
+        <button class="btn btn-go" id="newBtn">🔄 New word</button>
+        <button class="btn btn-soft" id="cbBtn" aria-pressed="false">👁️ Colour-blind mode</button>
+      </div>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ul>
+        <li>Guess a real five-letter word and press <strong>Enter</strong>.</li>
+        <li><span class="swatch sw-correct"></span><strong>Right letter, right spot</strong></li>
+        <li><span class="swatch sw-present"></span><strong>Right letter, wrong spot</strong></li>
+        <li><span class="swatch sw-absent"></span><strong>Not in the word at all</strong></li>
+        <li>Six tries. A brand new word every round — nothing is saved, so your scores reset when you leave.</li>
+      </ul>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+        var DATA = {"a":["acorn","actor","adult","after","agent","alarm","album","alien","amber","angle","angry","ankle","anvil","apple","apron","arena","argue","attic","bacon","bagel","baker","banjo","beach","begin","beige","belly","bench","berry","birch","bison","black","block","bloom","board","boast","bonus","bossy","bound","brain","brass","brave","bread","brick","bride","brief","bring","broad","brook","broom","brown","brush","buddy","build","built","bunny","buyer","cabin","cable","camel","candy","canoe","carry","carve","catch","cedar","cello","chain","chair","chalk","chant","charm","chart","chase","cheap","check","cheek","cheer","chest","chief","child","chill","choir","claim","clamp","class","clean","clear","cliff","climb","clock","cloth","cloud","coach","coast","cocoa","comet","coral","couch","count","court","craft","crane","crate","crawl","cream","creek","creep","crisp","cross","crowd","crown","crust","curve","cycle","daddy","daily","daisy","dance","delay","delta","denim","depth","digit","disco","dodge","dough","dozen","drain","drawn","dream","dress","drift","drill","drink","drive","drone","dryer","eager","eagle","early","earth","eight","elbow","empty","enjoy","enter","equal","essay","exact","fancy","feast","fence","ferry","fetch","field","fifth","fifty","final","finch","first","flake","float","floor","flour","flute","foggy","forge","forty","frame","fresh","frost","frown","fruit","funny","gecko","giant","glass","glide","globe","glove","goofy","goose","gorge","grade","grain","grape","graph","grass","great","green","greet","grill","groom","group","grove","guest","guide","happy","hazel","heart","heavy","hedge","hello","hiker","hinge","hippo","honey","horse","hotel","house","hover","humid","hurry","hyena","ideal","imply","ivory","jelly","jolly","judge","juice","kayak","knead","koala","large","laser","latch","later","laugh","layer","leafy","learn","leave","lemon","level","lever","light","lilac","linen","llama","lobby","lodge","logic","loyal","lucky","lunar","lunch","magic","maker","mango","maple","march","marry","marsh","match","medal","melon","merry","metal","meter","mimic","misty","mixer","model","mommy","money","month","moody","moose","motor","mount","mouse","mouth","mower","music","nerve","never","niece","night","noble","noisy","notch","novel","nurse","nylon","oasis","ocean","offer","often","olive","onion","opera","orbit","order","organ","otter","ounce","paint","panda","paper","party","pasta","paste","patch","patio","pause","peace","peach","pedal","penny","petal","phone","piano","pilot","pizza","plain","plane","plant","plate","pluck","point","poppy","porch","pouch","pound","power","price","pride","print","prism","prize","proud","pulse","pupil","puppy","purse","quail","quick","quiet","quilt","quote","radio","rainy","raise","ranch","ratio","raven","reach","ready","reply","rhino","rhyme","ridge","river","roast","robin","robot","rocky","round","route","rugby","ruler","salad","sandy","sauce","scale","scarf","scold","scoop","score","scout","seven","shake","shape","share","shark","sheep","sheet","shelf","shift","shine","shirt","shore","short","shout","shrub","silly","sixty","skate","skill","skirt","skunk","slate","sleet","slice","slide","slope","sloth","small","smart","smell","smile","snack","snail","snake","sneak","snowy","solar","solid","solve","sorry","sound","space","speak","speed","spell","spend","spice","spicy","spine","spoke","spoon","sport","spray","squid","stack","stalk","stamp","stand","start","state","steam","steel","steer","stick","stone","stood","store","storm","story","stove","straw","study","sugar","sunny","sushi","swamp","sweep","sweet","swing","swirl","swoop","syrup","table","taken","taste","tasty","teach","teeth","thank","thick","think","third","thorn","three","threw","throw","thumb","tiger","timer","title","toast","today","topic","torch","total","touch","tough","towel","tower","track","trade","trail","train","truck","trunk","trust","truth","tulip","tutor","tweet","twice","twirl","twist","uncle","upset","value","valve","verse","vinyl","visit","voice","wagon","waltz","watch","water","weave","wedge","weigh","whale","wheat","wheel","whisk","white","width","windy","witty","woman","worry","worth","woven","wrist","write","wrote","yacht","young","youth","zebra"],"g":"abodeacornacresactoracuteadderadultaeonsafteragentagileaislealarmalbumalderalertalgaealienalivealloyamberambleamigoangleangryangstankleannumanvilaphidappleapronarenaargueashenaskedaspenassetasteratlasatollatticauditaugerauntyaversavowsawaitazurebaconbadgebagelbakedbakerbakesbalmybalsabanjobasicbasilbasinbastebayoubeachbeansbebopbeechbeetsbeganbeginbeigebellybeltsbenchberetberryberthbevelbicepbillsbirchbisonblackblankbleatblendblinkblissblockbloombluesbluffblurtblushboardboastbonesbonusbooksboothbootsboredbossyboughboundbowlsboxesbracebractbragsbraidbrainbrakebrassbravebreadbreambrewsbriarbrickbridebriefbrinebringbriskbroadbroilbroodbrookbroombrothbrownbrowsbrushbuddybuggybuglebuildbuiltbunksbunnyburrobuttebuyercabincablecacticaddycadetcairncamelcandycannycanoecapescaratcarrycarvecatchcaulkcedarcellocentschainchairchalkchampchantcharmchartchasechatscheapcheckcheekcheerchesschestchidechiefchildchilichillchimpchipschirpchoirchordchorechurncivetcivilclaimclampclansclaspclasscleanclearcleatclerkcliffclimbclimeclockclothcloudclovecoachcoastcobracocoacoinscolorcometcondocongaconiccopsecoralcostscouchcountcoupecourtcraftcranecratecrawlcreamcreekcreepcrepecresscrestcrispcrockcronycrooncrosscrowdcrowncrowscrumbcrustcubiccubitcuffscumincurrycurvecurvycycledaddydailydairydaisydancedartsdatesdebitdecrydelaydeltadenimdepotdepthderbydesksdiarydigitdinardinerdingodiodediscodivandiverdodgedoorsdoughdoweldownydowrydozendraftdraindrakedramadrapedrawldrawndreamdressdriftdrilldrinkdrivedronedryerducatduskyduveteagereagleearlyearnseartheaseleavesebonyedgesegreteightelateelbowelderemberemptyendedenjoyenterenvoyepochepoxyequalessayetheretudeexactexamsextolfablefacetfaintfaithfalsefancyfaunafeastfemurfenceferalfernsferryfetchfiberfieldfifthfiftyfillyfinalfinchfirstfixedfjordflakeflameflareflaskflintfloatflockfloorfloraflourflownflungflutefoggyfoliofolksforgeforksformsfortefortyforumfoyerframefrancfreshfriesfrockfrondfrostfrothfrownfruitfryerfudgefundsfungifunnyfutonfuzzygablegaugegeckogeesegeodegiantgiftsgildsgizmogladeglassglazegleamglideglobegloryglovegluedgoofygoosegorgegorsegourdgownsgracegradegraingramsgrapegraphgrassgrategravygreatgreengreetgrillgripegroomgroupgroutgrovegruffgrumpguavaguestguideguildgullyguppygustyhabithalvehappyhardyhastyhazelheartheathheavyhedgeheelsheirshelixhellohennaherbshertzhewedhikedhikerhillyhingehintshippohiredhoisthollyhoneshoneyhonorhorsehotelhoundhourshousehoverhowdyhumidhumorhurlshurryhutchhyenahymnsicingidealidiomiglooimplyindexingotinlayinletinnerirateisletivoryjadedjapesjauntjeansjellyjestsjettyjeweljoistjokedjokesjollyjoulejudgejuicekayakkebabkhakikiloskioskkneadknitsknollknotsknownkoalakrillkudoskudzulabellaborlacesladlelampslarchlargelarvalaserlassolatchlaterlathelattelaudslaughlayerleafyleaptlearnleastleaveledgeleekslemonlevelleverlightlilaclimbslimeslinedlinenlinerlingoliterlitrellamalobbylodgelogiclopeslotusloyalluckylumenlunarlunchlungelurchlyricmacawmagicmaizemajormakermakesmangomanormantamaplemarchmarksmarrymarshmasonmatchmatesmathsmauvemedalmedicmelonmendsmercymeritmerrymetalmetermetremetromezzomidgemilesmimicminceminerminormintsminusmirthmistymixedmixermixesmochamodelmodemmolarmommymoneymonthmoodymoonsmoosemopedmoralmoseymossymotifmotormottomouldmountmousemouthmovedmowermuggymummymusicmutednachonadirnailsnaivenannynasalnatalnavelnerveneverniecenightninthnippynoblenoisynomadnorthnotchnotesnounsnovelnursenylonoasisoceanochreoctaloctetofferoftenokapioldenoliveonionoperaopineorateorbitorderorganotterounceouterovateovensovoidowingozonepacedpaintpalmspandapanelpantspaperparedparsepartypastapastepatchpatiopausepayeepayerpeacepeachpearlpearspecanpedalpencepennypeonyperchpesospestopetalphonephotopianopickypilotpinchpinkypintspiperpixelpizzaplaidplainplaitplaneplankplantplateplazapleatpliedplierplodspluckplumbplumeplumspoachpoesypointpolarpoppyporchpouchpoundpowerprateprawnpresspriceprideprimeprintpriorprismprizeprobeprongproseproudprowlprunepsalmpulsepupilpuppypureepurseputtyquailquartquickquietquillquiltquipsquotequothracedradarradiiradiorainyraiserallyramenranchrantsratioravenrayonreachreadyrealmrebusrecapreelsrelayreplyresinrhinorhombrhymeriderridgerimesrinseripenrisenrivalriverrivetroamsroastrobesrobinrobotrockyrollsroostrotorrougeroughroundrouteroverrowedrowerroyalrugbyrulerrumbarumorrupeeruralsablesaithsaladsalonsalsasaltysandysatinsaucesautesavedsaverscaldscalescalpscarfscionscoffscoldsconescoopscootscorescoutscreescrubsedansedgeseguesensesepalsepiaserveservosevensewedshackshadeshakeshaleshapesharesharksharpshaveshawlsheepsheetshelfshiftshineshirtshoalshoesshoreshortshoutshrewshrubshuntshushsidlesievesillysinewsitarsixthsixtyskateskierskiesskillskimsskirtskunkslangslantslatesleeksleetsliceslideslinkslipsslopeslothslunkslushsmallsmartsmellsmilesmirksmithsmocksnacksnailsnakesneaksneersnoresnowysoarssockssolarsolidsolvesorrysoundsouthspacespeakspeedspellspendspentspicespicyspielspikespinespinsspirespokespoolspoonsporesportspoutspraysquadsquatsquidstackstaffstagestairstalkstallstampstandstarestarsstartstatesteaksteamsteedsteelsteepsteerstepssternstickstoatstoicstonestoodstoolstoopstorestormstorystovestrapstrawstraystrumstrutstudystylesuavesuedesugarsuitesunnysunupsurgesushiswampswarmswayssweepsweetsweptswiftswingswirlswoopswungsyruptabletakentalkstallytalontalustapertapirtardytastetastytaunttaupetawnytaxesteachteaseteethtellstempotenortenthtepidteststhankthemethickthighthinkthirdthornthreethrewthrowthumbthymetiaratibiatidaltigertilestimertimestimidtingetithetitletoasttodaytokentonaltongstoothtopaztopictorchtorsotorustotaltouchtoughtowedtoweltowertracetracktradetrailtraintraittraystreadtreattrekstriadtribetrilltrimstrotstrouttrucktrunktrusstrusttruthtubertuliptummytunictutortwangtweedtweettwicetwinetwinstwirltwistumberumbrauncleunitsunityupseturbanurgedusherusualuttervaguevaletvalidvaluevalvevaporvasesvaultveinsveldtverbsversevestsvetchvicarvillavinylviolavipervisitvisorvistavitalvividvocalvoicevoltsvouchvowedvowelwadedwaferwaftswageswagonwaistwaltzwarpswatchwaterwattswearyweavewedgeweeksweighweldswhalewharfwheatwheelwhelkwhinewhirlwhiskwhitewidenwidthwieldwinchwindywiredwittywomanwoodsworryworthwovenwringwristwritewrotexylemyachtyardsyarnsyearnyearsyeastyellsyieldyodelyoungyouthyuccayummyzebra"};
+
+        var ANSWERS = DATA.a;
+        var VALID = new Set();
+        for (var vi = 0; vi + 5 <= DATA.g.length; vi += 5) VALID.add(DATA.g.substr(vi, 5));
+        ANSWERS.forEach(function (w) { VALID.add(w); });
+
+        var ROWS = 6, COLS = 5;
+        var KB = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
+
+        var boardEl = document.getElementById("board");
+        var keyboardEl = document.getElementById("keyboard");
+        var messageEl = document.getElementById("message");
+        var statRound = document.getElementById("statRound");
+        var statWon = document.getElementById("statWon");
+        var statStreak = document.getElementById("statStreak");
+        var cbBtn = document.getElementById("cbBtn");
+        var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        var answer = "";
+        var guesses = [];      // submitted words
+        var current = "";      // in-progress guess
+        var over = false;
+        var busy = false;      // true while a row is revealing
+        var played = 0, won = 0, streak = 0;
+        var rowEls = [], tileEls = [], keyEls = {};
+        var msgTimer = 0;
+        var revealTimers = [];
+
+        // ---------- build ----------
+        function buildBoard() {
+          boardEl.innerHTML = "";
+          rowEls = []; tileEls = [];
+          for (var r = 0; r < ROWS; r++) {
+            var row = document.createElement("div");
+            row.className = "row";
+            row.setAttribute("role", "group");
+            row.setAttribute("aria-label", "Guess " + (r + 1));
+            var tiles = [];
+            for (var c = 0; c < COLS; c++) {
+              var t = document.createElement("div");
+              t.className = "tile";
+              t.setAttribute("aria-label", "empty");
+              row.appendChild(t);
+              tiles.push(t);
+            }
+            boardEl.appendChild(row);
+            rowEls.push(row);
+            tileEls.push(tiles);
+          }
+        }
+
+        function buildKeyboard() {
+          keyboardEl.innerHTML = "";
+          keyEls = {};
+          KB.forEach(function (letters, ri) {
+            var row = document.createElement("div");
+            row.className = "kb-row";
+            if (ri === 2) row.appendChild(makeKey("enter", "Enter", true));
+            letters.split("").forEach(function (ch) { row.appendChild(makeKey(ch, ch, false)); });
+            if (ri === 2) row.appendChild(makeKey("back", "⌫ Del", true));
+            keyboardEl.appendChild(row);
+          });
+        }
+
+        function makeKey(id, label, wide) {
+          var b = document.createElement("button");
+          b.className = "key" + (wide ? " wide" : "");
+          b.textContent = label;
+          b.setAttribute("data-key", id);
+          b.setAttribute("aria-label", id === "back" ? "Delete letter" : id === "enter" ? "Submit guess" : "Letter " + id);
+          b.addEventListener("click", function () { handleKey(id); });
+          if (id.length === 1) keyEls[id] = b;
+          return b;
+        }
+
+        // ---------- messaging ----------
+        function say(main, sub, mood) {
+          clearTimeout(msgTimer);
+          messageEl.className = "message " + (mood || "info");
+          messageEl.innerHTML = "";
+          messageEl.appendChild(document.createTextNode(main));
+          if (sub) {
+            var s = document.createElement("span");
+            s.className = "sub";
+            s.textContent = sub;
+            messageEl.appendChild(s);
+          }
+        }
+
+        function flash(main, mood) {
+          say(main, "", mood);
+          msgTimer = setTimeout(function () {
+            if (!over) say("Try " + (guesses.length + 1) + " of " + ROWS + ".", "", "info");
+          }, 1800);
+        }
+
+        function updateStats() {
+          statRound.textContent = over ? "Round over" : "Try " + (guesses.length + 1) + " of " + ROWS;
+          statWon.textContent = "Won " + won + " of " + played;
+          statStreak.textContent = "Streak " + streak;
+        }
+
+        // ---------- scoring ----------
+        // Two passes so repeated letters are marked the way players expect:
+        // exact matches are claimed first, then leftovers fill in as "present".
+        function scoreGuess(guess, target) {
+          var res = new Array(COLS).fill("absent");
+          var pool = {};
+          var i;
+          for (i = 0; i < COLS; i++) {
+            if (guess[i] === target[i]) res[i] = "correct";
+            else pool[target[i]] = (pool[target[i]] || 0) + 1;
+          }
+          for (i = 0; i < COLS; i++) {
+            if (res[i] === "correct") continue;
+            var ch = guess[i];
+            if (pool[ch] > 0) { res[i] = "present"; pool[ch]--; }
+          }
+          return res;
+        }
+
+        var RANK = { absent: 1, present: 2, correct: 3 };
+        function paintKey(ch, state) {
+          var k = keyEls[ch];
+          if (!k) return;
+          var cur = k.getAttribute("data-state");
+          if (cur && RANK[cur] >= RANK[state]) return;
+          k.setAttribute("data-state", state);
+          k.classList.remove("correct", "present", "absent");
+          k.classList.add(state);
+          k.setAttribute("aria-label", "Letter " + ch + ", " + stateWords(state));
+        }
+
+        function stateWords(state) {
+          return state === "correct" ? "right letter right spot"
+            : state === "present" ? "right letter wrong spot"
+            : "not in the word";
+        }
+
+        // ---------- drawing ----------
+        function drawCurrent() {
+          var r = guesses.length;
+          if (r >= ROWS) return;
+          for (var c = 0; c < COLS; c++) {
+            var t = tileEls[r][c];
+            var ch = current[c] || "";
+            var had = t.textContent;
+            t.textContent = ch;
+            t.classList.toggle("filled", !!ch);
+            t.setAttribute("aria-label", ch ? "letter " + ch : "empty");
+            if (ch && !had && !reducedMotion) {
+              t.classList.remove("pop");
+              (function (tile) {
+                requestAnimationFrame(function () { tile.classList.add("pop"); });
+                setTimeout(function () { tile.classList.remove("pop"); }, 160);
+              })(t);
+            }
+          }
+        }
+
+        function revealRow(r, guess, res, onDone) {
+          var step = reducedMotion ? 0 : 260;
+          var tiles = tileEls[r];
+          for (var c = 0; c < COLS; c++) {
+            (function (c) {
+              revealTimers.push(setTimeout(function () {
+                var t = tiles[c];
+                if (!reducedMotion) t.classList.add("flip");
+                revealTimers.push(setTimeout(function () {
+                  t.classList.add(res[c]);
+                  t.setAttribute("aria-label", "letter " + guess[c] + ", " + stateWords(res[c]));
+                  paintKey(guess[c], res[c]);
+                }, reducedMotion ? 0 : 250));
+              }, c * step));
+            })(c);
+          }
+          revealTimers.push(setTimeout(onDone, reducedMotion ? 30 : COLS * step + 320));
+        }
+
+        // ---------- play ----------
+        function handleKey(k) {
+          if (over || busy) return;
+          if (k === "enter") return submit();
+          if (k === "back") {
+            if (current.length) { current = current.slice(0, -1); drawCurrent(); }
+            return;
+          }
+          if (!/^[a-z]$/.test(k)) return;
+          if (current.length >= COLS) return;
+          current += k;
+          drawCurrent();
+        }
+
+        function submit() {
+          var r = guesses.length;
+          if (current.length < COLS) {
+            shakeRow(r);
+            flash("Needs " + COLS + " letters", "bad");
+            return;
+          }
+          if (!VALID.has(current)) {
+            shakeRow(r);
+            flash("That is not in our word list", "bad");
+            return;
+          }
+          var guess = current;
+          var res = scoreGuess(guess, answer);
+          guesses.push(guess);
+          current = "";
+          busy = true;
+          say("Checking…", "", "info");
+
+          revealRow(r, guess, res, function () {
+            busy = false;
+            if (guess === answer) {
+              over = true;
+              played++; won++; streak++;
+              var praise = ["Genius!", "Brilliant!", "Great work!", "Nice one!", "Got there!", "Phew!"];
+              say(praise[Math.min(r, praise.length - 1)],
+                  "You found " + answer.toUpperCase() + " in " + (r + 1) + (r === 0 ? " try." : " tries."), "good");
+              confetti();
+            } else if (guesses.length >= ROWS) {
+              over = true;
+              played++; streak = 0;
+              say("Out of tries!", "The word was " + answer.toUpperCase() + ". Tap New word for another.", "bad");
+            } else {
+              say("Try " + (guesses.length + 1) + " of " + ROWS + ".", "", "info");
+            }
+            updateStats();
+          });
+        }
+
+        function shakeRow(r) {
+          if (r >= ROWS) return;
+          var row = rowEls[r];
+          row.classList.remove("shake");
+          requestAnimationFrame(function () { row.classList.add("shake"); });
+          setTimeout(function () { row.classList.remove("shake"); }, 520);
+        }
+
+        function newRound() {
+          // a reveal still in flight would otherwise colour this round's
+          // keyboard with the previous word's results
+          revealTimers.forEach(clearTimeout);
+          revealTimers = [];
+          clearTimeout(msgTimer);
+          answer = ANSWERS[Math.floor(Math.random() * ANSWERS.length)];
+          guesses = [];
+          current = "";
+          over = false;
+          busy = false;
+          buildBoard();
+          Object.keys(keyEls).forEach(function (ch) {
+            var k = keyEls[ch];
+            k.removeAttribute("data-state");
+            k.classList.remove("correct", "present", "absent");
+            k.setAttribute("aria-label", "Letter " + ch);
+          });
+          say("Type or tap a five-letter word, then press Enter.", "", "info");
+          updateStats();
+        }
+
+        function confetti() {
+          if (reducedMotion) return;
+          var colors = ["#ff6b57", "#7c3aed", "#0f766e", "#b45309", "#15803d"];
+          for (var i = 0; i < 70; i++) {
+            var bit = document.createElement("div");
+            bit.className = "confetti-bit";
+            bit.style.left = Math.random() * 100 + "vw";
+            bit.style.background = colors[i % colors.length];
+            bit.style.animationDuration = 1.6 + Math.random() * 1.6 + "s";
+            bit.style.animationDelay = Math.random() * 0.4 + "s";
+            document.body.appendChild(bit);
+            (function (b) { setTimeout(function () { b.remove(); }, 4000); })(bit);
+          }
+        }
+
+        document.addEventListener("keydown", function (ev) {
+          if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
+          var t = ev.target;
+          if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+          if (ev.key === "Enter") {
+            // Enter should still submit when an on-screen letter key happens to
+            // hold focus, but must not steal it from New word / Colour-blind.
+            if (t && t.tagName === "BUTTON" && !t.classList.contains("key")) return;
+            ev.preventDefault();
+            handleKey("enter");
+          } else if (ev.key === "Backspace") {
+            ev.preventDefault();
+            handleKey("back");
+          } else if (/^[a-zA-Z]$/.test(ev.key)) {
+            handleKey(ev.key.toLowerCase());
+          }
+        });
+
+        document.getElementById("newBtn").addEventListener("click", newRound);
+        cbBtn.addEventListener("click", function () {
+          var on = document.documentElement.classList.toggle("cb");
+          cbBtn.setAttribute("aria-pressed", on ? "true" : "false");
+          flash(on ? "Colour-blind colours on" : "Standard colours on", "info");
+        });
+
+        buildBoard();
+        buildKeyboard();
+        newRound();
+      })();
+    </script>
+  </body>
+</html>
