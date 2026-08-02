@@ -50,7 +50,12 @@
         --font: var(--font-display);
       }
     
-      html, body { background: var(--bg); }
+      html, body {
+        background: var(--bg);
+        /* Android pull-to-refresh reloads the page mid-stroke; contain keeps
+           normal scrolling but stops the overscroll gesture */
+        overscroll-behavior-y: contain;
+      }
       body {
         font-family: var(--font);
         color: var(--ink);
@@ -119,7 +124,9 @@
       .board-wrap { position: relative; width: 100%; }
       svg.board {
         display: block; width: 100%; aspect-ratio: 1 / 1;
-        touch-action: none; user-select: none; -webkit-user-select: none;
+        /* a swipe on empty board area must still scroll the page; gestures that
+           start on a dot are claimed for drawing (see g.dot + touchmove guard) */
+        touch-action: pan-y; user-select: none; -webkit-user-select: none;
         border-radius: var(--radius-md);
         background:
           radial-gradient(circle at 20% 15%, rgba(124, 58, 237, 0.05), transparent 45%),
@@ -141,7 +148,7 @@
     
       .rubber { stroke: var(--coral); stroke-width: 2.4; stroke-linecap: round; opacity: 0.45; }
     
-      g.dot { cursor: pointer; }
+      g.dot { cursor: pointer; touch-action: none; }
       g.dot .hit { fill: transparent; }
       g.dot .vis {
         fill: #ffffff; stroke: #b3a698; stroke-width: 1.6;
@@ -717,6 +724,13 @@
       }
       svg.addEventListener("pointerup", endDrag);
       svg.addEventListener("pointercancel", endDrag);
+    
+      // touch-action on SVG child elements is ignored by some Android browsers,
+      // so the dots cannot reliably claim their own gestures; while a stroke is
+      // live, block the browser's scroll fallback directly
+      svg.addEventListener("touchmove", function (ev) {
+        if (dragging) ev.preventDefault();
+      }, { passive: false });
     
       // ---------- picker ----------
       function buildPicker() {
