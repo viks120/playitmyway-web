@@ -615,6 +615,19 @@
         document.getElementById("resetBtn").addEventListener("click", newMatch);
         document.getElementById("playAgainBtn").addEventListener("click", newMatch);
 
+        // Some Android browsers ignore overscroll-behavior, so block
+        // pull-to-refresh directly (it would wipe the match score): a downward
+        // finger movement while already at the very top can only be a refresh.
+        var ptrStartY = 0;
+        document.addEventListener("touchstart", function (ev) {
+          ptrStartY = ev.touches[0].clientY;
+        }, { passive: true });
+        document.addEventListener("touchmove", function (ev) {
+          if (window.scrollY <= 0 && ev.touches[0].clientY > ptrStartY && ev.cancelable) {
+            ev.preventDefault();
+          }
+        }, { passive: false });
+
         document.addEventListener("keydown", function (ev) {
           if (!matchOverlay.classList.contains("hidden")) return;
           // a held-down key would otherwise auto-play the whole match, and
