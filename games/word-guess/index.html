@@ -645,6 +645,19 @@
           if (b && ev.detail > 0) b.blur();
         });
 
+        // Some Android browsers ignore overscroll-behavior, so block
+        // pull-to-refresh directly (it would wipe the stats and streak): a
+        // downward finger movement while already at the top can only refresh.
+        var ptrStartY = 0;
+        document.addEventListener("touchstart", function (ev) {
+          ptrStartY = ev.touches[0].clientY;
+        }, { passive: true });
+        document.addEventListener("touchmove", function (ev) {
+          if (window.scrollY <= 0 && ev.touches[0].clientY > ptrStartY && ev.cancelable) {
+            ev.preventDefault();
+          }
+        }, { passive: false });
+
         document.getElementById("newBtn").addEventListener("click", function () {
           // mid-reveal the round has not been counted yet; starting over here
           // would silently drop a win or spare a lost streak
