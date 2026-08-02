@@ -216,7 +216,9 @@
       .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
       .btn-soft { background: var(--band-tint); color: var(--band); }
       .btn-go { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
-      .btn[aria-pressed="true"] { outline: 2px solid var(--band); outline-offset: 1px; }
+      /* box-shadow, not outline: an outline here would mask the :focus-visible
+         ring, leaving the button with no visible focus state when pressed */
+      .btn[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--band); }
 
       .how-to {
         width: 100%;
@@ -292,6 +294,7 @@
       <div class="board" id="board" aria-label="Guess grid"></div>
 
       <p class="message info" id="message" aria-live="polite">Type or tap a five-letter word, then press Enter.</p>
+      <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
 
       <div class="keyboard" id="keyboard"></div>
 
@@ -328,6 +331,7 @@
         var boardEl = document.getElementById("board");
         var keyboardEl = document.getElementById("keyboard");
         var messageEl = document.getElementById("message");
+        var srStatus = document.getElementById("srStatus");
         var statRound = document.getElementById("statRound");
         var statWon = document.getElementById("statWon");
         var statStreak = document.getElementById("statStreak");
@@ -357,6 +361,9 @@
             for (var c = 0; c < COLS; c++) {
               var t = document.createElement("div");
               t.className = "tile";
+              // a bare div is role=generic and its aria-label is discarded;
+              // role=img makes the per-tile result readable
+              t.setAttribute("role", "img");
               t.setAttribute("aria-label", "empty");
               row.appendChild(t);
               tiles.push(t);
@@ -449,6 +456,17 @@
           k.setAttribute("aria-label", "Letter " + ch + ", " + stateWords(state));
         }
 
+        // Reading five tiles one by one is unusable; summarise the row instead.
+        function announceRow(guess, res) {
+          var parts = [];
+          for (var i = 0; i < COLS; i++) {
+            parts.push(guess[i].toUpperCase() + " " + (
+              res[i] === "correct" ? "right spot" :
+              res[i] === "present" ? "wrong spot" : "not in word"));
+          }
+          srStatus.textContent = guess.toUpperCase() + ": " + parts.join(", ") + ".";
+        }
+
         function stateWords(state) {
           return state === "correct" ? "right letter right spot"
             : state === "present" ? "right letter wrong spot"
@@ -530,6 +548,7 @@
 
           revealRow(r, guess, res, function () {
             busy = false;
+            announceRow(guess, res);
             if (guess === answer) {
               over = true;
               played++; won++; streak++;
@@ -598,9 +617,10 @@
           var t = ev.target;
           if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
           if (ev.key === "Enter") {
-            // Enter should still submit when an on-screen letter key happens to
-            // hold focus, but must not steal it from New word / Colour-blind.
-            if (t && t.tagName === "BUTTON" && !t.classList.contains("key")) return;
+            // Enter must keep working on whatever the player has focused —
+            // the Back to Games link, New word, Colour-blind mode. Only the
+            // on-screen letter keys hand Enter over to the game.
+            if (t && t.closest && t.closest('a[href], button:not(.key)')) return;
             ev.preventDefault();
             handleKey("enter");
           } else if (ev.key === "Backspace") {
@@ -611,11 +631,28 @@
           }
         });
 
-        document.getElementById("newBtn").addEventListener("click", newRound);
+        // Clicking a button with the mouse leaves it focused, so a later Enter
+        // would re-trigger that button instead of submitting the typed guess,
+        // and Space would re-type the last on-screen letter. Drop focus after a
+        // pointer click only — ev.detail is 0 for keyboard activation, so
+        // keyboard players keep their place.
+        document.addEventListener("click", function (ev) {
+          var b = ev.target.closest && ev.target.closest("button");
+          if (b && ev.detail > 0) b.blur();
+        });
+
+        document.getElementById("newBtn").addEventListener("click", function () {
+          // mid-reveal the round has not been counted yet; starting over here
+          // would silently drop a win or spare a lost streak
+          if (busy) return;
+          newRound();
+        });
         cbBtn.addEventListener("click", function () {
           var on = document.documentElement.classList.toggle("cb");
           cbBtn.setAttribute("aria-pressed", on ? "true" : "false");
-          flash(on ? "Colour-blind colours on" : "Standard colours on", "info");
+          // once the round is over the message holds the answer reveal —
+          // do not overwrite it just to confirm a colour change
+          if (!over) flash(on ? "Colour-blind colours on" : "Standard colours on", "info");
         });
 
         buildBoard();

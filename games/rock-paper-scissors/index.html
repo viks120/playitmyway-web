@@ -218,8 +218,11 @@
       }
       .choice .ico { font-size: clamp(34px, 10vw, 42px); line-height: 1; }
       .choice .lbl { font-size: 15px; font-weight: 600; }
-      .choice:hover:not(:disabled) { transform: translateY(-3px); border-color: var(--band); }
-      .choice:disabled { opacity: 0.5; cursor: default; }
+      .choice:hover:not([aria-disabled="true"]) { transform: translateY(-3px); border-color: var(--band); }
+      /* aria-disabled rather than the disabled attribute: disabling a button
+         that currently has focus throws focus back to the page body */
+      .choice[aria-disabled="true"] { opacity: 0.5; cursor: default; }
+      .choice[aria-disabled="true"]:hover { transform: none; }
       .choice.picked { border-color: var(--teal); background: var(--teal-tint); }
 
       .controls { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
@@ -256,6 +259,16 @@
       .match-overlay h2 { margin: 4px 0 0; font-size: clamp(26px, 7vw, 36px); }
       .match-overlay p { margin: 0; color: var(--ink-soft); font-size: 17px; }
       .hidden { display: none !important; }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
 
       .how-to {
         width: 100%;
@@ -325,9 +338,10 @@
         </div>
       </div>
 
-      <p class="callout" id="callout" aria-live="polite">
+      <p class="callout" id="callout">
         Pick your move to start!
       </p>
+      <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
 
       <div class="choices">
         <button class="choice" id="btnRock" data-move="rock">
@@ -349,7 +363,8 @@
       </div>
     </main>
 
-    <div class="match-overlay hidden" id="matchOverlay" role="dialog" aria-label="Match over">
+    <div class="match-overlay hidden" id="matchOverlay" role="dialog" aria-modal="true"
+         aria-labelledby="matchTitle" aria-describedby="matchSub">
       <span class="big" id="matchEmoji" aria-hidden="true">🏆</span>
       <h2 id="matchTitle">You win the match!</h2>
       <p id="matchSub">You beat Robo 5–3</p>
@@ -391,6 +406,7 @@
         var handRobo = document.getElementById("handRobo");
         var roboFace = document.getElementById("roboFace");
         var callout = document.getElementById("callout");
+        var srStatus = document.getElementById("srStatus");
         var youScoreEl = document.getElementById("youScore");
         var roboScoreEl = document.getElementById("roboScore");
         var matchChip = document.getElementById("matchChip");
@@ -411,7 +427,9 @@
         function clearTimers() { timers.forEach(clearTimeout); timers = []; }
         function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
 
-        function say(main, sub, mood) {
+        // announce = false for the Rock…Paper…Scissors countdown, which would
+        // otherwise flood the live region and bury the actual round result
+        function say(main, sub, mood, announce) {
           callout.className = "callout" + (mood ? " " + mood : "");
           callout.innerHTML = "";
           callout.appendChild(document.createTextNode(main));
@@ -421,6 +439,7 @@
             s.textContent = sub;
             callout.appendChild(s);
           }
+          if (announce !== false) srStatus.textContent = main + (sub ? " " + sub : "");
         }
 
         function setHands(you, robo) {
@@ -442,7 +461,10 @@
         }
 
         function setEnabled(on) {
-          choiceBtns.forEach(function (b) { b.disabled = !on; });
+          choiceBtns.forEach(function (b) {
+            if (on) b.removeAttribute("aria-disabled");
+            else b.setAttribute("aria-disabled", "true");
+          });
         }
 
         function updateScore() {
@@ -470,9 +492,9 @@
 
           setHands("✊", "✊");
           shake(true);
-          say("Rock…", "", "count");
-          later(function () { say("Paper…", "", "count"); }, 420);
-          later(function () { say("Scissors…", "", "count"); }, 840);
+          say("Rock…", "", "count", false);
+          later(function () { say("Paper…", "", "count", false); }, 420);
+          later(function () { say("Scissors…", "", "count", false); }, 840);
           later(function () {
             shake(false);
             setHands(ICON[myMove], ICON[roboMove]);
@@ -527,24 +549,45 @@
             ? "You beat Robo " + youScore + "–" + roboScore + ". Champion!"
             : "Robo got there first, " + roboScore + "–" + youScore + ". Rematch?";
           matchOverlay.classList.remove("hidden");
+          setBackgroundInert(true);
+          // role=dialog + aria-labelledby + focus moving inside is what makes
+          // a screen reader read out who won
           document.getElementById("playAgainBtn").focus();
           if (youWon) confetti();
         }
 
+        // the overlay covers the page, so everything behind it must stop being
+        // tabbable and stop being read out while it is open
+        function setBackgroundInert(on) {
+          [document.querySelector(".card"), document.querySelector(".back-link"),
+           document.querySelector(".game-head"), document.querySelector(".how-to")]
+            .forEach(function (n) {
+              if (!n) return;
+              if (on) { n.setAttribute("inert", ""); n.setAttribute("aria-hidden", "true"); }
+              else { n.removeAttribute("inert"); n.removeAttribute("aria-hidden"); }
+            });
+        }
+
         function newMatch() {
           clearTimers();
+          var fromOverlay = !matchOverlay.classList.contains("hidden");
           youScore = 0;
           roboScore = 0;
           round = 1;
           busy = false;
           matchOverlay.classList.add("hidden");
+          setBackgroundInert(false);
           roboFace.textContent = "🤖";
           setHands("✊", "✊");
           shake(false);
+          // clearTimers() cancels the pending pop cleanup, so drop it here or
+          // the class sticks and the reveal never animates again
+          [handYou, handRobo].forEach(function (h) { h.classList.remove("pop"); });
           choiceBtns.forEach(function (b) { b.classList.remove("picked"); });
           setEnabled(true);
           updateScore();
           say("Pick your move to start!", "", "");
+          if (fromOverlay) choiceBtns[0].focus();
         }
 
         function confetti() {
@@ -570,6 +613,9 @@
 
         document.addEventListener("keydown", function (ev) {
           if (!matchOverlay.classList.contains("hidden")) return;
+          // a held-down key would otherwise auto-play the whole match, and
+          // Ctrl+1 / Cmd+2 are browser tab shortcuts, not game moves
+          if (ev.repeat || ev.ctrlKey || ev.metaKey || ev.altKey) return;
           if (ev.key === "1") play("rock");
           else if (ev.key === "2") play("paper");
           else if (ev.key === "3") play("scissors");
