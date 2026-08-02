@@ -139,7 +139,10 @@
         display: block;
         width: 100%;
         aspect-ratio: 1 / 1;
-        touch-action: none;
+        /* the board fills most of a phone screen, so a swipe on empty board
+           area must still scroll the page; only gestures that start on a dot
+           are claimed for dragging (see g.dot below) */
+        touch-action: pan-y;
         user-select: none;
         -webkit-user-select: none;
         border-radius: var(--radius-md);
@@ -154,6 +157,7 @@
 
       .link-line { stroke-width: 2.6; stroke-linecap: round; fill: none; }
 
+      g.dot { touch-action: none; }
       g.dot .hit { fill: transparent; }
       g.dot .disc {
         fill: #fff;
@@ -316,7 +320,7 @@
       </p>
 
       <div class="board-wrap">
-        <svg class="board" id="board" viewBox="-9 -9 118 118" role="application"
+        <svg class="board" id="board" viewBox="-9 -9 118 118" role="group"
              aria-label="Dot to dot board. Tap the numbered dots in order."></svg>
         <div class="win-overlay hidden" id="winOverlay" role="dialog" aria-label="Picture finished">
           <span class="win-emoji" id="winEmoji" aria-hidden="true">🪁</span>
@@ -374,6 +378,7 @@
         var activePointerId = null;
         var lastNudge = 0;
         var winTimer = 0;
+        var wrongTimer = 0;
         var pic, dotEls, lineEls, fillEl;
 
         function el(name, attrs) {
@@ -426,6 +431,7 @@
 
         function loadPicture(i) {
           clearTimeout(winTimer);
+          clearTimeout(wrongTimer);
           pi = i;
           pic = PICTURES[i];
           joined = 0;
@@ -502,12 +508,18 @@
           });
 
           var nxt = isFinished() ? -1 : nextIndex();
+          var focusWasOnDot = dotEls.indexOf(document.activeElement) !== -1;
           dotEls.forEach(function (g, di) {
             var linked = joined > 0 && (di < joined || isFinished());
             g.classList.toggle("linked", linked);
             g.classList.toggle("next", di === nxt);
             g.setAttribute("tabindex", di === nxt ? "0" : "-1");
           });
+          // the closing dot is dot 1, which sits BEFORE the current dot in the
+          // SVG, so forward Tab could never reach it — carry focus across
+          if (focusWasOnDot && nxt >= 0 && document.activeElement !== dotEls[nxt]) {
+            dotEls[nxt].focus();
+          }
 
           if (isFinished()) {
             promptEl.classList.add("done");
@@ -530,6 +542,15 @@
           g.classList.remove("nudge");
           requestAnimationFrame(function () { g.classList.add("nudge"); });
           setTimeout(function () { g.classList.remove("nudge"); }, 440);
+          // the wiggle is the only "wrong dot" feedback, and it is switched off
+          // for reduced motion — say it in words too, which also reaches
+          // screen readers via the prompt's live region
+          var label = promptEl.querySelector(".prompt-label");
+          clearTimeout(wrongTimer);
+          label.textContent = "Not that one — find";
+          wrongTimer = setTimeout(function () {
+            if (!isFinished()) label.textContent = joined === pic.d.length ? "Last one! Back to" : "Tap number";
+          }, 1400);
         }
 
         function tapDot(di) {
@@ -565,12 +586,17 @@
 
         function restart() {
           clearTimeout(winTimer);
+          clearTimeout(wrongTimer);
+          // hiding the overlay while its button holds focus drops focus to the
+          // document body, sending keyboard players back to the top of the page
+          var fromOverlay = !winOverlay.classList.contains("hidden");
           joined = 0;
           fillEl.classList.remove("show");
           winOverlay.classList.add("hidden");
           promptEl.classList.remove("done");
           endDrag();
           update();
+          if (fromOverlay && dotEls[0]) dotEls[0].focus();
         }
 
         function confetti() {
@@ -663,7 +689,11 @@
         document.getElementById("restartBtn").addEventListener("click", restart);
         document.getElementById("againBtn").addEventListener("click", restart);
         document.getElementById("nextBtn").addEventListener("click", function () {
-          if (pi < PICTURES.length - 1) { loadPicture(pi + 1); buildPicker(); }
+          if (pi < PICTURES.length - 1) {
+            loadPicture(pi + 1);
+            buildPicker();
+            if (dotEls[0]) dotEls[0].focus();
+          }
         });
 
         loadPicture(0);
