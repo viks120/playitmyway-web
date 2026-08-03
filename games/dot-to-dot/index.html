@@ -161,6 +161,7 @@
       .fill-shape.show { opacity: 0.28; }
 
       .link-line { stroke-width: 2.6; stroke-linecap: round; fill: none; }
+      .rubber { stroke-width: 2.6; stroke-linecap: round; fill: none; opacity: 0.45; }
 
       g.dot { touch-action: none; }
       g.dot .hit { fill: transparent; }
@@ -389,7 +390,7 @@
         var lastNudge = 0;
         var winTimer = 0;
         var wrongTimer = 0;
-        var pic, dotEls, lineEls, fillEl;
+        var pic, dotEls, lineEls, fillEl, rubber;
 
         function el(name, attrs) {
           var n = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -473,6 +474,10 @@
             svg.appendChild(ln);
             lineEls.push(ln);
           }
+
+          rubber = el("line", { x1: 0, y1: 0, x2: 0, y2: 0, "class": "rubber", stroke: pic.c });
+          rubber.style.display = "none";
+          svg.appendChild(rubber);
 
           pts.forEach(function (p, di) {
             var g = el("g", { "class": "dot", tabindex: "0", role: "button" });
@@ -572,6 +577,7 @@
         }
 
         function finish() {
+          rubber.style.display = "none";
           fillEl.classList.add("show");
           done[pi] = true;
           winEmoji.textContent = pic.e;
@@ -650,26 +656,46 @@
           if (!winOverlay.classList.contains("hidden")) return;
           if (dragging) return;
           if (ev.pointerType === "mouse" && ev.button !== 0) return;
-          var di = hitDot(svgPoint(ev));
+          var p = svgPoint(ev);
+          var di = hitDot(p);
           if (di === -1) return;
           ev.preventDefault();
           svg.setPointerCapture(ev.pointerId);
           activePointerId = ev.pointerId;
           dragging = true;
           tapDot(di);
+          updateRubber(p);
         });
 
         svg.addEventListener("pointermove", function (ev) {
           if (!dragging || ev.pointerId !== activePointerId) return;
           if (isFinished()) return;
-          var di = hitDot(svgPoint(ev));
+          var p = svgPoint(ev);
+          var di = hitDot(p);
           if (di !== -1 && di === nextIndex()) tapDot(di);
+          updateRubber(p);
         });
 
         function endDrag(ev) {
           if (ev && ev.pointerId !== activePointerId) return;
           dragging = false;
           activePointerId = null;
+          if (rubber) rubber.style.display = "none";
+        }
+
+        // pen-style feedback while dragging, same as One Line Draw: a soft
+        // line follows the finger from the last joined dot
+        function updateRubber(p) {
+          if (!dragging || joined === 0 || isFinished()) {
+            rubber.style.display = "none";
+            return;
+          }
+          var a = pic.d[joined - 1];
+          rubber.setAttribute("x1", a[0]);
+          rubber.setAttribute("y1", a[1]);
+          rubber.setAttribute("x2", p[0]);
+          rubber.setAttribute("y2", p[1]);
+          rubber.style.display = "";
         }
 
         // In no-lift mode the picture must be drawn in one continuous stroke:
