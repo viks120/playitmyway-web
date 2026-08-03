@@ -191,6 +191,8 @@
       .btn:active { transform: translateY(0); }
       .btn-outline { background: var(--violet-tint); color: var(--violet); }
       .btn-hint { background: var(--amber-tint); color: var(--amber); }
+      /* box-shadow, not outline, so the :focus-visible ring stays visible */
+      .btn[aria-pressed="true"] { box-shadow: inset 0 0 0 2.5px var(--violet); }
     
       .win-overlay {
         position: absolute; inset: 0; border-radius: var(--radius-md);
@@ -296,6 +298,7 @@
         <button class="btn btn-outline" id="undoBtn">↩️ Undo</button>
         <button class="btn btn-outline" id="restartBtn">🔄 Restart</button>
         <button class="btn btn-hint" id="hintBtn">💡 Hint</button>
+        <button class="btn btn-outline" id="noLiftBtn" aria-pressed="false">🖊️ No lifting</button>
       </div>
     </main>
     
@@ -311,6 +314,7 @@
         <li>Drag (or tap dot after dot) to draw along the lines.</li>
         <li>Cover <strong>every line exactly once</strong> to win. You can't draw the same line twice!</li>
         <li>Stuck? Use <strong>Undo</strong>, <strong>Restart</strong>, or a <strong>Hint</strong> 💡</li>
+        <li>Ready for a real challenge? Turn on 🖊️ <strong>No lifting</strong> — one single stroke, and lifting your finger starts the shape over!</li>
       </ol>
     </section>
     
@@ -344,6 +348,7 @@
       var tracedCount = 0;
       var completed = {};        // session-only: levelIndex -> true
       var dragging = false;
+      var noLift = false;
       var activePointerId = null;
       var hintFlashTimer = 0;
       var lastWiggle = -1;
@@ -722,8 +727,24 @@
         activePointerId = null;
         rubber.style.display = "none";
       }
-      svg.addEventListener("pointerup", endDrag);
-      svg.addEventListener("pointercancel", endDrag);
+    
+      // In no-lift mode the whole shape must be drawn in one continuous stroke:
+      // raising the pen (or the browser cancelling the gesture) starts the shape
+      // over. Applies to pointer input only — keyboard play has no held pen.
+      function onPointerEnd(ev) {
+        if (ev.pointerId !== activePointerId) return;
+        var hadInk = dragging && stroke.length > 0;
+        endDrag(ev);
+        if (noLift && hadInk && tracedCount < lvl.g.length) {
+          stroke = [];
+          traced = lvl.g.map(function () { return false; });
+          tracedCount = 0;
+          updateHud();
+          setHelper("Pen lifted! One stroke means no stopping — try again!", "warn");
+        }
+      }
+      svg.addEventListener("pointerup", onPointerEnd);
+      svg.addEventListener("pointercancel", onPointerEnd);
     
       // touch-action on SVG child elements is ignored by some Android browsers,
       // so the dots cannot reliably claim their own gestures; while a stroke is
@@ -777,6 +798,14 @@
       document.getElementById("undoBtn").addEventListener("click", undo);
       document.getElementById("restartBtn").addEventListener("click", restart);
       document.getElementById("hintBtn").addEventListener("click", hint);
+      document.getElementById("noLiftBtn").addEventListener("click", function () {
+        noLift = !noLift;
+        this.setAttribute("aria-pressed", noLift ? "true" : "false");
+        restart();
+        setHelper(noLift
+          ? "No-lift mode! Draw the whole shape in one go — don't lift your finger!"
+          : "No-lift mode off. Tap a dot to start!", noLift ? "excited" : "");
+      });
       document.getElementById("againBtn").addEventListener("click", restart);
       document.getElementById("nextBtn").addEventListener("click", function () {
         if (li < LEVELS.length - 1) { loadLevel(li + 1); buildPicker(); }
