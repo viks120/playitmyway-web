@@ -224,6 +224,8 @@
       .btn-soft { background: var(--band-tint); color: var(--band); }
       .btn-go { background: var(--coral-deep); color: #fff; font-size: 18px; box-shadow: var(--shadow-rest); }
       .btn-again { background: var(--green-tint); color: var(--green); }
+      /* box-shadow, not outline, so the :focus-visible ring stays visible */
+      .btn[aria-pressed="true"] { box-shadow: inset 0 0 0 2.5px var(--band); }
 
       .win-overlay {
         position: absolute;
@@ -341,6 +343,7 @@
       <div class="controls">
         <button class="btn btn-soft" id="undoBtn">↩️ Undo</button>
         <button class="btn btn-soft" id="restartBtn">🔄 Start over</button>
+        <button class="btn btn-soft" id="noLiftBtn" aria-pressed="false">🖊️ No lifting</button>
       </div>
     </main>
 
@@ -356,6 +359,7 @@
         <li>Then tap <strong>2</strong>, then <strong>3</strong> — count out loud as you go!</li>
         <li>The glowing dot is always the next one. Tapping a wrong dot is fine, nothing breaks.</li>
         <li>Join every dot to finish the picture and see what it is 🎉</li>
+        <li>Feeling brave? Turn on 🖊️ <strong>No lifting</strong> and draw the whole picture in one smooth line — great pencil practice!</li>
       </ol>
     </section>
 
@@ -380,6 +384,7 @@
         var joined = 0;      // how many dots are connected (0 = none tapped yet)
         var done = {};       // session-only completion marks
         var dragging = false;
+        var noLift = false;
         var activePointerId = null;
         var lastNudge = 0;
         var winTimer = 0;
@@ -666,8 +671,28 @@
           dragging = false;
           activePointerId = null;
         }
-        svg.addEventListener("pointerup", endDrag);
-        svg.addEventListener("pointercancel", endDrag);
+
+        // In no-lift mode the picture must be drawn in one continuous stroke:
+        // raising the finger before the closing dot starts the picture over.
+        // Pointer input only — keyboard play has no held pen.
+        function onPointerEnd(ev) {
+          if (ev.pointerId !== activePointerId) return;
+          var hadInk = dragging && joined > 0;
+          endDrag(ev);
+          if (noLift && hadInk && !isFinished()) {
+            joined = 0;
+            fillEl.classList.remove("show");
+            update();
+            var label = promptEl.querySelector(".prompt-label");
+            clearTimeout(wrongTimer);
+            label.textContent = "Pen lifted! Back to";
+            wrongTimer = setTimeout(function () {
+              if (!isFinished() && joined === 0) label.textContent = "Tap number";
+            }, 1600);
+          }
+        }
+        svg.addEventListener("pointerup", onPointerEnd);
+        svg.addEventListener("pointercancel", onPointerEnd);
 
         // touch-action on SVG child elements is ignored by some Android
         // browsers, so the dots cannot reliably claim their own gestures;
@@ -712,6 +737,13 @@
 
         document.getElementById("undoBtn").addEventListener("click", undo);
         document.getElementById("restartBtn").addEventListener("click", restart);
+        document.getElementById("noLiftBtn").addEventListener("click", function () {
+          noLift = !noLift;
+          this.setAttribute("aria-pressed", noLift ? "true" : "false");
+          restart();
+          var label = promptEl.querySelector(".prompt-label");
+          label.textContent = noLift ? "No lifting! Drag from" : "Tap number";
+        });
         document.getElementById("againBtn").addEventListener("click", restart);
         document.getElementById("nextBtn").addEventListener("click", function () {
           if (pi < PICTURES.length - 1) {
