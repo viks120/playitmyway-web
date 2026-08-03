@@ -747,8 +747,14 @@
       svg.addEventListener("pointercancel", onPointerEnd);
     
       // touch-action on SVG child elements is ignored by some Android browsers,
-      // so the dots cannot reliably claim their own gestures; while a stroke is
-      // live, block the browser's scroll fallback directly
+      // and once a pan-y gesture is compositor-owned its touchmove events are
+      // non-cancelable — so the stroke must be claimed at touchstart, which fires
+      // after pointerdown has set `dragging` and is still cancelable. Cancelling
+      // it stops any scroll from starting for this touch; touches that don't
+      // begin on a dot scroll normally.
+      svg.addEventListener("touchstart", function (ev) {
+        if (dragging && ev.cancelable) ev.preventDefault();
+      }, { passive: false });
       svg.addEventListener("touchmove", function (ev) {
         if (dragging && ev.cancelable) ev.preventDefault();
       }, { passive: false });
