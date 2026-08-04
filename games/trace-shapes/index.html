@@ -147,6 +147,11 @@
       }
       .helper.excited { color: var(--band); font-weight: 600; }
       .helper.warn { color: var(--amber); font-weight: 600; }
+      /* reserve two lines on narrow screens so a wrapping message never
+         shifts the board under a finger mid-trace */
+      @media (max-width: 380px) {
+        .helper { min-height: 40px; }
+      }
 
       .board-wrap { position: relative; width: 100%; }
       svg.board {
