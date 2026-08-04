@@ -605,8 +605,8 @@
           updateHud();
           if (sk >= strokes.length) { finish(); return; }
           updateMarkers();
+          // the helper is itself a polite live region — one announcement only
           setHelper("Stroke " + sk + " done! Now start at green dot " + (sk + 1) + ".", "excited");
-          srStatus.textContent = "Stroke " + sk + " finished. " + (strokes.length - sk) + " to go.";
         }
 
         function endTrace(ev) {
@@ -705,7 +705,6 @@
           loadGlyph(gi); // clean slate
           busy = true;
           setHelper("Watch how it goes… then your turn!", "excited");
-          srStatus.textContent = "Showing how to trace " + glyphName(glyph) + ".";
           if (reducedMotion) {
             paintEls.forEach(function (p) { p.style.strokeDashoffset = 0; });
             demoTimer = setTimeout(function () { busy = false; loadGlyph(gi); setHelper("Your turn! Start at the green dot.", "excited"); }, 1400);
