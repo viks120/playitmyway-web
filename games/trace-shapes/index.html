@@ -459,7 +459,9 @@
 
         function set() { return SETS[si]; }
         function noun() { return set().noun; }
-        function glyphName(g) { return noun() === "shape" ? g.l : noun() + " " + g.l; }
+        // glyphs with an emoji are named things ("Circle", "Zigzag") — their
+        // label stands alone; bare characters get the noun ("letter A")
+        function glyphName(g) { return g.e ? g.l : noun() + " " + g.l; }
 
         // ---------------- rendering ----------------
         function loadGlyph(index) {
@@ -504,7 +506,7 @@
           svg.appendChild(demoDot);
 
           svg.setAttribute("aria-label", "Tracing board showing " + glyphName(glyph));
-          glyphChip.textContent = (noun() === "shape" ? (glyph.e ? glyph.e + " " : "") : "") +
+          glyphChip.textContent = (glyph.e ? glyph.e + " " : "") +
             glyphName(glyph).replace(/^./, function (c) { return c.toUpperCase(); });
           setHelper("Put your finger on the green dot and trace!", "");
           updateMarkers();
@@ -652,7 +654,9 @@
           fingerDot.style.display = "none";
           done[set().key][gi] = true;
           var g = glyph;
-          winBig.textContent = noun() === "shape" ? (g.e || g.l) : g.l;
+          // multi-word names ("Standing Line") don't fit the giant glyph font;
+          // named glyphs celebrate with their emoji instead
+          winBig.textContent = g.e || g.l;
           var all = set().glyphs.every(function (_, i) { return done[set().key][i]; });
           winTitle.textContent = all ? "🏆 ALL " + set().tab.replace(/^\S+\s*/, "") + " done!" : "🎉 You traced it!";
           winSub.textContent = all
@@ -766,7 +770,7 @@
             var b = document.createElement("button");
             b.className = "glyph-chip" + (i === gi ? " active" : "");
             b.setAttribute("aria-label", "Trace " + glyphName(g) + (done[set().key][i] ? " (done)" : ""));
-            b.innerHTML = (noun() === "shape" ? "<span aria-hidden='true'>" + g.e + "</span>" : g.l) +
+            b.innerHTML = (g.e ? "<span aria-hidden='true'>" + g.e + "</span>" : g.l) +
               (done[set().key][i] ? "<span class='tick' aria-hidden='true'>✓</span>" : "");
             b.addEventListener("click", function () {
               // tapping the chip that is already active would wipe progress
