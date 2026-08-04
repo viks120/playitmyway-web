@@ -653,7 +653,8 @@
           ptrStartY = ev.touches[0].clientY;
         }, { passive: true });
         document.addEventListener("touchmove", function (ev) {
-          if (window.scrollY <= 0 && ev.touches[0].clientY > ptrStartY && ev.cancelable) {
+          // single-finger only: a second touch means pinch-zoom, not refresh
+          if (ev.touches.length === 1 && window.scrollY <= 0 && ev.touches[0].clientY > ptrStartY && ev.cancelable) {
             ev.preventDefault();
           }
         }, { passive: false });
