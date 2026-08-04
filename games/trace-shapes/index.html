@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0f766e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Trace Shapes – Free Shape Tracing Game for Kids | Play It My Way</title>
+    <meta name="description" content="Free shape tracing game for kids! Trace circles, squares, triangles, stars, hearts and more with your finger. Green start dots and a watch-me demo build steady pencil control. Fun pre-writing practice for ages 3+. No ads, no download!" />
+    <meta name="keywords" content="shape tracing game for kids, trace shapes online free, learn shapes toddlers, drawing shapes for preschoolers, pre-writing practice shapes, trace circle square triangle, fine motor skills games, kids tracing activities free" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Trace Shapes – Free Shape Tracing for Kids" />
+    <meta property="og:description" content="Trace circles, stars, hearts and 12 shapes in all with your finger. Free pre-writing practice for ages 3+. No ads!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/trace-shapes/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Trace Shapes – Free Kids Tracing" />
+    <meta name="twitter:description" content="Finger-trace 12 shapes with guided start dots. Free, ages 3+, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/trace-shapes/" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <style>
+      :root {
+        --bg: var(--color-bg);
+        --surface: var(--color-surface);
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --band: var(--color-teal);
+        --band-tint: var(--color-teal-tint);
+        --coral: var(--color-primary);
+        --coral-deep: var(--color-primary-deep);
+        --green: var(--color-green);
+        --green-tint: var(--color-green-tint);
+        --amber: var(--color-amber);
+        --amber-tint: var(--color-amber-tint);
+        --guide: #e8dfd2;
+        --guide-dash: #c4b6a4;
+        --font: var(--font-display);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body {
+        background: var(--bg);
+        /* Android pull-to-refresh would reload the page mid-trace */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font);
+        color: var(--ink);
+        margin: 0;
+        padding: 14px 12px 44px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: var(--font); }
+
+      .back-link {
+        align-self: flex-start;
+        color: var(--band);
+        background: var(--band-tint);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      header.game-head { text-align: center; margin: 10px 0 12px; }
+      header.game-head h1 {
+        font-size: clamp(26px, 7vw, 34px);
+        font-weight: 600;
+        margin: 0 0 4px;
+        text-wrap: balance;
+      }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        width: 100%;
+        max-width: 520px;
+        padding: 14px 14px 18px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .tab {
+        border: 2px solid var(--band-tint);
+        background: var(--surface);
+        color: var(--band);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 9px 18px;
+        border-radius: var(--radius-pill);
+        min-height: 46px;
+        transition: transform 150ms ease;
+      }
+      .tab:hover { transform: translateY(-2px); }
+      .tab[aria-pressed="true"] { background: var(--band); border-color: var(--band); color: #fff; }
+
+      .status-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 6px;
+      }
+      .chip {
+        font-weight: 600;
+        font-size: 14px;
+        padding: 6px 12px;
+        border-radius: var(--radius-pill);
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+      .chip-glyph { background: var(--band-tint); color: var(--band); font-size: 16px; }
+      .chip-stroke { background: var(--amber-tint); color: var(--amber); }
+
+      .helper {
+        min-height: 26px;
+        text-align: center;
+        color: var(--ink-soft);
+        font-size: 16.5px;
+        margin: 2px 0 8px;
+      }
+      .helper.excited { color: var(--band); font-weight: 600; }
+      .helper.warn { color: var(--amber); font-weight: 600; }
+
+      .board-wrap { position: relative; width: 100%; }
+      svg.board {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        touch-action: pan-y;
+        user-select: none;
+        -webkit-user-select: none;
+        border-radius: var(--radius-md);
+        background:
+          radial-gradient(circle at 20% 16%, rgba(15, 118, 110, 0.05), transparent 45%),
+          radial-gradient(circle at 84% 86%, rgba(255, 107, 87, 0.06), transparent 45%),
+          #fffdf9;
+      }
+
+      .guide { stroke: var(--guide); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .guide-dash { stroke: var(--guide-dash); stroke-width: 1.3; stroke-dasharray: 2.8 2.8; stroke-linecap: round; fill: none; }
+      /* coral-deep: the painted line needs 3:1 non-text contrast against
+         both the board and the grey guide (plain coral is ~2.4:1) */
+      .paint { stroke: var(--coral-deep); stroke-width: 5.6; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+
+      .start-dot { fill: var(--green); }
+      .start-num {
+        fill: #ffffff;
+        font-size: 5.2px;
+        font-weight: 600;
+        text-anchor: middle;
+        dominant-baseline: central;
+        pointer-events: none;
+      }
+      .start-ring { fill: none; stroke: var(--green); stroke-width: 1; animation: ping 1.5s ease infinite; }
+      @keyframes ping {
+        0% { r: 5; opacity: 0.9; }
+        75% { r: 10; opacity: 0; }
+        100% { r: 10; opacity: 0; }
+      }
+      .start-arrow { fill: var(--green); }
+      .finger-dot { fill: var(--coral-deep); opacity: 0.85; }
+      .demo-dot { fill: var(--band); }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 12px 20px;
+        border-radius: var(--radius-pill);
+        min-height: 48px;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn-soft { background: var(--band-tint); color: var(--band); }
+      .btn-go { background: var(--coral-deep); color: #fff; font-size: 18px; box-shadow: var(--shadow-rest); }
+      .btn-again { background: var(--green-tint); color: var(--green); }
+
+      .win-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius-md);
+        background: rgba(255, 253, 249, 0.95);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        text-align: center;
+        padding: 20px;
+        animation: fadeIn 300ms ease;
+      }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      .win-big {
+        font-size: clamp(56px, 18vw, 88px);
+        line-height: 1.1;
+        font-weight: 600;
+        color: var(--coral);
+      }
+      .win-overlay h2 { margin: 4px 0 0; font-size: clamp(22px, 6vw, 30px); color: var(--green); }
+      .win-overlay p { margin: 0; color: var(--ink-soft); font-size: 17px; }
+      .hidden { display: none !important; }
+
+      .picker { width: 100%; max-width: 520px; margin-top: 18px; }
+      .picker h2 { font-size: 19px; margin: 0 0 10px; }
+      .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+      .glyph-chip {
+        border: 2px solid #e4dbcf;
+        background: var(--surface);
+        color: var(--ink);
+        cursor: pointer;
+        border-radius: var(--radius-md);
+        padding: 6px 8px;
+        font-size: 18px;
+        font-weight: 600;
+        min-width: 48px;
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        transition: transform 150ms ease, border-color 150ms ease;
+      }
+      .glyph-chip:hover { transform: translateY(-2px); }
+      .glyph-chip.active { border-color: var(--band); background: var(--band-tint); color: var(--band); }
+      .glyph-chip .tick { font-size: 12px; color: var(--green); }
+
+      .how-to {
+        width: 100%;
+        max-width: 520px;
+        margin-top: 18px;
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 16px 18px;
+      }
+      .how-to h2 { font-size: 19px; margin: 0 0 8px; }
+      .how-to ol { margin: 0; padding-left: 22px; color: var(--ink-soft); font-size: 16px; line-height: 1.65; }
+      .how-to li::marker { color: var(--band); font-weight: 600; }
+      .how-to .note { margin: 8px 0 0; font-size: 14px; color: var(--ink-soft); }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .confetti-bit {
+        position: fixed;
+        top: -14px;
+        width: 10px;
+        height: 14px;
+        border-radius: 3px;
+        pointer-events: none;
+        z-index: 50;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall { to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .confetti-bit { display: none; }
+        .start-ring { opacity: 0.9; r: 7; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>⭐ Trace Shapes</h1>
+      <p>Follow the green dot and draw every shape!</p>
+    </header>
+
+    <main class="card">
+      <div class="tabs hidden" id="tabs" role="group" aria-label="Choose what to trace"></div>
+
+      <div class="status-row">
+        <span class="chip chip-glyph" id="glyphChip">Letter A</span>
+        <span class="chip chip-stroke" id="strokeChip">Stroke 1 of 3</span>
+      </div>
+
+      <p class="helper" id="helper" aria-live="polite">Put your finger on the green dot and trace!</p>
+
+      <div class="board-wrap">
+        <svg class="board" id="board" viewBox="0 0 100 100" role="img"
+             aria-label="Tracing board"></svg>
+        <div class="win-overlay hidden" id="winOverlay" role="dialog" aria-label="Tracing finished">
+          <span class="win-big" id="winBig">A</span>
+          <h2 id="winTitle">You traced it!</h2>
+          <p id="winSub">Wonderful writing!</p>
+          <div class="controls">
+            <button class="btn btn-again" id="againBtn">🔄 Again</button>
+            <button class="btn btn-go" id="nextBtn">Next →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-soft" id="demoBtn">👀 Show me</button>
+        <button class="btn btn-soft" id="restartBtn">🔄 Start over</button>
+      </div>
+      <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
+    </main>
+
+    <nav class="picker" aria-label="Pick something to trace">
+      <h2 id="pickerTitle">✏️ Pick one to trace</h2>
+      <div class="chip-grid" id="pickerGrid"></div>
+    </nav>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Put your finger (or mouse) on the <strong>green dot</strong>.</li>
+        <li>Trace slowly along the grey path — your line paints in as you go!</li>
+        <li>Follow the little arrow, and do the strokes in number order.</li>
+        <li>Not sure how? Tap <strong>👀 Show me</strong> to watch first.</li>
+      </ol>
+      <p class="note">This activity is traced by touch or mouse. Grown-ups: tracing with one finger, nice and slow, is great pencil practice.</p>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+        var SETS = [{"key":"shapes","tab":"⭐ Shapes","noun":"shape","glyphs":[{"l":"Circle","e":"🔵","s":[[[50,13],[44.3,13.9],[38.6,14.8],[33.5,17.5],[28.3,20.1],[24.2,24.2],[20.1,28.3],[17.5,33.5],[14.8,38.6],[13.9,44.3],[13,50],[13.9,55.7],[14.8,61.4],[17.5,66.6],[20.1,71.7],[24.2,75.8],[28.3,79.9],[33.5,82.6],[38.6,85.2],[44.3,86.1],[50,87],[55.7,86.1],[61.4,85.2],[66.6,82.6],[71.7,79.9],[75.8,75.8],[79.9,71.7],[82.6,66.6],[85.2,61.4],[86.1,55.7],[87,50],[86.1,44.3],[85.2,38.6],[82.6,33.5],[79.9,28.3],[75.8,24.2],[71.7,20.1],[66.6,17.5],[61.4,14.8],[55.7,13.9],[50,13]]]},{"l":"Square","e":"🟥","s":[[[22,22],[30,22],[38,22],[46,22],[54,22],[62,22],[70,22],[78,22],[78,30],[78,38],[78,46],[78,54],[78,62],[78,70],[78,78],[70,78],[62,78],[54,78],[46,78],[38,78],[30,78],[22,78],[22,70],[22,62],[22,54],[22,46],[22,38],[22,30],[22,22]]]},{"l":"Triangle","e":"🔺","s":[[[50,14],[53.6,20.8],[57.2,27.6],[60.8,34.4],[64.4,41.2],[68,48],[71.6,54.8],[75.2,61.6],[78.8,68.4],[82.4,75.2],[86,82],[78,82],[70,82],[62,82],[54,82],[46,82],[38,82],[30,82],[22,82],[14,82],[17.6,75.2],[21.2,68.4],[24.8,61.6],[28.4,54.8],[32,48],[35.6,41.2],[39.2,34.4],[42.8,27.6],[46.4,20.8],[50,14]]]},{"l":"Rectangle","e":"🟩","s":[[[12,32],[19.6,32],[27.2,32],[34.8,32],[42.4,32],[50,32],[57.6,32],[65.2,32],[72.8,32],[80.4,32],[88,32],[88,39.2],[88,46.4],[88,53.6],[88,60.8],[88,68],[80.4,68],[72.8,68],[65.2,68],[57.6,68],[50,68],[42.4,68],[34.8,68],[27.2,68],[19.6,68],[12,68],[12,60.8],[12,53.6],[12,46.4],[12,39.2],[12,32]]]},{"l":"Oval","e":"🥚","s":[[[50,23],[43.8,23.7],[37.6,24.3],[32.1,26.3],[26.5,28.2],[22.1,31.2],[17.6,34.1],[14.8,37.9],[12,41.7],[11,45.9],[10,50],[11,54.2],[12,58.3],[14.8,62.1],[17.6,65.9],[22.1,68.9],[26.5,71.8],[32.1,73.8],[37.6,75.7],[43.8,76.4],[50,77],[56.2,76.4],[62.4,75.7],[68,73.8],[73.5,71.8],[78,68.9],[82.4,65.9],[85.2,62.1],[88,58.3],[89,54.2],[90,50],[89,45.9],[88,41.7],[85.2,37.9],[82.4,34.1],[78,31.2],[73.5,28.2],[68,26.3],[62.4,24.3],[56.2,23.7],[50,23]]]},{"l":"Diamond","e":"🔷","s":[[[50,8],[54.8,13.3],[59.5,18.5],[64.3,23.8],[69,29],[73.8,34.3],[78.5,39.5],[83.3,44.8],[88,50],[83.3,55.3],[78.5,60.5],[73.8,65.8],[69,71],[64.3,76.3],[59.5,81.5],[54.8,86.8],[50,92],[45.3,86.8],[40.5,81.5],[35.8,76.3],[31,71],[26.3,65.8],[21.5,60.5],[16.8,55.3],[12,50],[16.8,44.8],[21.5,39.5],[26.3,34.3],[31,29],[35.8,23.8],[40.5,18.5],[45.3,13.3],[50,8]]]},{"l":"Star","e":"⭐","s":[[[50,10],[52.7,16.9],[55.3,23.7],[58,30.6],[60.6,37.4],[67.9,37.8],[75.3,38.2],[82.6,38.6],[89.9,39],[84.2,43.7],[78.5,48.3],[72.8,53],[67.1,57.6],[69,64.7],[70.9,71.8],[72.8,78.9],[74.7,86],[68.5,82],[62.4,78],[56.2,74],[50,70],[43.8,74],[37.7,78],[31.5,82],[25.3,86],[27.2,78.9],[29.1,71.8],[31,64.7],[32.9,57.6],[27.2,53],[21.5,48.3],[15.8,43.7],[10.1,39],[17.4,38.6],[24.8,38.2],[32.1,37.8],[39.4,37.4],[42.1,30.6],[44.7,23.7],[47.4,16.9],[50,10]]]},{"l":"Heart","e":"❤️","s":[[[50,34],[48.9,30.3],[47.5,27],[45.7,24.1],[43.7,21.7],[41.5,19.6],[39,17.9],[36.5,16.8],[33.9,16],[31.3,15.8],[28.7,16],[26.3,16.7],[24,17.9],[21.9,19.7],[20,22],[17.9,25.9],[16.6,29.9],[16.2,33.9],[16.5,38.1],[17.5,42.3],[19.2,46.7],[21.5,51.3],[24.3,55.9],[27.7,60.8],[31.5,65.8],[35.6,71],[40.2,76.5],[45,82.1],[50,88],[55,82.1],[59.8,76.5],[64.4,71],[68.5,65.8],[72.3,60.8],[75.7,55.9],[78.5,51.3],[80.8,46.7],[82.5,42.3],[83.5,38.1],[83.8,33.9],[83.4,29.9],[82.1,25.9],[80,22],[78.1,19.7],[76,17.9],[73.7,16.7],[71.3,16],[68.7,15.8],[66.1,16],[63.5,16.8],[61,17.9],[58.5,19.6],[56.3,21.7],[54.3,24.1],[52.5,27],[51.1,30.3],[50,34]]]},{"l":"Pentagon","e":"⬠","s":[[[50,12],[56.3,16.6],[62.7,21.2],[69,25.8],[75.3,30.4],[81.7,35],[88,39.6],[85.6,47.1],[83.2,54.5],[80.8,62],[78.3,69.5],[75.9,76.9],[73.5,84.4],[65.7,84.4],[57.8,84.4],[50,84.4],[42.2,84.4],[34.3,84.4],[26.5,84.4],[24.1,76.9],[21.7,69.5],[19.3,62],[16.8,54.5],[14.4,47.1],[12,39.6],[18.3,35],[24.7,30.4],[31,25.8],[37.3,21.2],[43.7,16.6],[50,12]]]},{"l":"Hexagon","e":"⬡","s":[[[50,10],[56.9,14],[63.8,18],[70.8,22],[77.7,26],[84.6,30],[84.6,38],[84.6,46],[84.6,54],[84.6,62],[84.6,70],[77.7,74],[70.8,78],[63.8,82],[56.9,86],[50,90],[43.1,86],[36.2,82],[29.2,78],[22.3,74],[15.4,70],[15.4,62],[15.4,54],[15.4,46],[15.4,38],[15.4,30],[22.3,26],[29.2,22],[36.2,18],[43.1,14],[50,10]]]},{"l":"Plus","e":"➕","s":[[[38,12],[46,12],[54,12],[62,12],[62,18.5],[62,25],[62,31.5],[62,38],[68.5,38],[75,38],[81.5,38],[88,38],[88,46],[88,54],[88,62],[81.5,62],[75,62],[68.5,62],[62,62],[62,68.5],[62,75],[62,81.5],[62,88],[54,88],[46,88],[38,88],[38,81.5],[38,75],[38,68.5],[38,62],[31.5,62],[25,62],[18.5,62],[12,62],[12,54],[12,46],[12,38],[18.5,38],[25,38],[31.5,38],[38,38],[38,31.5],[38,25],[38,18.5],[38,12]]]},{"l":"Moon","e":"🌙","s":[[[50,10],[55.9,11],[61.7,12],[67,14.8],[72.3,17.6],[76.5,22.1],[80.7,26.5],[83.4,32.1],[86.1,37.6],[87.1,43.8],[88,50],[87.1,56.2],[86.1,62.4],[83.4,68],[80.7,73.5],[76.5,78],[72.3,82.4],[67,85.2],[61.7,88],[55.9,89],[50,90],[53.2,86.1],[55.9,81.4],[58.1,75.9],[59.8,69.9],[61,63.5],[61.8,56.8],[62,50],[61.8,43.2],[61,36.5],[59.8,30.1],[58.1,24.1],[55.9,18.6],[53.2,13.9],[50,10]]]}]}];
+
+        var TOL = 9;        // how far the finger may stray from the path
+        var WINDOW = 13;    // how far ahead progress can jump per move
+        var START_HIT = 12; // how close to the tip a touch must begin
+
+        var svg = document.getElementById("board");
+        var helper = document.getElementById("helper");
+        var srStatus = document.getElementById("srStatus");
+        var glyphChip = document.getElementById("glyphChip");
+        var strokeChip = document.getElementById("strokeChip");
+        var winOverlay = document.getElementById("winOverlay");
+        var winBig = document.getElementById("winBig");
+        var winTitle = document.getElementById("winTitle");
+        var winSub = document.getElementById("winSub");
+        var tabsEl = document.getElementById("tabs");
+        var pickerGrid = document.getElementById("pickerGrid");
+        var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        var si = 0;          // set index
+        var gi = 0;          // glyph index within set
+        var sk = 0;          // stroke index within glyph
+        var t = 0;           // arc-length progress along current stroke
+        var tracing = false;
+        var busy = false;    // demo animation running
+        var activePointerId = null;
+        var done = {};       // done[setKey] = { glyphIndex: true }
+        var current = {};    // remembered glyph index per set
+        var demoRaf = 0;
+        var demoTimer = 0;
+
+        var glyph, strokes, cums, totals;
+        var guideEls, paintEls, startG, fingerDot, demoDot;
+
+        SETS.forEach(function (s) { done[s.key] = {}; current[s.key] = 0; });
+
+        function el(name, attrs) {
+          var n = document.createElementNS("http://www.w3.org/2000/svg", name);
+          for (var k in attrs) n.setAttribute(k, attrs[k]);
+          return n;
+        }
+
+        function cumLen(pts) {
+          var c = [0];
+          for (var i = 1; i < pts.length; i++)
+            c.push(c[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+          return c;
+        }
+
+        function pointAt(pts, cum, d) {
+          if (d <= 0) return pts[0];
+          var total = cum[cum.length - 1];
+          if (d >= total) return pts[pts.length - 1];
+          for (var i = 1; i < cum.length; i++) {
+            if (cum[i] >= d) {
+              var u = (d - cum[i - 1]) / (cum[i] - cum[i - 1] || 1);
+              return [
+                pts[i - 1][0] + u * (pts[i][0] - pts[i - 1][0]),
+                pts[i - 1][1] + u * (pts[i][1] - pts[i - 1][1]),
+              ];
+            }
+          }
+          return pts[pts.length - 1];
+        }
+
+        // Furthest arc position the finger has legitimately reached: project
+        // the finger onto segments within [t, t + WINDOW]; only points within
+        // TOL of the path advance progress, and never backwards.
+        function advance(pts, cum, tNow, p) {
+          var best = tNow;
+          var limit = tNow + WINDOW;
+          for (var i = 1; i < pts.length; i++) {
+            if (cum[i] < tNow) continue;
+            if (cum[i - 1] > limit) break;
+            var ax = pts[i - 1][0], ay = pts[i - 1][1];
+            var dx = pts[i][0] - ax, dy = pts[i][1] - ay;
+            var len2 = dx * dx + dy * dy || 1;
+            var u = ((p[0] - ax) * dx + (p[1] - ay) * dy) / len2;
+            u = Math.max(0, Math.min(1, u));
+            var qx = ax + u * dx, qy = ay + u * dy;
+            if (Math.hypot(p[0] - qx, p[1] - qy) > TOL) continue;
+            var pos = cum[i - 1] + u * (cum[i] - cum[i - 1]);
+            if (pos > best && pos <= limit) best = pos;
+          }
+          return best;
+        }
+
+        function pathD(pts) {
+          var d = "M " + pts[0][0] + " " + pts[0][1];
+          for (var i = 1; i < pts.length; i++) d += " L " + pts[i][0] + " " + pts[i][1];
+          return d;
+        }
+
+        function set() { return SETS[si]; }
+        function noun() { return set().noun; }
+        function glyphName(g) { return noun() === "shape" ? g.l : noun() + " " + g.l; }
+
+        // ---------------- rendering ----------------
+        function loadGlyph(index) {
+          cancelDemo();
+          gi = index;
+          current[set().key] = gi;
+          glyph = set().glyphs[gi];
+          strokes = glyph.s;
+          cums = strokes.map(cumLen);
+          totals = cums.map(function (c) { return c[c.length - 1]; });
+          sk = 0;
+          t = 0;
+          tracing = false;
+          activePointerId = null;
+          winOverlay.classList.add("hidden");
+          svg.innerHTML = "";
+          guideEls = []; paintEls = [];
+
+          strokes.forEach(function (pts) {
+            var g1 = el("path", { d: pathD(pts), "class": "guide" });
+            svg.appendChild(g1);
+          });
+          strokes.forEach(function (pts) {
+            var g2 = el("path", { d: pathD(pts), "class": "guide-dash" });
+            svg.appendChild(g2);
+          });
+          strokes.forEach(function (pts, i2) {
+            var p = el("path", { d: pathD(pts), "class": "paint" });
+            p.style.strokeDasharray = totals[i2];
+            p.style.strokeDashoffset = totals[i2];
+            svg.appendChild(p);
+            paintEls.push(p);
+          });
+
+          startG = el("g", {});
+          svg.appendChild(startG);
+          fingerDot = el("circle", { r: 4.4, "class": "finger-dot" });
+          fingerDot.style.display = "none";
+          svg.appendChild(fingerDot);
+          demoDot = el("circle", { r: 4.4, "class": "demo-dot" });
+          demoDot.style.display = "none";
+          svg.appendChild(demoDot);
+
+          svg.setAttribute("aria-label", "Tracing board showing " + glyphName(glyph));
+          glyphChip.textContent = (noun() === "shape" ? (glyph.e ? glyph.e + " " : "") : "") +
+            glyphName(glyph).replace(/^./, function (c) { return c.toUpperCase(); });
+          setHelper("Put your finger on the green dot and trace!", "");
+          updateMarkers();
+          updateHud();
+        }
+
+        function updateHud() {
+          strokeChip.textContent = "Stroke " + Math.min(sk + 1, strokes.length) + " of " + strokes.length;
+        }
+
+        function updateMarkers() {
+          startG.innerHTML = "";
+          if (sk >= strokes.length) return;
+          var pts = strokes[sk];
+          var tip = pointAt(pts, cums[sk], t);
+          if (t === 0) {
+            var ring = el("circle", { cx: tip[0], cy: tip[1], r: 5, "class": "start-ring" });
+            var dot = el("circle", { cx: tip[0], cy: tip[1], r: 5, "class": "start-dot" });
+            var num = el("text", { x: tip[0], y: tip[1], "class": "start-num" });
+            num.textContent = String(sk + 1);
+            startG.appendChild(ring);
+            startG.appendChild(dot);
+            startG.appendChild(num);
+            // direction arrow a little way along the stroke
+            var ahead = pointAt(pts, cums[sk], Math.min(9, totals[sk] * 0.4));
+            var ang = Math.atan2(ahead[1] - tip[1], ahead[0] - tip[0]);
+            var ax = tip[0] + Math.cos(ang) * 8.5, ay = tip[1] + Math.sin(ang) * 8.5;
+            var arrow = el("polygon", { "class": "start-arrow", points: "0,-2.4 4.6,0 0,2.4" });
+            arrow.setAttribute("transform", "translate(" + ax + " " + ay + ") rotate(" + (ang * 180) / Math.PI + ")");
+            startG.appendChild(arrow);
+          } else {
+            var tipDot = el("circle", { cx: tip[0], cy: tip[1], r: 4.6, "class": "start-dot" });
+            startG.appendChild(tipDot);
+          }
+        }
+
+        function paint() {
+          paintEls[sk].style.strokeDashoffset = Math.max(0, totals[sk] - t);
+        }
+
+        function setHelper(msg, mood) {
+          helper.textContent = msg;
+          helper.className = "helper" + (mood ? " " + mood : "");
+        }
+
+        // ---------------- tracing ----------------
+        function svgPoint(ev) {
+          var r = svg.getBoundingClientRect();
+          return [((ev.clientX - r.left) / r.width) * 100, ((ev.clientY - r.top) / r.height) * 100];
+        }
+
+        svg.addEventListener("contextmenu", function (ev) { ev.preventDefault(); });
+
+        svg.addEventListener("pointerdown", function (ev) {
+          if (busy || tracing || !winOverlay.classList.contains("hidden")) return;
+          if (ev.pointerType === "mouse" && ev.button !== 0) return;
+          if (sk >= strokes.length) return;
+          var p = svgPoint(ev);
+          var tip = pointAt(strokes[sk], cums[sk], t);
+          if (Math.hypot(p[0] - tip[0], p[1] - tip[1]) > START_HIT) {
+            setHelper(t === 0 ? "Start at the green dot " + (sk + 1) + "!" : "Touch your line where it stopped!", "warn");
+            return;
+          }
+          ev.preventDefault();
+          svg.setPointerCapture(ev.pointerId);
+          activePointerId = ev.pointerId;
+          tracing = true;
+          fingerDot.style.display = "";
+          fingerDot.setAttribute("cx", tip[0]);
+          fingerDot.setAttribute("cy", tip[1]);
+          setHelper("Nice and slow — follow the path!", "excited");
+        });
+
+        svg.addEventListener("pointermove", function (ev) {
+          if (!tracing || ev.pointerId !== activePointerId) return;
+          if (sk >= strokes.length) return;
+          var p = svgPoint(ev);
+          var newT = advance(strokes[sk], cums[sk], t, p);
+          if (newT > t) {
+            t = newT;
+            paint();
+            updateMarkers();
+            // only move the marker with real progress — following a stray
+            // finger would park it on the next stroke's start dot
+            var tip = pointAt(strokes[sk], cums[sk], t);
+            fingerDot.setAttribute("cx", tip[0]);
+            fingerDot.setAttribute("cy", tip[1]);
+          }
+          if (t >= totals[sk] - 0.6) strokeDone();
+        });
+
+        function strokeDone() {
+          paintEls[sk].style.strokeDashoffset = 0;
+          sk++;
+          t = 0;
+          updateHud();
+          if (sk >= strokes.length) { finish(); return; }
+          updateMarkers();
+          setHelper("Stroke " + sk + " done! Now start at green dot " + (sk + 1) + ".", "excited");
+          srStatus.textContent = "Stroke " + sk + " finished. " + (strokes.length - sk) + " to go.";
+        }
+
+        function endTrace(ev) {
+          if (ev && ev.pointerId !== activePointerId) return;
+          tracing = false;
+          activePointerId = null;
+          fingerDot.style.display = "none";
+          if (sk < strokes.length && t > 0 && !busy) {
+            setHelper("You can rest! Touch your line to keep going.", "");
+          }
+        }
+        svg.addEventListener("pointerup", endTrace);
+        svg.addEventListener("pointercancel", endTrace);
+
+        // A pan-y gesture that the compositor owns delivers non-cancelable
+        // touchmove events, so the trace must be claimed at touchstart — it
+        // fires after pointerdown has set `tracing` and is still cancelable.
+        // Touches that don't begin on the tracing tip scroll the page.
+        svg.addEventListener("touchstart", function (ev) {
+          if (tracing && ev.cancelable) ev.preventDefault();
+        }, { passive: false });
+        svg.addEventListener("touchmove", function (ev) {
+          if (tracing && ev.cancelable) ev.preventDefault();
+        }, { passive: false });
+
+        // Some Android browsers ignore overscroll-behavior, so block
+        // pull-to-refresh directly: a downward finger movement while the page
+        // is already at the very top can only be the refresh gesture.
+        var ptrStartY = 0;
+        document.addEventListener("touchstart", function (ev) {
+          ptrStartY = ev.touches[0].clientY;
+        }, { passive: true });
+        document.addEventListener("touchmove", function (ev) {
+          // single-finger only: a second touch means pinch-zoom, not refresh
+          if (ev.touches.length === 1 && window.scrollY <= 0 && ev.touches[0].clientY > ptrStartY && ev.cancelable) {
+            ev.preventDefault();
+          }
+        }, { passive: false });
+
+        // ---------------- completion ----------------
+        function finish() {
+          // the finger may still be down on the final stroke's last point
+          tracing = false;
+          activePointerId = null;
+          fingerDot.style.display = "none";
+          done[set().key][gi] = true;
+          var g = glyph;
+          winBig.textContent = noun() === "shape" ? (g.e || g.l) : g.l;
+          var all = set().glyphs.every(function (_, i) { return done[set().key][i]; });
+          winTitle.textContent = all ? "🏆 ALL " + set().tab.replace(/^\S+\s*/, "") + " done!" : "🎉 You traced it!";
+          winSub.textContent = all
+            ? "You traced every single one. Amazing!"
+            : "That is a beautiful " + glyphName(g) + "!";
+          document.getElementById("nextBtn").classList.toggle("hidden", gi === set().glyphs.length - 1);
+          winOverlay.classList.remove("hidden");
+          srStatus.textContent = "Finished tracing " + glyphName(g) + "!";
+          buildPicker();
+          confetti();
+          document.getElementById("againBtn").focus();
+        }
+
+        function restart() {
+          cancelDemo();
+          loadGlyph(gi);
+        }
+
+        function confetti() {
+          if (reducedMotion) return;
+          var colors = ["#ff6b57", "#7c3aed", "#0f766e", "#b45309", "#15803d"];
+          for (var i = 0; i < 60; i++) {
+            var bit = document.createElement("div");
+            bit.className = "confetti-bit";
+            bit.style.left = Math.random() * 100 + "vw";
+            bit.style.background = colors[i % colors.length];
+            bit.style.animationDuration = 1.6 + Math.random() * 1.6 + "s";
+            bit.style.animationDelay = Math.random() * 0.4 + "s";
+            document.body.appendChild(bit);
+            (function (b) { setTimeout(function () { b.remove(); }, 4000); })(bit);
+          }
+        }
+
+        // ---------------- demo ----------------
+        function cancelDemo() {
+          if (demoRaf) cancelAnimationFrame(demoRaf);
+          demoRaf = 0;
+          clearTimeout(demoTimer);
+          demoTimer = 0;
+          busy = false;
+          if (demoDot) demoDot.style.display = "none";
+        }
+
+        function demo() {
+          if (busy) return;
+          loadGlyph(gi); // clean slate
+          busy = true;
+          setHelper("Watch how it goes… then your turn!", "excited");
+          srStatus.textContent = "Showing how to trace " + glyphName(glyph) + ".";
+          if (reducedMotion) {
+            paintEls.forEach(function (p) { p.style.strokeDashoffset = 0; });
+            demoTimer = setTimeout(function () { busy = false; loadGlyph(gi); setHelper("Your turn! Start at the green dot.", "excited"); }, 1400);
+            return;
+          }
+          var dsk = 0, dt = 0;
+          var SPEED = 55; // units per second
+          var last = 0;
+          demoDot.style.display = "";
+          function step(ts) {
+            if (!last) last = ts;
+            dt += ((ts - last) / 1000) * SPEED;
+            last = ts;
+            if (dt >= totals[dsk]) {
+              paintEls[dsk].style.strokeDashoffset = 0;
+              dsk++;
+              dt = 0;
+              if (dsk >= strokes.length) {
+                demoDot.style.display = "none";
+                // busy stays true through the grace pause so a touch cannot
+                // start a trace that the pending reset would wipe; the
+                // timer's loadGlyph -> cancelDemo releases it
+                demoTimer = setTimeout(function () { loadGlyph(gi); setHelper("Your turn! Start at the green dot.", "excited"); }, 700);
+                return;
+              }
+            }
+            paintEls[dsk].style.strokeDashoffset = Math.max(0, totals[dsk] - dt);
+            var p = pointAt(strokes[dsk], cums[dsk], dt);
+            demoDot.setAttribute("cx", p[0]);
+            demoDot.setAttribute("cy", p[1]);
+            demoRaf = requestAnimationFrame(step);
+          }
+          demoRaf = requestAnimationFrame(step);
+        }
+
+        // ---------------- tabs + picker ----------------
+        function buildTabs() {
+          if (SETS.length < 2) return;
+          tabsEl.classList.remove("hidden");
+          tabsEl.innerHTML = "";
+          SETS.forEach(function (s, i) {
+            var b = document.createElement("button");
+            b.className = "tab";
+            b.setAttribute("aria-pressed", i === si ? "true" : "false");
+            b.textContent = s.tab;
+            b.addEventListener("click", function () {
+              if (i === si) return;
+              if (busy) cancelDemo();
+              si = i;
+              loadGlyph(current[s.key] || 0);
+              buildTabs();
+              buildPicker();
+              tabsEl.children[i].focus();
+            });
+            tabsEl.appendChild(b);
+          });
+        }
+
+        function buildPicker() {
+          pickerGrid.innerHTML = "";
+          set().glyphs.forEach(function (g, i) {
+            var b = document.createElement("button");
+            b.className = "glyph-chip" + (i === gi ? " active" : "");
+            b.setAttribute("aria-label", "Trace " + glyphName(g) + (done[set().key][i] ? " (done)" : ""));
+            b.innerHTML = (noun() === "shape" ? "<span aria-hidden='true'>" + g.e + "</span>" : g.l) +
+              (done[set().key][i] ? "<span class='tick' aria-hidden='true'>✓</span>" : "");
+            b.addEventListener("click", function () {
+              // tapping the chip that is already active would wipe progress
+              if (i === gi && winOverlay.classList.contains("hidden")) return;
+              loadGlyph(i);
+              buildPicker();
+              pickerGrid.children[i].focus({ preventScroll: true });
+              document.querySelector(".card").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+            });
+            pickerGrid.appendChild(b);
+          });
+        }
+
+        // ---------------- buttons ----------------
+        document.getElementById("demoBtn").addEventListener("click", demo);
+        document.getElementById("restartBtn").addEventListener("click", restart);
+        document.getElementById("againBtn").addEventListener("click", function () {
+          // the overlay hides while its button holds focus — hand focus to
+          // Show me so keyboard players keep their place
+          restart();
+          document.getElementById("demoBtn").focus();
+        });
+        document.getElementById("nextBtn").addEventListener("click", function () {
+          if (gi < set().glyphs.length - 1) {
+            loadGlyph(gi + 1);
+            buildPicker();
+            document.getElementById("demoBtn").focus();
+          }
+        });
+
+        buildTabs();
+        loadGlyph(0);
+        buildPicker();
+      })();
+    </script>
+  </body>
+</html>
