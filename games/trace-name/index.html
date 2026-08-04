@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0f766e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Trace Your Name – Free Name Tracing for Kids | Play It My Way</title>
+    <meta name="description" content="Free name tracing for kids! Type any name or word and your child traces it letter by letter with guided start dots and stroke arrows. Nothing typed is saved or sent anywhere. The most motivating way to start writing, ages 3+. No ads, no download!" />
+    <meta name="keywords" content="name tracing for kids, trace your name free, name writing practice preschool, custom name tracing online, learn to write my name, personalized tracing kids, preschool name practice, handwriting name game free" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Trace Your Name – Free Name Tracing for Kids" />
+    <meta property="og:description" content="Type any name and trace it letter by letter with guided strokes. Nothing is saved. Free, ages 3+, no ads!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/trace-name/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Trace Your Name – Free Kids Name Tracing" />
+    <meta name="twitter:description" content="Type a name, trace every letter. Nothing saved, free, ages 3+!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/trace-name/" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <style>
+      :root {
+        --bg: var(--color-bg);
+        --surface: var(--color-surface);
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --band: var(--color-teal);
+        --band-tint: var(--color-teal-tint);
+        --coral: var(--color-primary);
+        --coral-deep: var(--color-primary-deep);
+        --green: var(--color-green);
+        --green-tint: var(--color-green-tint);
+        --amber: var(--color-amber);
+        --amber-tint: var(--color-amber-tint);
+        --guide: #e8dfd2;
+        --guide-dash: #c4b6a4;
+        --font: var(--font-display);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body {
+        background: var(--bg);
+        /* Android pull-to-refresh would reload the page mid-trace */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font);
+        color: var(--ink);
+        margin: 0;
+        padding: 14px 12px 44px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: var(--font); }
+
+      .back-link {
+        align-self: flex-start;
+        color: var(--band);
+        background: var(--band-tint);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      header.game-head { text-align: center; margin: 10px 0 12px; }
+      header.game-head h1 {
+        font-size: clamp(26px, 7vw, 34px);
+        font-weight: 600;
+        margin: 0 0 4px;
+        text-wrap: balance;
+      }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        width: 100%;
+        max-width: 520px;
+        padding: 14px 14px 18px;
+      }
+
+      .name-form { margin-bottom: 12px; }
+      .name-label {
+        display: block;
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--ink-soft);
+        margin-bottom: 6px;
+      }
+      .name-row { display: flex; gap: 8px; }
+      .name-input {
+        flex: 1 1 auto;
+        min-width: 0;
+        font-family: var(--font);
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--ink);
+        background: #fffdf9;
+        border: 2px solid #ddd2c4;
+        border-radius: var(--radius-md);
+        padding: 10px 14px;
+        min-height: 50px;
+      }
+      .name-input:focus-visible { border-color: var(--band); }
+      .name-hint { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-soft); }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .tab {
+        border: 2px solid var(--band-tint);
+        background: var(--surface);
+        color: var(--band);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 9px 18px;
+        border-radius: var(--radius-pill);
+        min-height: 46px;
+        transition: transform 150ms ease;
+      }
+      .tab:hover { transform: translateY(-2px); }
+      .tab[aria-pressed="true"] { background: var(--band); border-color: var(--band); color: #fff; }
+
+      .status-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 6px;
+      }
+      .chip {
+        font-weight: 600;
+        font-size: 14px;
+        padding: 6px 12px;
+        border-radius: var(--radius-pill);
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+      .chip-glyph { background: var(--band-tint); color: var(--band); font-size: 16px; }
+      .chip-stroke { background: var(--amber-tint); color: var(--amber); }
+
+      .helper {
+        min-height: 26px;
+        text-align: center;
+        color: var(--ink-soft);
+        font-size: 16.5px;
+        margin: 2px 0 8px;
+      }
+      .helper.excited { color: var(--band); font-weight: 600; }
+      .helper.warn { color: var(--amber); font-weight: 600; }
+
+      .board-wrap { position: relative; width: 100%; }
+      svg.board {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        touch-action: pan-y;
+        user-select: none;
+        -webkit-user-select: none;
+        border-radius: var(--radius-md);
+        background:
+          radial-gradient(circle at 20% 16%, rgba(15, 118, 110, 0.05), transparent 45%),
+          radial-gradient(circle at 84% 86%, rgba(255, 107, 87, 0.06), transparent 45%),
+          #fffdf9;
+      }
+
+      .guide { stroke: var(--guide); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .guide-dash { stroke: var(--guide-dash); stroke-width: 1.3; stroke-dasharray: 2.8 2.8; stroke-linecap: round; fill: none; }
+      /* coral-deep: the painted line needs 3:1 non-text contrast against
+         both the board and the grey guide (plain coral is ~2.4:1) */
+      .paint { stroke: var(--coral-deep); stroke-width: 5.6; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+
+      .start-dot { fill: var(--green); }
+      .start-num {
+        fill: #ffffff;
+        font-size: 5.2px;
+        font-weight: 600;
+        text-anchor: middle;
+        dominant-baseline: central;
+        pointer-events: none;
+      }
+      .start-ring { fill: none; stroke: var(--green); stroke-width: 1; animation: ping 1.5s ease infinite; }
+      @keyframes ping {
+        0% { r: 5; opacity: 0.9; }
+        75% { r: 10; opacity: 0; }
+        100% { r: 10; opacity: 0; }
+      }
+      .start-arrow { fill: var(--green); }
+      .finger-dot { fill: var(--coral-deep); opacity: 0.85; }
+      .demo-dot { fill: var(--band); }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 12px 20px;
+        border-radius: var(--radius-pill);
+        min-height: 48px;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn-soft { background: var(--band-tint); color: var(--band); }
+      .btn-go { background: var(--coral-deep); color: #fff; font-size: 18px; box-shadow: var(--shadow-rest); }
+      .btn-again { background: var(--green-tint); color: var(--green); }
+
+      .win-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius-md);
+        background: rgba(255, 253, 249, 0.95);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        text-align: center;
+        padding: 20px;
+        animation: fadeIn 300ms ease;
+      }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      .win-big {
+        /* holds a whole word, not a single glyph */
+        font-size: clamp(28px, 10vw, 48px);
+        line-height: 1.15;
+        font-weight: 600;
+        color: var(--coral-deep);
+        letter-spacing: 0.04em;
+        word-break: break-all;
+        max-width: 100%;
+      }
+      .win-overlay h2 { margin: 4px 0 0; font-size: clamp(22px, 6vw, 30px); color: var(--green); }
+      .win-overlay p { margin: 0; color: var(--ink-soft); font-size: 17px; }
+      .hidden { display: none !important; }
+
+      .picker { width: 100%; max-width: 520px; margin-top: 18px; }
+      .picker h2 { font-size: 19px; margin: 0 0 10px; }
+      .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+      .glyph-chip {
+        border: 2px solid #e4dbcf;
+        background: var(--surface);
+        color: var(--ink);
+        cursor: pointer;
+        border-radius: var(--radius-md);
+        padding: 6px 8px;
+        font-size: 18px;
+        font-weight: 600;
+        min-width: 48px;
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        transition: transform 150ms ease, border-color 150ms ease;
+      }
+      .glyph-chip:hover { transform: translateY(-2px); }
+      .glyph-chip.active { border-color: var(--band); background: var(--band-tint); color: var(--band); }
+      .glyph-chip .tick { font-size: 12px; color: var(--green); }
+
+      .how-to {
+        width: 100%;
+        max-width: 520px;
+        margin-top: 18px;
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 16px 18px;
+      }
+      .how-to h2 { font-size: 19px; margin: 0 0 8px; }
+      .how-to ol { margin: 0; padding-left: 22px; color: var(--ink-soft); font-size: 16px; line-height: 1.65; }
+      .how-to li::marker { color: var(--band); font-weight: 600; }
+      .how-to .note { margin: 8px 0 0; font-size: 14px; color: var(--ink-soft); }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .confetti-bit {
+        position: fixed;
+        top: -14px;
+        width: 10px;
+        height: 14px;
+        border-radius: 3px;
+        pointer-events: none;
+        z-index: 50;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall { to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .confetti-bit { display: none; }
+        .start-ring { opacity: 0.9; r: 7; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>💖 Trace Your Name</h1>
+      <p>Type any name — then trace it letter by letter!</p>
+    </header>
+
+    <main class="card">
+      <form class="name-form" id="nameForm" autocomplete="off">
+        <label class="name-label" for="nameInput">Grown-ups: type a name or word to trace</label>
+        <div class="name-row">
+          <input class="name-input" id="nameInput" type="text" maxlength="10"
+                 autocomplete="off" autocapitalize="off" spellcheck="false"
+                 placeholder="e.g. Maya" aria-describedby="nameHint" />
+          <button class="btn btn-go" type="submit">✏️ Make it!</button>
+        </div>
+        <p class="name-hint" id="nameHint">Letters only, up to 10. Nothing you type is saved or sent anywhere.</p>
+      </form>
+
+      <div class="tabs hidden" id="tabs" role="group" aria-label="Choose what to trace"></div>
+
+      <div class="status-row">
+        <span class="chip chip-glyph" id="glyphChip">Letter A</span>
+        <span class="chip chip-stroke" id="strokeChip">Stroke 1 of 3</span>
+      </div>
+
+      <p class="helper" id="helper" aria-live="polite">Put your finger on the green dot and trace!</p>
+
+      <div class="board-wrap">
+        <svg class="board" id="board" viewBox="0 0 100 100" role="img"
+             aria-label="Tracing board"></svg>
+        <div class="win-overlay hidden" id="winOverlay" role="dialog" aria-label="Tracing finished">
+          <span class="win-big" id="winBig">A</span>
+          <h2 id="winTitle">You traced it!</h2>
+          <p id="winSub">Wonderful writing!</p>
+          <div class="controls">
+            <button class="btn btn-again" id="againBtn">🔄 Same word</button>
+            <button class="btn btn-go" id="nextBtn">✨ New word</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-soft" id="demoBtn">👀 Show me</button>
+        <button class="btn btn-soft" id="restartBtn">🔄 This letter again</button>
+      </div>
+      <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
+    </main>
+
+    <nav class="picker" aria-label="The letters of your word">
+      <h2 id="pickerTitle">🔤 Your word</h2>
+      <div class="chip-grid" id="pickerGrid"></div>
+    </nav>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>A grown-up types a name or word and taps <strong>Make it!</strong></li>
+        <li>Trace each letter — put your finger on the <strong>green dot</strong> and follow the path.</li>
+        <li>Finish a letter and the next one appears. Finish them all to see your whole word! 🎉</li>
+        <li>Not sure how? Tap <strong>👀 Show me</strong> to watch first.</li>
+      </ol>
+      <p class="note">Nothing typed here is saved or sent anywhere — it disappears when you leave the page. Tracing their own name is one of the most motivating ways for a child to start writing.</p>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+        var GLYPHS = {"A":[[[50,10],[47.5,17.3],[44.9,24.5],[42.4,31.8],[39.8,39.1],[37.3,46.4],[34.7,53.6],[32.2,60.9],[29.6,68.2],[27.1,75.5],[24.5,82.7],[22,90]],[[50,10],[52.5,17.3],[55.1,24.5],[57.6,31.8],[60.2,39.1],[62.7,46.4],[65.3,53.6],[67.8,60.9],[70.4,68.2],[72.9,75.5],[75.5,82.7],[78,90]],[[33,60],[39.8,60],[46.6,60],[53.4,60],[60.2,60],[67,60]]],"B":[[[30,10],[30,18],[30,26],[30,34],[30,42],[30,50],[30,58],[30,66],[30,74],[30,82],[30,90]],[[30,10],[34.2,10.5],[38.3,10.9],[42.1,12.3],[45.9,13.6],[51.8,17.8],[55.7,23.1],[57,29],[55.7,34.9],[51.8,40.2],[45.9,44.4],[42.1,45.8],[38.3,47.1],[34.2,47.6],[30,48]],[[30,48],[34.8,48.5],[39.6,49],[43.9,50.5],[48.2,52],[51.7,54.4],[55.1,56.7],[59.5,62.5],[61,69],[59.5,75.5],[55.1,81.3],[51.7,83.7],[48.2,86],[43.9,87.5],[39.6,89],[34.8,89.5],[30,90]]],"C":[[[66.9,18.1],[63.3,15.4],[59.7,12.7],[55.7,11.9],[51.7,11],[47.7,12],[43.7,13],[40.2,15.8],[36.6,18.6],[33.8,22.9],[30.9,27.2],[29.1,32.6],[27.3,38],[26.7,44],[26,50],[26.7,56],[27.3,62],[29.1,67.4],[30.9,72.8],[33.8,77.1],[36.6,81.4],[40.2,84.2],[43.7,87],[47.7,88],[51.7,89],[55.7,88.2],[59.7,87.3],[63.3,84.6],[66.9,81.9]]],"D":[[[30,10],[30,18],[30,26],[30,34],[30,42],[30,50],[30,58],[30,66],[30,74],[30,82],[30,90]],[[30,10],[35.7,11],[41.4,12],[46.6,14.8],[51.7,17.6],[55.8,22.1],[59.9,26.5],[62.6,32.1],[65.2,37.6],[66.1,43.8],[67,50],[66.1,56.2],[65.2,62.4],[62.6,68],[59.9,73.5],[55.8,78],[51.7,82.4],[46.6,85.2],[41.4,88],[35.7,89],[30,90]]],"E":[[[30,10],[30,18],[30,26],[30,34],[30,42],[30,50],[30,58],[30,66],[30,74],[30,82],[30,90]],[[30,10],[37,10],[44,10],[51,10],[58,10],[65,10],[72,10]],[[30,50],[37.2,50],[44.4,50],[51.6,50],[58.8,50],[66,50]],[[30,90],[37,90],[44,90],[51,90],[58,90],[65,90],[72,90]]],"F":[[[30,10],[30,18],[30,26],[30,34],[30,42],[30,50],[30,58],[30,66],[30,74],[30,82],[30,90]],[[30,10],[37,10],[44,10],[51,10],[58,10],[65,10],[72,10]],[[30,50],[36.8,50],[43.6,50],[50.4,50],[57.2,50],[64,50]]],"G":[[[65.5,18.1],[61.8,15.5],[58.1,12.8],[54.1,11.9],[50,11],[46,11.9],[41.9,12.8],[38.2,15.5],[34.5,18.1],[31.6,22.2],[28.6,26.3],[26.6,31.5],[24.6,36.7],[23.8,42.5],[23,48.3],[23.5,54.2],[23.9,60.1],[25.5,65.6],[27.2,71],[29.9,75.5],[32.6,79.9],[36.2,83],[39.7,86],[43.7,87.5],[47.6,88.9],[51.7,88.5],[55.8,88.1],[59.7,85.9],[63.5,83.8]],[[77,58],[70.8,58],[64.5,58],[58.3,58],[52,58]]],"H":[[[28,10],[28,18],[28,26],[28,34],[28,42],[28,50],[28,58],[28,66],[28,74],[28,82],[28,90]],[[72,10],[72,18],[72,26],[72,34],[72,42],[72,50],[72,58],[72,66],[72,74],[72,82],[72,90]],[[28,50],[35.3,50],[42.7,50],[50,50],[57.3,50],[64.7,50],[72,50]]],"I":[[[50,10],[50,18],[50,26],[50,34],[50,42],[50,50],[50,58],[50,66],[50,74],[50,82],[50,90]],[[30,10],[38,10],[46,10],[54,10],[62,10],[70,10]],[[30,90],[38,90],[46,90],[54,90],[62,90],[70,90]]],"J":[[[58,10],[58,18],[58,26],[58,34],[58,42],[58,50],[58,58],[58,66],[57.4,71.3],[55.5,76],[52.6,79.8],[49,82.2],[45,83],[41,82.2],[37.4,79.8],[34.5,76],[32.6,71.3],[32,66]],[[40,10],[47.2,10],[54.4,10],[61.6,10],[68.8,10],[76,10]]],"K":[[[30,10],[30,18],[30,26],[30,34],[30,42],[30,50],[30,58],[30,66],[30,74],[30,82],[30,90]],[[70,10],[65,15.3],[60,20.5],[55,25.8],[50,31],[45,36.3],[40,41.5],[35,46.8],[30,52]],[[30,52],[35.7,57.4],[41.4,62.9],[47.1,68.3],[52.9,73.7],[58.6,79.1],[64.3,84.6],[70,90]]],"L":[[[32,10],[32,18],[32,26],[32,34],[32,42],[32,50],[32,58],[32,66],[32,74],[32,82],[32,90],[39,90],[46,90],[53,90],[60,90],[67,90],[74,90]]],"M":[[[24,90],[24,82],[24,74],[24,66],[24,58],[24,50],[24,42],[24,34],[24,26],[24,18],[24,10]],[[24,10],[27.3,16.5],[30.5,23],[33.8,29.5],[37,36],[40.3,42.5],[43.5,49],[46.8,55.5],[50,62],[53.3,55.5],[56.5,49],[59.8,42.5],[63,36],[66.3,29.5],[69.5,23],[72.8,16.5],[76,10],[76,18],[76,26],[76,34],[76,42],[76,50],[76,58],[76,66],[76,74],[76,82],[76,90]]],"N":[[[28,90],[28,82],[28,74],[28,66],[28,58],[28,50],[28,42],[28,34],[28,26],[28,18],[28,10]],[[28,10],[31.7,16.7],[35.3,23.3],[39,30],[42.7,36.7],[46.3,43.3],[50,50],[53.7,56.7],[57.3,63.3],[61,70],[64.7,76.7],[68.3,83.3],[72,90],[72,82],[72,74],[72,66],[72,58],[72,50],[72,42],[72,34],[72,26],[72,18],[72,10]]],"O":[[[50,10],[45.7,11],[41.3,12],[37.4,14.8],[33.5,17.6],[30.4,22.1],[27.3,26.5],[25.4,32.1],[23.4,37.6],[22.7,43.8],[22,50],[22.7,56.2],[23.4,62.4],[25.4,68],[27.3,73.5],[30.4,78],[33.5,82.4],[37.4,85.2],[41.3,88],[45.7,89],[50,90],[54.4,89],[58.7,88],[62.6,85.2],[66.5,82.4],[69.6,78],[72.7,73.5],[74.7,68],[76.6,62.4],[77.3,56.2],[78,50],[77.3,43.8],[76.6,37.6],[74.7,32.1],[72.7,26.5],[69.6,22.1],[66.5,17.6],[62.6,14.8],[58.7,12],[54.4,11],[50,10]]],"P":[[[30,10],[30,18],[30,26],[30,34],[30,42],[30,50],[30,58],[30,66],[30,74],[30,82],[30,90]],[[30,10],[34.5,10.5],[39,11],[43,12.5],[47,14],[50.3,16.4],[53.5,18.7],[57.6,24.5],[59,31],[57.6,37.5],[53.5,43.3],[50.3,45.7],[47,48],[43,49.5],[39,51],[34.5,51.5],[30,52]]],"Q":[[[50,10],[45.7,11],[41.3,11.9],[37.4,14.6],[33.5,17.3],[30.4,21.5],[27.3,25.7],[25.4,31],[23.4,36.3],[22.7,42.2],[22,48],[22.7,53.9],[23.4,59.7],[25.4,65],[27.3,70.3],[30.4,74.5],[33.5,78.7],[37.4,81.4],[41.3,84.1],[45.7,85.1],[50,86],[54.4,85.1],[58.7,84.1],[62.6,81.4],[66.5,78.7],[69.6,74.5],[72.7,70.3],[74.7,65],[76.6,59.7],[77.3,53.9],[78,48],[77.3,42.2],[76.6,36.3],[74.7,31],[72.7,25.7],[69.6,21.5],[66.5,17.3],[62.6,14.6],[58.7,11.9],[54.4,11],[50,10]],[[58,66],[63,72],[68,78],[73,84],[78,90]]],"R":[[[30,10],[30,18],[30,26],[30,34],[30,42],[30,50],[30,58],[30,66],[30,74],[30,82],[30,90]],[[30,10],[34.5,10.5],[39,11],[43,12.5],[47,14],[50.3,16.4],[53.5,18.7],[57.6,24.5],[59,31],[57.6,37.5],[53.5,43.3],[50.3,45.7],[47,48],[43,49.5],[39,51],[34.5,51.5],[30,52]],[[30,52],[35.3,56.8],[40.5,61.5],[45.8,66.3],[51,71],[56.3,75.8],[61.5,80.5],[66.8,85.3],[72,90]]],"S":[[[70,24],[67.9,20.1],[65.3,16.9],[62.1,14.4],[58.6,12.6],[54.8,11.5],[50.9,11],[47,11.3],[43.2,12.1],[39.7,13.6],[36.5,15.7],[33.9,18.4],[31.8,21.7],[30.5,25.6],[30,30],[30.6,33.9],[32.2,37.2],[34.7,40],[37.9,42.4],[41.7,44.5],[45.7,46.4],[50,48.3],[54.3,50.1],[58.3,52.1],[62.1,54.3],[65.3,56.9],[67.8,60],[69.4,63.7],[70,68],[69.5,72.5],[68.1,76.4],[65.9,79.8],[63.1,82.7],[59.7,85],[56,86.7],[52,87.8],[47.9,88.2],[43.8,87.9],[39.8,87],[36.1,85.4],[32.8,83],[30.1,79.9],[28,76]]],"T":[[[50,10],[50,18],[50,26],[50,34],[50,42],[50,50],[50,58],[50,66],[50,74],[50,82],[50,90]],[[26,10],[34,10],[42,10],[50,10],[58,10],[66,10],[74,10]]],"U":[[[28,10],[28,17.5],[28,25],[28,32.5],[28,40],[28,47.5],[28,55],[28.6,60.1],[29.1,65.2],[30.7,69.8],[32.2,74.4],[34.7,78.1],[37.1,81.7],[43.2,86.4],[50,88],[56.8,86.4],[62.9,81.7],[65.4,78.1],[67.8,74.4],[69.4,69.8],[70.9,65.2],[71.5,60.1],[72,55],[72,47.5],[72,40],[72,32.5],[72,25],[72,17.5],[72,10]]],"V":[[[26,10],[28.2,17.3],[30.4,24.5],[32.5,31.8],[34.7,39.1],[36.9,46.4],[39.1,53.6],[41.3,60.9],[43.5,68.2],[45.6,75.5],[47.8,82.7],[50,90],[52.2,82.7],[54.4,75.5],[56.5,68.2],[58.7,60.9],[60.9,53.6],[63.1,46.4],[65.3,39.1],[67.5,31.8],[69.6,24.5],[71.8,17.3],[74,10]]],"W":[[[20,10],[21.5,17.3],[22.9,24.5],[24.4,31.8],[25.8,39.1],[27.3,46.4],[28.7,53.6],[30.2,60.9],[31.6,68.2],[33.1,75.5],[34.5,82.7],[36,90],[38,82.6],[40,75.1],[42,67.7],[44,60.3],[46,52.9],[48,45.4],[50,38],[52,45.4],[54,52.9],[56,60.3],[58,67.7],[60,75.1],[62,82.6],[64,90],[65.5,82.7],[66.9,75.5],[68.4,68.2],[69.8,60.9],[71.3,53.6],[72.7,46.4],[74.2,39.1],[75.6,31.8],[77.1,24.5],[78.5,17.3],[80,10]]],"X":[[[28,10],[31.7,16.7],[35.3,23.3],[39,30],[42.7,36.7],[46.3,43.3],[50,50],[53.7,56.7],[57.3,63.3],[61,70],[64.7,76.7],[68.3,83.3],[72,90]],[[72,10],[68.3,16.7],[64.7,23.3],[61,30],[57.3,36.7],[53.7,43.3],[50,50],[46.3,56.7],[42.7,63.3],[39,70],[35.3,76.7],[31.7,83.3],[28,90]]],"Y":[[[26,10],[30,16.3],[34,22.7],[38,29],[42,35.3],[46,41.7],[50,48]],[[74,10],[70,16.3],[66,22.7],[62,29],[58,35.3],[54,41.7],[50,48],[50,55],[50,62],[50,69],[50,76],[50,83],[50,90]]],"Z":[[[28,10],[35.3,10],[42.7,10],[50,10],[57.3,10],[64.7,10],[72,10],[68.3,16.7],[64.7,23.3],[61,30],[57.3,36.7],[53.7,43.3],[50,50],[46.3,56.7],[42.7,63.3],[39,70],[35.3,76.7],[31.7,83.3],[28,90],[35.3,90],[42.7,90],[50,90],[57.3,90],[64.7,90],[72,90]]],"a":[[[60.5,51.5],[56.7,46.9],[51.7,43.6],[46,42.1],[40,42.4],[34.5,44.5],[29.9,48.3],[26.6,53.3],[25.1,59],[25.4,65],[27.5,70.5],[31.3,75.1],[36.3,78.4],[42,79.9],[48,79.6],[53.5,77.5],[58.1,73.7],[61.4,68.7],[62.9,63],[62.6,57],[60.5,51.5]],[[63,44],[63,51.2],[63,58.4],[63,65.6],[63,72.8],[63,80]]],"b":[[[30,12],[30,19.6],[30,27.1],[30,34.7],[30,42.2],[30,49.8],[30,57.3],[30,64.9],[30,72.4],[30,80]],[[30,61],[30.9,55.1],[33.6,49.8],[37.8,45.6],[43.1,42.9],[49,42],[54.9,42.9],[60.2,45.6],[64.4,49.8],[67.1,55.1],[68,61],[67.1,66.9],[64.4,72.2],[60.2,76.4],[54.9,79.1],[49,80],[43.1,79.1],[37.8,76.4],[33.6,72.2],[30.9,66.9],[30,61]]],"c":[[[62.2,46.4],[56.9,43.3],[50.9,42],[44.9,42.7],[39.3,45.3],[34.9,49.5],[32,54.9],[31,61],[32,67.1],[34.9,72.5],[39.3,76.7],[44.9,79.3],[50.9,80],[56.9,78.7],[62.2,75.6]]],"d":[[[61.5,51.5],[57.7,46.9],[52.7,43.6],[47,42.1],[41,42.4],[35.5,44.5],[30.9,48.3],[27.6,53.3],[26.1,59],[26.4,65],[28.5,70.5],[32.3,75.1],[37.3,78.4],[43,79.9],[49,79.6],[54.5,77.5],[59.1,73.7],[62.4,68.7],[63.9,63],[63.6,57],[61.5,51.5]],[[64,12],[64,19.6],[64,27.1],[64,34.7],[64,42.2],[64,49.8],[64,57.3],[64,64.9],[64,72.4],[64,80]]],"e":[[[31,61],[38.6,61],[46.2,61],[53.8,61],[61.4,61],[69,61],[68.1,55.1],[65.3,49.8],[61.1,45.6],[55.8,42.9],[49.9,42],[44,43],[38.7,45.7],[34.5,50],[31.9,55.3],[31,61.3],[32,67.1],[34.8,72.4],[39.1,76.6]]],"f":[[[58,16],[55.5,14.9],[53,14.3],[50.6,14],[48.4,14.1],[46.3,14.6],[44.3,15.4],[42.5,16.5],[40.9,17.9],[39.5,19.7],[38.3,21.7],[37.3,23.9],[36.6,26.4],[36.2,29.1],[36,32],[36,40],[36,48],[36,56],[36,64],[36,72],[36,80]],[[26,44],[34,44],[42,44],[50,44]]],"g":[[[60.5,51.5],[56.7,46.9],[51.7,43.6],[46,42.1],[40,42.4],[34.5,44.5],[29.9,48.3],[26.6,53.3],[25.1,59],[25.4,65],[27.5,70.5],[31.3,75.1],[36.3,78.4],[42,79.9],[48,79.6],[53.5,77.5],[58.1,73.7],[61.4,68.7],[62.9,63],[62.6,57],[60.5,51.5]],[[63,44],[63,52],[63,60],[63,68],[63,76],[63,84],[62.8,86.2],[62,88.1],[60.9,89.7],[59.5,91],[57.8,92.1],[55.9,92.8],[53.9,93.3],[51.8,93.4],[49.6,93.3],[47.5,93],[45.6,92.4],[43.8,91.5],[42.2,90.4],[41,89]]],"h":[[[30,12],[30,19.6],[30,27.1],[30,34.7],[30,42.2],[30,49.8],[30,57.3],[30,64.9],[30,72.4],[30,80]],[[30,60],[30.7,54.4],[32.7,49.4],[35.8,45.4],[39.7,42.9],[44,42],[48.3,42.9],[52.2,45.4],[55.3,49.4],[57.3,54.4],[58,60],[58,66.7],[58,73.3],[58,80]]],"i":[[[50,42],[50,49.6],[50,57.2],[50,64.8],[50,72.4],[50,80]],[[50,24.5],[51.1,24.7],[52.1,25.2],[52.8,25.9],[53.3,26.9],[53.5,28],[53.3,29.1],[52.8,30.1],[52.1,30.8],[51.1,31.3],[50,31.5],[48.9,31.3],[47.9,30.8],[47.2,30.1],[46.7,29.1],[46.5,28],[46.7,26.9],[47.2,25.9],[47.9,25.2],[48.9,24.7],[50,24.5]]],"j":[[[54,42],[54,49],[54,56],[54,63],[54,70],[54,77],[54,84],[53.8,86.2],[53.1,88.1],[52.1,89.7],[50.7,91],[49.1,92.1],[47.3,92.8],[45.4,93.3],[43.4,93.4],[41.3,93.3],[39.3,93],[37.5,92.4],[35.7,91.5],[34.2,90.4],[33,89]],[[54,24.5],[55.1,24.7],[56.1,25.2],[56.8,25.9],[57.3,26.9],[57.5,28],[57.3,29.1],[56.8,30.1],[56.1,30.8],[55.1,31.3],[54,31.5],[52.9,31.3],[51.9,30.8],[51.2,30.1],[50.7,29.1],[50.5,28],[50.7,26.9],[51.2,25.9],[51.9,25.2],[52.9,24.7],[54,24.5]]],"k":[[[30,12],[30,19.6],[30,27.1],[30,34.7],[30,42.2],[30,49.8],[30,57.3],[30,64.9],[30,72.4],[30,80]],[[54,44],[49.2,48.4],[44.4,52.8],[39.6,57.2],[34.8,61.6],[30,66]],[[30,66],[36,69.5],[42,73],[48,76.5],[54,80]]],"l":[[[50,12],[50,19.6],[50,27.1],[50,34.7],[50,42.2],[50,49.8],[50,57.3],[50,64.9],[50,72.4],[50,80]]],"m":[[[26,42],[26,49.6],[26,57.2],[26,64.8],[26,72.4],[26,80]],[[26,60],[26.5,55.1],[28.1,50.6],[30.5,47.1],[33.6,44.8],[37,44],[40.4,44.8],[43.5,47.1],[45.9,50.6],[47.5,55.1],[48,60],[48,66.7],[48,73.3],[48,80]],[[48,60],[48.5,55.1],[50.1,50.6],[52.5,47.1],[55.6,44.8],[59,44],[62.4,44.8],[65.5,47.1],[67.9,50.6],[69.5,55.1],[70,60],[70,66.7],[70,73.3],[70,80]]],"n":[[[32,42],[32,49.6],[32,57.2],[32,64.8],[32,72.4],[32,80]],[[32,60],[32.7,55.1],[34.7,50.6],[37.8,47.1],[41.7,44.8],[46,44],[50.3,44.8],[54.2,47.1],[57.3,50.6],[59.3,55.1],[60,60],[60,66.7],[60,73.3],[60,80]]],"o":[[[50,42],[44.1,42.9],[38.8,45.6],[34.6,49.8],[31.9,55.1],[31,61],[31.9,66.9],[34.6,72.2],[38.8,76.4],[44.1,79.1],[50,80],[55.9,79.1],[61.2,76.4],[65.4,72.2],[68.1,66.9],[69,61],[68.1,55.1],[65.4,49.8],[61.2,45.6],[55.9,42.9],[50,42]]],"p":[[[32,42],[32,49.7],[32,57.4],[32,65.1],[32,72.9],[32,80.6],[32,88.3],[32,96]],[[32,61],[32.9,55.1],[35.4,49.8],[39.4,45.6],[44.4,42.9],[50,42],[55.6,42.9],[60.6,45.6],[64.6,49.8],[67.1,55.1],[68,61],[67.1,66.9],[64.6,72.2],[60.6,76.4],[55.6,79.1],[50,80],[44.4,79.1],[39.4,76.4],[35.4,72.2],[32.9,66.9],[32,61]]],"q":[[[61.5,51.5],[57.7,46.9],[52.7,43.6],[47,42.1],[41,42.4],[35.5,44.5],[30.9,48.3],[27.6,53.3],[26.1,59],[26.4,65],[28.5,70.5],[32.3,75.1],[37.3,78.4],[43,79.9],[49,79.6],[54.5,77.5],[59.1,73.7],[62.4,68.7],[63.9,63],[63.6,57],[61.5,51.5]],[[64,44],[64,51.7],[64,59.3],[64,67],[64,74.7],[64,82.3],[64,90],[64.1,91.2],[64.5,92.2],[65,92.9],[65.7,93.5],[66.5,93.9],[67.5,94.1],[68.5,94.1],[69.6,94],[70.7,93.7],[71.9,93.2],[73,92.6],[74.1,91.9],[75.1,91],[76,90]]],"r":[[[36,42],[36,49.6],[36,57.2],[36,64.8],[36,72.4],[36,80]],[[36,60],[36.4,56.1],[37.4,52.5],[39.1,49.3],[41.3,46.7],[43.9,45],[46.7,44.1],[49.7,44.2],[52.5,45.2],[55.1,47.1],[57.2,49.7]]],"s":[[[62,47],[60.7,45.6],[59.1,44.5],[57.2,43.6],[55.1,43],[52.8,42.7],[50.5,42.6],[48.1,42.8],[45.9,43.2],[43.8,43.9],[41.9,45],[40.3,46.3],[39.1,47.9],[38.3,49.8],[38,52],[38.3,54],[39.3,55.6],[40.8,57],[42.8,58.2],[45,59.3],[47.4,60.2],[50,61.1],[52.6,62.1],[55,63],[57.2,64.2],[59.2,65.5],[60.7,67],[61.7,68.8],[62,71],[61.7,73],[60.9,74.8],[59.7,76.4],[58.1,77.7],[56.1,78.8],[54,79.6],[51.6,80.1],[49.2,80.4],[46.7,80.3],[44.2,79.9],[41.8,79.2],[39.6,78.1],[37.7,76.7],[36,75]]],"t":[[[46,16],[46,24],[46,32],[46,40],[46,48],[46,56],[46,64],[46,72],[46.1,73.6],[46.6,75],[47.2,76.1],[48.1,77],[49.1,77.7],[50.3,78.2],[51.5,78.5],[52.8,78.6],[54.1,78.6],[55.5,78.4],[56.8,78],[58,77.5],[59.1,76.8],[60,76]],[[32,38],[39,38],[46,38],[53,38],[60,38]]],"u":[[[32,42],[32,49.3],[32,56.7],[32,64],[32.6,68.9],[34.5,73.4],[37.4,76.9],[41,79.2],[45,80],[49,79.2],[52.6,76.9],[55.5,73.4],[57.4,68.9],[58,64],[58,56.7],[58,49.3],[58,42]],[[58,42],[58,49.6],[58,57.2],[58,64.8],[58,72.4],[58,80]]],"v":[[[34,42],[36.7,48.3],[39.3,54.7],[42,61],[44.7,67.3],[47.3,73.7],[50,80],[52.7,73.7],[55.3,67.3],[58,61],[60.7,54.7],[63.3,48.3],[66,42]]],"w":[[[28,42],[30.2,49.6],[32.4,57.2],[34.6,64.8],[36.8,72.4],[39,80],[41.8,73],[44.5,66],[47.3,59],[50,52],[52.8,59],[55.5,66],[58.3,73],[61,80],[63.2,72.4],[65.4,64.8],[67.6,57.2],[69.8,49.6],[72,42]]],"x":[[[34,42],[38.6,47.4],[43.1,52.9],[47.7,58.3],[52.3,63.7],[56.9,69.1],[61.4,74.6],[66,80]],[[66,42],[61.4,47.4],[56.9,52.9],[52.3,58.3],[47.7,63.7],[43.1,69.1],[38.6,74.6],[34,80]]],"y":[[[34,42],[38.3,48.5],[42.5,55],[46.8,61.5],[51,68]],[[66,42],[62.3,48.5],[58.5,55],[54.8,61.5],[51,68],[47.3,74.5],[43.5,81],[39.8,87.5],[36,94]]],"z":[[[34,42],[42,42],[50,42],[58,42],[66,42],[61.4,47.4],[56.9,52.9],[52.3,58.3],[47.7,63.7],[43.1,69.1],[38.6,74.6],[34,80],[42,80],[50,80],[58,80],[66,80]]]}; // stroke data per character, A-Z and a-z
+        var SETS = [];         // built from whatever word the grown-up types
+        var word = "";
+
+        var TOL = 9;        // how far the finger may stray from the path
+        var WINDOW = 13;    // how far ahead progress can jump per move
+        var START_HIT = 12; // how close to the tip a touch must begin
+
+        var svg = document.getElementById("board");
+        var helper = document.getElementById("helper");
+        var srStatus = document.getElementById("srStatus");
+        var glyphChip = document.getElementById("glyphChip");
+        var strokeChip = document.getElementById("strokeChip");
+        var winOverlay = document.getElementById("winOverlay");
+        var winBig = document.getElementById("winBig");
+        var winTitle = document.getElementById("winTitle");
+        var winSub = document.getElementById("winSub");
+        var tabsEl = document.getElementById("tabs");
+        var pickerGrid = document.getElementById("pickerGrid");
+        var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        var si = 0;          // set index
+        var gi = 0;          // glyph index within set
+        var sk = 0;          // stroke index within glyph
+        var t = 0;           // arc-length progress along current stroke
+        var tracing = false;
+        var busy = false;    // demo animation running
+        var activePointerId = null;
+        var done = {};       // done[setKey] = { glyphIndex: true }
+        var current = {};    // remembered glyph index per set
+        var demoRaf = 0;
+        var demoTimer = 0;
+        var advanceTimer = 0;
+
+        var glyph, strokes, cums, totals;
+        var guideEls, paintEls, startG, fingerDot, demoDot;
+
+        SETS.forEach(function (s) { done[s.key] = {}; current[s.key] = 0; });
+
+        function el(name, attrs) {
+          var n = document.createElementNS("http://www.w3.org/2000/svg", name);
+          for (var k in attrs) n.setAttribute(k, attrs[k]);
+          return n;
+        }
+
+        function cumLen(pts) {
+          var c = [0];
+          for (var i = 1; i < pts.length; i++)
+            c.push(c[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+          return c;
+        }
+
+        function pointAt(pts, cum, d) {
+          if (d <= 0) return pts[0];
+          var total = cum[cum.length - 1];
+          if (d >= total) return pts[pts.length - 1];
+          for (var i = 1; i < cum.length; i++) {
+            if (cum[i] >= d) {
+              var u = (d - cum[i - 1]) / (cum[i] - cum[i - 1] || 1);
+              return [
+                pts[i - 1][0] + u * (pts[i][0] - pts[i - 1][0]),
+                pts[i - 1][1] + u * (pts[i][1] - pts[i - 1][1]),
+              ];
+            }
+          }
+          return pts[pts.length - 1];
+        }
+
+        // Furthest arc position the finger has legitimately reached: project
+        // the finger onto segments within [t, t + WINDOW]; only points within
+        // TOL of the path advance progress, and never backwards.
+        function advance(pts, cum, tNow, p) {
+          var best = tNow;
+          var limit = tNow + WINDOW;
+          for (var i = 1; i < pts.length; i++) {
+            if (cum[i] < tNow) continue;
+            if (cum[i - 1] > limit) break;
+            var ax = pts[i - 1][0], ay = pts[i - 1][1];
+            var dx = pts[i][0] - ax, dy = pts[i][1] - ay;
+            var len2 = dx * dx + dy * dy || 1;
+            var u = ((p[0] - ax) * dx + (p[1] - ay) * dy) / len2;
+            u = Math.max(0, Math.min(1, u));
+            var qx = ax + u * dx, qy = ay + u * dy;
+            if (Math.hypot(p[0] - qx, p[1] - qy) > TOL) continue;
+            var pos = cum[i - 1] + u * (cum[i] - cum[i - 1]);
+            if (pos > best && pos <= limit) best = pos;
+          }
+          return best;
+        }
+
+        function pathD(pts) {
+          var d = "M " + pts[0][0] + " " + pts[0][1];
+          for (var i = 1; i < pts.length; i++) d += " L " + pts[i][0] + " " + pts[i][1];
+          return d;
+        }
+
+        function set() { return SETS[si]; }
+        function noun() { return set().noun; }
+        function glyphName(g) { return noun() === "shape" ? g.l : noun() + " " + g.l; }
+
+        // ---------------- rendering ----------------
+        function loadGlyph(index) {
+          if (!SETS.length) return;
+          cancelDemo();
+          clearTimeout(advanceTimer);
+          gi = index;
+          current[set().key] = gi;
+          glyph = set().glyphs[gi];
+          strokes = glyph.s;
+          cums = strokes.map(cumLen);
+          totals = cums.map(function (c) { return c[c.length - 1]; });
+          sk = 0;
+          t = 0;
+          tracing = false;
+          activePointerId = null;
+          winOverlay.classList.add("hidden");
+          svg.innerHTML = "";
+          guideEls = []; paintEls = [];
+
+          strokes.forEach(function (pts) {
+            var g1 = el("path", { d: pathD(pts), "class": "guide" });
+            svg.appendChild(g1);
+          });
+          strokes.forEach(function (pts) {
+            var g2 = el("path", { d: pathD(pts), "class": "guide-dash" });
+            svg.appendChild(g2);
+          });
+          strokes.forEach(function (pts, i2) {
+            var p = el("path", { d: pathD(pts), "class": "paint" });
+            p.style.strokeDasharray = totals[i2];
+            p.style.strokeDashoffset = totals[i2];
+            svg.appendChild(p);
+            paintEls.push(p);
+          });
+
+          startG = el("g", {});
+          svg.appendChild(startG);
+          fingerDot = el("circle", { r: 4.4, "class": "finger-dot" });
+          fingerDot.style.display = "none";
+          svg.appendChild(fingerDot);
+          demoDot = el("circle", { r: 4.4, "class": "demo-dot" });
+          demoDot.style.display = "none";
+          svg.appendChild(demoDot);
+
+          svg.setAttribute("aria-label", "Tracing board showing " + glyphName(glyph));
+          glyphChip.textContent = (noun() === "shape" ? (glyph.e ? glyph.e + " " : "") : "") +
+            glyphName(glyph).replace(/^./, function (c) { return c.toUpperCase(); });
+          setHelper("Put your finger on the green dot and trace!", "");
+          updateMarkers();
+          updateHud();
+        }
+
+        function updateHud() {
+          strokeChip.textContent = "Stroke " + Math.min(sk + 1, strokes.length) + " of " + strokes.length;
+        }
+
+        function updateMarkers() {
+          startG.innerHTML = "";
+          if (sk >= strokes.length) return;
+          var pts = strokes[sk];
+          var tip = pointAt(pts, cums[sk], t);
+          if (t === 0) {
+            var ring = el("circle", { cx: tip[0], cy: tip[1], r: 5, "class": "start-ring" });
+            var dot = el("circle", { cx: tip[0], cy: tip[1], r: 5, "class": "start-dot" });
+            var num = el("text", { x: tip[0], y: tip[1], "class": "start-num" });
+            num.textContent = String(sk + 1);
+            startG.appendChild(ring);
+            startG.appendChild(dot);
+            startG.appendChild(num);
+            // direction arrow a little way along the stroke
+            var ahead = pointAt(pts, cums[sk], Math.min(9, totals[sk] * 0.4));
+            var ang = Math.atan2(ahead[1] - tip[1], ahead[0] - tip[0]);
+            var ax = tip[0] + Math.cos(ang) * 8.5, ay = tip[1] + Math.sin(ang) * 8.5;
+            var arrow = el("polygon", { "class": "start-arrow", points: "0,-2.4 4.6,0 0,2.4" });
+            arrow.setAttribute("transform", "translate(" + ax + " " + ay + ") rotate(" + (ang * 180) / Math.PI + ")");
+            startG.appendChild(arrow);
+          } else {
+            var tipDot = el("circle", { cx: tip[0], cy: tip[1], r: 4.6, "class": "start-dot" });
+            startG.appendChild(tipDot);
+          }
+        }
+
+        function paint() {
+          paintEls[sk].style.strokeDashoffset = Math.max(0, totals[sk] - t);
+        }
+
+        function setHelper(msg, mood) {
+          helper.textContent = msg;
+          helper.className = "helper" + (mood ? " " + mood : "");
+        }
+
+        // ---------------- tracing ----------------
+        function svgPoint(ev) {
+          var r = svg.getBoundingClientRect();
+          return [((ev.clientX - r.left) / r.width) * 100, ((ev.clientY - r.top) / r.height) * 100];
+        }
+
+        svg.addEventListener("contextmenu", function (ev) { ev.preventDefault(); });
+
+        svg.addEventListener("pointerdown", function (ev) {
+          if (!SETS.length) return;
+          if (busy || tracing || !winOverlay.classList.contains("hidden")) return;
+          if (ev.pointerType === "mouse" && ev.button !== 0) return;
+          if (sk >= strokes.length) return;
+          var p = svgPoint(ev);
+          var tip = pointAt(strokes[sk], cums[sk], t);
+          if (Math.hypot(p[0] - tip[0], p[1] - tip[1]) > START_HIT) {
+            setHelper(t === 0 ? "Start at the green dot " + (sk + 1) + "!" : "Touch your line where it stopped!", "warn");
+            return;
+          }
+          ev.preventDefault();
+          svg.setPointerCapture(ev.pointerId);
+          activePointerId = ev.pointerId;
+          tracing = true;
+          fingerDot.style.display = "";
+          fingerDot.setAttribute("cx", tip[0]);
+          fingerDot.setAttribute("cy", tip[1]);
+          setHelper("Nice and slow — follow the path!", "excited");
+        });
+
+        svg.addEventListener("pointermove", function (ev) {
+          if (!tracing || ev.pointerId !== activePointerId) return;
+          if (sk >= strokes.length) return;
+          var p = svgPoint(ev);
+          var newT = advance(strokes[sk], cums[sk], t, p);
+          if (newT > t) {
+            t = newT;
+            paint();
+            updateMarkers();
+            // only move the marker with real progress — following a stray
+            // finger would park it on the next stroke's start dot
+            var tip = pointAt(strokes[sk], cums[sk], t);
+            fingerDot.setAttribute("cx", tip[0]);
+            fingerDot.setAttribute("cy", tip[1]);
+          }
+          if (t >= totals[sk] - 0.6) strokeDone();
+        });
+
+        function strokeDone() {
+          paintEls[sk].style.strokeDashoffset = 0;
+          sk++;
+          t = 0;
+          updateHud();
+          if (sk >= strokes.length) { finish(); return; }
+          updateMarkers();
+          setHelper("Stroke " + sk + " done! Now start at green dot " + (sk + 1) + ".", "excited");
+          srStatus.textContent = "Stroke " + sk + " finished. " + (strokes.length - sk) + " to go.";
+        }
+
+        function endTrace(ev) {
+          if (ev && ev.pointerId !== activePointerId) return;
+          tracing = false;
+          activePointerId = null;
+          fingerDot.style.display = "none";
+          if (sk < strokes.length && t > 0 && !busy) {
+            setHelper("You can rest! Touch your line to keep going.", "");
+          }
+        }
+        svg.addEventListener("pointerup", endTrace);
+        svg.addEventListener("pointercancel", endTrace);
+
+        // A pan-y gesture that the compositor owns delivers non-cancelable
+        // touchmove events, so the trace must be claimed at touchstart — it
+        // fires after pointerdown has set `tracing` and is still cancelable.
+        // Touches that don't begin on the tracing tip scroll the page.
+        svg.addEventListener("touchstart", function (ev) {
+          if (tracing && ev.cancelable) ev.preventDefault();
+        }, { passive: false });
+        svg.addEventListener("touchmove", function (ev) {
+          if (tracing && ev.cancelable) ev.preventDefault();
+        }, { passive: false });
+
+        // Some Android browsers ignore overscroll-behavior, so block
+        // pull-to-refresh directly: a downward finger movement while the page
+        // is already at the very top can only be the refresh gesture.
+        var ptrStartY = 0;
+        document.addEventListener("touchstart", function (ev) {
+          ptrStartY = ev.touches[0].clientY;
+        }, { passive: true });
+        document.addEventListener("touchmove", function (ev) {
+          // single-finger only: a second touch means pinch-zoom, not refresh
+          if (ev.touches.length === 1 && window.scrollY <= 0 && ev.touches[0].clientY > ptrStartY && ev.cancelable) {
+            ev.preventDefault();
+          }
+        }, { passive: false });
+
+        // ---------------- completion ----------------
+        function finish() {
+          // the finger may still be down on the final stroke's last point
+          tracing = false;
+          activePointerId = null;
+          fingerDot.style.display = "none";
+          done[set().key][gi] = true;
+          buildPicker();
+          if (gi < set().glyphs.length - 1) {
+            // mid-word: brief cheer, then the next letter appears by itself
+            setHelper("“" + glyph.l + "” done! Here comes the next letter…", "excited");
+            confetti(22);
+            clearTimeout(advanceTimer);
+            advanceTimer = setTimeout(function () {
+              loadGlyph(gi + 1);
+              buildPicker();
+            }, reducedMotion ? 500 : 1200);
+            return;
+          }
+          winBig.textContent = word;
+          winTitle.textContent = "🎉 You wrote " + word + "!";
+          winSub.textContent = "Every single letter — wonderful writing!";
+          winOverlay.classList.remove("hidden");
+          srStatus.textContent = "You traced the whole word " + word + "!";
+          confetti(80);
+          document.getElementById("againBtn").focus();
+        }
+
+        function restart() {
+          cancelDemo();
+          loadGlyph(gi);
+        }
+
+        function restartWord() {
+          if (!SETS.length) return;
+          done[set().key] = {};
+          winOverlay.classList.add("hidden");
+          loadGlyph(0);
+          buildPicker();
+        }
+
+        function showEmptyState() {
+          cancelDemo();
+          clearTimeout(advanceTimer);
+          SETS = [];
+          word = "";
+          tracing = false;
+          activePointerId = null;
+          winOverlay.classList.add("hidden");
+          svg.innerHTML = "";
+          var big = el("text", { x: 50, y: 44, "text-anchor": "middle" });
+          big.setAttribute("style", "font-size:17px;");
+          big.textContent = "✏️";
+          svg.appendChild(big);
+          var small = el("text", { x: 50, y: 60, "text-anchor": "middle" });
+          small.setAttribute("style", "font-size:5.2px;fill:#5f5751;");
+          small.textContent = "Type a name above to begin!";
+          svg.appendChild(small);
+          svg.setAttribute("aria-label", "Tracing board, waiting for a word");
+          glyphChip.textContent = "Your word";
+          strokeChip.textContent = "—";
+          setHelper("Type a name or word above, then tap Make it!", "");
+          buildPicker();
+        }
+
+        function confetti(count) {
+          if (reducedMotion) return;
+          var colors = ["#ff6b57", "#7c3aed", "#0f766e", "#b45309", "#15803d"];
+          for (var i = 0; i < (count || 60); i++) {
+            var bit = document.createElement("div");
+            bit.className = "confetti-bit";
+            bit.style.left = Math.random() * 100 + "vw";
+            bit.style.background = colors[i % colors.length];
+            bit.style.animationDuration = 1.6 + Math.random() * 1.6 + "s";
+            bit.style.animationDelay = Math.random() * 0.4 + "s";
+            document.body.appendChild(bit);
+            (function (b) { setTimeout(function () { b.remove(); }, 4000); })(bit);
+          }
+        }
+
+        // ---------------- demo ----------------
+        function cancelDemo() {
+          if (demoRaf) cancelAnimationFrame(demoRaf);
+          demoRaf = 0;
+          clearTimeout(demoTimer);
+          demoTimer = 0;
+          busy = false;
+          if (demoDot) demoDot.style.display = "none";
+        }
+
+        function demo() {
+          if (!SETS.length || busy) return;
+          loadGlyph(gi); // clean slate
+          busy = true;
+          setHelper("Watch how it goes… then your turn!", "excited");
+          if (reducedMotion) {
+            paintEls.forEach(function (p) { p.style.strokeDashoffset = 0; });
+            demoTimer = setTimeout(function () { busy = false; loadGlyph(gi); setHelper("Your turn! Start at the green dot.", "excited"); }, 1400);
+            return;
+          }
+          var dsk = 0, dt = 0;
+          var SPEED = 55; // units per second
+          var last = 0;
+          demoDot.style.display = "";
+          function step(ts) {
+            if (!last) last = ts;
+            dt += ((ts - last) / 1000) * SPEED;
+            last = ts;
+            if (dt >= totals[dsk]) {
+              paintEls[dsk].style.strokeDashoffset = 0;
+              dsk++;
+              dt = 0;
+              if (dsk >= strokes.length) {
+                demoDot.style.display = "none";
+                // busy stays true through the grace pause so a touch cannot
+                // start a trace that the pending reset would wipe; the
+                // timer's loadGlyph -> cancelDemo releases it
+                demoTimer = setTimeout(function () { loadGlyph(gi); setHelper("Your turn! Start at the green dot.", "excited"); }, 700);
+                return;
+              }
+            }
+            paintEls[dsk].style.strokeDashoffset = Math.max(0, totals[dsk] - dt);
+            var p = pointAt(strokes[dsk], cums[dsk], dt);
+            demoDot.setAttribute("cx", p[0]);
+            demoDot.setAttribute("cy", p[1]);
+            demoRaf = requestAnimationFrame(step);
+          }
+          demoRaf = requestAnimationFrame(step);
+        }
+
+        // ---------------- tabs + picker ----------------
+        function buildTabs() {
+          if (SETS.length < 2) return;
+          tabsEl.classList.remove("hidden");
+          tabsEl.innerHTML = "";
+          SETS.forEach(function (s, i) {
+            var b = document.createElement("button");
+            b.className = "tab";
+            b.setAttribute("aria-pressed", i === si ? "true" : "false");
+            b.textContent = s.tab;
+            b.addEventListener("click", function () {
+              if (i === si) return;
+              if (busy) cancelDemo();
+              si = i;
+              loadGlyph(current[s.key] || 0);
+              buildTabs();
+              buildPicker();
+              tabsEl.children[i].focus();
+            });
+            tabsEl.appendChild(b);
+          });
+        }
+
+        function buildPicker() {
+          pickerGrid.innerHTML = "";
+          if (!SETS.length) return;
+          set().glyphs.forEach(function (g, i) {
+            var b = document.createElement("button");
+            b.className = "glyph-chip" + (i === gi ? " active" : "");
+            b.setAttribute("aria-label", "Trace " + glyphName(g) + ", " + (i + 1) + " of " +
+              set().glyphs.length + (done[set().key][i] ? " (done)" : ""));
+            b.innerHTML = (noun() === "shape" ? "<span aria-hidden='true'>" + g.e + "</span>" : g.l) +
+              (done[set().key][i] ? "<span class='tick' aria-hidden='true'>✓</span>" : "");
+            b.addEventListener("click", function () {
+              // tapping the chip that is already active would wipe progress
+              if (i === gi && winOverlay.classList.contains("hidden")) return;
+              loadGlyph(i);
+              buildPicker();
+              pickerGrid.children[i].focus({ preventScroll: true });
+              document.querySelector(".card").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+            });
+            pickerGrid.appendChild(b);
+          });
+        }
+
+        // ---------------- buttons ----------------
+        document.getElementById("demoBtn").addEventListener("click", demo);
+        document.getElementById("restartBtn").addEventListener("click", restart);
+        document.getElementById("againBtn").addEventListener("click", function () {
+          // the overlay hides while its button holds focus — hand focus to
+          // Show me so keyboard players keep their place
+          restartWord();
+          document.getElementById("demoBtn").focus();
+        });
+        document.getElementById("nextBtn").addEventListener("click", function () {
+          showEmptyState();
+          var inp = document.getElementById("nameInput");
+          inp.value = "";
+          inp.focus();
+        });
+
+        document.getElementById("nameForm").addEventListener("submit", function (ev) {
+          ev.preventDefault();
+          var input = document.getElementById("nameInput");
+          var w = (input.value || "").replace(/[^a-zA-Z]/g, "").slice(0, 10);
+          if (!w) {
+            setHelper("Letters only, please — try typing a name!", "warn");
+            input.focus();
+            return;
+          }
+          cancelDemo();
+          clearTimeout(advanceTimer);
+          input.value = w;
+          // put the mobile keyboard away so the tracing board is visible
+          input.blur();
+          word = w;
+          SETS = [{
+            key: "word", tab: "", noun: "letter",
+            glyphs: w.split("").map(function (ch) { return { l: ch, s: GLYPHS[ch] }; }),
+          }];
+          done = { word: {} };
+          current = { word: 0 };
+          si = 0;
+          winOverlay.classList.add("hidden");
+          loadGlyph(0);
+          buildPicker();
+          srStatus.textContent = "Ready to trace " + w + " — " + w.length +
+            (w.length === 1 ? " letter." : " letters.");
+        });
+
+        buildTabs();
+        showEmptyState();
+      })();
+    </script>
+  </body>
+</html>
