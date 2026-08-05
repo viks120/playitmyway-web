@@ -25,6 +25,12 @@
         box-sizing: border-box;
       }
 
+      html,
+      body {
+        /* an accidental pull-to-refresh mid-game would wipe the board */
+        overscroll-behavior-y: contain;
+      }
+
       body {
         font-family: "Arial", sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -88,6 +94,10 @@
         background: #bbada0;
         padding: 10px;
         border-radius: 10px;
+        /* the game needs swipes in all four directions, so the board must
+           own every gesture that starts on it — the rest of the page still
+           scrolls normally */
+        touch-action: none;
       }
 
       .cell {
@@ -555,17 +565,39 @@
             }
           });
 
-          // Touch events for mobile
-          let startX, startY;
+          // Touch events for mobile. These live on the GRID, not the document:
+          // on the document every scroll of the page counted as a swipe and
+          // moved the tiles, and swiping the board scrolled the page as well.
+          const grid = document.getElementById("grid");
+          let startX = null;
+          let startY = null;
           const minSwipeDistance = 30; // Minimum distance for a swipe
 
-          document.addEventListener("touchstart", (e) => {
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-          });
+          grid.addEventListener(
+            "touchstart",
+            (e) => {
+              if (e.touches.length !== 1) { startX = startY = null; return; }
+              startX = e.touches[0].clientX;
+              startY = e.touches[0].clientY;
+              // claim the gesture before the browser can start scrolling
+              if (e.cancelable) e.preventDefault();
+            },
+            { passive: false }
+          );
 
-          document.addEventListener("touchend", (e) => {
-            if (!startX || !startY || this.gameOver) return;
+          grid.addEventListener(
+            "touchmove",
+            (e) => {
+              if (startX !== null && e.cancelable) e.preventDefault();
+            },
+            { passive: false }
+          );
+
+          grid.addEventListener("touchend", (e) => {
+            if (startX === null || startY === null || this.gameOver) {
+              startX = startY = null;
+              return;
+            }
 
             const endX = e.changedTouches[0].clientX;
             const endY = e.changedTouches[0].clientY;
@@ -573,9 +605,10 @@
             const diffX = startX - endX;
             const diffY = startY - endY;
 
+            startX = startY = null;
+
             // Only register swipe if it's longer than minimum distance
             if (Math.abs(diffX) < minSwipeDistance && Math.abs(diffY) < minSwipeDistance) {
-              startX = startY = null;
               return;
             }
 
@@ -586,9 +619,37 @@
               if (diffY > 0) this.move("up");
               else this.move("down");
             }
+          });
 
+          grid.addEventListener("touchcancel", () => {
             startX = startY = null;
           });
+
+          // Some Android browsers ignore overscroll-behavior, so block
+          // pull-to-refresh directly: a single-finger downward move while the
+          // page is already at the top can only be the refresh gesture.
+          let ptrStartY = 0;
+          document.addEventListener(
+            "touchstart",
+            (e) => {
+              ptrStartY = e.touches[0].clientY;
+            },
+            { passive: true }
+          );
+          document.addEventListener(
+            "touchmove",
+            (e) => {
+              if (
+                e.touches.length === 1 &&
+                window.scrollY <= 0 &&
+                e.touches[0].clientY > ptrStartY &&
+                e.cancelable
+              ) {
+                e.preventDefault();
+              }
+            },
+            { passive: false }
+          );
         }
 
         addRandomTile() {
