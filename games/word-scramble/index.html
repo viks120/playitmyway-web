@@ -893,11 +893,62 @@
 
       function scrambleWord(word) {
         const letters = word.split("");
-        for (let i = letters.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [letters[i], letters[j]] = [letters[j], letters[i]];
+        // a "scramble" identical to the answer reads as a solved puzzle
+        // (about 1 in 6 for three-letter words) — reshuffle unless the word
+        // has no distinct arrangement at all (e.g. "aaa")
+        for (let attempt = 0; attempt < 20; attempt++) {
+          for (let i = letters.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [letters[i], letters[j]] = [letters[j], letters[i]];
+          }
+          if (letters.join("") !== word) break;
         }
         return letters.join("");
+      }
+
+      // Shared placement/removal used by mouse clicks, taps and drops, so
+      // every input method mutates the tray/slot model the same way
+      function placeTileInFirstEmptySlot(tileEl) {
+        if (wordComplete) return false;
+        const letterIndex = parseInt(tileEl.dataset.index);
+        if (scrambledLetters[letterIndex].used) return false;
+        const emptySlot = answerSlots.find((slot) => !slot.filled);
+        if (!emptySlot) return false;
+        emptySlot.element.textContent = tileEl.textContent;
+        emptySlot.element.classList.add("filled");
+        emptySlot.filled = true;
+        emptySlot.currentLetter = tileEl.textContent;
+        emptySlot.tileIndex = letterIndex;
+        scrambledLetters[letterIndex].used = true;
+        tileEl.style.display = "none";
+        return true;
+      }
+
+      function removeLetterFromSlot(slotEl) {
+        if (wordComplete) return false;
+        if (!slotEl.classList.contains("filled")) return false;
+        const slotIndex = parseInt(slotEl.dataset.index);
+        const slot = answerSlots[slotIndex];
+        // restore the exact tile that filled this slot; letters placed by
+        // the hint helper carry no tile identity, so fall back to matching
+        // by letter for those
+        let tile =
+          slot.tileIndex !== undefined ? scrambledLetters[slot.tileIndex] : null;
+        if (!tile || !tile.used || tile.letter !== slot.currentLetter) {
+          tile = scrambledLetters.find(
+            (item) => item.letter === slot.currentLetter && item.used
+          );
+        }
+        if (tile) {
+          tile.used = false;
+          tile.element.style.display = "flex";
+        }
+        slotEl.textContent = "";
+        slotEl.classList.remove("filled");
+        slot.filled = false;
+        slot.currentLetter = "";
+        delete slot.tileIndex;
+        return true;
       }
 
       function createLetterTile(letter, index) {
@@ -910,6 +961,12 @@
         // Drag and drop functionality
         tile.addEventListener("dragstart", handleDragStart);
         tile.addEventListener("dragend", handleDragEnd);
+
+        // Mouse: click a letter to drop it into the next empty slot —
+        // the game was drag-only on desktop
+        tile.addEventListener("click", function () {
+          placeTileInFirstEmptySlot(this);
+        });
 
         // Touch support for mobile
         tile.addEventListener("touchstart", handleTouchStart);
@@ -927,6 +984,12 @@
         // Drop functionality
         slot.addEventListener("dragover", handleDragOver);
         slot.addEventListener("drop", handleDrop);
+
+        // Mouse: click a filled slot to send its letter back to the tray —
+        // there was previously no way to undo a placement on desktop
+        slot.addEventListener("click", function () {
+          removeLetterFromSlot(this);
+        });
 
         // Touch support for mobile
         slot.addEventListener("touchstart", handleTouchStart);
@@ -1244,6 +1307,7 @@
           const slotIndex = parseInt(this.dataset.index);
 
           if (
+            !wordComplete &&
             !answerSlots[slotIndex].filled &&
             !scrambledLetters[letterIndex].used
           ) {
@@ -1252,6 +1316,7 @@
             this.classList.add("filled");
             answerSlots[slotIndex].filled = true;
             answerSlots[slotIndex].currentLetter = draggedElement.textContent;
+            answerSlots[slotIndex].tileIndex = letterIndex;
             scrambledLetters[letterIndex].used = true;
             draggedElement.style.display = "none";
           }
@@ -1284,43 +1349,15 @@
         const deltaY = Math.abs(touchEndY - touchStartY);
 
         if (deltaX < 10 && deltaY < 10) {
-          // Handle tap
+          // Handle tap through the shared helpers; when a tap does the work,
+          // suppress the synthetic click that follows so it can't act twice
+          let handled = false;
           if (touchElement.classList.contains("letter-tile")) {
-            // Find first empty slot
-            const emptySlot = answerSlots.find((slot) => !slot.filled);
-            if (emptySlot) {
-              const letterIndex = parseInt(touchElement.dataset.index);
-              if (!scrambledLetters[letterIndex].used) {
-                emptySlot.element.textContent = touchElement.textContent;
-                emptySlot.element.classList.add("filled");
-                emptySlot.filled = true;
-                emptySlot.currentLetter = touchElement.textContent;
-                scrambledLetters[letterIndex].used = true;
-                touchElement.style.display = "none";
-              }
-            }
+            handled = placeTileInFirstEmptySlot(touchElement);
           } else if (touchElement.classList.contains("answer-slot")) {
-            // Remove letter from slot
-            if (touchElement.classList.contains("filled")) {
-              const slotIndex = parseInt(touchElement.dataset.index);
-              const letter = answerSlots[slotIndex].currentLetter;
-
-              // Find and restore the letter tile
-              const letterTile = scrambledLetters.find(
-                (item) => item.letter === letter && item.used
-              );
-              if (letterTile) {
-                letterTile.used = false;
-                letterTile.element.style.display = "flex";
-              }
-
-              // Clear slot
-              touchElement.textContent = "";
-              touchElement.classList.remove("filled");
-              answerSlots[slotIndex].filled = false;
-              answerSlots[slotIndex].currentLetter = "";
-            }
+            handled = removeLetterFromSlot(touchElement);
           }
+          if (handled && e.cancelable) e.preventDefault();
         }
 
         touchElement = null;
