@@ -20,6 +20,7 @@
   <meta name="twitter:description" content="Play classic Minesweeper free online. Clear the board without hitting a mine across three difficulty levels of pure logic. No ads, no download.">
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    :root { --cell-size: 30px; }
     body {
       font-family: "Comic Sans MS", "Arial Rounded MT Bold", Arial, sans-serif;
       background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
@@ -49,18 +50,21 @@
     .game-container {
       background: rgba(255,255,255,0.95); border-radius: 15px;
       padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      max-width: 100%;
     }
+    .board-scroll { overflow-x: auto; }
     .grid {
-      display: grid; gap: 2px; margin: 0 auto;
+      display: grid; gap: 2px; margin: 0 auto; width: max-content;
       background: #7f8c8d; padding: 5px; border-radius: 5px;
     }
     .cell {
-      width: 30px; height: 30px; background: #bdc3c7;
+      width: var(--cell-size); height: var(--cell-size); background: #bdc3c7;
       border: 2px outset #ecf0f1; display: flex;
       align-items: center; justify-content: center;
       font-weight: bold; font-size: 14px; cursor: pointer;
-      user-select: none;
+      user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
     }
+    .cell.holding { background: #f9e79f; border-color: #f1c40f; }
     .cell.revealed { background: #ecf0f1; border: 1px solid #95a5a6; }
     .cell.mine { background: #e74c3c; }
     .cell.flagged::after { content: "🚩"; }
@@ -109,7 +113,8 @@
       100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
     }
     @media (max-width: 480px) {
-      .cell { width: 25px; height: 25px; font-size: 12px; }
+      :root { --cell-size: 25px; }
+      .cell { font-size: 12px; }
       .back-link { top: 5px; left: 5px; padding: 5px 8px; font-size: 0.8em; }
     }
   </style>
@@ -128,7 +133,7 @@
     <button class="diff-btn" onclick="setDifficulty('hard')">Hard (16×30)</button>
   </div>
   <div class="game-container">
-    <div class="grid" id="grid"></div>
+    <div class="board-scroll"><div class="grid" id="grid"></div></div>
     <div class="controls">
       <button class="btn" onclick="newGame()">🔄 New Game</button>
       <button class="btn" id="flagBtn" onclick="toggleFlagMode()">🚩 Flag Mode: OFF</button>
@@ -217,7 +222,7 @@
       document.getElementById('mineCount').textContent = mines;
       updateBest();
       const gridEl = document.getElementById('grid');
-      gridEl.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
+      gridEl.style.gridTemplateColumns = `repeat(${cols}, var(--cell-size))`;
       gridEl.innerHTML = '';
       for (let r = 0; r < rows; r++) {
         grid[r] = [];
@@ -227,10 +232,57 @@
           cell.className = 'cell';
           cell.dataset.r = r; cell.dataset.c = c;
           cell.addEventListener('click', () => handleClick(r, c));
-          cell.addEventListener('contextmenu', (e) => { e.preventDefault(); toggleFlag(r, c); });
+          cell.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            if (pressTimer !== null || longPressFired) return;
+            toggleFlag(r, c);
+          });
+          cell.addEventListener('touchstart', (e) => startPress(e, cell, r, c), { passive: true });
+          cell.addEventListener('touchmove', movePress, { passive: true });
+          cell.addEventListener('touchend', endPress);
+          cell.addEventListener('touchcancel', cancelPress);
           gridEl.appendChild(cell);
         }
       }
+    }
+
+    let pressTimer = null, longPressFired = false, holdCell = null;
+    let pressX = 0, pressY = 0;
+
+    function startPress(e, cell, r, c) {
+      cancelPress();
+      if (gameOver || grid[r][c].revealed) return;
+      longPressFired = false;
+      pressX = e.touches[0].clientX;
+      pressY = e.touches[0].clientY;
+      holdCell = cell;
+      cell.classList.add('holding');
+      pressTimer = setTimeout(() => {
+        pressTimer = null;
+        longPressFired = true;
+        cell.classList.remove('holding');
+        toggleFlag(r, c);
+      }, 450);
+    }
+
+    function movePress(e) {
+      if (pressTimer === null) return;
+      const dx = e.touches[0].clientX - pressX;
+      const dy = e.touches[0].clientY - pressY;
+      if (Math.hypot(dx, dy) > 10) cancelPress();
+    }
+
+    function cancelPress() {
+      clearTimeout(pressTimer); pressTimer = null;
+      if (holdCell) { holdCell.classList.remove('holding'); holdCell = null; }
+    }
+
+    function endPress(e) {
+      if (longPressFired) {
+        e.preventDefault();
+        longPressFired = false;
+      }
+      cancelPress();
     }
 
     function placeMines(excludeR, excludeC) {
@@ -238,7 +290,8 @@
       while (placed < mines) {
         const r = Math.floor(Math.random() * rows);
         const c = Math.floor(Math.random() * cols);
-        if (!grid[r][c].mine && !(r === excludeR && c === excludeC)) {
+        const nearFirstClick = Math.abs(r - excludeR) <= 1 && Math.abs(c - excludeC) <= 1;
+        if (!grid[r][c].mine && !nearFirstClick) {
           grid[r][c].mine = true; placed++;
         }
       }
@@ -352,6 +405,7 @@
       newGame();
     }
 
+    document.getElementById('grid').addEventListener('contextmenu', (e) => e.preventDefault());
     newGame();
   </script>
 </body>
