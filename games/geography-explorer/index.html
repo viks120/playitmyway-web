@@ -281,6 +281,58 @@
         color: white;
       }
 
+      .feedback.reveal {
+        background: #cfe8ff;
+        color: #1b4b72;
+      }
+
+      .hint {
+        text-align: center;
+        font-size: clamp(1.1em, 4vw, 1.4em);
+        font-weight: bold;
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 12px;
+        display: none;
+        background: #fff3cd;
+        color: #8a6d1a;
+      }
+
+      .answer-btn.eliminated {
+        background: #cccccc;
+        color: #666;
+        text-shadow: none;
+      }
+
+      .answer-btn:disabled {
+        cursor: not-allowed;
+      }
+
+      .answer-btn:disabled:hover {
+        transform: none;
+      }
+
+      .continent.eliminated {
+        background: #cccccc;
+        color: #888;
+        cursor: not-allowed;
+      }
+
+      .continent.eliminated:hover {
+        background: #cccccc;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btn:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+      }
+
+      .btn:disabled:hover {
+        transform: none;
+      }
+
       .back-link {
         position: absolute;
         top: 20px;
@@ -536,6 +588,7 @@
 
     <div class="game-container">
       <div class="feedback" id="feedback"></div>
+      <div class="hint" id="hint"></div>
 
       <div class="question-area">
         <div class="question" id="question">Find the country on the map</div>
@@ -551,8 +604,11 @@
       </div>
 
       <div class="controls">
-        <button class="btn" onclick="getHint()">Get Hint</button>
+        <button class="btn" id="hintBtn" onclick="getHint()">Get Hint</button>
         <button class="btn" onclick="newChallenge()">New Challenge</button>
+        <button class="btn" id="nextBtn" onclick="newChallenge()" style="display: none">
+          Next
+        </button>
       </div>
     </div>
 
@@ -688,6 +744,9 @@
       let level = 1;
       let countriesFound = 0;
       let hintsUsed = 0;
+      let attemptCount = 0;
+      let questionOver = false;
+      let feedbackTimer = null;
 
       const geographyDatabase = {
         countries: [
@@ -853,7 +912,7 @@
           continentDiv.dataset.continent = continent;
 
           continentDiv.addEventListener("click", () =>
-            checkContinentAnswer(continent)
+            checkContinentAnswer(continent, continentDiv)
           );
 
           mapContainer.appendChild(continentDiv);
@@ -882,7 +941,7 @@
           const btn = document.createElement("button");
           btn.className = "answer-btn";
           btn.textContent = continent;
-          btn.onclick = () => checkAnswer(continent === country.continent);
+          btn.onclick = () => checkAnswer(continent, btn);
           answerOptions.appendChild(btn);
         });
 
@@ -921,7 +980,7 @@
             const btn = document.createElement("button");
             btn.className = "answer-btn";
             btn.textContent = capital;
-            btn.onclick = () => checkAnswer(capital === country.capital);
+            btn.onclick = () => checkAnswer(capital, btn);
             answerOptions.appendChild(btn);
           });
 
@@ -960,7 +1019,7 @@
             const btn = document.createElement("button");
             btn.className = "answer-btn";
             btn.textContent = countryName;
-            btn.onclick = () => checkAnswer(countryName === country.name);
+            btn.onclick = () => checkAnswer(countryName, btn);
             answerOptions.appendChild(btn);
           });
 
@@ -969,6 +1028,8 @@
 
       function newChallenge() {
         hintsUsed = 0;
+        attemptCount = 0;
+        questionOver = false;
 
         switch (currentMode) {
           case "countries":
@@ -982,22 +1043,100 @@
             break;
         }
 
-        // Clear feedback and reset map
+        // Clear feedback, hint and reset map
+        if (feedbackTimer) {
+          clearTimeout(feedbackTimer);
+          feedbackTimer = null;
+        }
         document.getElementById("feedback").style.display = "none";
+        document.getElementById("hint").style.display = "none";
+        document.getElementById("hintBtn").disabled = false;
+        document.getElementById("nextBtn").style.display = "none";
         document.querySelectorAll(".continent").forEach((c) => {
-          c.classList.remove("correct", "incorrect");
+          c.classList.remove("correct", "incorrect", "eliminated");
         });
         document.querySelectorAll(".answer-btn").forEach((btn) => {
-          btn.classList.remove("correct", "incorrect");
+          btn.classList.remove("correct", "incorrect", "eliminated");
+          btn.disabled = false;
         });
       }
 
-      function checkAnswer(isCorrect) {
-        const points = 50 - hintsUsed * 10;
+      function showFeedback(message, type, autoHideMs) {
+        const feedback = document.getElementById("feedback");
+        if (feedbackTimer) {
+          clearTimeout(feedbackTimer);
+          feedbackTimer = null;
+        }
+        feedback.textContent = message;
+        feedback.className = "feedback" + (type ? " " + type : "");
+        feedback.style.display = "block";
+        if (autoHideMs) {
+          feedbackTimer = setTimeout(() => {
+            feedback.style.display = "none";
+            feedbackTimer = null;
+          }, autoHideMs);
+        }
+      }
+
+      function showHint(message) {
+        const hintElement = document.getElementById("hint");
+        hintElement.textContent = message;
+        hintElement.style.display = "block";
+      }
+
+      function findOptionElements(value) {
+        const matches = [];
+        document.querySelectorAll("#answerOptions .answer-btn").forEach((btn) => {
+          if (btn.textContent === value) matches.push(btn);
+        });
+        if (currentMode === "countries") {
+          const continentEl = document.querySelector(
+            '.continent[data-continent="' + value + '"]'
+          );
+          if (continentEl) matches.push(continentEl);
+        }
+        return matches;
+      }
+
+      function eliminationHint(selected) {
+        const country = currentChallenge.country;
+        let reason = country.hint;
+        if (!reason) {
+          if (currentMode === "capitals") {
+            reason = `The capital starts with "${country.capital[0]}"`;
+          } else if (currentMode === "flags") {
+            reason = `This country is in ${country.continent}`;
+          } else {
+            reason = `The continent starts with "${country.continent[0]}"`;
+          }
+        }
+        return `💡 It's not ${selected}! Hint: ${reason}`;
+      }
+
+      function lockQuestion() {
+        questionOver = true;
+        document.querySelectorAll("#answerOptions .answer-btn").forEach((btn) => {
+          btn.disabled = true;
+        });
+        document.getElementById("hintBtn").disabled = true;
+        document.getElementById("nextBtn").style.display = "inline-block";
+      }
+
+      function checkAnswer(selected, element) {
+        if (questionOver || element.classList.contains("eliminated")) {
+          return;
+        }
+
+        const isCorrect = selected === currentChallenge.correctAnswer;
 
         if (isCorrect) {
-          // Correct answer
+          // Correct answer: full points first try, half on second, never negative
           playSound('correct');
+          const basePoints = Math.max(0, 50 - hintsUsed * 10);
+          const points =
+            attemptCount === 0
+              ? basePoints
+              : Math.max(0, Math.floor(basePoints / 2));
           score += points;
           countriesFound++;
 
@@ -1008,61 +1147,60 @@
 
           updateStats();
 
-          document.getElementById(
-            "feedback"
-          ).textContent = `🎉 Correct! +${points} points`;
-          document.getElementById("feedback").className = "feedback correct";
-          document.getElementById("feedback").style.display = "block";
+          showFeedback(`🎉 Correct! +${points} points`, "correct");
 
           // Highlight correct answer
-          event.target.classList.add("correct");
+          findOptionElements(selected).forEach((el) =>
+            el.classList.add("correct")
+          );
+          lockQuestion();
 
           if (level > previousLevel) {
-            setTimeout(() => showLevelModal(), 1500);
-          } else {
-            setTimeout(() => {
-              newChallenge();
-            }, 2000);
+            showLevelModal();
           }
         } else {
-          // Incorrect answer
           playSound('wrong');
-          document.getElementById("feedback").textContent = "😅 Try again!";
-          document.getElementById("feedback").className = "feedback incorrect";
-          document.getElementById("feedback").style.display = "block";
+          attemptCount++;
 
-          // Highlight incorrect answer
-          event.target.classList.add("incorrect");
-
-          setTimeout(() => {
-            document.getElementById("feedback").style.display = "none";
-            event.target.classList.remove("incorrect");
-          }, 2000);
+          if (attemptCount === 1) {
+            // First miss: grey out the chosen option and hint — no reveal yet
+            findOptionElements(selected).forEach((el) => {
+              el.classList.add("eliminated");
+              if (el.tagName === "BUTTON") el.disabled = true;
+            });
+            showHint(eliminationHint(selected));
+            showFeedback("😅 Not quite — try again!", "incorrect", 2000);
+          } else {
+            // Second miss: reveal the answer with the country's fun fact
+            const country = currentChallenge.country;
+            findOptionElements(selected).forEach((el) =>
+              el.classList.add("incorrect")
+            );
+            findOptionElements(currentChallenge.correctAnswer).forEach((el) =>
+              el.classList.add("correct")
+            );
+            showFeedback(
+              `The answer is ${currentChallenge.correctAnswer}! 🌍 ${country.name}: ${country.hint}`,
+              "reveal"
+            );
+            lockQuestion();
+          }
         }
       }
 
-      function checkContinentAnswer(selectedContinent) {
+      function checkContinentAnswer(selectedContinent, continentElement) {
         if (currentMode === "countries") {
-          const isCorrect =
-            selectedContinent === currentChallenge.correctAnswer;
-          checkAnswer(isCorrect);
-
-          // Highlight continent
-          const continentElement = event.target;
-          continentElement.classList.add(isCorrect ? "correct" : "incorrect");
+          checkAnswer(selectedContinent, continentElement);
         }
       }
 
       function getHint() {
+        if (hintsUsed >= 1 || questionOver) {
+          return;
+        }
         hintsUsed++;
-        const hintElement = document.getElementById("feedback");
-        hintElement.textContent = `💡 Hint: ${currentChallenge.country.hint}`;
-        hintElement.className = "feedback";
-        hintElement.style.display = "block";
-
-        setTimeout(() => {
-          hintElement.style.display = "none";
-        }, 3000);
+        document.getElementById("hintBtn").disabled = true;
+        showHint(`💡 Hint: ${currentChallenge.country.hint}`);
       }
 
       function updateStats() {

@@ -184,6 +184,23 @@
         color: #8b0000;
       }
 
+      .hint-message {
+        text-align: center;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        font-size: clamp(1em, 3vw, 1.15em);
+        font-weight: bold;
+        background: #fff3cd;
+        color: #7a5a00;
+        display: none;
+      }
+
+      .word.check-me {
+        outline: 3px solid #ff6b6b;
+        outline-offset: 2px;
+      }
+
       .explanation {
         font-size: clamp(0.9em, 2.5vw, 1em);
         margin-top: 10px;
@@ -359,8 +376,10 @@
       
       <div class="word-bank" id="wordBank"></div>
       
-      <div class="feedback" id="feedback"></div>
-      
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+
+      <div class="hint-message" id="hintMessage" aria-live="polite"></div>
+
       <div class="controls">
         <button class="btn" onclick="checkSentence()" id="checkBtn">✓ Check</button>
         <button class="btn" onclick="clearSentence()">↺ Clear</button>
@@ -467,6 +486,8 @@
       let correctCount = 0;
       let selectedWords = [];
       let hintsUsed = 0;
+      let attempts = 0;
+      let roundOver = false;
       let best = 0;
       const totalQuestions = 10;
 
@@ -520,6 +541,8 @@
         const sentence = currentSentences[currentIndex];
         selectedWords = [];
         hintsUsed = 0;
+        attempts = 0;
+        roundOver = false;
 
         document.getElementById('questionCounter').textContent = 
           `Sentence ${currentIndex + 1} of ${currentSentences.length}`;
@@ -542,11 +565,13 @@
 
         clearSentence();
         document.getElementById('feedback').style.display = 'none';
+        document.getElementById('hintMessage').style.display = 'none';
         document.getElementById('checkBtn').disabled = false;
         document.getElementById('nextBtn').disabled = true;
       }
 
       function toggleWord(wordEl) {
+        if (roundOver) return;
         playSound('click');
         const word = wordEl.dataset.word;
         
@@ -584,6 +609,7 @@
       }
 
       function removeWordFromSentence(word) {
+        if (roundOver) return;
         playSound('click');
         selectedWords = selectedWords.filter(w => w !== word);
         
@@ -598,6 +624,7 @@
       }
 
       function clearSentence() {
+        if (roundOver) return;
         selectedWords = [];
         document.querySelectorAll('#wordBank .word').forEach(el => {
           el.classList.remove('in-sentence');
@@ -606,60 +633,105 @@
       }
 
       function checkSentence() {
+        if (roundOver) return;
         const sentence = currentSentences[currentIndex];
         const correctSentence = sentence.words.join(' ');
         const userSentence = selectedWords.join(' ');
-        
+
         const feedback = document.getElementById('feedback');
-        
+        const hintMessage = document.getElementById('hintMessage');
+        // Shared path: the authored explanation renders on success AND on reveal
+        const explanationHtml = `<div class="explanation">📚 ${sentence.explanation}</div>`;
+
+        if (selectedWords.length < sentence.words.length) {
+          // Not a real attempt yet — every word needs a spot first
+          const left = sentence.words.length - selectedWords.length;
+          hintMessage.innerHTML = `<div>🧩 Use all the words! ${left} ${left === 1 ? 'word is' : 'words are'} still in the word bank.</div>`;
+          hintMessage.style.display = 'block';
+          return;
+        }
+
         if (userSentence === correctSentence) {
-          // Correct!
+          // Correct! Full points first try, half on the second try
           playSound('correct');
-          const points = Math.max(10, 50 - hintsUsed * 10);
+          const fullPoints = Math.max(10, 50 - hintsUsed * 10);
+          const points = attempts === 0 ? fullPoints : Math.max(0, Math.floor(fullPoints / 2));
           score += points;
           correctCount++;
-          
+          roundOver = true;
+
           feedback.innerHTML = `
-            <div>🎉 Correct! +${points} points</div>
-            <div class="explanation">📚 ${sentence.explanation}</div>
+            <div>🎉 Correct!${attempts > 0 ? ' Great second try!' : ''} +${points} points</div>
+            ${explanationHtml}
           `;
           feedback.className = 'feedback correct';
           feedback.style.display = 'block';
-          
+          hintMessage.style.display = 'none';
+
           document.getElementById('checkBtn').disabled = true;
           document.getElementById('nextBtn').disabled = false;
         } else {
           // Incorrect
           playSound('wrong');
-          feedback.innerHTML = `
-            <div>😅 Not quite right. Try again!</div>
-            <div class="explanation">The correct order matters for grammar.</div>
-          `;
-          feedback.className = 'feedback incorrect';
-          feedback.style.display = 'block';
-          
-          setTimeout(() => {
-            feedback.style.display = 'none';
-          }, 2000);
+          attempts++;
+
+          if (attempts === 1) {
+            // First miss: keep their arrangement and point at the first wrong word
+            let firstWrong = 0;
+            while (firstWrong < selectedWords.length && selectedWords[firstWrong] === sentence.words[firstWrong]) firstWrong++;
+
+            feedback.innerHTML = '<div>😅 Not quite right. Try again!</div>';
+            feedback.className = 'feedback incorrect';
+            feedback.style.display = 'block';
+
+            const goodStart = firstWrong > 0
+              ? `The first ${firstWrong === 1 ? 'word is' : firstWrong + ' words are'} right — `
+              : '';
+            hintMessage.innerHTML = `
+              <div>💡 ${sentence.hint}</div>
+              <div>🔍 ${goodStart}check word ${firstWrong + 1}: "${selectedWords[firstWrong]}" isn't in the right spot.</div>
+            `;
+            hintMessage.style.display = 'block';
+
+            const sentenceArea = document.getElementById('sentenceArea');
+            if (sentenceArea.children[firstWrong]) {
+              sentenceArea.children[firstWrong].classList.add('check-me');
+            }
+          } else {
+            // Second miss: reveal the answer and teach with the real explanation
+            roundOver = true;
+            const sentenceArea = document.getElementById('sentenceArea');
+            sentenceArea.innerHTML = sentence.words.map(word =>
+              `<span class="word in-sentence">${word}</span>`
+            ).join('');
+            sentenceArea.classList.add('valid');
+
+            feedback.innerHTML = `
+              <div>😊 The correct sentence is: "${correctSentence}"</div>
+              ${explanationHtml}
+            `;
+            feedback.className = 'feedback incorrect';
+            feedback.style.display = 'block';
+            hintMessage.style.display = 'none';
+
+            document.getElementById('checkBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = false;
+          }
         }
-        
+
         updateDisplay();
       }
 
       function getHintHelp() {
+        if (roundOver) return;
         hintsUsed++;
         const sentence = currentSentences[currentIndex];
-        
-        // Show first word hint
+
+        // Show first word hint — stays visible until the child acts
         const firstWord = sentence.words[0];
-        const feedback = document.getElementById('feedback');
-        feedback.innerHTML = `<div>💡 The sentence starts with: "${firstWord}"</div>`;
-        feedback.className = 'feedback correct';
-        feedback.style.display = 'block';
-        
-        setTimeout(() => {
-          feedback.style.display = 'none';
-        }, 3000);
+        const hintMessage = document.getElementById('hintMessage');
+        hintMessage.innerHTML = `<div>💡 The sentence starts with: "${firstWord}"</div>`;
+        hintMessage.style.display = 'block';
       }
 
       function nextSentence() {

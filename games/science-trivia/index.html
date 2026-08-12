@@ -194,6 +194,14 @@
         animation: incorrectShake 0.5s ease;
       }
 
+      .answer-btn.eliminated {
+        background: linear-gradient(45deg, #bdbdbd, #9e9e9e);
+        opacity: 0.7;
+        cursor: not-allowed;
+        pointer-events: none;
+        animation: incorrectShake 0.5s ease;
+      }
+
       @keyframes correctPulse {
         0% {
           transform: scale(1);
@@ -264,6 +272,25 @@
       .feedback.incorrect {
         background: #ff6b6b;
         color: white;
+      }
+
+      .hint {
+        text-align: center;
+        font-size: clamp(1.1em, 4vw, 1.3em);
+        font-weight: bold;
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 12px;
+        display: none;
+        background: #fff3cd;
+        color: #7a5c00;
+        text-shadow: none;
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
       }
 
       .explanation {
@@ -513,6 +540,7 @@
 
     <div class="game-container">
       <div class="feedback" id="feedback"></div>
+      <div class="hint" id="hint"></div>
 
       <div class="question-area">
         <div class="question-number" id="questionNumber">Question 1 of 10</div>
@@ -526,8 +554,8 @@
       </div>
 
       <div class="controls">
-        <button class="btn" onclick="getHint()">Get Hint</button>
-        <button class="btn" onclick="nextQuestion()">Next Question</button>
+        <button class="btn" id="hintBtn" onclick="getHint()">Get Hint</button>
+        <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Next Question</button>
         <button class="btn" onclick="newQuiz()">New Quiz</button>
       </div>
     </div>
@@ -681,7 +709,10 @@
       let questionsAnswered = 0;
       let currentQuestionIndex = 0;
       let currentQuestions = [];
-      let hintsUsed = 0;
+      let attemptCount = 0; // wrong tries on the current question
+      let hintUsedThisQuestion = false; // manual Hint button pressed (max one per question)
+      let hintShown = false; // hint element is visible for this question
+      let questionResolved = false; // scored (correct or revealed) — unlocks Next
       let triviaDatabase = {};
       let usedQuestions = new Set(); // Track used questions to prevent repetition
 
@@ -774,7 +805,6 @@
         questionsAnswered = 0;
         quizStartBest = bestScore;
         score = 0;
-        hintsUsed = 0;
 
         // Mark selected questions as used
         shuffledQuestions.forEach((q) => usedQuestions.add(q.question));
@@ -809,88 +839,115 @@
           answerOptions.appendChild(btn);
         });
 
-        // Clear feedback
+        // Reset the attempt ladder for this question
+        attemptCount = 0;
+        hintUsedThisQuestion = false;
+        hintShown = false;
+        questionResolved = false;
+
+        // Clear feedback and hint, lock Next until this question is scored
         document.getElementById("feedback").style.display = "none";
+        document.getElementById("hint").style.display = "none";
+        document.getElementById("nextBtn").disabled = true;
+        document.getElementById("hintBtn").disabled = false;
       }
 
-      function checkAnswer(selectedIndex) {
-        const question = currentQuestions[currentQuestionIndex];
-        const isCorrect = selectedIndex === question.correct;
+      function showHint(text) {
+        const hint = document.getElementById("hint");
+        hint.textContent = `💡 Hint: ${text}`;
+        hint.style.display = "block";
+        hintShown = true;
+        // One hint per question — grey the button once it's on screen
+        document.getElementById("hintBtn").disabled = true;
+      }
 
-        // Disable all buttons
+      function resolveQuestion() {
+        questionResolved = true;
+        questionsAnswered++;
+        if (questionsAnswered >= level * 5) {
+          level++;
+        }
+        updateStats();
+        if (score > bestScore) {
+          bestScore = score;
+        }
+        // All answers locked; advancing is up to the child now
         document.querySelectorAll(".answer-btn").forEach((btn) => {
           btn.style.pointerEvents = "none";
         });
+        document.getElementById("hintBtn").disabled = true;
+        document.getElementById("nextBtn").disabled = false;
+      }
 
-        // Highlight correct and incorrect answers
-        document.querySelectorAll(".answer-btn").forEach((btn, index) => {
-          if (index === question.correct) {
-            btn.classList.add("correct");
-          } else if (index === selectedIndex && !isCorrect) {
-            btn.classList.add("incorrect");
-          }
-        });
+      function checkAnswer(selectedIndex) {
+        if (questionResolved) return;
+
+        const question = currentQuestions[currentQuestionIndex];
+        const isCorrect = selectedIndex === question.correct;
+        const buttons = document.querySelectorAll(".answer-btn");
+        const feedback = document.getElementById("feedback");
 
         if (isCorrect) {
-          // Correct answer
+          // Correct answer — full points first try, half on the second, never negative
           playSound('correct');
-          const points = 50 - hintsUsed * 10;
+          const basePoints = attemptCount === 0 ? 50 : 25;
+          const points = Math.max(0, basePoints - (hintUsedThisQuestion ? 10 : 0));
           score += points;
-          questionsAnswered++;
 
-          if (questionsAnswered >= level * 5) {
-            level++;
-          }
+          buttons[question.correct].classList.add("correct");
+          resolveQuestion();
 
-          updateStats();
-          if (score > bestScore) {
-            bestScore = score;
-          }
-
-          document.getElementById("feedback").innerHTML = `
+          feedback.innerHTML = `
                     <div>🎉 Correct! +${points} points</div>
                     <div class="explanation">${question.explanation}</div>
                 `;
-          document.getElementById("feedback").className = "feedback correct";
-          document.getElementById("feedback").style.display = "block";
+          feedback.className = "feedback correct";
+          feedback.style.display = "block";
+          return;
+        }
+
+        attemptCount++;
+        playSound('wrong');
+
+        if (attemptCount === 1) {
+          // First miss — grey out that choice, share the hint, and let them try again
+          buttons[selectedIndex].classList.add("eliminated");
+          feedback.innerHTML = `
+                    <div>😅 Not "${question.options[selectedIndex]}" — try again!</div>
+                `;
+          feedback.className = "feedback incorrect";
+          feedback.style.display = "block";
+          showHint(question.hint);
         } else {
-          // Incorrect answer
-          playSound('wrong');
-          document.getElementById("feedback").innerHTML = `
+          // Second miss — reveal the answer with the full explanation, no points
+          buttons[question.correct].classList.add("correct");
+          buttons[selectedIndex].classList.add("incorrect");
+          resolveQuestion();
+
+          feedback.innerHTML = `
                     <div>😅 Incorrect! The correct answer was: ${
                       question.options[question.correct]
                     }</div>
                     <div class="explanation">${question.explanation}</div>
                 `;
-          document.getElementById("feedback").className = "feedback incorrect";
-          document.getElementById("feedback").style.display = "block";
+          feedback.className = "feedback incorrect";
+          feedback.style.display = "block";
         }
-
-        // Auto-advance after 3 seconds
-        setTimeout(() => {
-          nextQuestion();
-        }, 3000);
       }
 
       function nextQuestion() {
+        // Advance only once the current question has been scored
+        if (!questionResolved) return;
         currentQuestionIndex++;
-        hintsUsed = 0;
         displayQuestion();
       }
 
       function getHint() {
         if (currentQuestionIndex >= currentQuestions.length) return;
+        if (questionResolved || hintShown) return; // one hint per question
 
-        hintsUsed++;
-        const question = currentQuestions[currentQuestionIndex];
-        const feedback = document.getElementById("feedback");
-        feedback.textContent = `💡 Hint: ${question.hint}`;
-        feedback.className = "feedback";
-        feedback.style.display = "block";
-
-        setTimeout(() => {
-          feedback.style.display = "none";
-        }, 3000);
+        hintUsedThisQuestion = true;
+        showHint(currentQuestions[currentQuestionIndex].hint);
       }
 
       function newQuiz() {
@@ -909,6 +966,7 @@
         document.getElementById("question").style.display = "none";
         document.getElementById("answerOptions").style.display = "none";
         document.getElementById("feedback").style.display = "none";
+        document.getElementById("hint").style.display = "none";
         
         // Show modal instead of inline feedback
         showQuizModal();
