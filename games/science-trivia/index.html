@@ -705,6 +705,8 @@
       // bestScore syncs to score during play, so the end-of-quiz modal
       // compares against the best as it stood when this quiz began
       let quizStartBest = 0;
+      // where the correct answer landed in this question's shuffled order
+      let currentCorrectIndex = 0;
       let level = 1;
       let questionsAnswered = 0;
       let currentQuestionIndex = 0;
@@ -827,15 +829,24 @@
         } of ${currentQuestions.length}`;
         document.getElementById("question").textContent = question.question;
 
-        // Create answer options
+        // Create answer options in a fresh random order each time —
+        // rendered in stored order, the right answer was memorisable
+        // by position alone
         const answerOptions = document.getElementById("answerOptions");
         answerOptions.innerHTML = "";
 
-        question.options.forEach((option, index) => {
+        const order = question.options.map((_, i) => i);
+        for (let i = order.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [order[i], order[j]] = [order[j], order[i]];
+        }
+        currentCorrectIndex = order.indexOf(question.correct);
+
+        order.forEach((optionIndex, domIndex) => {
           const btn = document.createElement("button");
           btn.className = "answer-btn";
-          btn.textContent = option;
-          btn.onclick = () => checkAnswer(index);
+          btn.textContent = question.options[optionIndex];
+          btn.onclick = () => checkAnswer(domIndex);
           answerOptions.appendChild(btn);
         });
 
@@ -883,7 +894,7 @@
         if (questionResolved) return;
 
         const question = currentQuestions[currentQuestionIndex];
-        const isCorrect = selectedIndex === question.correct;
+        const isCorrect = selectedIndex === currentCorrectIndex;
         const buttons = document.querySelectorAll(".answer-btn");
         const feedback = document.getElementById("feedback");
 
@@ -894,7 +905,7 @@
           const points = Math.max(0, basePoints - (hintUsedThisQuestion ? 10 : 0));
           score += points;
 
-          buttons[question.correct].classList.add("correct");
+          buttons[currentCorrectIndex].classList.add("correct");
           resolveQuestion();
 
           feedback.innerHTML = `
@@ -913,14 +924,14 @@
           // First miss — grey out that choice, share the hint, and let them try again
           buttons[selectedIndex].classList.add("eliminated");
           feedback.innerHTML = `
-                    <div>😅 Not "${question.options[selectedIndex]}" — try again!</div>
+                    <div>😅 Not "${buttons[selectedIndex].textContent}" — try again!</div>
                 `;
           feedback.className = "feedback incorrect";
           feedback.style.display = "block";
           showHint(question.hint);
         } else {
           // Second miss — reveal the answer with the full explanation, no points
-          buttons[question.correct].classList.add("correct");
+          buttons[currentCorrectIndex].classList.add("correct");
           buttons[selectedIndex].classList.add("incorrect");
           resolveQuestion();
 
@@ -951,8 +962,9 @@
       }
 
       function newQuiz() {
-        // Clear used questions when starting a completely new quiz
-        usedQuestions.clear();
+        // usedQuestions is deliberately NOT cleared here — clearing it made
+        // the anti-repeat filter a no-op, so every quiz drew from the full
+        // pool. generateQuiz resets it itself once the pool runs low.
         generateQuiz();
       }
 
