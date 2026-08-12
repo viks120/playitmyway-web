@@ -151,6 +151,14 @@
         margin-bottom: 15px;
       }
 
+      .hint-status {
+        font-size: clamp(0.95em, 3vw, 1.1em);
+        color: #2d5a3d;
+        font-weight: bold;
+        min-height: 1.4em;
+        margin-bottom: 10px;
+      }
+
       .scrambled-letters {
         display: flex;
         justify-content: center;
@@ -555,6 +563,7 @@
       <div class="word-info">
         <div class="category" id="category">Category: Animals</div>
         <div class="hint" id="hint">Hint: A furry pet that says "meow"</div>
+        <div class="hint-status" id="hintStatus" aria-live="polite"></div>
       </div>
 
       <div class="scrambled-letters" id="scrambledLetters">
@@ -565,11 +574,13 @@
         <!-- Answer slots will be generated here -->
       </div>
 
-      <div class="feedback" id="feedback"></div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
 
       <div class="controls">
         <button class="btn" onclick="checkAnswer()">Check Answer</button>
         <button class="btn" onclick="getHint()">Get Hint</button>
+        <button class="btn" id="showMeBtn" onclick="showMe()" style="display: none">Show Me 👀</button>
+        <button class="btn" id="nextBtn" onclick="newWord()" style="display: none">Next Word ➡️</button>
         <button class="btn" onclick="newWord()">New Word</button>
       </div>
     </div>
@@ -727,9 +738,15 @@
       let level = 1;
       let wordsSolved = 0;
       let hintsUsed = 0;
+      let failedAttempts = 0;
+      let wordComplete = false;
+      let currentHint = "";
+      const MAX_HINTS = 2;
+      const HINT_COST = 5;
       let streak = 0;
       let bestStreak = 0;
       let bestScore = 0;
+      let feedbackTimer = null;
 
       const wordDatabase = {
         easy: [
@@ -925,6 +942,7 @@
         const wordData = words[randomIndex];
 
         currentWord = wordData.word;
+        currentHint = wordData.hint;
         document.getElementById(
           "category"
         ).textContent = `Category: ${wordData.category}`;
@@ -965,6 +983,21 @@
       }
 
       function checkAnswer() {
+        if (wordComplete) return;
+
+        // Only a full word counts as an attempt
+        if (answerSlots.some((slot) => !slot.filled)) {
+          clearTimeout(feedbackTimer);
+          document.getElementById("feedback").textContent = "🧩 Place all the letters first!";
+          document.getElementById("feedback").className = "feedback incorrect";
+          document.getElementById("feedback").style.display = "block";
+
+          feedbackTimer = setTimeout(() => {
+            document.getElementById("feedback").style.display = "none";
+          }, 2000);
+          return;
+        }
+
         const currentAnswer = answerSlots
           .map((slot) => (slot.filled ? slot.currentLetter : ""))
           .join("");
@@ -972,6 +1005,7 @@
         if (currentAnswer === currentWord) {
           // Correct answer
           playSound('correct');
+          wordComplete = true;
           streak++;
           if (streak > bestStreak) bestStreak = streak;
           document.getElementById('streak').textContent = streak;
@@ -979,9 +1013,13 @@
             document.getElementById('streakIndicator').classList.add('show');
           }
 
-          const basePoints = currentWord.length * 10 - hintsUsed * 5;
+          // Full points first try, half after a wrong try — never negative
+          let basePoints = currentWord.length * 10;
+          if (failedAttempts >= 1) {
+            basePoints = Math.floor(basePoints / 2);
+          }
           const streakBonus = streak >= 3 ? streak * 5 : 0;
-          const points = basePoints + streakBonus;
+          const points = Math.max(0, basePoints + streakBonus);
           score += points;
           wordsSolved++;
 
@@ -992,19 +1030,21 @@
 
           updateStats();
 
-          const feedbackText = streak >= 3 
-            ? `🔥 ${streak} in a row! +${points} points!` 
+          const feedbackText = streak >= 3
+            ? `🔥 ${streak} in a row! +${points} points!`
             : `🎉 Correct! +${points} points`;
+          clearTimeout(feedbackTimer);
           document.getElementById("feedback").textContent = feedbackText;
           document.getElementById("feedback").className = "feedback correct";
           document.getElementById("feedback").style.display = "block";
 
+          document.getElementById("hintStatus").textContent = "";
+          document.getElementById("showMeBtn").style.display = "none";
+
           if (level > previousLevel) {
-            setTimeout(() => showLevelModal(), 1500);
+            showLevelModal();
           } else {
-            setTimeout(() => {
-              newWord();
-            }, 2000);
+            document.getElementById("nextBtn").style.display = "inline-block";
           }
         } else {
           // Incorrect answer
@@ -1012,31 +1052,156 @@
           streak = 0;
           document.getElementById('streak').textContent = streak;
           document.getElementById('streakIndicator').classList.remove('show');
-          document.getElementById("feedback").textContent = "😅 Try again!";
+          failedAttempts++;
+
+          // Persistent helper message — stays until the child acts
+          const placedCount = answerSlots.filter(
+            (slot, i) => slot.filled && slot.currentLetter === currentWord[i]
+          ).length;
+          const hintStatusEl = document.getElementById("hintStatus");
+          if (failedAttempts >= 3) {
+            document.getElementById("showMeBtn").style.display = "inline-block";
+            hintStatusEl.textContent = `🤗 Tricky one! ${placedCount} of ${currentWord.length} letters are in the right spot. Tap "Show Me 👀" to see the answer, or keep trying!`;
+          } else if (placedCount > 0) {
+            hintStatusEl.textContent = `📍 ${placedCount} of ${currentWord.length} letters are in the right spot — keep going!`;
+          } else {
+            hintStatusEl.textContent = "📍 No letters are in the right spot yet — try a different order!";
+          }
+
+          clearTimeout(feedbackTimer);
+          document.getElementById("feedback").textContent = "😅 Not quite — try again!";
           document.getElementById("feedback").className = "feedback incorrect";
           document.getElementById("feedback").style.display = "block";
 
-          setTimeout(() => {
+          feedbackTimer = setTimeout(() => {
             document.getElementById("feedback").style.display = "none";
           }, 2000);
         }
       }
 
       function getHint() {
-        hintsUsed++;
-        const hintElement = document.getElementById("hint");
-        const currentHint = hintElement.textContent;
+        if (wordComplete) return;
 
-        // Show first letter as additional hint
-        const firstLetter = currentWord[0];
-        hintElement.textContent = `Hint: ${currentHint.replace(
-          "Hint: ",
-          ""
-        )} (Starts with "${firstLetter}")`;
+        const hintStatusEl = document.getElementById("hintStatus");
+
+        if (hintsUsed >= MAX_HINTS) {
+          hintStatusEl.textContent = "🙈 No more letter hints for this word — you can do it!";
+          return;
+        }
+
+        // Find the first slot that doesn't hold its correct letter yet
+        let targetIndex = -1;
+        for (let i = 0; i < answerSlots.length; i++) {
+          if (!answerSlots[i].filled || answerSlots[i].currentLetter !== currentWord[i]) {
+            targetIndex = i;
+            break;
+          }
+        }
+
+        if (targetIndex === -1) {
+          hintStatusEl.textContent = "🌟 Every letter is in place — press Check Answer!";
+          return;
+        }
+
+        const neededLetter = currentWord[targetIndex];
+        const targetSlot = answerSlots[targetIndex];
+
+        // If the slot holds a wrong letter, send it back to the tray first
+        if (targetSlot.filled) {
+          const wrongTile = scrambledLetters.find(
+            (item) => item.letter === targetSlot.currentLetter && item.used
+          );
+          if (wrongTile) {
+            wrongTile.used = false;
+            wrongTile.element.style.display = "flex";
+          }
+          targetSlot.element.textContent = "";
+          targetSlot.element.classList.remove("filled");
+          targetSlot.filled = false;
+          targetSlot.currentLetter = "";
+        }
+
+        // Take the needed letter from the tray, or rescue it from a wrong slot
+        let tile = scrambledLetters.find(
+          (item) => item.letter === neededLetter && !item.used
+        );
+        if (!tile) {
+          const wrongIndex = answerSlots.findIndex(
+            (slot, i) =>
+              i !== targetIndex &&
+              slot.filled &&
+              slot.currentLetter === neededLetter &&
+              currentWord[i] !== neededLetter
+          );
+          if (wrongIndex !== -1) {
+            const wrongSlot = answerSlots[wrongIndex];
+            tile = scrambledLetters.find(
+              (item) => item.letter === neededLetter && item.used
+            );
+            wrongSlot.element.textContent = "";
+            wrongSlot.element.classList.remove("filled");
+            wrongSlot.filled = false;
+            wrongSlot.currentLetter = "";
+          }
+        }
+        if (!tile) return; // Safety net — every word letter has a tile
+
+        // Small fixed cost — score never drops below zero
+        score = Math.max(0, score - HINT_COST);
+        updateStats();
+        hintsUsed++;
+
+        // Place the correct letter into its slot
+        tile.used = true;
+        tile.element.style.display = "none";
+        targetSlot.element.textContent = neededLetter;
+        targetSlot.element.classList.add("filled");
+        targetSlot.filled = true;
+        targetSlot.currentLetter = neededLetter;
+
+        const hintsLeft = MAX_HINTS - hintsUsed;
+        hintStatusEl.textContent = `💡 Letter ${targetIndex + 1} is "${neededLetter}" (-${HINT_COST} points). ${hintsLeft} letter hint${hintsLeft === 1 ? "" : "s"} left for this word.`;
+        playSound('click');
+      }
+
+      function showMe() {
+        if (wordComplete) return;
+        wordComplete = true;
+
+        // Reveal the whole word — every slot gets its correct letter
+        scrambledLetters.forEach((item) => {
+          item.used = true;
+          item.element.style.display = "none";
+        });
+        answerSlots.forEach((slot, i) => {
+          const letter = currentWord[i];
+          slot.element.textContent = letter;
+          slot.element.classList.add("filled");
+          slot.filled = true;
+          slot.currentLetter = letter;
+        });
+
+        streak = 0;
+        document.getElementById('streak').textContent = streak;
+        document.getElementById('streakIndicator').classList.remove('show');
+
+        document.getElementById("hintStatus").textContent = "";
+        clearTimeout(feedbackTimer);
+        document.getElementById("feedback").textContent = `👀 The word was ${currentWord} — ${currentHint}. No points this time, but the next one is yours!`;
+        document.getElementById("feedback").className = "feedback correct";
+        document.getElementById("feedback").style.display = "block";
+
+        document.getElementById("showMeBtn").style.display = "none";
+        document.getElementById("nextBtn").style.display = "inline-block";
       }
 
       function newWord() {
         hintsUsed = 0;
+        failedAttempts = 0;
+        wordComplete = false;
+        document.getElementById("hintStatus").textContent = "";
+        document.getElementById("showMeBtn").style.display = "none";
+        document.getElementById("nextBtn").style.display = "none";
         generateNewWord();
       }
 

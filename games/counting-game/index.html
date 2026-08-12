@@ -190,6 +190,28 @@
         background: linear-gradient(45deg, #ff6b6b, #ee5a52);
       }
 
+      .answer-btn.eliminated {
+        background: #cfcfcf;
+        color: #777;
+        cursor: not-allowed;
+      }
+
+      .answer-btn.eliminated:hover {
+        transform: none;
+      }
+
+      .hint {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 10px;
+        display: none;
+        background: #fff3cd;
+        color: #7a5c00;
+      }
+
       .feedback {
         text-align: center;
         font-size: 20px;
@@ -563,7 +585,9 @@
 
       <div class="answer-options" id="answerOptions"></div>
 
-      <div class="feedback" id="feedback"></div>
+      <div class="hint" id="hint" aria-live="polite"></div>
+
+      <div class="feedback" id="feedback" aria-live="polite"></div>
 
       <div class="controls">
         <button class="btn" onclick="nextQuestion()">Next Question</button>
@@ -725,6 +749,7 @@
       let questionNumber = 1;
       let currentQuestion = {};
       let selectedObjects = [];
+      let attemptCount = 0;
       let streak = 0;
       let bestStreak = 0;
       let highScore = 0;
@@ -775,6 +800,8 @@
           type: "addition",
           question: `What is ${num1} + ${num2}?`,
           objects: [],
+          num1: num1,
+          num2: num2,
           answer: answer,
           options: generateOptions(answer),
         };
@@ -789,6 +816,8 @@
           type: "subtraction",
           question: `What is ${num1} - ${num2}?`,
           objects: [],
+          num1: num1,
+          num2: num2,
           answer: answer,
           options: generateOptions(answer),
         };
@@ -839,11 +868,12 @@
           const button = document.createElement("button");
           button.className = "answer-btn";
           button.textContent = option;
-          button.addEventListener("click", () => checkAnswer(option));
+          button.addEventListener("click", () => checkAnswer(option, button));
           answerOptions.appendChild(button);
         });
 
         selectedObjects = [];
+        attemptCount = 0;
       }
 
       function toggleObject(objectDiv) {
@@ -859,43 +889,94 @@
         }
       }
 
-      function checkAnswer(selectedAnswer) {
-        const feedback = document.getElementById("feedback");
-        const buttons = document.querySelectorAll(".answer-btn");
+      function countAlong(total) {
+        const counts = [];
+        for (let i = 1; i <= total; i++) {
+          counts.push(i);
+        }
+        return counts.join(", ");
+      }
 
-        buttons.forEach((btn) => {
-          btn.disabled = true;
-          if (parseInt(btn.textContent) === currentQuestion.answer) {
-            btn.classList.add("correct");
-          } else if (
-            parseInt(btn.textContent) === selectedAnswer &&
-            selectedAnswer !== currentQuestion.answer
-          ) {
-            btn.classList.add("incorrect");
-          }
-        });
+      function getHintText() {
+        if (currentQuestion.type === "counting") {
+          return "🤔 Count again! Point to each one as you count. 👆";
+        }
+        if (currentQuestion.type === "addition") {
+          return `🤔 Not that one! Hold up ${currentQuestion.num1} fingers, then ${currentQuestion.num2} more, and count them all. ✋`;
+        }
+        return `🤔 Not that one! Hold up ${currentQuestion.num1} fingers, put ${currentQuestion.num2} down, and count what is left. ✋`;
+      }
+
+      function getRevealText() {
+        const answer = currentQuestion.answer;
+        if (currentQuestion.type === "counting") {
+          return `There ${answer === 1 ? "is" : "are"} ${answer}! ${countAlong(answer)} 🎉`;
+        }
+        if (currentQuestion.type === "addition") {
+          return `${currentQuestion.num1} + ${currentQuestion.num2} makes ${answer}! Count with me: ${countAlong(answer)} 🎉`;
+        }
+        return `${currentQuestion.num1} take away ${currentQuestion.num2} leaves ${answer}! Count with me: ${countAlong(answer)} 🎉`;
+      }
+
+      function checkAnswer(selectedAnswer, button) {
+        const feedback = document.getElementById("feedback");
+        const hint = document.getElementById("hint");
+        const buttons = document.querySelectorAll(".answer-btn");
 
         if (selectedAnswer === currentQuestion.answer) {
           playSound('correct');
-          streak++;
-          if (streak > bestStreak) bestStreak = streak;
-          document.getElementById('streak').textContent = streak;
-          if (streak >= 2) {
-            document.getElementById('streakIndicator').classList.add('show');
+          buttons.forEach((btn) => {
+            btn.disabled = true;
+            if (parseInt(btn.textContent) === currentQuestion.answer) {
+              btn.classList.add("correct");
+            }
+          });
+          hint.style.display = "none";
+
+          if (attemptCount === 0) {
+            streak++;
+            if (streak > bestStreak) bestStreak = streak;
+            document.getElementById('streak').textContent = streak;
+            if (streak >= 2) {
+              document.getElementById('streakIndicator').classList.add('show');
+            }
+            feedback.textContent = streak >= 3 ? `🔥 ${streak} in a row! +${10 + streak * 2} points!` : "🎉 Correct! Well done!";
+            score += 10 + (streak >= 3 ? streak * 2 : 0);
+          } else {
+            feedback.textContent = currentQuestion.type === "counting"
+              ? `🎉 You did it! There ${currentQuestion.answer === 1 ? "is" : "are"} ${currentQuestion.answer}!`
+              : `🎉 You did it! It's ${currentQuestion.answer}!`;
+            score += 5;
           }
-          feedback.textContent = streak >= 3 ? `🔥 ${streak} in a row! +${10 + streak * 2} points!` : "🎉 Correct! Well done!";
           feedback.className = "feedback correct";
-          score += 10 + (streak >= 3 ? streak * 2 : 0);
+          feedback.style.display = "block";
         } else {
           playSound('wrong');
           streak = 0;
           document.getElementById('streak').textContent = streak;
           document.getElementById('streakIndicator').classList.remove('show');
-          feedback.textContent = `😅 Wrong! The answer is ${currentQuestion.answer}`;
-          feedback.className = "feedback incorrect";
+          attemptCount++;
+
+          if (attemptCount === 1) {
+            button.disabled = true;
+            button.classList.add("eliminated");
+            hint.textContent = getHintText();
+            hint.style.display = "block";
+          } else {
+            buttons.forEach((btn) => {
+              btn.disabled = true;
+              if (parseInt(btn.textContent) === currentQuestion.answer) {
+                btn.classList.add("correct");
+              }
+            });
+            button.classList.add("incorrect");
+            hint.style.display = "none";
+            feedback.textContent = getRevealText();
+            feedback.className = "feedback incorrect";
+            feedback.style.display = "block";
+          }
         }
 
-        feedback.style.display = "block";
         document.getElementById("score").textContent = score;
 
         if (score >= level * 50) {
@@ -916,6 +997,7 @@
           questionNumber * 10 + "%";
 
         document.getElementById("feedback").style.display = "none";
+        document.getElementById("hint").style.display = "none";
 
         // Generate new question based on mode
         switch (currentMode) {
@@ -948,6 +1030,7 @@
         document.getElementById("questionNum").textContent = questionNumber;
         document.getElementById("progressFill").style.width = "10%";
         document.getElementById("feedback").style.display = "none";
+        document.getElementById("hint").style.display = "none";
 
         // Generate first question
         switch (currentMode) {

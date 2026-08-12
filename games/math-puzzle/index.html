@@ -253,6 +253,13 @@
         transform: scale(1.05);
       }
 
+      .btn:disabled,
+      .btn:disabled:hover {
+        opacity: 0.5;
+        cursor: default;
+        transform: none;
+      }
+
       .feedback {
         text-align: center;
         font-size: clamp(1.2em, 5vw, 1.5em);
@@ -272,6 +279,25 @@
       .feedback.incorrect {
         background: #ff6b6b;
         color: white;
+      }
+
+      .feedback.reveal {
+        background: #fff3cd;
+        color: #856404;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.4);
+      }
+
+      .hint-box {
+        text-align: center;
+        font-size: clamp(1.1em, 4vw, 1.3em);
+        font-weight: bold;
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 12px;
+        display: none;
+        background: #fff3cd;
+        color: #856404;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.4);
       }
 
       .back-link {
@@ -538,7 +564,8 @@
     </div>
 
     <div class="game-container">
-      <div class="feedback" id="feedback"></div>
+      <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+      <div class="hint-box" id="hint" role="status" aria-live="polite"></div>
 
       <div class="puzzle-area">
         <div class="puzzle-question" id="question">Solve the equation</div>
@@ -549,8 +576,9 @@
       </div>
 
       <div class="controls">
-        <button class="btn" onclick="checkAnswer()">Check Answer</button>
-        <button class="btn" onclick="getHint()">Get Hint</button>
+        <button class="btn" id="checkBtn" onclick="checkAnswer()">Check Answer</button>
+        <button class="btn" id="nextBtn" onclick="newPuzzle()" style="display: none">Next Puzzle →</button>
+        <button class="btn" id="hintBtn" onclick="getHint()">Get Hint</button>
         <button class="btn" onclick="newPuzzle()">New Puzzle</button>
       </div>
     </div>
@@ -700,6 +728,8 @@
       let puzzlesSolved = 0;
       let hintsUsed = 0;
       let highScore = 0;
+      let attemptCount = 0;
+      let puzzleResolved = false;
 
       const puzzleDatabase = {
         equations: [
@@ -930,7 +960,12 @@
 
       function newPuzzle() {
         hintsUsed = 0;
+        attemptCount = 0;
+        puzzleResolved = false;
         document.getElementById("equation").style.display = "block";
+        document.getElementById("checkBtn").disabled = false;
+        document.getElementById("hintBtn").disabled = false;
+        document.getElementById("nextBtn").style.display = "none";
 
         switch (currentMode) {
           case "equations":
@@ -944,13 +979,166 @@
             break;
         }
 
-        // Clear feedback
-        document.getElementById("feedback").style.display = "none";
+        // Clear feedback and hint
+        hideFeedback();
+        hideHint();
+      }
+
+      function showFeedback(text, type) {
+        const el = document.getElementById("feedback");
+        el.textContent = text;
+        el.className = "feedback " + type;
+        el.style.display = "block";
+      }
+
+      function hideFeedback() {
+        const el = document.getElementById("feedback");
+        el.textContent = "";
+        el.className = "feedback";
+        el.style.display = "none";
+      }
+
+      function showHint(text) {
+        const el = document.getElementById("hint");
+        el.textContent = text;
+        el.style.display = "block";
+      }
+
+      function hideHint() {
+        const el = document.getElementById("hint");
+        el.textContent = "";
+        el.style.display = "none";
+      }
+
+      function resolvePuzzle() {
+        puzzleResolved = true;
+        const answerInput = document.getElementById("answerInput");
+        if (answerInput) {
+          answerInput.disabled = true;
+        }
+        document.getElementById("checkBtn").disabled = true;
+        document.getElementById("hintBtn").disabled = true;
+        document.getElementById("nextBtn").style.display = "inline-block";
+      }
+
+      // Split "5 + ? = 12" into its pieces so hints can reason about it
+      function parseEquation(eq) {
+        const sides = eq.split("=");
+        if (sides.length !== 2) return null;
+        const target = parseFloat(sides[1]);
+        const parts = sides[0].trim().split(/\s+/);
+        if (parts.length !== 3 || isNaN(target)) return null;
+        return { left: parts[0], op: parts[1], right: parts[2], target };
+      }
+
+      // Wrong attempt 1 (equations): show what their guess makes, and which way to go
+      function buildEquationComparison(guess) {
+        const parsed = parseEquation(currentPuzzle.equation);
+        if (!parsed || isNaN(guess)) return null;
+        const a = parsed.left === "?" ? guess : parseFloat(parsed.left);
+        const b = parsed.right === "?" ? guess : parseFloat(parsed.right);
+        let achieved;
+        switch (parsed.op) {
+          case "+": achieved = a + b; break;
+          case "-": achieved = a - b; break;
+          case "×": achieved = a * b; break;
+          case "÷": achieved = b === 0 ? null : a / b; break;
+          default: return null;
+        }
+        if (achieved === null || isNaN(achieved) || achieved === parsed.target) return null;
+        const shown = parseFloat(achieved.toFixed(2));
+        const tried = currentPuzzle.equation.split("=")[0].trim().replace("?", guess);
+        const bigger = achieved > parsed.target;
+        // "15 - ?" and "15 ÷ ?" shrink as the guess grows, so flip the advice
+        const inverted = parsed.right === "?" && (parsed.op === "-" || parsed.op === "÷");
+        const tryDirection = bigger !== inverted ? "smaller" : "bigger";
+        return `💡 ${tried} = ${shown} — that's ${bigger ? "bigger" : "smaller"} than ${parsed.target}. Try a ${tryDirection} number!`;
+      }
+
+      function buildWrongAttemptHint(userAnswer) {
+        if (currentMode === "equations") {
+          const comparison = buildEquationComparison(parseFloat(userAnswer));
+          if (comparison) return comparison;
+        }
+        // Patterns name the step, logic hints point at the idea — without giving the answer
+        return `💡 Hint: ${currentPuzzle.hint}`;
+      }
+
+      // Wrong attempt 2 (equations): a worked line like "12 - 5 = 7, so 5 + 7 = 12"
+      function buildEquationWorkedLine() {
+        const parsed = parseEquation(currentPuzzle.equation);
+        if (!parsed) return "";
+        const ans = currentPuzzle.answer;
+        const t = parsed.target;
+        if (parsed.right === "?") {
+          const a = parseFloat(parsed.left);
+          switch (parsed.op) {
+            case "+": return `${t} - ${a} = ${ans}, so ${a} + ${ans} = ${t}`;
+            case "-": return `${a} - ${t} = ${ans}, so ${a} - ${ans} = ${t}`;
+            case "×": return `${t} ÷ ${a} = ${ans}, so ${a} × ${ans} = ${t}`;
+            case "÷": return `${a} ÷ ${t} = ${ans}, so ${a} ÷ ${ans} = ${t}`;
+          }
+        } else {
+          const b = parseFloat(parsed.right);
+          switch (parsed.op) {
+            case "+": return `${t} - ${b} = ${ans}, so ${ans} + ${b} = ${t}`;
+            case "-": return `${t} + ${b} = ${ans}, so ${ans} - ${b} = ${t}`;
+            case "×": return `${t} ÷ ${b} = ${ans}, so ${ans} × ${b} = ${t}`;
+            case "÷": return `${t} × ${b} = ${ans}, so ${ans} ÷ ${b} = ${t}`;
+          }
+        }
+        return "";
+      }
+
+      // Wrong attempt 2 (patterns): name the step and show the last jump worked out
+      function buildPatternWorkedLine() {
+        const nums = currentPuzzle.pattern.filter((n) => n !== "?").map(Number);
+        const ans = Number(currentPuzzle.answer);
+        if (nums.length < 2 || isNaN(ans)) return "";
+        const last = nums[nums.length - 1];
+        const prev = nums[nums.length - 2];
+        const step = last - prev;
+        if (last + step === ans) {
+          return step >= 0
+            ? `${currentPuzzle.hint}: ${last} + ${step} = ${ans}`
+            : `${currentPuzzle.hint}: ${last} - ${Math.abs(step)} = ${ans}`;
+        }
+        if (prev !== 0 && last !== 0) {
+          const ratio = last / prev;
+          if (last * ratio === ans) {
+            return ratio >= 1
+              ? `${currentPuzzle.hint}: ${last} × ${ratio} = ${ans}`
+              : `${currentPuzzle.hint}: ${last} ÷ ${1 / ratio} = ${ans}`;
+          }
+        }
+        return "";
+      }
+
+      function buildRevealText() {
+        const ans = currentPuzzle.answer;
+        let worked = "";
+        if (currentMode === "equations") {
+          worked = buildEquationWorkedLine();
+        } else if (currentMode === "patterns") {
+          worked = buildPatternWorkedLine();
+        }
+        if (!worked) {
+          worked = currentPuzzle.hint;
+        }
+        return `😅 The answer is ${ans}. 💡 ${worked}`;
       }
 
       function checkAnswer() {
+        if (puzzleResolved) return;
+
         const answerInput = document.getElementById("answerInput");
         const userAnswer = answerInput.value.trim();
+
+        if (userAnswer === "") {
+          playSound('hint');
+          showFeedback("😅 Type an answer first!", "incorrect");
+          return;
+        }
 
         let isCorrect = false;
 
@@ -965,9 +1153,10 @@
         }
 
         if (isCorrect) {
-          // Correct answer
+          // Correct answer: full points first try, half on the second, never negative
           playSound('correct');
-          const points = 50 - hintsUsed * 10;
+          const basePoints = attemptCount === 0 ? 50 : 25;
+          const points = Math.max(0, basePoints - hintsUsed * 10);
           score += points;
           puzzlesSolved++;
 
@@ -977,49 +1166,42 @@
           }
 
           updateStats();
-
-          document.getElementById(
-            "feedback"
-          ).textContent = `🎉 Correct! +${points} points`;
-          document.getElementById("feedback").className = "feedback correct";
-          document.getElementById("feedback").style.display = "block";
+          hideHint();
+          showFeedback(
+            attemptCount === 0
+              ? `🎉 Correct! +${points} points`
+              : `🎉 You got it! +${points} points`,
+            "correct"
+          );
+          resolvePuzzle();
 
           // Check for level up
           if (level > previousLevel) {
-            setTimeout(() => {
-              showMilestoneModal(`🎉 Level ${level}!`);
-            }, 1000);
-          } else {
-            setTimeout(() => {
-              newPuzzle();
-            }, 2000);
+            showMilestoneModal(`🎉 Level ${level}!`);
           }
         } else {
-          // Incorrect answer
+          // Incorrect answer: hint first, reveal on the second miss
           playSound('wrong');
-          document.getElementById("feedback").textContent = "😅 Try again!";
-          document.getElementById("feedback").className = "feedback incorrect";
-          document.getElementById("feedback").style.display = "block";
+          attemptCount++;
 
-          setTimeout(() => {
-            document.getElementById("feedback").style.display = "none";
-          }, 2000);
+          if (attemptCount === 1) {
+            showFeedback("😅 Not quite — try again!", "incorrect");
+            showHint(buildWrongAttemptHint(userAnswer));
+            answerInput.select();
+            answerInput.focus();
+          } else {
+            hideHint();
+            showFeedback(buildRevealText(), "reveal");
+            resolvePuzzle();
+          }
         }
       }
 
       function getHint() {
+        if (puzzleResolved) return;
         playSound('hint');
         hintsUsed++;
-        const hintElement = document.getElementById("feedback");
-        hintElement.textContent = `💡 Hint: ${currentPuzzle.hint}`;
-        hintElement.className = "feedback";
-        hintElement.style.display = "block";
-        hintElement.style.background = "#fff3cd";
-        hintElement.style.color = "#856404";
-
-        setTimeout(() => {
-          hintElement.style.display = "none";
-        }, 3000);
+        showHint(`💡 Hint: ${currentPuzzle.hint}`);
       }
 
       function updateStats() {
@@ -1031,7 +1213,14 @@
       // Enter key support
       document.addEventListener("keypress", function (e) {
         if (e.key === "Enter") {
-          checkAnswer();
+          if (puzzleResolved) {
+            // Advance only if the milestone modal isn't waiting for its own Continue
+            if (!document.getElementById("milestoneModal").classList.contains("show")) {
+              newPuzzle();
+            }
+          } else {
+            checkAnswer();
+          }
         }
       });
 
