@@ -105,6 +105,11 @@
         to { top: 550px; }
       }
 
+      .game-area.paused .fruit,
+      .game-area.paused .bad-item {
+        animation-play-state: paused;
+      }
+
       .catch-effect {
         position: absolute;
         font-size: 24px;
@@ -288,13 +293,21 @@
         <p>Move the basket to catch fruits</p>
         <p>🍎🍊🍋🍇🍓 = +10 points</p>
         <p>⭐ = +50 bonus!</p>
+        <p>🔥 Catch 5 in a row = +20 combo!</p>
         <p>💣 = Lose a life!</p>
         <br>
         <button class="btn" onclick="startGame()">Start Game</button>
       </div>
+      <div class="start-screen" id="pauseScreen" style="display: none;">
+        <h2>⏸️ Paused</h2>
+        <p>Take a break!</p>
+        <br>
+        <button class="btn" onclick="togglePause()">▶️ Resume</button>
+      </div>
     </div>
 
     <div class="controls">
+      <button class="btn" id="pauseBtn" onclick="togglePause()">⏸️ Pause</button>
       <button class="btn" onclick="startGame()">New Game</button>
     </div>
 
@@ -372,9 +385,10 @@
       const bonus = '⭐';
       const bad = '💣';
 
-      let score = 0, level = 1, lives = 3;
+      let score = 0, level = 1, lives = 3, combo = 0;
       let gameRunning = false;
-      let spawnInterval, gameLoop;
+      let paused = false;
+      let spawnTimer, gameLoop;
       let basketX = 160;
       let best = 0;
 
@@ -395,15 +409,21 @@
         basket.style.left = basketX + 'px';
       }
 
+      function nudgeBasket(dx) {
+        const maxX = gameArea.getBoundingClientRect().width - 80;
+        basketX = Math.max(0, Math.min(maxX, basketX + dx));
+        basket.style.left = basketX + 'px';
+      }
+
       // Mouse/Touch controls
       gameArea.addEventListener('mousemove', (e) => {
-        if (!gameRunning) return;
+        if (!gameRunning || paused) return;
         const rect = gameArea.getBoundingClientRect();
         moveBasket(e.clientX - rect.left);
       });
 
       gameArea.addEventListener('touchmove', (e) => {
-        if (!gameRunning) return;
+        if (!gameRunning || paused) return;
         e.preventDefault();
         const rect = gameArea.getBoundingClientRect();
         moveBasket(e.touches[0].clientX - rect.left);
@@ -411,9 +431,15 @@
 
       // Keyboard controls
       document.addEventListener('keydown', (e) => {
-        if (!gameRunning) return;
-        if (e.key === 'ArrowLeft') moveBasket(basketX - 20);
-        if (e.key === 'ArrowRight') moveBasket(basketX + 60);
+        if (e.key === 'Escape' && gameRunning) {
+          togglePause();
+          return;
+        }
+        if (!gameRunning || paused) return;
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+          e.preventDefault();
+          nudgeBasket(e.key === 'ArrowLeft' ? -60 : 60);
+        }
       });
 
       function spawnItem() {
@@ -442,7 +468,10 @@
 
         item.addEventListener('animationend', () => {
           if (item.parentNode) {
-            if (item.dataset.type !== 'bad') loseLife();
+            if (item.dataset.type !== 'bad' && gameRunning) {
+              combo = 0;
+              showEffect(parseFloat(item.style.left), gameArea.offsetHeight - 60, '💨', '#999');
+            }
             item.remove();
           }
         });
@@ -464,16 +493,25 @@
             item.remove();
 
             if (type === 'bad') {
+              combo = 0;
               loseLife();
               showEffect(itemRect.left, itemRect.top, '💥');
             } else if (type === 'bonus') {
+              combo++;
               score += 50;
               playSound('bonus');
               showEffect(itemRect.left, itemRect.top, '+50');
             } else {
+              combo++;
               score += 10;
               playSound('catch');
               showEffect(itemRect.left, itemRect.top, '+10');
+            }
+
+            if (combo > 0 && combo % 5 === 0) {
+              score += 20;
+              playSound('bonus');
+              showEffect(itemRect.left, itemRect.top - 30, '🔥 +20');
             }
 
             updateDisplay();
@@ -515,25 +553,45 @@
         // Clear existing items
         document.querySelectorAll('.fruit, .bad-item').forEach(i => i.remove());
         
-        score = 0; level = 1; lives = 3;
+        score = 0; level = 1; lives = 3; combo = 0;
         gameRunning = true;
+        paused = false;
+        gameArea.classList.remove('paused');
+        document.getElementById('pauseScreen').style.display = 'none';
+        document.getElementById('pauseBtn').textContent = '⏸️ Pause';
         basketX = gameArea.offsetWidth / 2 - 40;
         basket.style.left = basketX + 'px';
         updateDisplay();
 
+        // self-rescheduling timeout so the spawn gap tightens as the level
+        // climbs (a fixed setInterval would ignore the ramp)
         const spawnRate = () => Math.max(500, 1500 - level * 100);
-        
-        spawnInterval = setInterval(() => {
-          if (gameRunning) spawnItem();
-        }, 1000);
+        const scheduleSpawn = () => {
+          spawnTimer = setTimeout(() => {
+            if (!gameRunning) return;
+            if (!paused) spawnItem();
+            scheduleSpawn();
+          }, spawnRate());
+        };
+        scheduleSpawn();
 
         gameLoop = setInterval(checkCollisions, 50);
       }
 
+      function togglePause() {
+        if (!gameRunning) return;
+        paused = !paused;
+        gameArea.classList.toggle('paused', paused);
+        document.getElementById('pauseScreen').style.display = paused ? 'flex' : 'none';
+        document.getElementById('pauseBtn').textContent = paused ? '▶️ Resume' : '⏸️ Pause';
+      }
+
       function endGame() {
         gameRunning = false;
-        clearInterval(spawnInterval);
+        clearTimeout(spawnTimer);
         clearInterval(gameLoop);
+        gameArea.classList.remove('paused');
+        document.getElementById('pauseScreen').style.display = 'none';
 
         const isNewBest = score > best;
         if (isNewBest) {

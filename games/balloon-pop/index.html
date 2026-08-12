@@ -321,6 +321,44 @@
         transition: width 0.1s linear;
       }
 
+      .feedback {
+        min-height: 1.5em;
+        margin-bottom: 8px;
+        color: white;
+        font-size: clamp(0.9em, 3vw, 1.1em);
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        z-index: 10;
+      }
+
+      .start-overlay {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.6);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        text-align: center;
+        z-index: 50;
+      }
+
+      .start-overlay.hidden { display: none; }
+
+      .start-msg {
+        font-size: clamp(1.1em, 4vw, 1.4em);
+        font-weight: bold;
+        color: #333;
+      }
+
+      .start-btn {
+        font-size: clamp(1.2em, 4vw, 1.4em);
+        padding: 15px 40px;
+      }
+
       @media (max-width: 480px) {
         body { padding: 5px; padding-top: 35px; }
         .header { margin-bottom: 5px; }
@@ -360,7 +398,14 @@
 
     <div class="timer-bar"><div class="timer-fill" id="timerFill" style="width: 100%"></div></div>
 
-    <div class="game-area" id="gameArea"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+
+    <div class="game-area" id="gameArea">
+      <div class="start-overlay" id="startOverlay">
+        <div class="start-msg">Pop the balloons in order — ready?</div>
+        <button class="btn start-btn" onclick="startGame()">▶️ Start</button>
+      </div>
+    </div>
 
     <div class="controls">
       <button class="btn" onclick="startGame()">New Game</button>
@@ -517,6 +562,7 @@
           
           score += 10;
           balloon.remove();
+          showFeedback('');
 
           if (mode !== 'free') {
             currentTarget++;
@@ -524,10 +570,14 @@
               levelUp();
             }
           }
-          
+
           updateDisplay();
         } else {
-          // Wrong balloon
+          // Wrong balloon: name what they hit and what they need —
+          // a buzz alone teaches nothing
+          const hit = mode === 'letters' ? letters[value - 1] : value;
+          const want = mode === 'letters' ? letters[currentTarget - 1] : currentTarget;
+          showFeedback(`That was ${hit} — we're looking for ${want}!`);
           playSound('wrong');
           showScorePopup(x, y, '-5');
           score = Math.max(0, score - 5);
@@ -566,12 +616,45 @@
       function levelUp() {
         level++;
         currentTarget = 1;
-        maxTarget = Math.min(10 + level * 2, 26);
+        maxTarget = Math.min((mode === 'letters' ? 6 : 10) + level * 2, 26);
         timeLeft += 15;
         playSound('levelUp');
         createConfetti();
         spawnBalloons();
         updateDisplay();
+      }
+
+      // Refill without touching balloons already on screen — a full respawn
+      // mid-play made the whole board teleport under the child's finger
+      function topUpBalloons() {
+        const existing = document.querySelectorAll('.balloon');
+        const target = Math.min(6 + level, 12);
+        let need = target - existing.length;
+        if (need <= 0) return;
+
+        const values = [];
+        const have = [...existing].map(b => parseInt(b.dataset.value, 10));
+        if (mode !== 'free' && !have.includes(currentTarget)) {
+          values.push({
+            value: currentTarget,
+            display: mode === 'letters' ? letters[currentTarget - 1] : currentTarget.toString()
+          });
+        }
+        while (values.length < need) {
+          if (mode === 'letters') {
+            const rand = Math.floor(Math.random() * maxTarget) + 1;
+            values.push({ value: rand, display: letters[rand - 1] });
+          } else {
+            const pool = mode === 'free' ? 10 : maxTarget;
+            const rand = Math.floor(Math.random() * pool) + 1;
+            values.push({ value: rand, display: rand.toString() });
+          }
+        }
+        values.forEach(v => createBalloon(v.value, v.display));
+      }
+
+      function showFeedback(text) {
+        document.getElementById('feedback').textContent = text;
       }
 
       function spawnBalloons() {
@@ -631,18 +714,21 @@
         score = 0;
         level = 1;
         currentTarget = 1;
-        maxTarget = mode === 'letters' ? 26 : 10;
+        // letters start with a small pool (A-F) and grow each level —
+        // starting at all 26 made level 2's "10 + level*2" a step backwards
+        maxTarget = mode === 'letters' ? 6 : 10;
         timeLeft = 30;
         gameRunning = true;
+        document.getElementById('startOverlay').classList.add('hidden');
+        showFeedback('');
 
         updateDisplay();
         spawnBalloons();
 
         timerInterval = setInterval(updateTimer, 100);
         spawnInterval = setInterval(() => {
-          if (gameRunning && document.querySelectorAll('.balloon').length < 8) {
-            const count = document.querySelectorAll('.balloon').length;
-            if (count < 6) spawnBalloons();
+          if (gameRunning && document.querySelectorAll('.balloon').length < 6) {
+            topUpBalloons();
           }
         }, 3000);
       }
@@ -651,6 +737,9 @@
         gameRunning = false;
         clearInterval(timerInterval);
         clearInterval(spawnInterval);
+        // the Start overlay returns behind the modal, so closing the modal
+        // never strands the child on a dead board
+        document.getElementById('startOverlay').classList.remove('hidden');
 
         const isNewBest = score > best;
         if (isNewBest) {
@@ -684,8 +773,9 @@
         startGame();
       }
 
+      // no auto-start: the 30-second timer only runs once a child chooses to
+      // begin — the board waits behind the Start overlay until then
       updateDisplay();
-      startGame();
     </script>
   </body>
 </html>

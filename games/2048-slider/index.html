@@ -94,10 +94,23 @@
         background: #bbada0;
         padding: 10px;
         border-radius: 10px;
+        /* tiles are absolutely-positioned children, so the grid anchors them */
+        position: relative;
         /* the game needs swipes in all four directions, so the board must
            own every gesture that starts on it — the rest of the page still
            scrolls normally */
         touch-action: none;
+      }
+
+      /* Tiles live in a layer above the background cells and slide between
+         positions with a transform, so a move glides instead of teleporting.
+         .cell.tile so this outranks .cell's position: relative */
+      .cell.tile {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        transition: transform 0.15s ease;
       }
 
       .cell {
@@ -162,6 +175,14 @@
         color: #f9f6f2;
         font-size: 1.4rem;
       }
+      /* "Keep going" runs past 2048, so the bigger tiles need colours too */
+      .cell[data-value="4096"],
+      .cell[data-value="8192"],
+      .cell[data-value="16384"] {
+        background: #3c3a32;
+        color: #f9f6f2;
+        font-size: 1.2rem;
+      }
 
       .cell.new {
         animation: pop 0.3s ease;
@@ -192,6 +213,16 @@
         }
         100% {
           transform: scale(1);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .cell.tile {
+          transition: none;
+        }
+        .cell.new,
+        .cell.merged {
+          animation: none;
         }
       }
 
@@ -427,7 +458,9 @@
         <p id="gameOverMessage">
           Your final score: <span id="finalScore">0</span>
         </p>
+        <p id="mathFact"></p>
         <p id="highScoreMsg" class="high-score-msg" style="display: none;">🏆 New best this visit!</p>
+        <button class="btn" id="keepGoingBtn" onclick="keepGoing()" style="display: none;">Keep going ✨</button>
         <button class="btn" onclick="newGame()">Play Again</button>
       </div>
     </div>
@@ -528,21 +561,72 @@
           this.newBestThisGame = false;
           this.gameOver = false;
           this.eventListenersAdded = false;
+          this.tiles = [];
+          this.tileId = 0;
+          this.merges = 0;
+          this.keptGoing = false;
+          this.pendingFinalize = null;
+          this.reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
           this.init();
         }
 
         init() {
+          this.buildBackground();
+          this.tiles.forEach((t) => t.el.remove());
+          this.tiles = [];
           this.updateBest();
+          this.updateScore();
           this.addRandomTile();
           this.addRandomTile();
-          this.render();
           if (!this.eventListenersAdded) {
             this.setupEventListeners();
             this.eventListenersAdded = true;
           }
         }
 
+        // The 16 grid cells are a static backdrop, built once; the moving
+        // tiles are an absolutely-positioned layer above them
+        buildBackground() {
+          const gridElement = document.getElementById("grid");
+          if (this.bgCells) return;
+          gridElement.innerHTML = "";
+          this.bgCells = [];
+          for (let n = 0; n < 16; n++) {
+            const cell = document.createElement("div");
+            cell.className = "cell";
+            gridElement.appendChild(cell);
+            this.bgCells.push(cell);
+          }
+        }
+
+        cellAt(i, j) {
+          return this.bgCells[i * 4 + j];
+        }
+
+        placeTile(t) {
+          const c = this.cellAt(t.i, t.j);
+          t.el.style.width = c.offsetWidth + "px";
+          t.el.style.height = c.offsetHeight + "px";
+          t.el.style.transform = "translate(" + c.offsetLeft + "px, " + c.offsetTop + "px)";
+        }
+
+        // reposition every tile with no glide (window resized / rotated)
+        relayout() {
+          this.tiles.forEach((t) => {
+            t.el.style.transition = "none";
+            this.placeTile(t);
+          });
+          void document.getElementById("grid").offsetWidth;
+          this.tiles.forEach((t) => {
+            t.el.style.transition = "";
+          });
+        }
+
         setupEventListeners() {
+          // tiles are pinned to pixel positions, so a resize or rotation
+          // must re-anchor them to their cells (instantly, no glide)
+          window.addEventListener("resize", () => this.relayout());
+
           document.addEventListener("keydown", (e) => {
             if (this.gameOver) return;
 
@@ -666,154 +750,125 @@
           if (emptyCells.length > 0) {
             const { i, j } =
               emptyCells[Math.floor(Math.random() * emptyCells.length)];
-            this.grid[i][j] = Math.random() < 0.9 ? 2 : 4;
+            const value = Math.random() < 0.9 ? 2 : 4;
+            this.grid[i][j] = value;
+            this.spawnTileEl(i, j, value);
           }
+        }
+
+        spawnTileEl(i, j, value) {
+          const t = { id: ++this.tileId, value, i, j, el: document.createElement("div") };
+          t.el.className = "cell tile new";
+          t.el.textContent = value;
+          t.el.setAttribute("data-value", value);
+          document.getElementById("grid").appendChild(t.el);
+          t.el.style.transition = "none";
+          this.placeTile(t);
+          void t.el.offsetWidth;
+          t.el.style.transition = "";
+          this.tiles.push(t);
+          return t;
+        }
+
+        // One slide routine for all four directions, operating on tile
+        // objects so each one knows where it moved and what it merged into.
+        // Merge order matches the old per-direction code: the pair nearest
+        // the edge tiles move toward merges first, one merge per tile per move.
+        slide(direction) {
+          const horizontal = direction === "left" || direction === "right";
+          const forward = direction === "left" || direction === "up";
+          let moved = false;
+          const absorbed = [];
+
+          for (let line = 0; line < 4; line++) {
+            const lineTiles = this.tiles
+              .filter((t) => (horizontal ? t.i === line : t.j === line))
+              .sort((a, b) => {
+                const pa = horizontal ? a.j : a.i;
+                const pb = horizontal ? b.j : b.i;
+                return forward ? pa - pb : pb - pa;
+              });
+
+            let slot = forward ? 0 : 3;
+            let prev = null;
+            for (const t of lineTiles) {
+              if (prev && prev.value === t.value && !prev.mergedThisMove) {
+                // glide onto the tile we merge with, then vanish into it
+                t.mergeInto = prev;
+                t.i = prev.i;
+                t.j = prev.j;
+                prev.value *= 2;
+                prev.mergedThisMove = true;
+                this.score += prev.value;
+                this.merges++;
+                absorbed.push(t);
+                moved = true;
+              } else {
+                const from = horizontal ? t.j : t.i;
+                if (horizontal) t.j = slot; else t.i = slot;
+                if (from !== slot) moved = true;
+                slot += forward ? 1 : -1;
+                prev = t;
+              }
+            }
+          }
+
+          // survivors define the new grid; absorbed tiles leave it
+          this.tiles = this.tiles.filter((t) => !t.mergeInto);
+          this.grid = Array(4).fill().map(() => Array(4).fill(0));
+          this.tiles.forEach((t) => {
+            t.mergedThisMove = false;
+            this.grid[t.i][t.j] = t.value;
+          });
+
+          return { moved, absorbed };
         }
 
         move(direction) {
-          const oldGrid = JSON.stringify(this.grid);
-          let moved = false;
+          if (this.gameOver) return;
+          this.finalizeNow();
+          const { moved, absorbed } = this.slide(direction);
+          if (!moved) return;
 
-          switch (direction) {
-            case "left":
-              moved = this.moveLeft();
-              break;
-            case "right":
-              moved = this.moveRight();
-              break;
-            case "up":
-              moved = this.moveUp();
-              break;
-            case "down":
-              moved = this.moveDown();
-              break;
-          }
+          playSound('move');
+          this.tiles.forEach((t) => this.placeTile(t));
+          absorbed.forEach((t) => this.placeTile(t));
+          this.updateScore();
 
-          if (moved) {
-            playSound('move');
+          // after the glide: absorbed tiles vanish, survivors pulse with
+          // their doubled value, and the new tile pops in
+          const finish = () => {
+            this.pendingFinalize = null;
+            absorbed.forEach((t) => {
+              t.el.remove();
+              const winner = t.mergeInto;
+              winner.el.textContent = winner.value;
+              winner.el.setAttribute("data-value", winner.value);
+              winner.el.classList.remove("merged");
+              void winner.el.offsetWidth;
+              winner.el.classList.add("merged");
+            });
             this.addRandomTile();
-            this.render();
             this.checkGameOver();
+          };
+          if (this.reduced) {
+            finish();
+          } else {
+            const timer = setTimeout(finish, 170);
+            this.pendingFinalize = () => {
+              clearTimeout(timer);
+              finish();
+            };
           }
         }
 
-        moveLeft() {
-          let moved = false;
-          for (let i = 0; i < 4; i++) {
-            const row = this.grid[i].filter((x) => x !== 0);
-            for (let j = 0; j < row.length - 1; j++) {
-              if (row[j] === row[j + 1]) {
-                row[j] *= 2;
-                this.score += row[j];
-                row.splice(j + 1, 1);
-                moved = true;
-              }
-            }
-            const newRow = row.concat(Array(4 - row.length).fill(0));
-            if (JSON.stringify(this.grid[i]) !== JSON.stringify(newRow)) {
-              moved = true;
-            }
-            this.grid[i] = newRow;
-          }
-          return moved;
+        // a fresh move mid-animation completes the previous one instantly,
+        // so rapid play can never desync tiles from the grid
+        finalizeNow() {
+          if (this.pendingFinalize) this.pendingFinalize();
         }
 
-        moveRight() {
-          let moved = false;
-          for (let i = 0; i < 4; i++) {
-            const row = this.grid[i].filter((x) => x !== 0);
-            for (let j = row.length - 1; j > 0; j--) {
-              if (row[j] === row[j - 1]) {
-                row[j] *= 2;
-                this.score += row[j];
-                row.splice(j - 1, 1);
-                moved = true;
-              }
-            }
-            const newRow = Array(4 - row.length)
-              .fill(0)
-              .concat(row);
-            if (JSON.stringify(this.grid[i]) !== JSON.stringify(newRow)) {
-              moved = true;
-            }
-            this.grid[i] = newRow;
-          }
-          return moved;
-        }
-
-        moveUp() {
-          let moved = false;
-          for (let j = 0; j < 4; j++) {
-            const col = [];
-            for (let i = 0; i < 4; i++) {
-              if (this.grid[i][j] !== 0) col.push(this.grid[i][j]);
-            }
-            for (let i = 0; i < col.length - 1; i++) {
-              if (col[i] === col[i + 1]) {
-                col[i] *= 2;
-                this.score += col[i];
-                col.splice(i + 1, 1);
-                moved = true;
-              }
-            }
-            const newCol = col.concat(Array(4 - col.length).fill(0));
-            for (let i = 0; i < 4; i++) {
-              if (this.grid[i][j] !== newCol[i]) {
-                moved = true;
-              }
-              this.grid[i][j] = newCol[i];
-            }
-          }
-          return moved;
-        }
-
-        moveDown() {
-          let moved = false;
-          for (let j = 0; j < 4; j++) {
-            const col = [];
-            for (let i = 0; i < 4; i++) {
-              if (this.grid[i][j] !== 0) col.push(this.grid[i][j]);
-            }
-            for (let i = col.length - 1; i > 0; i--) {
-              if (col[i] === col[i - 1]) {
-                col[i] *= 2;
-                this.score += col[i];
-                col.splice(i - 1, 1);
-                moved = true;
-              }
-            }
-            const newCol = Array(4 - col.length)
-              .fill(0)
-              .concat(col);
-            for (let i = 0; i < 4; i++) {
-              if (this.grid[i][j] !== newCol[i]) {
-                moved = true;
-              }
-              this.grid[i][j] = newCol[i];
-            }
-          }
-          return moved;
-        }
-
-        render() {
-          const gridElement = document.getElementById("grid");
-          gridElement.innerHTML = "";
-
-          for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 4; j++) {
-              const cell = document.createElement("div");
-              cell.className = "cell";
-              const value = this.grid[i][j];
-
-              if (value !== 0) {
-                cell.textContent = value;
-                cell.setAttribute("data-value", value);
-              }
-
-              gridElement.appendChild(cell);
-            }
-          }
-
+        updateScore() {
           document.getElementById("score").textContent = this.score;
           this.updateBest();
         }
@@ -829,15 +884,18 @@
         }
 
         checkGameOver() {
-          // Check if 2048 is reached
-          for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 4; j++) {
-              if (this.grid[i][j] === 2048) {
-                this.showGameOver(
-                  "You Win!",
-                  "Congratulations! You reached 2048!"
-                );
-                return;
+          // Reaching 2048 celebrates once — "Keep going" then lets the run
+          // continue toward 4096 instead of force-ending a best game
+          if (!this.keptGoing) {
+            for (let i = 0; i < 4; i++) {
+              for (let j = 0; j < 4; j++) {
+                if (this.grid[i][j] >= 2048) {
+                  this.showGameOver(
+                    "You Win!",
+                    "Congratulations! You reached 2048!"
+                  );
+                  return;
+                }
               }
             }
           }
@@ -884,8 +942,21 @@
             highScoreMsg.style.display = "none";
           }
           
+          // one true line of maths from the game the child just played
+          const maxTile = Math.max.apply(null, [].concat.apply([], this.grid));
+          const mathFact = document.getElementById("mathFact");
+          if (maxTile >= 4) {
+            mathFact.innerHTML =
+              "Biggest tile " + maxTile + " = 2<sup>" + Math.log2(maxTile) + "</sup>" +
+              " · you merged " + this.merges + (this.merges === 1 ? " time" : " times");
+          } else {
+            mathFact.textContent = "";
+          }
+          document.getElementById("keepGoingBtn").style.display =
+            title === "You Win!" ? "inline-block" : "none";
+
           document.getElementById("gameOver").classList.add("show");
-          
+
           if (title === "You Win!") {
             playSound('win');
             createConfetti();
@@ -895,12 +966,15 @@
         }
 
         reset() {
+          this.finalizeNow();
           this.grid = Array(4)
             .fill()
             .map(() => Array(4).fill(0));
           this.score = 0;
           this.newBestThisGame = false;
           this.gameOver = false;
+          this.merges = 0;
+          this.keptGoing = false;
           document.getElementById("gameOver").classList.remove("show");
           this.init();
         }
@@ -914,6 +988,13 @@
         } else {
           game = new Game2048();
         }
+      }
+
+      function keepGoing() {
+        if (!game) return;
+        game.keptGoing = true;
+        game.gameOver = false;
+        document.getElementById("gameOver").classList.remove("show");
       }
 
       function showInstructions() {
