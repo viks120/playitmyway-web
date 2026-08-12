@@ -138,6 +138,42 @@
       .chip-glyph { background: var(--band-tint); color: var(--band); font-size: 16px; }
       .chip-stroke { background: var(--amber-tint); color: var(--amber); }
 
+      /* fading-scaffold stage chips: always the same three, so the row keeps
+         one fixed height and the board never moves when the stage changes */
+      .stage-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+        margin: 0 0 6px;
+      }
+      .stage-btn {
+        border: 2px solid var(--band-tint);
+        background: var(--surface);
+        color: var(--ink-soft);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13.5px;
+        padding: 4px 12px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+        transition: transform 150ms ease;
+      }
+      .stage-btn:hover { transform: translateY(-2px); }
+      .stage-btn .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: 2px solid var(--band);
+        background: transparent;
+      }
+      .stage-btn[aria-pressed="true"] { background: var(--band-tint); border-color: var(--band); color: var(--band); }
+      .stage-btn[aria-pressed="true"] .dot { background: var(--band); }
+
       .helper {
         min-height: 26px;
         text-align: center;
@@ -173,6 +209,8 @@
       /* coral-deep: the painted line needs 3:1 non-text contrast against
          both the board and the grey guide (plain coral is ~2.4:1) */
       .paint { stroke: var(--coral-deep); stroke-width: 5.6; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      /* stage 3: the pattern itself hides — a faint box marks where it lives */
+      .stage-box { fill: none; stroke: var(--guide); stroke-width: 1.2; stroke-dasharray: 3 3; }
 
       .start-dot { fill: var(--green); }
       .start-num {
@@ -238,6 +276,10 @@
       }
       .win-overlay h2 { margin: 4px 0 0; font-size: clamp(22px, 6vw, 30px); color: var(--green); }
       .win-overlay p { margin: 0; color: var(--ink-soft); font-size: 17px; }
+      .win-overlay .win-praise { color: var(--band); font-weight: 600; font-size: 15.5px; }
+      /* stage-3 self-check: the child's own line drawn over the true pattern */
+      .win-trace { width: 42%; max-width: 170px; aspect-ratio: 1 / 1; }
+      .own-trace { stroke: var(--band); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; fill: none; }
       .hidden { display: none !important; }
 
       .picker { width: 100%; max-width: 520px; margin-top: 18px; }
@@ -327,6 +369,8 @@
         <span class="chip chip-stroke" id="strokeChip">Stroke 1 of 3</span>
       </div>
 
+      <div class="stage-row" id="stageRow" role="group" aria-label="How much help to show"></div>
+
       <p class="helper" id="helper" aria-live="polite">Put your finger on the green dot and trace!</p>
 
       <div class="board-wrap">
@@ -334,8 +378,10 @@
              aria-label="Tracing board"></svg>
         <div class="win-overlay hidden" id="winOverlay" role="dialog" aria-label="Tracing finished">
           <span class="win-big" id="winBig">A</span>
+          <svg class="win-trace hidden" id="winTrace" viewBox="0 0 100 100" aria-hidden="true"></svg>
           <h2 id="winTitle">You traced it!</h2>
           <p id="winSub">Wonderful writing!</p>
+          <p class="win-praise" id="winPraise"></p>
           <div class="controls">
             <button class="btn btn-again" id="againBtn">🔄 Again</button>
             <button class="btn btn-go" id="nextBtn">Next →</button>
@@ -362,6 +408,7 @@
         <li>Trace slowly along the grey path — your line paints in as you go!</li>
         <li>Follow the little arrow, and do the strokes in number order.</li>
         <li>Not sure how? Tap <strong>👀 Show me</strong> to watch first.</li>
+        <li>Traced it? Tap <strong>Again with less help</strong> — the pattern fades away until you can draw it all by yourself!</li>
       </ol>
       <p class="note">This activity is traced by touch or mouse. Grown-ups: tracing with one finger, nice and slow, is great pencil practice.</p>
     </section>
@@ -375,6 +422,15 @@
         var WINDOW = 13;    // how far ahead progress can jump per move
         var START_HIT = 12; // how close to the tip a touch must begin
 
+        // Fading scaffold: each stage shows less of the pattern. TOL and
+        // START_HIT are rewritten from the active stage on every loadGlyph;
+        // stage 3 is looser because a freehand start has no line to hug.
+        var STAGES = [
+          { label: "Trace",       tol: 9,  startHit: 12, guide: 1,    dash: true  },
+          { label: "Fading",      tol: 7,  startHit: 12, guide: 0.22, dash: false },
+          { label: "On your own", tol: 12, startHit: 16, guide: 0,    dash: false }
+        ];
+
         var svg = document.getElementById("board");
         var helper = document.getElementById("helper");
         var srStatus = document.getElementById("srStatus");
@@ -384,6 +440,9 @@
         var winBig = document.getElementById("winBig");
         var winTitle = document.getElementById("winTitle");
         var winSub = document.getElementById("winSub");
+        var winPraise = document.getElementById("winPraise");
+        var winTrace = document.getElementById("winTrace");
+        var stageRow = document.getElementById("stageRow");
         var tabsEl = document.getElementById("tabs");
         var pickerGrid = document.getElementById("pickerGrid");
         var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -397,13 +456,18 @@
         var activePointerId = null;
         var done = {};       // done[setKey] = { glyphIndex: true }
         var current = {};    // remembered glyph index per set
+        var stage = 0;       // index into STAGES for the current glyph
+        var stageOf = {};    // stageOf[setKey] = { glyphIndex: stage } — session memory only
+        var devSum = 0, devN = 0; // deviation accumulators for praise wording
+        var rawTrace = [];   // stage-3 raw pointer polylines for the win self-check
+        var rawStroke = null;
         var demoRaf = 0;
         var demoTimer = 0;
 
         var glyph, strokes, cums, totals;
         var guideEls, paintEls, startG, fingerDot, demoDot;
 
-        SETS.forEach(function (s) { done[s.key] = {}; current[s.key] = 0; });
+        SETS.forEach(function (s) { done[s.key] = {}; current[s.key] = 0; stageOf[s.key] = {}; });
 
         function el(name, attrs) {
           var n = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -439,6 +503,7 @@
         // TOL of the path advance progress, and never backwards.
         function advance(pts, cum, tNow, p) {
           var best = tNow;
+          var bestDev = -1;
           var limit = tNow + WINDOW;
           for (var i = 1; i < pts.length; i++) {
             if (cum[i] < tNow) continue;
@@ -449,10 +514,14 @@
             var u = ((p[0] - ax) * dx + (p[1] - ay) * dy) / len2;
             u = Math.max(0, Math.min(1, u));
             var qx = ax + u * dx, qy = ay + u * dy;
-            if (Math.hypot(p[0] - qx, p[1] - qy) > TOL) continue;
+            var dev = Math.hypot(p[0] - qx, p[1] - qy);
+            if (dev > TOL) continue;
             var pos = cum[i - 1] + u * (cum[i] - cum[i - 1]);
-            if (pos > best && pos <= limit) best = pos;
+            if (pos > best && pos <= limit) { best = pos; bestDev = dev; }
           }
+          // remember how far off-centre the accepted point sat — this only
+          // ever softens or sharpens the praise line, never becomes a score
+          if (bestDev >= 0) { devSum += bestDev; devN++; }
           return best;
         }
 
@@ -477,8 +546,17 @@
           strokes = glyph.s;
           cums = strokes.map(cumLen);
           totals = cums.map(function (c) { return c[c.length - 1]; });
+          // every reload re-reads the glyph's session stage — restart, demo
+          // and picker taps all funnel through here, so this is the one place
+          // the engine's tolerances get set
+          stage = stageOf[set().key][gi] || 0;
+          var cfg = STAGES[stage];
+          TOL = cfg.tol;
+          START_HIT = cfg.startHit;
           sk = 0;
           t = 0;
+          devSum = 0; devN = 0;
+          rawTrace = []; rawStroke = null;
           tracing = false;
           activePointerId = null;
           winOverlay.classList.add("hidden");
@@ -487,12 +565,25 @@
 
           strokes.forEach(function (pts) {
             var g1 = el("path", { d: pathD(pts), "class": "guide" });
+            if (cfg.guide < 1) g1.style.opacity = cfg.guide;
+            if (!cfg.guide) g1.style.display = "none";
             svg.appendChild(g1);
           });
-          strokes.forEach(function (pts) {
+          if (cfg.dash) strokes.forEach(function (pts) {
             var g2 = el("path", { d: pathD(pts), "class": "guide-dash" });
             svg.appendChild(g2);
           });
+          if (!cfg.guide) {
+            // no pattern to hug at stage 3 — a faint box shows where it lives
+            var x0 = 100, y0 = 100, x1 = 0, y1 = 0;
+            strokes.forEach(function (pts) {
+              pts.forEach(function (p) {
+                if (p[0] < x0) x0 = p[0]; if (p[0] > x1) x1 = p[0];
+                if (p[1] < y0) y0 = p[1]; if (p[1] > y1) y1 = p[1];
+              });
+            });
+            svg.appendChild(el("rect", { x: x0 - 4, y: y0 - 4, width: x1 - x0 + 8, height: y1 - y0 + 8, rx: 4, "class": "stage-box" }));
+          }
           strokes.forEach(function (pts, i2) {
             var p = el("path", { d: pathD(pts), "class": "paint" });
             p.style.strokeDasharray = totals[i2];
@@ -513,13 +604,42 @@
           svg.setAttribute("aria-label", "Tracing board showing " + glyphName(glyph));
           glyphChip.textContent = (glyph.e ? glyph.e + " " : "") +
             glyphName(glyph).replace(/^./, function (c) { return c.toUpperCase(); });
-          setHelper("Put your finger on the green dot and trace!", "");
+          setHelper(stage === 2 ? "No line this time — start at the green dot!"
+            : stage === 1 ? "The " + noun() + " is fading — you know the way!"
+            : "Put your finger on the green dot and trace!", "");
           updateMarkers();
+          updateStages();
           updateHud();
         }
 
         function updateHud() {
           strokeChip.textContent = "Stroke " + Math.min(sk + 1, strokes.length) + " of " + strokes.length;
+        }
+
+        // stage chips are deliberately tappable: a grown-up (or a bold kid)
+        // may jump straight to any amount of help — stages are chosen, not
+        // only earned. Built once; only the pressed state ever changes, so
+        // the row's height is identical at every stage.
+        function buildStages() {
+          STAGES.forEach(function (s, i) {
+            var b = document.createElement("button");
+            b.className = "stage-btn";
+            b.setAttribute("aria-pressed", i === stage ? "true" : "false");
+            b.innerHTML = "<span class='dot' aria-hidden='true'></span>" + s.label;
+            b.addEventListener("click", function () {
+              // tapping the current stage mid-trace would wipe progress
+              if (i === stage && winOverlay.classList.contains("hidden")) return;
+              if (busy) cancelDemo();
+              stageOf[set().key][gi] = i;
+              loadGlyph(gi);
+            });
+            stageRow.appendChild(b);
+          });
+        }
+
+        function updateStages() {
+          for (var i = 0; i < stageRow.children.length; i++)
+            stageRow.children[i].setAttribute("aria-pressed", i === stage ? "true" : "false");
         }
 
         function updateMarkers() {
@@ -579,6 +699,7 @@
           svg.setPointerCapture(ev.pointerId);
           activePointerId = ev.pointerId;
           tracing = true;
+          if (stage === 2) { rawStroke = [p]; rawTrace.push(rawStroke); }
           fingerDot.style.display = "";
           fingerDot.setAttribute("cx", tip[0]);
           fingerDot.setAttribute("cy", tip[1]);
@@ -589,6 +710,9 @@
           if (!tracing || ev.pointerId !== activePointerId) return;
           if (sk >= strokes.length) return;
           var p = svgPoint(ev);
+          // the raw (unsnapped) finger path — replayed on the stage-3 win
+          // overlay so the child can compare their line with the real pattern
+          if (stage === 2 && rawStroke) rawStroke.push(p);
           var newT = advance(strokes[sk], cums[sk], t, p);
           if (newT > t) {
             t = newT;
@@ -657,17 +781,52 @@
           tracing = false;
           activePointerId = null;
           fingerDot.style.display = "none";
+          // celebrate "ALL done" only on the win that completes the set —
+          // later re-traces of the last glyph keep their own stage titles
+          var wasAll = set().glyphs.every(function (_, i) { return done[set().key][i]; });
           done[set().key][gi] = true;
           var g = glyph;
           // multi-word names ("Standing Line") don't fit the giant glyph font;
           // named glyphs celebrate with their emoji instead
           winBig.textContent = g.e || g.l;
+          // stage-3 self-check: the child's own line over the true pattern —
+          // a picture to look at together, never a verdict
+          var replay = stage === STAGES.length - 1 && rawTrace.length > 0;
+          winBig.classList.toggle("hidden", replay);
+          winTrace.classList.toggle("hidden", !replay);
+          if (replay) {
+            winTrace.innerHTML = "";
+            strokes.forEach(function (pts) {
+              winTrace.appendChild(el("path", { d: pathD(pts), "class": "guide" }));
+            });
+            rawTrace.forEach(function (pts) {
+              if (pts.length > 1) winTrace.appendChild(el("path", { d: pathD(pts), "class": "own-trace" }));
+            });
+          }
           var all = set().glyphs.every(function (_, i) { return done[set().key][i]; });
-          winTitle.textContent = all ? "🏆 ALL " + set().tab.replace(/^\S+\s*/, "") + " done!" : "🎉 You traced it!";
-          winSub.textContent = all
+          var justCompleted = all && !wasAll;
+          winTitle.textContent = justCompleted ? "🏆 ALL " + set().tab.replace(/^\S+\s*/, "") + " done!"
+            : replay ? "🌟 All by yourself!" : "🎉 You traced it!";
+          winSub.textContent = justCompleted
             ? "You traced every single one. Amazing!"
             : "That is a beautiful " + glyphName(g) + "!";
-          document.getElementById("nextBtn").classList.toggle("hidden", gi === set().glyphs.length - 1);
+          // praise only — fixed thresholds, so the same tracing never reads
+          // as a downgrade just because a later stage tightened TOL
+          var avgDev = devN ? devSum / devN : 0;
+          winPraise.textContent =
+            avgDev <= 4 ? "So smooth! Your finger glided the whole way." :
+            avgDev <= 7.5 ? "Nice steady tracing — what careful fingers!" :
+            "You did it! Lines get smoother every try — tap 👀 Show me to watch one more time.";
+          // stages 1–2 invite a re-trace of the SAME glyph with less help;
+          // only stage 3 moves on to the next glyph
+          var nextBtn = document.getElementById("nextBtn");
+          if (stage < STAGES.length - 1) {
+            nextBtn.textContent = "Again with less help →";
+            nextBtn.classList.remove("hidden");
+          } else {
+            nextBtn.textContent = "Next →";
+            nextBtn.classList.toggle("hidden", gi === set().glyphs.length - 1);
+          }
           winOverlay.classList.remove("hidden");
           srStatus.textContent = "Finished tracing " + glyphName(g) + "!";
           buildPicker();
@@ -798,7 +957,12 @@
           document.getElementById("demoBtn").focus();
         });
         document.getElementById("nextBtn").addEventListener("click", function () {
-          if (gi < set().glyphs.length - 1) {
+          if (stage < STAGES.length - 1) {
+            // "Again with less help" — same glyph, one notch less scaffold
+            stageOf[set().key][gi] = stage + 1;
+            loadGlyph(gi);
+            document.getElementById("demoBtn").focus();
+          } else if (gi < set().glyphs.length - 1) {
             loadGlyph(gi + 1);
             buildPicker();
             document.getElementById("demoBtn").focus();
@@ -806,6 +970,7 @@
         });
 
         buildTabs();
+        buildStages();
         loadGlyph(0);
         buildPicker();
       })();
