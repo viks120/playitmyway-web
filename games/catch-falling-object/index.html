@@ -277,7 +277,7 @@
     <div class="stats">
       <div>Score: <span id="score">0</span></div>
       <div>Level: <span id="level">1</span></div>
-      <div>Best: <span id="best">0</span></div>
+      <div>Best this visit: <span id="best">0</span></div>
     </div>
 
     <div class="game-area" id="gameArea">
@@ -309,7 +309,7 @@
         </div>
         <p>Score: <span id="finalScore">0</span></p>
         <p>Level: <span id="finalLevel">1</span></p>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New High Score!</p>
+        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
         <button class="modal-btn" onclick="closeModal(); startGame();">Play Again</button>
       </div>
     </div>
@@ -376,7 +376,7 @@
       let gameRunning = false;
       let spawnInterval, gameLoop;
       let basketX = 160;
-      let best = parseInt(localStorage.getItem('catchfruit_best')) || 0;
+      let best = 0;
 
       const gameArea = document.getElementById('gameArea');
       const basket = document.getElementById('basket');
@@ -538,7 +538,6 @@
         const isNewBest = score > best;
         if (isNewBest) {
           best = score;
-          localStorage.setItem('catchfruit_best', best);
         }
 
         document.getElementById('finalScore').textContent = score;

@@ -339,7 +339,7 @@
 
     <div class="stats">
       <div>Score: <span id="score">0</span></div>
-      <div>Best: <span id="best">0</span></div>
+      <div>Best this visit: <span id="best">0</span></div>
     </div>
 
     <div class="difficulty-selector">
@@ -380,7 +380,7 @@
         </div>
         <p>You scored <span id="finalScore">0</span> points!</p>
         <p>Sentences correct: <span id="correctCount">0</span>/10</p>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New High Score!</p>
+        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New best this visit!</p>
         <button class="modal-btn" onclick="closeModal()">Play Again</button>
       </div>
     </div>
@@ -467,7 +467,7 @@
       let correctCount = 0;
       let selectedWords = [];
       let hintsUsed = 0;
-      let best = parseInt(localStorage.getItem('sentencebuilder_best')) || 0;
+      let best = 0;
       const totalQuestions = 10;
 
       async function loadSentences() {
@@ -676,7 +676,6 @@
         const isNewBest = score > best;
         if (isNewBest) {
           best = score;
-          localStorage.setItem('sentencebuilder_best', best);
           updateDisplay();
         }
 

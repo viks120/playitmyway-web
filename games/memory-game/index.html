@@ -526,7 +526,7 @@
           <p>Time: <span id="finalTime">0:00</span></p>
           <p>Difficulty: <span id="finalDifficulty">Easy</span></p>
         </div>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best Score!</p>
+        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
         <button class="modal-btn" onclick="closeModalAndRestart()">Play Again</button>
       </div>
     </div>
@@ -628,16 +628,6 @@
         });
       }
 
-      function getHighScore(difficulty) {
-        const key = `memory_highscore_${difficulty}`;
-        return parseInt(localStorage.getItem(key)) || Infinity;
-      }
-
-      function setHighScore(difficulty, moves) {
-        const key = `memory_highscore_${difficulty}`;
-        localStorage.setItem(key, moves);
-      }
-
       function showWinModal(moves, timeElapsed, difficulty) {
         const modal = document.getElementById('winModal');
         document.getElementById('finalMoves').textContent = moves;
@@ -649,10 +639,10 @@
         const stars = getStarRating(moves, difficulty);
         displayStars(stars);
 
-        const highScore = getHighScore(difficulty);
+        const highScore = bestMoves[difficulty];
         const highScoreMsg = document.getElementById('highScoreMsg');
-        if (moves < highScore) {
-          setHighScore(difficulty, moves);
+        if (highScore === 0 || moves < highScore) {
+          bestMoves[difficulty] = moves;
           highScoreMsg.style.display = 'block';
         } else {
           highScoreMsg.style.display = 'none';
@@ -703,6 +693,7 @@
       let startTime = Date.now();
       let timerInterval;
       let currentDifficulty = "easy";
+      let bestMoves = { easy: 0, medium: 0, hard: 0 };
 
       const difficultyConfig = {
         easy: { rows: 2, cols: 2, pairs: 2 },

@@ -570,7 +570,7 @@
           <p>Level: <span id="modalLevel">1</span></p>
           <p>Puzzles Solved: <span id="modalSolved">0</span></p>
         </div>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New High Score!</p>
+        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
         <button class="modal-btn" onclick="closeModal()">Continue</button>
       </div>
     </div>
@@ -660,16 +660,6 @@
         });
       }
 
-      function getHighScore(mode) {
-        const key = `mathpuzzle_highscore_${mode}`;
-        return parseInt(localStorage.getItem(key)) || 0;
-      }
-
-      function setHighScore(mode, score) {
-        const key = `mathpuzzle_highscore_${mode}`;
-        localStorage.setItem(key, score);
-      }
-
       function showMilestoneModal(title) {
         const modal = document.getElementById('milestoneModal');
         document.getElementById('milestoneTitle').textContent = title;
@@ -680,10 +670,9 @@
         const starCount = Math.min(3, level);
         displayStars(starCount);
 
-        const highScore = getHighScore(currentMode);
         const highScoreMsg = document.getElementById('highScoreMsg');
         if (score > highScore) {
-          setHighScore(currentMode, score);
+          highScore = score;
           highScoreMsg.style.display = 'block';
         } else {
           highScoreMsg.style.display = 'none';
@@ -710,6 +699,7 @@
       let level = 1;
       let puzzlesSolved = 0;
       let hintsUsed = 0;
+      let highScore = 0;
 
       const puzzleDatabase = {
         equations: [

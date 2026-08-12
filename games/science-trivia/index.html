@@ -547,7 +547,7 @@
           <p>Level Reached: <span id="modalLevel">1</span></p>
           <p>Questions Answered: <span id="modalQuestions">0</span></p>
         </div>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New High Score!</p>
+        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
         <button class="modal-btn" onclick="closeModal()">Play Again</button>
       </div>
     </div>
@@ -634,19 +634,6 @@
         });
       }
 
-      function getHighScore(category) {
-        const key = `science_highscore_${category}`;
-        return parseInt(localStorage.getItem(key)) || 0;
-      }
-
-      function saveHighScore() {
-        const key = `science_highscore_${currentCategory}`;
-        const highScore = getHighScore(currentCategory);
-        if (score > highScore) {
-          localStorage.setItem(key, score);
-        }
-      }
-
       function showQuizModal() {
         const modal = document.getElementById('quizModal');
         document.getElementById('modalTitle').textContent = '🎊 Quiz Complete!';
@@ -657,9 +644,9 @@
         const starCount = score >= 400 ? 3 : score >= 250 ? 2 : 1;
         displayStars(starCount);
 
-        const highScore = getHighScore(currentCategory);
+        const highScore = quizStartBest;
         const highScoreMsg = document.getElementById('highScoreMsg');
-        if (score > highScore) {
+        if (score > highScore && score > 0) {
           highScoreMsg.style.display = 'block';
         } else {
           highScoreMsg.style.display = 'none';
@@ -686,6 +673,10 @@
       }
       let currentCategory = "chemistry";
       let score = 0;
+      let bestScore = 0;
+      // bestScore syncs to score during play, so the end-of-quiz modal
+      // compares against the best as it stood when this quiz began
+      let quizStartBest = 0;
       let level = 1;
       let questionsAnswered = 0;
       let currentQuestionIndex = 0;
@@ -781,6 +772,7 @@
         currentQuestions = shuffledQuestions;
         currentQuestionIndex = 0;
         questionsAnswered = 0;
+        quizStartBest = bestScore;
         score = 0;
         hintsUsed = 0;
 
@@ -851,7 +843,9 @@
           }
 
           updateStats();
-          saveHighScore();
+          if (score > bestScore) {
+            bestScore = score;
+          }
 
           document.getElementById("feedback").innerHTML = `
                     <div>🎉 Correct! +${points} points</div>
@@ -906,7 +900,9 @@
       }
 
       function endQuiz() {
-        saveHighScore();
+        if (score > bestScore) {
+          bestScore = score;
+        }
         
         // Hide question area
         document.getElementById("questionNumber").style.display = "none";

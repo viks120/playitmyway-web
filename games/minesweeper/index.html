@@ -120,7 +120,7 @@
   <div class="stats">
     <div>💣 Mines: <span id="mineCount">10</span></div>
     <div>⏱️ Time: <span id="timer">0</span>s</div>
-    <div>🏆 Best: <span id="best">-</span>s</div>
+    <div>🏆 Best this visit: <span id="best">-</span>s</div>
   </div>
   <div class="difficulty-selector">
     <button class="diff-btn active" onclick="setDifficulty('easy')">Easy (9×9)</button>
@@ -199,7 +199,7 @@
     let grid = [], rows, cols, mines, revealed = 0, flagged = 0;
     let gameOver = false, firstClick = true, flagMode = false;
     let timerInterval, seconds = 0;
-    let best = JSON.parse(localStorage.getItem('minesweeper_best') || '{}');
+    let best = {};
 
     function setDifficulty(d) {
       difficulty = d;
@@ -328,7 +328,6 @@
         playSound('win'); createConfetti();
         if (!best[difficulty] || seconds < best[difficulty]) {
           best[difficulty] = seconds;
-          localStorage.setItem('minesweeper_best', JSON.stringify(best));
           updateBest();
         }
         showModal(true);

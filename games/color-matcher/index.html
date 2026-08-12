@@ -570,7 +570,7 @@
           <p>Level: <span id="modalLevel">1</span></p>
           <p>Accuracy: <span id="modalAccuracy">0</span>%</p>
         </div>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New High Score!</p>
+        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
         <button class="modal-btn" onclick="closeModal()">Continue</button>
       </div>
     </div>
@@ -658,14 +658,6 @@
         });
       }
 
-      function getHighScore() {
-        return parseInt(localStorage.getItem('color_highscore')) || 0;
-      }
-
-      function setHighScore(score) {
-        localStorage.setItem('color_highscore', score);
-      }
-
       function showLevelModal(accuracy) {
         const modal = document.getElementById('levelModal');
         document.getElementById('modalTitle').textContent = `🎊 Level ${level}!`;
@@ -676,10 +668,9 @@
         const starCount = accuracy >= 95 ? 3 : accuracy >= 80 ? 2 : 1;
         displayStars(starCount);
 
-        const highScore = getHighScore();
         const highScoreMsg = document.getElementById('highScoreMsg');
         if (score > highScore) {
-          setHighScore(score);
+          highScore = score;
           highScoreMsg.style.display = 'block';
         } else {
           highScoreMsg.style.display = 'none';
@@ -704,6 +695,7 @@
       let playerColor = { r: 128, g: 128, b: 128 };
       let score = 0;
       let level = 1;
+      let highScore = 0;
 
       const redSlider = document.getElementById("redSlider");
       const greenSlider = document.getElementById("greenSlider");

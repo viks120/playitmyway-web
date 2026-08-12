@@ -402,7 +402,7 @@
         <div class="score-value" id="score">0</div>
       </div>
       <div class="score-box">
-        <div class="score-label">Best</div>
+        <div class="score-label">Best this visit</div>
         <div class="score-value" id="best">0</div>
       </div>
     </div>
@@ -427,7 +427,7 @@
         <p id="gameOverMessage">
           Your final score: <span id="finalScore">0</span>
         </p>
-        <p id="highScoreMsg" class="high-score-msg" style="display: none;">🏆 New High Score!</p>
+        <p id="highScoreMsg" class="high-score-msg" style="display: none;">🏆 New best this visit!</p>
         <button class="btn" onclick="newGame()">Play Again</button>
       </div>
     </div>
@@ -524,7 +524,8 @@
             .fill()
             .map(() => Array(4).fill(0));
           this.score = 0;
-          this.best = parseInt(localStorage.getItem("2048-best")) || 0;
+          this.best = 0;
+          this.newBestThisGame = false;
           this.gameOver = false;
           this.eventListenersAdded = false;
           this.init();
@@ -820,7 +821,9 @@
         updateBest() {
           if (this.score > this.best) {
             this.best = this.score;
-            localStorage.setItem("2048-best", this.best);
+            // remembered so the game-over modal can celebrate after
+            // best has already been synced to the final score
+            this.newBestThisGame = true;
           }
           document.getElementById("best").textContent = this.best;
         }
@@ -872,10 +875,10 @@
           
           displayStars(this.score);
           
-          // Check for new high score (must be strictly greater than previous best)
-          const previousBest = parseInt(localStorage.getItem("2048-best")) || 0;
+          // updateBest() has already synced best to the final score, so
+          // compare via the flag it sets, not the (now equal) values
           const highScoreMsg = document.getElementById("highScoreMsg");
-          if (this.score > previousBest && this.score > 0) {
+          if (this.newBestThisGame && this.score > 0) {
             highScoreMsg.style.display = "block";
           } else {
             highScoreMsg.style.display = "none";
@@ -896,6 +899,7 @@
             .fill()
             .map(() => Array(4).fill(0));
           this.score = 0;
+          this.newBestThisGame = false;
           this.gameOver = false;
           document.getElementById("gameOver").classList.remove("show");
           this.init();
