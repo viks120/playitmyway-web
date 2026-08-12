@@ -590,7 +590,7 @@
           <p>Words Solved: <span id="modalSolved">0</span></p>
           <p>Best Streak: <span id="modalStreak">0</span></p>
         </div>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New High Score!</p>
+        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
         <button class="modal-btn" onclick="closeModal()">Continue</button>
       </div>
     </div>
@@ -685,16 +685,6 @@
         });
       }
 
-      function getHighScore(difficulty) {
-        const key = `wordscramble_highscore_${difficulty}`;
-        return parseInt(localStorage.getItem(key)) || 0;
-      }
-
-      function setHighScore(difficulty, score) {
-        const key = `wordscramble_highscore_${difficulty}`;
-        localStorage.setItem(key, score);
-      }
-
       function showLevelModal() {
         const modal = document.getElementById('levelModal');
         document.getElementById('modalTitle').textContent = `🎊 Level ${level}!`;
@@ -706,10 +696,9 @@
         const starCount = Math.min(3, level);
         displayStars(starCount);
 
-        const highScore = getHighScore(currentDifficulty);
         const highScoreMsg = document.getElementById('highScoreMsg');
-        if (score > highScore) {
-          setHighScore(currentDifficulty, score);
+        if (score > bestScore) {
+          bestScore = score;
           highScoreMsg.style.display = 'block';
         } else {
           highScoreMsg.style.display = 'none';
@@ -740,6 +729,7 @@
       let hintsUsed = 0;
       let streak = 0;
       let bestStreak = 0;
+      let bestScore = 0;
 
       const wordDatabase = {
         easy: [

@@ -186,10 +186,6 @@
         background: linear-gradient(45deg, #ff6b6b, #ee5a52);
       }
 
-      .btn.save {
-        background: linear-gradient(45deg, #4ecdc4, #44a08d);
-      }
-
       .back-link {
         position: absolute;
         top: 20px;
@@ -461,7 +457,6 @@
 
       <div class="controls">
         <button class="btn clear" onclick="clearCanvas()">Clear Canvas</button>
-        <button class="btn save" onclick="saveDrawing()">Save Drawing</button>
         <button class="btn" onclick="downloadDrawing()">Download</button>
       </div>
     </div>
@@ -485,6 +480,22 @@
           window.innerHeight * 0.5
         );
 
+        // No-op if the canvas pixel dimensions are unchanged
+        const targetWidth = Math.floor(containerWidth);
+        const targetHeight = Math.floor(containerHeight);
+        if (canvas.width === targetWidth && canvas.height === targetHeight) {
+          return;
+        }
+
+        // Preserve the current artwork before resizing
+        let snapshot = null;
+        if (canvas.width > 0 && canvas.height > 0) {
+          snapshot = document.createElement("canvas");
+          snapshot.width = canvas.width;
+          snapshot.height = canvas.height;
+          snapshot.getContext("2d").drawImage(canvas, 0, 0);
+        }
+
         canvas.width = containerWidth;
         canvas.height = containerHeight;
 
@@ -495,6 +506,19 @@
         // Reinitialize canvas with white background
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the preserved artwork back at a uniform scale, centred —
+        // stretching to fill would distort the drawing when rotation
+        // changes the canvas aspect ratio
+        if (snapshot) {
+          const scale = Math.min(
+            canvas.width / snapshot.width,
+            canvas.height / snapshot.height
+          );
+          const w = snapshot.width * scale;
+          const h = snapshot.height * scale;
+          ctx.drawImage(snapshot, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+        }
       }
 
       // Initialize canvas
@@ -691,23 +715,6 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
-      function saveDrawing() {
-        const dataURL = canvas.toDataURL("image/png");
-        localStorage.setItem("savedDrawing", dataURL);
-        alert("Drawing saved! You can load it later.");
-      }
-
-      function loadDrawing() {
-        const savedDrawing = localStorage.getItem("savedDrawing");
-        if (savedDrawing) {
-          const img = new Image();
-          img.onload = () => {
-            ctx.drawImage(img, 0, 0);
-          };
-          img.src = savedDrawing;
-        }
-      }
-
       function downloadDrawing() {
         try {
           // Create canvas data URL
@@ -808,13 +815,6 @@
 
       // Initialize
       updateBrushPreview();
-
-      // Load saved drawing if exists
-      if (localStorage.getItem("savedDrawing")) {
-        if (confirm("Load your previous drawing?")) {
-          loadDrawing();
-        }
-      }
     </script>
   </body>
 </html>

@@ -366,7 +366,7 @@
 
     <div class="stats">
       <div>Score: <span id="score">0</span></div>
-      <div>Best: <span id="best">0</span></div>
+      <div>Best this visit: <span id="best">0</span></div>
     </div>
 
     <div class="mode-selector">
@@ -406,7 +406,7 @@
           <span class="star">★</span>
         </div>
         <p>You tapped <span id="finalScore">0</span> animals!</p>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New High Score!</p>
+        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New best this visit!</p>
         <button class="modal-btn" onclick="closeModal()">Play Again</button>
       </div>
     </div>
@@ -494,7 +494,7 @@
       let timerInterval = null;
       let timeLeft = 120; // 2 minutes in seconds
       const totalTime = 120;
-      let best = parseInt(localStorage.getItem('whackamole_best')) || 0;
+      let best = 0;
 
       const moleGrid = document.getElementById('moleGrid');
       const holes = [];
@@ -669,7 +669,6 @@
         const isNewBest = score > best;
         if (isNewBest) {
           best = score;
-          localStorage.setItem('whackamole_best', best);
           updateDisplay();
         }
         

@@ -129,7 +129,7 @@
   <div class="stats">
     <div>⏱️ Time: <span id="timer">0:00</span></div>
     <div>❌ Errors: <span id="errors">0</span>/3</div>
-    <div>🏆 Best: <span id="best">-</span></div>
+    <div>🏆 Best this visit: <span id="best">-</span></div>
   </div>
   <div class="difficulty-selector">
     <button class="diff-btn active" onclick="setDifficulty('easy')">🌱 Easy</button>
@@ -206,7 +206,7 @@
     let board = [], solution = [], given = [];
     let selectedCell = null, errors = 0, gameOver = false;
     let timerInterval, seconds = 0;
-    let best = JSON.parse(localStorage.getItem('sudoku_best') || '{}');
+    let best = {};
 
     const removeCounts = { easy: 35, medium: 45, hard: 55 };
 
@@ -470,7 +470,6 @@
       createConfetti();
       if (!best[difficulty] || seconds < best[difficulty]) {
         best[difficulty] = seconds;
-        localStorage.setItem('sudoku_best', JSON.stringify(best));
         updateBest();
       }
       showModal(true);

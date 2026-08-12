@@ -323,6 +323,7 @@
       <div class="board" id="board"></div>
       <div class="controls">
         <button class="btn" onclick="resetGame()">New Game</button>
+        <button class="btn" onclick="resetScores()">Reset Scores</button>
       </div>
     </div>
 
@@ -544,16 +545,9 @@
         updateStatus();
       }
 
-      // Load scores from localStorage
-      const saved = localStorage.getItem('tictactoe_scores');
-      if (saved) scores = JSON.parse(saved);
-
-      // Save scores on change
-      function updateScores() {
-        document.getElementById('xWins').textContent = scores.X;
-        document.getElementById('oWins').textContent = scores.O;
-        document.getElementById('draws').textContent = scores.draws;
-        localStorage.setItem('tictactoe_scores', JSON.stringify(scores));
+      function resetScores() {
+        scores = { X: 0, O: 0, draws: 0 };
+        updateScores();
       }
 
       createBoard();

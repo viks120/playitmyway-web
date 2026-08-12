@@ -436,12 +436,6 @@
         font-size: 1.1em;
       }
 
-      .modal .high-score {
-        color: #ff6b6b;
-        font-weight: bold;
-        font-size: 1.2em;
-      }
-
       .modal-btn {
         background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
         color: white;
@@ -577,7 +571,6 @@
           <p>Level: <span id="modalLevel">1</span></p>
           <p>Countries Found: <span id="modalFound">0</span></p>
         </div>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New High Score!</p>
         <button class="modal-btn" onclick="closeModal()">Continue</button>
       </div>
     </div>
@@ -664,19 +657,6 @@
         });
       }
 
-      function getHighScore(mode) {
-        const key = `geography_highscore_${mode}`;
-        return parseInt(localStorage.getItem(key)) || 0;
-      }
-
-      function saveHighScore() {
-        const key = `geography_highscore_${currentMode}`;
-        const highScore = getHighScore(currentMode);
-        if (score > highScore) {
-          localStorage.setItem(key, score);
-        }
-      }
-
       function showLevelModal() {
         const modal = document.getElementById('levelModal');
         document.getElementById('modalTitle').textContent = `🎊 Level ${level}!`;
@@ -686,14 +666,6 @@
 
         const starCount = Math.min(3, level);
         displayStars(starCount);
-
-        const highScore = getHighScore(currentMode);
-        const highScoreMsg = document.getElementById('highScoreMsg');
-        if (score > highScore) {
-          highScoreMsg.style.display = 'block';
-        } else {
-          highScoreMsg.style.display = 'none';
-        }
 
         modal.classList.add('show');
         playSound('levelUp');
@@ -1035,7 +1007,6 @@
           }
 
           updateStats();
-          saveHighScore();
 
           document.getElementById(
             "feedback"

@@ -587,7 +587,7 @@
           <p>Best Streak: <span id="finalStreak">0</span></p>
           <p>Mode: <span id="finalMode">Counting</span></p>
         </div>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New High Score!</p>
+        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
         <button class="modal-btn" onclick="closeModalAndRestart()">Play Again</button>
       </div>
     </div>
@@ -682,16 +682,6 @@
         });
       }
 
-      function getHighScore(mode) {
-        const key = `counting_highscore_${mode}`;
-        return parseInt(localStorage.getItem(key)) || 0;
-      }
-
-      function setHighScore(mode, score) {
-        const key = `counting_highscore_${mode}`;
-        localStorage.setItem(key, score);
-      }
-
       function showEndModal() {
         const modal = document.getElementById('endModal');
         document.getElementById('finalScore').textContent = score;
@@ -702,10 +692,9 @@
         const stars = getStarRating(score);
         displayStars(stars);
 
-        const highScore = getHighScore(currentMode);
         const highScoreMsg = document.getElementById('highScoreMsg');
         if (score > highScore) {
-          setHighScore(currentMode, score);
+          highScore = score;
           highScoreMsg.style.display = 'block';
         } else {
           highScoreMsg.style.display = 'none';
@@ -738,6 +727,7 @@
       let selectedObjects = [];
       let streak = 0;
       let bestStreak = 0;
+      let highScore = 0;
 
       const objects = [
         "🍎",
