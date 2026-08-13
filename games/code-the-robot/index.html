@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#7c3aed" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Code the Robot – Free Coding Game for Kids | Play It My Way</title>
+    <meta name="description" content="Tap arrow tiles to program a robot through the maze! 10 levels teach kids ages 7+ real coding skills: plan, run, spot the bug, fix it. No ads, no download." />
+    <meta name="keywords" content="coding game for kids, robot programming game for kids, sequencing game, learn to code for kids, free coding puzzle game" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Code the Robot – Free Coding Game for Kids" />
+    <meta property="og:description" content="Build a program from arrow tiles and watch the robot follow it through the maze. 10 free levels for ages 7+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/code-the-robot/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Code the Robot – Free Coding Game for Kids" />
+    <meta name="twitter:description" content="Program a robot through the maze with arrow tiles! 10 free levels for ages 7+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/code-the-robot/" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <style>
+      :root {
+        --bg: var(--color-bg);
+        --surface: var(--color-surface);
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --band: var(--color-violet);
+        --band-tint: var(--color-violet-tint);
+        --coral-deep: var(--color-primary-deep);
+        --teal: var(--color-teal);
+        --teal-tint: var(--color-teal-tint);
+        --amber: var(--color-amber);
+        --amber-tint: var(--color-amber-tint);
+        --green: var(--color-green);
+        --green-tint: var(--color-green-tint);
+        --crash: #b91c1c;
+        --crash-tint: #fee2e2;
+        --line-idle: #ded4c7;
+        --font: var(--font-display);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body {
+        background: var(--bg);
+        /* an accidental pull-to-refresh would wipe the child's program */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: var(--font); }
+
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 9px 14px; border-radius: var(--radius-pill);
+        background: var(--band-tint);
+        align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center;
+      }
+
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 {
+        font-size: clamp(26px, 7vw, 34px); font-weight: 600; margin: 0 0 4px;
+        text-wrap: balance;
+      }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        width: 100%; max-width: 520px;
+        padding: 14px 14px 18px;
+      }
+
+      .level-row {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 8px; margin-bottom: 4px; flex-wrap: wrap;
+      }
+      .level-name {
+        font-weight: 600; font-size: 20px; margin: 0;
+        display: flex; align-items: center; gap: 8px;
+      }
+      .level-chip {
+        background: var(--band-tint); color: var(--band);
+        font-weight: 600; font-size: 14px;
+        padding: 5px 12px; border-radius: var(--radius-pill);
+        white-space: nowrap;
+      }
+      .meta-row {
+        display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+        margin-bottom: 6px;
+      }
+      .meta-chip {
+        font-weight: 600; font-size: 13.5px;
+        padding: 5px 12px; border-radius: var(--radius-pill);
+        font-variant-numeric: tabular-nums; white-space: nowrap;
+      }
+      .par-chip { background: var(--teal-tint); color: var(--teal); }
+      .steps-chip { background: var(--amber-tint); color: var(--amber); }
+      .best-chip { background: var(--green-tint); color: var(--green); }
+
+      .helper {
+        min-height: 44px; text-align: center; color: var(--ink-soft);
+        font-size: 16px; margin: 2px 0 8px;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .helper.excited { color: var(--teal); font-weight: 600; }
+      .helper.warn { color: var(--amber); font-weight: 600; }
+      .helper.bad { color: var(--crash); font-weight: 600; }
+
+      /* ---- maze board ---- */
+      .board-wrap {
+        position: relative;
+        width: 100%; max-width: 420px;
+        margin: 0 auto;
+      }
+      .board {
+        display: grid;
+        width: 100%; aspect-ratio: 1 / 1;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        background: #f7f0e5;
+        user-select: none; -webkit-user-select: none;
+      }
+      .cell {
+        display: flex; align-items: center; justify-content: center;
+        background: #faf5ec;
+        /* grid lines without gaps, so the robot's percent transform
+           lands exactly on cell centres */
+        box-shadow: inset 0 0 0 1.5px #f1e7d8;
+        line-height: 1;
+      }
+      .cell.alt { background: #f4ecdf; }
+      .cell.wall { background: var(--amber-tint); }
+      .cell.goal { background: var(--green-tint); }
+      .cell.start { background: var(--band-tint); }
+
+      .robot {
+        position: absolute; top: 0; left: 0;
+        display: flex; align-items: center; justify-content: center;
+        pointer-events: none; z-index: 2;
+        transition: transform var(--ease-move);
+        line-height: 1;
+      }
+      .robot-inner { display: inline-block; }
+      .robot-inner.bump-u { animation: bumpU 0.55s ease; }
+      .robot-inner.bump-d { animation: bumpD 0.55s ease; }
+      .robot-inner.bump-l { animation: bumpL 0.55s ease; }
+      .robot-inner.bump-r { animation: bumpR 0.55s ease; }
+      @keyframes bumpU {
+        0%, 100% { transform: none; }
+        30% { transform: translateY(-30%); }
+        55% { transform: translateY(6%) rotate(-7deg); }
+        78% { transform: translateY(-3%) rotate(5deg); }
+      }
+      @keyframes bumpD {
+        0%, 100% { transform: none; }
+        30% { transform: translateY(30%); }
+        55% { transform: translateY(-6%) rotate(7deg); }
+        78% { transform: translateY(3%) rotate(-5deg); }
+      }
+      @keyframes bumpL {
+        0%, 100% { transform: none; }
+        30% { transform: translateX(-30%); }
+        55% { transform: translateX(6%) rotate(7deg); }
+        78% { transform: translateX(-3%) rotate(-5deg); }
+      }
+      @keyframes bumpR {
+        0%, 100% { transform: none; }
+        30% { transform: translateX(30%); }
+        55% { transform: translateX(-6%) rotate(-7deg); }
+        78% { transform: translateX(3%) rotate(5deg); }
+      }
+      .robot-inner.cheer { animation: cheer 0.7s ease; }
+      @keyframes cheer {
+        0%, 100% { transform: none; }
+        30% { transform: scale(1.3) rotate(-8deg); }
+        60% { transform: scale(1.15) rotate(8deg); }
+      }
+
+      /* ---- program strip ---- */
+      .strip-label {
+        font-size: 14.5px; font-weight: 600; color: var(--ink-soft);
+        margin: 14px 0 6px; text-align: center;
+      }
+      .strip {
+        display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+        min-height: 50px;
+      }
+      .tile {
+        position: relative;
+        width: 48px; height: 48px;
+        border: 2px solid var(--band); background: var(--band-tint);
+        border-radius: 10px; cursor: pointer;
+        font-size: 21px; padding: 0;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: transform 120ms ease, background 150ms ease;
+      }
+      .tile:hover { transform: translateY(-2px); }
+      .tile .num {
+        position: absolute; top: 1px; left: 4px;
+        font-size: 10.5px; font-weight: 600; color: var(--band);
+        font-variant-numeric: tabular-nums;
+      }
+      .tile.current {
+        background: var(--band); border-color: var(--band);
+        transform: scale(1.1);
+      }
+      .tile.current .num { color: #fff; }
+      .tile.crashed {
+        background: var(--crash-tint); border-color: var(--crash);
+        animation: crashFlash 0.5s ease 3;
+      }
+      .tile.crashed .num { color: var(--crash); }
+      @keyframes crashFlash { 50% { background: #fca5a5; transform: scale(1.12); } }
+      .slot {
+        width: 48px; height: 48px;
+        border: 2px dashed var(--line-idle); border-radius: 10px;
+      }
+
+      /* ---- command pad ---- */
+      .pad {
+        display: flex; gap: 8px; justify-content: center;
+        margin-top: 14px; flex-wrap: wrap;
+      }
+      .pad-btn {
+        width: 58px; height: 58px;
+        border: none; border-radius: var(--radius-md);
+        background: var(--band-tint); color: var(--band);
+        font-size: 26px; cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: transform 120ms ease, box-shadow 150ms ease;
+        box-shadow: var(--shadow-rest);
+      }
+      .pad-btn:hover { transform: translateY(-2px); }
+      .pad-btn:active { transform: translateY(0); }
+      .pad-btn.erase { background: var(--amber-tint); color: var(--amber); font-size: 23px; }
+
+      .controls {
+        display: flex; gap: 10px; justify-content: center;
+        margin-top: 14px; flex-wrap: wrap;
+      }
+      .btn {
+        border: none; cursor: pointer; font-weight: 600; font-size: 16px;
+        padding: 12px 18px; border-radius: var(--radius-pill);
+        min-height: 48px; transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn:active { transform: translateY(0); }
+      .btn-run { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
+      .btn-soft { background: var(--band-tint); color: var(--band); }
+      /* box-shadow, not outline, so the :focus-visible ring stays visible */
+      .btn[aria-pressed="true"] { box-shadow: inset 0 0 0 2.5px var(--band); }
+
+      .win-overlay {
+        position: absolute; inset: 0; border-radius: var(--radius-md);
+        background: rgba(255, 253, 249, 0.95);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 8px; text-align: center; padding: 20px; z-index: 3;
+        animation: fadeIn 300ms ease;
+      }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      .win-stars { font-size: clamp(30px, 9vw, 44px); letter-spacing: 4px; }
+      .win-overlay h2 { margin: 0; font-size: clamp(24px, 6vw, 32px); color: var(--green); }
+      .win-overlay p { margin: 0; color: var(--ink-soft); font-size: 16.5px; }
+      .btn-next { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
+      .btn-again { background: var(--green-tint); color: var(--green); }
+      .hidden { display: none !important; }
+
+      .picker { width: 100%; max-width: 520px; margin-top: 18px; }
+      .picker h2 { font-size: 19px; margin: 0 0 8px; }
+      .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+      .lvl-chip {
+        border: 2px solid var(--line-idle); background: var(--surface);
+        color: var(--ink); cursor: pointer;
+        border-radius: var(--radius-md); padding: 7px 10px;
+        font-size: 15px; font-weight: 600; min-width: 62px; min-height: 48px;
+        display: inline-flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 1px;
+        transition: transform 150ms ease, border-color 150ms ease;
+      }
+      .lvl-chip:hover { transform: translateY(-2px); }
+      .lvl-chip.active { border-color: var(--band); background: var(--band-tint); color: var(--band); }
+      .lvl-chip .stars { font-size: 10.5px; letter-spacing: 1px; color: var(--amber); }
+
+      .how-to {
+        width: 100%; max-width: 520px; margin-top: 18px;
+        background: var(--surface); border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest); padding: 16px 18px;
+      }
+      .how-to h2 { font-size: 19px; margin: 0 0 8px; }
+      .how-to ol { margin: 0; padding-left: 22px; color: var(--ink-soft); font-size: 16px; line-height: 1.65; }
+      .how-to li::marker { color: var(--band); font-weight: 600; }
+      .how-to .kbd-note { margin: 10px 0 0; color: var(--ink-soft); font-size: 14.5px; }
+      kbd {
+        font-family: inherit; font-size: 13px; font-weight: 600;
+        background: var(--band-tint); color: var(--band);
+        border-radius: 6px; padding: 2px 7px;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .confetti-bit {
+        position: fixed; top: -14px; width: 10px; height: 14px;
+        border-radius: 3px; pointer-events: none; z-index: 50;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall {
+        to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .confetti-bit { display: none; }
+        /* the crash marker must not depend on the flash animation */
+        .tile.crashed { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🤖 Code the Robot</h1>
+      <p>Build a program from arrow tiles — then run it and watch your robot go!</p>
+    </header>
+
+    <main class="card">
+      <div class="level-row">
+        <span class="level-chip" id="levelChip">Level 1 of 10</span>
+        <h2 class="level-name" id="levelName"><span aria-hidden="true">👣</span> First Steps</h2>
+      </div>
+      <div class="meta-row">
+        <span class="meta-chip par-chip" id="parChip">🎯 Best path: 2</span>
+        <span class="meta-chip steps-chip" id="stepsChip">0 / 12 steps</span>
+        <span class="meta-chip best-chip" id="bestChip">Best this visit: —</span>
+      </div>
+
+      <p class="helper" id="helper" aria-live="polite">Tap arrows to build a program, then press ▶ Run!</p>
+      <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
+
+      <div class="board-wrap" id="boardWrap">
+        <div class="board" id="board" aria-hidden="true"></div>
+        <div class="robot" id="robot" aria-hidden="true"><span class="robot-inner" id="robotInner">🤖</span></div>
+        <div class="win-overlay hidden" id="winOverlay" role="dialog" aria-label="Level complete">
+          <div class="win-stars" id="winStars" aria-hidden="true">⭐⭐⭐</div>
+          <h2 id="winTitle">🎉 You did it!</h2>
+          <p id="winSub">Your program worked!</p>
+          <div class="controls">
+            <button class="btn btn-again" id="againBtn">🔄 Try again</button>
+            <button class="btn btn-next" id="nextBtn">Next level →</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="strip-label" id="stripLabel">Your program — tap a tile to remove it</p>
+      <div class="strip" id="strip" aria-label="Program steps"></div>
+
+      <div class="pad" role="group" aria-label="Add a move">
+        <button class="pad-btn" data-dir="U" aria-label="Add move up">⬆️</button>
+        <button class="pad-btn" data-dir="D" aria-label="Add move down">⬇️</button>
+        <button class="pad-btn" data-dir="L" aria-label="Add move left">⬅️</button>
+        <button class="pad-btn" data-dir="R" aria-label="Add move right">➡️</button>
+        <button class="pad-btn erase" id="eraseBtn" aria-label="Remove last step">⌫</button>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-run" id="runBtn">▶ Run</button>
+        <button class="btn btn-soft" id="stepBtn">⏭ Step</button>
+        <button class="btn btn-soft" id="resetBtn">🔄 Reset</button>
+        <button class="btn btn-soft" id="muteBtn" aria-pressed="false">🔊 Sound on</button>
+      </div>
+    </main>
+
+    <nav class="picker" aria-label="Choose a level">
+      <h2>🗺️ Pick a level</h2>
+      <div class="chip-grid" id="pickerGrid"></div>
+    </nav>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Tap the arrow tiles ⬆️⬇️⬅️➡️ to build a program — up to <strong>12 steps</strong>.</li>
+        <li>Press <strong>▶ Run</strong> and watch the robot follow your steps to the ⭐.</li>
+        <li>Bumped into a wall? 🧱 No problem — the step that went wrong <strong>stays highlighted</strong>. Tap it to remove it, fix your program, and run again!</li>
+        <li>Use <strong>⏭ Step</strong> to walk through your program one move at a time.</li>
+        <li>Match the 🎯 best path for <strong>3 stars</strong>. Nothing is saved — stars reset when you leave.</li>
+      </ol>
+      <p class="kbd-note">Keyboard: <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> add steps, <kbd>Backspace</kbd> removes the last one, <kbd>Enter</kbd> runs.</p>
+    </section>
+
+    <script>
+    (function () {
+      "use strict";
+      var LEVELS = [{"n":"First Steps","e":"👣","s":5,"w":[],"r":[1,2],"g":[3,2],"p":2},{"n":"Blast Off","e":"🚀","s":5,"w":[],"r":[2,4],"g":[2,1],"p":3},{"n":"Turn the Corner","e":"🐢","s":5,"w":[[2,1],[1,2]],"r":[1,4],"g":[3,2],"p":4},{"n":"Around the Rocks","e":"🪨","s":5,"w":[[3,3],[2,4]],"r":[4,4],"g":[1,2],"p":5},{"n":"Zig and Zag","e":"⚡","s":6,"w":[[1,2],[0,3],[3,4]],"r":[0,4],"g":[4,2],"p":6},{"n":"The Corridor","e":"🚪","s":6,"w":[[1,4],[4,4],[5,4],[2,5]],"r":[5,5],"g":[0,3],"p":7},{"n":"Over the Wall","e":"🧗","s":7,"w":[[3,3],[3,4],[3,5],[3,6]],"r":[2,5],"g":[4,5],"p":8},{"n":"The Big Detour","e":"🗺️","s":7,"w":[[2,3],[3,3],[4,3],[5,3],[6,3],[5,1],[5,5]],"r":[3,6],"g":[3,0],"p":10},{"n":"The Staircase","e":"🪜","s":7,"w":[[5,0],[5,1],[3,2],[2,3],[3,3],[6,3],[1,4],[4,5]],"r":[6,0],"g":[1,6],"p":11},{"n":"The Snail Shell","e":"🐌","s":7,"w":[[1,1],[2,1],[3,1],[4,1],[5,1],[1,2],[1,3],[1,4],[1,5],[5,2],[5,3],[3,4],[4,4]],"r":[0,0],"g":[3,3],"p":12}];
+
+      var CAP = 12;
+      var DIRS = {
+        U: { x: 0, y: -1, e: "⬆️", name: "up" },
+        D: { x: 0, y: 1, e: "⬇️", name: "down" },
+        L: { x: -1, y: 0, e: "⬅️", name: "left" },
+        R: { x: 1, y: 0, e: "➡️", name: "right" }
+      };
+
+      var board = document.getElementById("board");
+      var boardWrap = document.getElementById("boardWrap");
+      var robot = document.getElementById("robot");
+      var robotInner = document.getElementById("robotInner");
+      var strip = document.getElementById("strip");
+      var helper = document.getElementById("helper");
+      var srStatus = document.getElementById("srStatus");
+      var levelChip = document.getElementById("levelChip");
+      var levelName = document.getElementById("levelName");
+      var parChip = document.getElementById("parChip");
+      var stepsChip = document.getElementById("stepsChip");
+      var bestChip = document.getElementById("bestChip");
+      var winOverlay = document.getElementById("winOverlay");
+      var winStars = document.getElementById("winStars");
+      var winTitle = document.getElementById("winTitle");
+      var winSub = document.getElementById("winSub");
+      var pickerGrid = document.getElementById("pickerGrid");
+      var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      // ---------- state (in memory only — nothing is ever stored) ----------
+      var li = 0;                 // current level index
+      var lvl = LEVELS[0];
+      var program = [];           // array of "U" | "D" | "L" | "R"
+      var pos = { x: 0, y: 0 };   // robot position
+      var pc = 0;                 // next instruction to execute
+      var running = false;        // auto-run in progress
+      var tracing = false;        // mid step-by-step trace
+      var runTimer = 0;
+      var bumpTimer = 0;
+      var best = {};              // session-only: levelIndex -> best stars
+      var wallSet = {};           // "x,y" -> true for current level
+
+      function key(x, y) { return x + "," + y; }
+      function isWall(x, y) { return !!wallSet[key(x, y)]; }
+      function inBounds(x, y) { return x >= 0 && y >= 0 && x < lvl.s && y < lvl.s; }
+      function cellName(x, y) { return "row " + (y + 1) + ", column " + (x + 1); }
+
+      // ---------- sound ----------
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      var audioCtx = null;
+      var soundOn = true;
+      function tone(freq, when, dur, gainVal, type) {
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = type || "sine";
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + when);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime + when);
+        gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + when + dur);
+        osc.start(audioCtx.currentTime + when);
+        osc.stop(audioCtx.currentTime + when + dur);
+      }
+      function playSound(kind) {
+        if (!soundOn || !AudioCtx) return;
+        try {
+          if (!audioCtx) audioCtx = new AudioCtx();
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          if (kind === "tapU") tone(660, 0, 0.09, 0.07);
+          else if (kind === "tapD") tone(440, 0, 0.09, 0.07);
+          else if (kind === "tapL") tone(523, 0, 0.09, 0.07);
+          else if (kind === "tapR") tone(587, 0, 0.09, 0.07);
+          else if (kind === "del") tone(330, 0, 0.08, 0.06);
+          else if (kind === "step") tone(500, 0, 0.06, 0.045, "triangle");
+          else if (kind === "crash") {
+            // soft, kind "hmm" — never harsh
+            tone(294, 0, 0.14, 0.06);
+            tone(247, 0.13, 0.22, 0.05);
+          } else if (kind === "win") {
+            [523, 659, 784, 1047].forEach(function (f, i) {
+              tone(f, i * 0.13, 0.28, 0.11);
+            });
+          } else if (kind === "click") tone(600, 0, 0.06, 0.05);
+        } catch (e) { /* audio is never allowed to break the game */ }
+      }
+
+      // ---------- helpers ----------
+      function setHelper(msg, mood) {
+        helper.textContent = msg;
+        helper.className = "helper" + (mood ? " " + mood : "");
+      }
+      function announce(msg) { srStatus.textContent = msg; }
+
+      // ---------- rendering ----------
+      function buildBoard() {
+        board.innerHTML = "";
+        board.style.gridTemplateColumns = "repeat(" + lvl.s + ", 1fr)";
+        board.style.gridTemplateRows = "repeat(" + lvl.s + ", 1fr)";
+        var fontFor = { 5: "clamp(24px, 11vw, 54px)", 6: "clamp(20px, 9vw, 44px)", 7: "clamp(17px, 7.6vw, 38px)" };
+        boardWrap.style.fontSize = fontFor[lvl.s] || fontFor[7];
+        wallSet = {};
+        lvl.w.forEach(function (wc) { wallSet[key(wc[0], wc[1])] = true; });
+        for (var y = 0; y < lvl.s; y++) {
+          for (var x = 0; x < lvl.s; x++) {
+            var c = document.createElement("div");
+            c.className = "cell" + ((x + y) % 2 ? " alt" : "");
+            if (isWall(x, y)) { c.classList.add("wall"); c.textContent = "🧱"; }
+            else if (x === lvl.g[0] && y === lvl.g[1]) { c.classList.add("goal"); c.textContent = "⭐"; }
+            else if (x === lvl.r[0] && y === lvl.r[1]) { c.classList.add("start"); }
+            board.appendChild(c);
+          }
+        }
+        robot.style.width = (100 / lvl.s) + "%";
+        robot.style.height = (100 / lvl.s) + "%";
+      }
+
+      function placeRobot(x, y) {
+        pos = { x: x, y: y };
+        robot.style.transform = "translate(" + (x * 100) + "%, " + (y * 100) + "%)";
+      }
+
+      function buildStrip() {
+        strip.innerHTML = "";
+        program.forEach(function (d, i) {
+          var b = document.createElement("button");
+          b.className = "tile";
+          b.setAttribute("aria-label", "Step " + (i + 1) + ": move " + DIRS[d].name + ". Tap to remove.");
+          var num = document.createElement("span");
+          num.className = "num";
+          num.setAttribute("aria-hidden", "true");
+          num.textContent = i + 1;
+          b.appendChild(num);
+          b.appendChild(document.createTextNode(DIRS[d].e));
+          b.addEventListener("click", function () { removeAt(i); });
+          strip.appendChild(b);
+        });
+        for (var i = program.length; i < CAP; i++) {
+          var s = document.createElement("span");
+          s.className = "slot";
+          s.setAttribute("aria-hidden", "true");
+          strip.appendChild(s);
+        }
+        stepsChip.textContent = program.length + " / " + CAP + " steps";
+      }
+
+      function tiles() { return strip.querySelectorAll(".tile"); }
+      function setCurrentTile(idx) {
+        tiles().forEach(function (t, i) { t.classList.toggle("current", i === idx); });
+      }
+      function clearCurrentTile() { setCurrentTile(-1); }
+      function markCrashTile(idx) {
+        var t = tiles()[idx];
+        if (t) t.classList.add("crashed");
+      }
+      function clearCrashTiles() {
+        tiles().forEach(function (t) { t.classList.remove("crashed"); });
+      }
+
+      function starsText(n) { return n === 3 ? "⭐⭐⭐" : n === 2 ? "⭐⭐" : n === 1 ? "⭐" : "—"; }
+      function updateBestChip() {
+        bestChip.textContent = "Best this visit: " + starsText(best[li] || 0);
+      }
+
+      // ---------- level lifecycle ----------
+      function loadLevel(i) {
+        cancelRun();
+        li = i;
+        lvl = LEVELS[i];
+        program = [];
+        pc = 0;
+        tracing = false;
+        winOverlay.classList.add("hidden");
+        levelChip.textContent = "Level " + (i + 1) + " of " + LEVELS.length;
+        levelName.innerHTML = "";
+        var em = document.createElement("span");
+        em.setAttribute("aria-hidden", "true");
+        em.textContent = lvl.e;
+        levelName.appendChild(em);
+        levelName.appendChild(document.createTextNode(" " + lvl.n));
+        parChip.textContent = "🎯 Best path: " + lvl.p;
+        buildBoard();
+        placeRobot(lvl.r[0], lvl.r[1]);
+        buildStrip();
+        updateBestChip();
+        setHelper("Tap arrows to build a program, then press ▶ Run!", "");
+        announce("Level " + (i + 1) + ": " + lvl.n + ". A " + lvl.s + " by " + lvl.s +
+          " maze. The robot starts at " + cellName(lvl.r[0], lvl.r[1]) +
+          ". The star is at " + cellName(lvl.g[0], lvl.g[1]) +
+          ". Shortest program: " + lvl.p + " steps.");
+      }
+
+      function backToStart() {
+        pc = 0;
+        tracing = false;
+        clearCurrentTile();
+        placeRobot(lvl.r[0], lvl.r[1]);
+      }
+
+      function cancelRun() {
+        clearTimeout(runTimer);
+        running = false;
+      }
+
+      // ---------- program edits ----------
+      function editGuard() {
+        if (running) { setHelper("Wait for the robot to finish!", "warn"); return false; }
+        return true;
+      }
+      function afterEdit() {
+        clearCrashTiles();
+        buildStrip();
+        backToStart();
+        winOverlay.classList.add("hidden");
+      }
+      function appendMove(d) {
+        if (!editGuard()) return;
+        if (program.length >= CAP) {
+          setHelper("Program is full — " + CAP + " steps max! Tap a tile to remove one.", "warn");
+          playSound("crash");
+          return;
+        }
+        program.push(d);
+        afterEdit();
+        playSound("tap" + d);
+        setHelper("Step " + program.length + ": " + DIRS[d].e + " " + DIRS[d].name + ". Press ▶ Run when ready!", "");
+        announce("Added step " + program.length + ": move " + DIRS[d].name + ".");
+      }
+      function removeAt(i) {
+        if (!editGuard()) return;
+        var d = program[i];
+        program.splice(i, 1);
+        afterEdit();
+        playSound("del");
+        setHelper("Removed step " + (i + 1) + " (" + DIRS[d].name + ").", "");
+        announce("Removed step " + (i + 1) + ": move " + DIRS[d].name + ". " + program.length + " steps left.");
+      }
+      function removeLast() {
+        if (!editGuard()) return;
+        if (!program.length) { setHelper("Nothing to remove yet!", "warn"); return; }
+        removeAt(program.length - 1);
+      }
+
+      // ---------- execution ----------
+      // Executes program[pc]. Returns "ok" | "crash" | "goal" | "end".
+      function execOne() {
+        var idx = pc;
+        setCurrentTile(idx);
+        var d = program[idx];
+        var v = DIRS[d];
+        var nx = pos.x + v.x, ny = pos.y + v.y;
+        if (!inBounds(nx, ny) || isWall(nx, ny)) {
+          crash(idx, d, nx, ny);
+          return "crash";
+        }
+        placeRobot(nx, ny);
+        pc++;
+        playSound("step");
+        if (nx === lvl.g[0] && ny === lvl.g[1]) {
+          winLevel(idx + 1);
+          return "goal";
+        }
+        announce("Step " + (idx + 1) + ": move " + v.name + ". Robot at " + cellName(nx, ny) + ".");
+        if (pc >= program.length) {
+          endShort();
+          return "end";
+        }
+        return "ok";
+      }
+
+      function crash(idx, d, nx, ny) {
+        var offGrid = !inBounds(nx, ny);
+        clearCurrentTile();
+        markCrashTile(idx);
+        clearTimeout(bumpTimer);
+        robotInner.className = "robot-inner bump-" + d.toLowerCase();
+        bumpTimer = setTimeout(function () { robotInner.className = "robot-inner"; }, 600);
+        playSound("crash");
+        tracing = false;
+        var what = offGrid ? "walks off the grid" : "hits a wall";
+        setHelper("Bump! Step " + (idx + 1) + " " + DIRS[d].e + " " + what + ". Fix that step and run again!", "bad");
+        announce("Bump! Step " + (idx + 1) + ", move " + DIRS[d].name + ", " + what +
+          ". The robot stopped at " + cellName(pos.x, pos.y) +
+          ". Your program is kept — fix step " + (idx + 1) + " and run again.");
+      }
+
+      function endShort() {
+        clearCurrentTile();
+        tracing = false;
+        setHelper("The robot stopped before the ⭐. Add more steps!", "warn");
+        announce("The program ended at " + cellName(pos.x, pos.y) + ", before the star. Add more steps.");
+      }
+
+      function winLevel(stepsUsed) {
+        cancelRun();
+        clearCurrentTile();
+        tracing = false;
+        var stars = stepsUsed <= lvl.p ? 3 : stepsUsed <= lvl.p + 2 ? 2 : 1;
+        if (stars > (best[li] || 0)) best[li] = stars;
+        updateBestChip();
+        buildPicker();
+        clearTimeout(bumpTimer);
+        robotInner.className = "robot-inner cheer";
+        bumpTimer = setTimeout(function () { robotInner.className = "robot-inner"; }, 800);
+        winStars.textContent = starsText(stars);
+        winTitle.textContent = stars === 3 ? "🏆 Perfect program!" : "🎉 You did it!";
+        winSub.textContent = "You reached the star in " + stepsUsed + " step" + (stepsUsed === 1 ? "" : "s") +
+          (stars === 3 ? " — the shortest way!" : ". Shortest possible: " + lvl.p + ".");
+        document.getElementById("nextBtn").classList.toggle("hidden", li === LEVELS.length - 1);
+        winOverlay.classList.remove("hidden");
+        setHelper("Level complete! 🎉", "excited");
+        announce("You reached the star in " + stepsUsed + " steps. " + stars +
+          (stars === 1 ? " star." : " stars.") +
+          (stars < 3 ? " Shortest possible: " + lvl.p + " steps." : " That is the shortest way!"));
+        playSound("win");
+        confetti();
+      }
+
+      function startRun() {
+        if (running) return;
+        if (!winOverlay.classList.contains("hidden")) return;
+        if (!program.length) {
+          setHelper("Add some arrow steps first!", "warn");
+          announce("The program is empty. Add some arrow steps first.");
+          return;
+        }
+        clearCrashTiles();
+        backToStart();
+        running = true;
+        if (reducedMotion) {
+          // instant steps: no animation, whole program in one go
+          var res = "ok";
+          while (res === "ok") res = execOne();
+          running = false;
+          return;
+        }
+        setHelper("Running… watch the robot! 🤖", "excited");
+        runTimer = setTimeout(tick, 300);
+      }
+      function tick() {
+        if (!running) return;
+        var res = execOne();
+        if (res === "ok") runTimer = setTimeout(tick, 450);
+        else running = false;
+      }
+
+      function stepOnce() {
+        if (running) return;
+        if (!winOverlay.classList.contains("hidden")) return;
+        if (!program.length) {
+          setHelper("Add some arrow steps first!", "warn");
+          announce("The program is empty. Add some arrow steps first.");
+          return;
+        }
+        if (!tracing) {
+          clearCrashTiles();
+          backToStart();
+          tracing = true;
+        }
+        var res = execOne();
+        if (res === "ok") {
+          setHelper("Step " + pc + " done — tap ⏭ Step for the next one.", "");
+        }
+      }
+
+      function resetRobot() {
+        cancelRun();
+        backToStart();
+        winOverlay.classList.add("hidden");
+        setHelper("Robot is back at the start. Your program is safe!", "");
+        announce("Robot reset to " + cellName(lvl.r[0], lvl.r[1]) + ". Your program is unchanged.");
+      }
+
+      // ---------- confetti ----------
+      function confetti() {
+        if (reducedMotion) return;
+        var colors = ["#ff6b57", "#7c3aed", "#0f766e", "#b45309", "#15803d"];
+        for (var i = 0; i < 70; i++) {
+          var bit = document.createElement("div");
+          bit.className = "confetti-bit";
+          bit.style.left = Math.random() * 100 + "vw";
+          bit.style.background = colors[i % colors.length];
+          bit.style.animationDuration = 1.6 + Math.random() * 1.6 + "s";
+          bit.style.animationDelay = Math.random() * 0.5 + "s";
+          bit.style.transform = "rotate(" + Math.random() * 360 + "deg)";
+          document.body.appendChild(bit);
+          (function (b) { setTimeout(function () { b.remove(); }, 4000); })(bit);
+        }
+      }
+
+      // ---------- picker ----------
+      function buildPicker() {
+        pickerGrid.innerHTML = "";
+        LEVELS.forEach(function (l, i) {
+          var b = document.createElement("button");
+          b.className = "lvl-chip" + (i === li ? " active" : "");
+          var earned = best[i] || 0;
+          b.setAttribute("aria-label", "Level " + (i + 1) + ": " + l.n +
+            (earned ? ", best " + earned + (earned === 1 ? " star" : " stars") : ""));
+          var top = document.createElement("span");
+          top.setAttribute("aria-hidden", "true");
+          top.textContent = l.e + " " + (i + 1);
+          var st = document.createElement("span");
+          st.className = "stars";
+          st.setAttribute("aria-hidden", "true");
+          st.textContent = earned ? "★★★".slice(0, earned) : " ";
+          b.appendChild(top);
+          b.appendChild(st);
+          b.addEventListener("click", function () {
+            loadLevel(i);
+            buildPicker();
+            document.querySelector(".card").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+          });
+          pickerGrid.appendChild(b);
+        });
+      }
+
+      // ---------- buttons ----------
+      document.querySelectorAll(".pad-btn[data-dir]").forEach(function (b) {
+        b.addEventListener("click", function () { appendMove(b.getAttribute("data-dir")); });
+      });
+      document.getElementById("eraseBtn").addEventListener("click", removeLast);
+      document.getElementById("runBtn").addEventListener("click", startRun);
+      document.getElementById("stepBtn").addEventListener("click", stepOnce);
+      document.getElementById("resetBtn").addEventListener("click", resetRobot);
+      var muteBtn = document.getElementById("muteBtn");
+      muteBtn.addEventListener("click", function () {
+        soundOn = !soundOn;
+        muteBtn.textContent = soundOn ? "🔊 Sound on" : "🔇 Sound off";
+        muteBtn.setAttribute("aria-pressed", String(!soundOn));
+        if (soundOn) playSound("click");
+      });
+      document.getElementById("againBtn").addEventListener("click", function () {
+        winOverlay.classList.add("hidden");
+        backToStart();
+        setHelper("Same maze, same program — can you make it shorter?", "");
+        announce("Robot back at the start. Edit your program and run again.");
+      });
+      document.getElementById("nextBtn").addEventListener("click", function () {
+        if (li < LEVELS.length - 1) { loadLevel(li + 1); buildPicker(); }
+      });
+
+      // ---------- keyboard ----------
+      var KEY_DIRS = { ArrowUp: "U", ArrowDown: "D", ArrowLeft: "L", ArrowRight: "R" };
+      document.addEventListener("keydown", function (ev) {
+        if (KEY_DIRS[ev.key]) {
+          ev.preventDefault();
+          appendMove(KEY_DIRS[ev.key]);
+        } else if (ev.key === "Backspace") {
+          ev.preventDefault();
+          removeLast();
+        } else if (ev.key === "Enter") {
+          // let focused buttons and links keep their native Enter behaviour
+          var t = ev.target;
+          if (t && (t.tagName === "BUTTON" || t.tagName === "A")) return;
+          ev.preventDefault();
+          startRun();
+        }
+      });
+
+      // Some Android browsers ignore overscroll-behavior, so block
+      // pull-to-refresh directly: a downward finger movement while the page is
+      // already at the very top can only be the refresh gesture.
+      var ptrStartY = 0;
+      document.addEventListener("touchstart", function (ev) {
+        ptrStartY = ev.touches[0].clientY;
+      }, { passive: true });
+      document.addEventListener("touchmove", function (ev) {
+        // single-finger only: a second touch means pinch-zoom, not refresh
+        if (ev.touches.length === 1 && window.scrollY <= 0 && ev.touches[0].clientY > ptrStartY && ev.cancelable) {
+          ev.preventDefault();
+        }
+      }, { passive: false });
+
+      // ---------- go ----------
+      loadLevel(0);
+      buildPicker();
+    })();
+    </script>
+  </body>
+</html>
