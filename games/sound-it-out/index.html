@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#b45309" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Sound It Out – Free Phonics Game for Kids | Play It My Way</title>
+    <meta name="description" content="See a picture, build its word sound by sound, then tap Blend and watch it light up letter by letter. CVC phonics practice and word ladders for ages 5+. No ads, no download." />
+    <meta name="keywords" content="phonics game for kids, cvc words game, sound it out game, blending sounds game, word ladder game for kids, learn to read three letter words, free phonics practice" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Sound It Out – Free CVC Phonics Game for Kids" />
+    <meta property="og:description" content="Build three-letter words sound by sound and watch them blend together, letter by letter. Picture words, word ladders, gentle hints. Free, no ads!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/sound-it-out/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Sound It Out – Free Phonics Game for Kids" />
+    <meta name="twitter:description" content="Build CVC words sound by sound, then blend them letter by letter. Word ladders too. Free, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/sound-it-out/" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <style>
+      :root {
+        --bg: var(--color-bg);
+        --surface: var(--color-surface);
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --band: var(--color-amber);         /* age band 5+ */
+        --band-tint: var(--color-amber-tint);
+        --good: var(--color-green);
+        --good-tint: var(--color-green-tint);
+        --coral-deep: var(--color-primary-deep);
+        --font: var(--font-display);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body {
+        background: var(--bg);
+        /* an accidental pull-to-refresh would wipe the streak and the round */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font);
+        color: var(--ink);
+        margin: 0;
+        padding: 14px 12px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: var(--font); touch-action: manipulation; }
+
+      .back-link {
+        align-self: flex-start;
+        color: var(--band);
+        background: var(--band-tint);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      header.game-head { text-align: center; margin: 10px 0 10px; }
+      header.game-head h1 {
+        font-size: clamp(26px, 7vw, 34px);
+        font-weight: 600;
+        margin: 0 0 4px;
+        text-wrap: balance;
+      }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        width: 100%;
+        max-width: 480px;
+        padding: 16px 14px 18px;
+      }
+
+      [hidden] { display: none !important; }
+
+      /* ---------- set picker ---------- */
+      .pick-title { font-size: 20px; font-weight: 600; text-align: center; margin: 2px 0 12px; }
+      .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      @media (max-width: 380px) { .chips { grid-template-columns: 1fr; } }
+      .chip {
+        border: 2.5px solid var(--band-tint);
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        padding: 12px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        min-height: 92px;
+        transition: transform var(--ease-quick), border-color var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .chip:hover { transform: translateY(-2px); border-color: var(--band); box-shadow: var(--shadow-rest); }
+      .chip .chip-emoji { font-size: 28px; line-height: 1; }
+      .chip .chip-name { font-size: 16.5px; font-weight: 600; color: var(--ink); }
+      .chip .chip-sub { font-size: 13px; color: var(--ink-soft); }
+      .chip.chip-wide { grid-column: 1 / -1; border-color: var(--band); background: var(--band-tint); }
+      .chip.chip-wide .chip-name { color: var(--band); }
+
+      /* ---------- play view ---------- */
+      .stats-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+      .stat {
+        background: var(--band-tint);
+        color: var(--band);
+        font-weight: 600;
+        font-size: 13.5px;
+        padding: 6px 12px;
+        border-radius: var(--radius-pill);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      /* ladder rungs: words already climbed, greyed */
+      .rungs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+        margin-bottom: 8px;
+        min-height: 30px;
+      }
+      .rung {
+        background: var(--band-tint);
+        color: var(--ink-soft);
+        font-weight: 600;
+        font-size: 14.5px;
+        letter-spacing: 0.08em;
+        padding: 4px 11px;
+        border-radius: var(--radius-pill);
+        opacity: 0.75;
+      }
+      .rung.rung-now { background: var(--band); color: #fff; opacity: 1; }
+
+      .prompt { text-align: center; color: var(--ink-soft); font-size: 16.5px; margin: 2px 0 6px; min-height: 24px; }
+      .prompt strong { color: var(--band); letter-spacing: 0.1em; }
+
+      .stage {
+        min-height: 118px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .pic {
+        position: relative;
+        border: none;
+        background: transparent;
+        font-size: clamp(60px, 19vw, 84px);
+        line-height: 1.15;
+        padding: 4px 14px;
+        border-radius: var(--radius-lg);
+        cursor: default;
+        user-select: none;
+      }
+      /* the picture becomes tappable only when a local voice exists */
+      body.has-voice .pic.speakable { cursor: pointer; }
+      body.has-voice .pic.speakable:hover { background: var(--band-tint); }
+      .speak-badge {
+        display: none;
+        position: absolute;
+        right: -4px;
+        bottom: 2px;
+        font-size: 20px;
+        background: var(--band-tint);
+        border-radius: var(--radius-pill);
+        padding: 3px 6px;
+      }
+      body.has-voice .pic.speakable .speak-badge { display: block; }
+      .pic.pop { animation: picPop 220ms ease; }
+      @keyframes picPop { 0% { transform: scale(0.7); opacity: 0.4; } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
+      .read-word {
+        font-size: clamp(38px, 13vw, 54px);
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        color: var(--band);
+      }
+
+      /* ---------- sound boxes (slots) ---------- */
+      .slots { display: flex; justify-content: center; gap: 10px; margin-bottom: 12px; }
+      .slot {
+        width: clamp(62px, 19vw, 82px);
+        height: clamp(72px, 22vw, 94px);
+        border: 3px dashed #ded4c7;
+        border-radius: var(--radius-md);
+        background: var(--surface);
+        color: var(--ink);
+        font-size: clamp(34px, 11vw, 46px);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+      }
+      .slot.filled { border-style: solid; border-color: var(--band); }
+      .slot.locked {
+        border-style: solid;
+        border-color: var(--good);
+        background: var(--good-tint);
+        color: var(--good);
+        cursor: default;
+      }
+      .slot.blend-now,
+      .slot.blend-all {
+        border-style: solid;
+        border-color: var(--band);
+        background: var(--band);
+        color: #fff;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .slot.blend-now { transform: scale(1.12); }
+      }
+
+      /* ---------- letter tray ---------- */
+      .tray {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 9px;
+        margin-bottom: 12px;
+        min-height: 62px;
+      }
+      .tile {
+        width: 52px;
+        height: 58px;
+        border: 2.5px solid var(--band);
+        border-radius: var(--radius-md);
+        background: var(--band-tint);
+        color: var(--band);
+        font-size: 27px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick), opacity var(--ease-quick);
+      }
+      .tile:hover:not(:disabled) { transform: translateY(-3px); box-shadow: var(--shadow-rest); }
+      .tile:disabled { opacity: 0.25; border-style: dashed; cursor: default; }
+
+      .action-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+
+      /* feedback always renders in reserved space so nothing jumps */
+      .feedback {
+        min-height: 96px;
+        margin-top: 8px;
+        border-radius: var(--radius-md);
+        padding: 10px 12px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+        background: transparent;
+        transition: background var(--ease-quick);
+      }
+      .feedback.good { background: var(--good-tint); }
+      .feedback.oops { background: var(--band-tint); }
+      .verdict { font-size: 17px; font-weight: 600; margin: 0; }
+      .feedback.good .verdict { color: var(--good); }
+      .feedback.oops .verdict { color: var(--band); }
+      .feedback .sub { font-size: 15px; color: var(--ink); margin: 0; line-height: 1.5; }
+
+      .advance-row { display: flex; justify-content: center; margin-top: 10px; min-height: 48px; }
+      .advance-row .btn { visibility: hidden; }
+      .advance-row.show .btn { visibility: visible; }
+
+      .controls { display: flex; gap: 10px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+      .btn {
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 15.5px;
+        padding: 11px 18px;
+        border-radius: var(--radius-pill);
+        min-height: 46px;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+      .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn:disabled { opacity: 0.55; cursor: default; }
+      .btn-soft { background: var(--band-tint); color: var(--band); }
+      .btn-go { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
+      .btn-blend { background: var(--band); color: #fff; box-shadow: var(--shadow-rest); }
+
+      /* ---------- results ---------- */
+      .results { text-align: center; }
+      .results h2 { font-size: 24px; margin: 4px 0 10px; }
+      .results .score-line { font-size: 18px; font-weight: 600; margin: 4px 0; }
+      .results .best-line { font-size: 15px; color: var(--ink-soft); margin: 4px 0 10px; }
+      .climbed {
+        background: var(--band-tint);
+        border-radius: var(--radius-md);
+        padding: 10px 12px;
+        margin: 10px 0;
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--band);
+        letter-spacing: 0.06em;
+        line-height: 1.7;
+      }
+
+      .how-to {
+        width: 100%;
+        max-width: 480px;
+        margin-top: 18px;
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 16px 18px;
+      }
+      .how-to h2 { font-size: 19px; margin: 0 0 8px; }
+      .how-to ul { margin: 0; padding-left: 20px; color: var(--ink-soft); font-size: 15.5px; line-height: 1.7; }
+      .how-to li::marker { color: var(--band); }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .confetti-bit {
+        position: fixed;
+        top: -14px;
+        width: 10px;
+        height: 14px;
+        border-radius: 3px;
+        pointer-events: none;
+        z-index: 50;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall { to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .confetti-bit { display: none; }
+        .slot.blend-now { transform: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🔡 Sound It Out</h1>
+      <p>Build the word sound by sound — then blend it!</p>
+    </header>
+
+    <main class="card">
+      <!-- set picker -->
+      <div id="pickView">
+        <h2 class="pick-title">🎯 Pick a sound set</h2>
+        <div class="chips" role="group" aria-label="Practice sets">
+          <button class="chip" data-set="a">
+            <span class="chip-emoji" aria-hidden="true">🐱</span>
+            <span class="chip-name">Short a</span>
+            <span class="chip-sub">cat, hat, van…</span>
+          </button>
+          <button class="chip" data-set="e">
+            <span class="chip-emoji" aria-hidden="true">🛏️</span>
+            <span class="chip-name">Short e</span>
+            <span class="chip-sub">bed, hen, ten…</span>
+          </button>
+          <button class="chip" data-set="i">
+            <span class="chip-emoji" aria-hidden="true">🐷</span>
+            <span class="chip-name">Short i</span>
+            <span class="chip-sub">pig, pin, six…</span>
+          </button>
+          <button class="chip" data-set="o">
+            <span class="chip-emoji" aria-hidden="true">🦊</span>
+            <span class="chip-name">Short o</span>
+            <span class="chip-sub">fox, dog, box…</span>
+          </button>
+          <button class="chip" data-set="u">
+            <span class="chip-emoji" aria-hidden="true">☀️</span>
+            <span class="chip-name">Short u</span>
+            <span class="chip-sub">sun, bug, cup…</span>
+          </button>
+          <button class="chip" data-set="mix">
+            <span class="chip-emoji" aria-hidden="true">🎲</span>
+            <span class="chip-name">Mixed</span>
+            <span class="chip-sub">every sound</span>
+          </button>
+          <button class="chip chip-wide" data-set="ladder">
+            <span class="chip-emoji" aria-hidden="true">🪜</span>
+            <span class="chip-name">Word Ladder</span>
+            <span class="chip-sub">change one sound at a time — cat → cot → cop…</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- play -->
+      <div id="playView" hidden>
+        <div class="stats-row">
+          <span class="stat" id="statMode">🎯 Set</span>
+          <span class="stat" id="statProgress">Word 1 of 8</span>
+          <span class="stat" id="statStreak">🔥 Streak 0</span>
+          <span class="stat" id="statBest">🏆 Best 0</span>
+        </div>
+
+        <div class="rungs" id="rungs" hidden></div>
+
+        <p class="prompt" id="prompt"></p>
+
+        <div class="stage">
+          <button class="pic" id="picBtn" type="button" tabindex="-1" aria-hidden="true">
+            <span id="picGlyph"></span>
+            <span class="speak-badge" aria-hidden="true">🔊</span>
+          </button>
+        </div>
+
+        <div class="slots" id="slots" role="group" aria-label="Sound boxes"></div>
+
+        <div class="tray" id="tray" role="group" aria-label="Letter tiles"></div>
+
+        <div class="action-row">
+          <button class="btn btn-blend" id="blendBtn">▶ Blend</button>
+          <button class="btn btn-go" id="checkBtn">✔ Check</button>
+        </div>
+
+        <div class="feedback" id="feedback" aria-live="polite">
+          <p class="verdict" id="verdict"></p>
+          <p class="sub" id="verdictSub"></p>
+        </div>
+
+        <div class="advance-row" id="advanceRow">
+          <button class="btn btn-go" id="nextBtn">Next word ➜</button>
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-soft" id="setsBtn">🎯 Sets</button>
+          <button class="btn btn-soft" id="muteBtn" aria-pressed="false">🔊 Sound on</button>
+        </div>
+      </div>
+
+      <!-- results -->
+      <div id="resultsView" class="results" hidden>
+        <h2 id="resultsHead" tabindex="-1">🎉 Set complete!</h2>
+        <p class="score-line" id="resultsScore"></p>
+        <p class="best-line" id="resultsBest"></p>
+        <div class="climbed" id="climbedBox" hidden></div>
+        <div class="controls">
+          <button class="btn btn-go" id="againBtn">🔄 Play again</button>
+          <button class="btn btn-soft" id="anotherBtn">🎯 Pick another set</button>
+        </div>
+      </div>
+    </main>
+
+    <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ul>
+        <li>Look at the picture, then <strong>tap the letters</strong> to fill the three sound boxes — first sound, middle sound, last sound.</li>
+        <li>Tap <strong>▶ Blend</strong> and watch the word light up letter by letter — slowly, then fast. Say each sound as it glows!</li>
+        <li>Tap <strong>✔ Check</strong> when the word looks right. A wrong try gets a friendly sound hint — never a penalty.</li>
+        <li>In a <strong>Word Ladder</strong>, each new word changes just one sound of the last word. Fix the empty box!</li>
+        <li>Keyboard: <strong>type a letter</strong> to use its tile, <strong>Backspace</strong> to take one back, <strong>Enter</strong> to check.</li>
+        <li>Nothing is saved — your best streak lasts only for this visit.</li>
+      </ul>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* ==WORD_DATA_START==
+           Pure data only — no DOM access in this section.
+           The build validator extracts and evaluates this slice in Node.
+           Every word is a strict short-vowel CVC: consonant + a/e/i/o/u + consonant.
+           An empty emoji string marks a ladder-only word (no unambiguous picture). */
+
+        var WORDS = [
+          // --- short a ---
+          ["cat", "🐱"], ["rat", "🐀"], ["bat", "🦇"], ["ram", "🐏"], ["man", "👨"],
+          ["dad", "🧔"], ["cab", "🚕"], ["van", "🚐"], ["bag", "👜"], ["map", "🗺️"],
+          ["can", "🥫"], ["pan", "🍳"], ["fan", "🪭"], ["cap", "🧢"], ["hat", "🎩"],
+          ["tag", "🏷️"], ["sax", "🎷"], ["tap", "🚰"], ["ham", "🍖"], ["yam", "🍠"],
+          ["gas", "⛽"], ["nap", "😴"], ["sad", "😢"], ["mad", "😠"], ["zap", "⚡"],
+          ["mat", ""], ["sat", ""], ["fat", ""], ["pat", ""],
+          ["bad", ""], ["had", ""], ["pad", ""],
+          ["gap", ""], ["lap", ""], ["rap", ""], ["sap", ""],
+          ["rag", ""], ["wag", ""],
+          ["dam", ""], ["jam", ""],
+          ["ran", ""], ["tan", ""],
+          ["jab", ""], ["lab", ""], ["tab", ""],
+          ["wax", ""],
+          // --- short e ---
+          ["hen", "🐔"], ["pen", "🖊️"], ["ten", "🔟"], ["bed", "🛏️"], ["leg", "🦵"],
+          ["net", "🥅"], ["web", "🕸️"], ["gem", "💎"], ["jet", "✈️"], ["red", "🟥"],
+          ["wet", "💦"],
+          ["fed", ""], ["led", ""], ["wed", ""],
+          ["beg", ""], ["peg", ""],
+          ["den", ""], ["men", ""],
+          ["bet", ""], ["get", ""], ["let", ""], ["met", ""], ["pet", ""], ["set", ""], ["vet", ""], ["yet", ""],
+          ["yes", ""],
+          // --- short i ---
+          ["pig", "🐷"], ["kid", "🧒"], ["lip", "👄"], ["bin", "🗑️"], ["pin", "📌"],
+          ["six", "6️⃣"], ["win", "🏆"],
+          ["bid", ""], ["did", ""], ["hid", ""], ["lid", ""], ["rid", ""],
+          ["big", ""], ["dig", ""], ["fig", ""], ["wig", ""],
+          ["fin", ""], ["tin", ""],
+          ["dip", ""], ["hip", ""], ["rip", ""], ["sip", ""], ["tip", ""], ["zip", ""],
+          ["bit", ""], ["fit", ""], ["hit", ""], ["kit", ""], ["lit", ""], ["sit", ""], ["pit", ""],
+          ["dim", ""], ["him", ""], ["rim", ""],
+          ["bib", ""], ["rib", ""],
+          ["fix", ""], ["mix", ""],
+          // --- short o ---
+          ["dog", "🐶"], ["fox", "🦊"], ["cop", "👮"], ["mom", "👩"], ["box", "📦"],
+          ["pot", "🫖"], ["dot", "🔴"], ["rod", "🎣"], ["log", "🪵"], ["fog", "🌫️"],
+          ["hot", "🥵"], ["pod", "🫛"],
+          ["cob", ""], ["job", ""], ["sob", ""],
+          ["cod", ""], ["nod", ""],
+          ["hog", ""], ["jog", ""],
+          ["hop", ""], ["mop", ""], ["pop", ""], ["top", ""],
+          ["cot", ""], ["got", ""], ["lot", ""], ["not", ""], ["rot", ""], ["tot", ""],
+          // --- short u ---
+          ["bug", "🐛"], ["bus", "🚌"], ["mug", "☕"], ["cup", "🥤"], ["tub", "🛁"],
+          ["hut", "🛖"], ["nut", "🥜"], ["sun", "☀️"], ["run", "🏃"], ["hug", "🤗"],
+          ["cut", "✂️"], ["yum", "😋"],
+          ["cub", ""], ["rub", ""], ["sub", ""],
+          ["bud", ""], ["mud", ""],
+          ["dug", ""], ["jug", ""], ["pug", ""], ["rug", ""], ["tug", ""],
+          ["gum", ""], ["hum", ""], ["sum", ""],
+          ["bun", ""], ["fun", ""], ["nun", ""],
+          ["pup", ""], ["but", ""]
+        ];
+
+        // easily-confused letters (similar sound or mirror shape) for distractor tiles
+        var CONFUSABLE = {
+          a: ["o", "u", "e"], e: ["i", "a", "u"], i: ["e", "u", "a"],
+          o: ["a", "u", "e"], u: ["o", "a", "i"],
+          b: ["d", "p", "h"], c: ["k", "g", "s"], d: ["b", "t", "p"],
+          f: ["v", "t", "k"], g: ["c", "j", "k"], h: ["n", "b", "k"],
+          j: ["g", "y", "z"], k: ["c", "g", "t"], l: ["t", "r", "j"],
+          m: ["n", "w", "h"], n: ["m", "h", "r"], p: ["b", "d", "g"],
+          r: ["l", "n", "w"], s: ["z", "c", "x"], t: ["d", "l", "f"],
+          v: ["f", "w", "b"], w: ["m", "v", "n"], x: ["s", "k", "z"],
+          y: ["j", "w", "v"], z: ["s", "x", "j"]
+        };
+        /* ==WORD_DATA_END== */
+
+        var VOWELS = "aeiou";
+        var CONSONANTS = "bcdfghjklmnpqrstvwxyz";
+        var POS_NAMES = ["first", "middle", "last"];
+        var SET_NAMES = { a: "Short a", e: "Short e", i: "Short i", o: "Short o", u: "Short u", mix: "Mixed" };
+        var SET_ICONS = { a: "🐱", e: "🛏️", i: "🐷", o: "🦊", u: "☀️", mix: "🎲" };
+        var ROUND_SIZE = 8;
+
+        // fast lookups + one-letter-apart adjacency for ladder chains
+        var wordSet = {}, emojiOf = {}, picturedWords = [];
+        WORDS.forEach(function (entry) {
+          wordSet[entry[0]] = true;
+          emojiOf[entry[0]] = entry[1];
+          if (entry[1]) picturedWords.push(entry[0]);
+        });
+        function oneApart(a, b) {
+          var diff = 0;
+          for (var i = 0; i < 3; i++) { if (a[i] !== b[i]) diff++; }
+          return diff === 1;
+        }
+        var NEIGHBORS = {};
+        WORDS.forEach(function (entry) {
+          var w = entry[0], list = [];
+          WORDS.forEach(function (other) {
+            if (other[0] !== w && oneApart(w, other[0])) list.push(other[0]);
+          });
+          NEIGHBORS[w] = list;
+        });
+
+        // ---------- helpers ----------
+        function $(id) { return document.getElementById(id); }
+        function shuffle(arr) {
+          for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+          }
+          return arr;
+        }
+        function sample(arr, n) { return shuffle(arr.slice()).slice(0, n); }
+
+        var reducedMotion = window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        // ---------- elements ----------
+        var pickView = $("pickView"), playView = $("playView"), resultsView = $("resultsView");
+        var slotsEl = $("slots"), trayEl = $("tray"), rungsEl = $("rungs");
+        var promptEl = $("prompt"), picBtn = $("picBtn"), picGlyph = $("picGlyph");
+        var feedbackEl = $("feedback"), verdictEl = $("verdict"), verdictSub = $("verdictSub");
+        var advanceRow = $("advanceRow"), nextBtn = $("nextBtn"), srStatus = $("srStatus");
+        var blendBtn = $("blendBtn"), checkBtn = $("checkBtn");
+        var statMode = $("statMode"), statProgress = $("statProgress");
+        var statStreak = $("statStreak"), statBest = $("statBest");
+
+        // ---------- in-memory state (nothing is ever stored) ----------
+        var mode = "set";            // "set" | "ladder"
+        var setId = "mix";
+        var queue = [];              // set mode: words still to build this round
+        var chain = [], chainPos = 0;
+        var target = "";             // the word being built
+        var slots = [];              // [{ch: "", locked: false}]
+        var tiles = [];              // [{ch, used}]
+        var misses = 0;
+        var phase = "pick";          // pick | build | feedback | done
+        var solvedCount = 0, roundTotal = 0;
+        var streak = 0, best = 0;    // "best this visit" — memory only
+        var blending = false;
+        var soundOn = true;
+        var blendTimers = [];
+
+        // ---------- gentle WebAudio chimes (fully playable silent) ----------
+        var AudioCtx = window.AudioContext || window.webkitAudioContext;
+        var audioCtx = null;
+        function tone(freq, when, dur, gainVal, type) {
+          var osc = audioCtx.createOscillator();
+          var gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.type = type || "sine";
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + when);
+          gain.gain.setValueAtTime(gainVal, audioCtx.currentTime + when);
+          gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + when + dur);
+          osc.start(audioCtx.currentTime + when);
+          osc.stop(audioCtx.currentTime + when + dur);
+        }
+        var SLOT_NOTES = [523, 659, 784]; // do–mi–so: one note per sound box
+        function playSound(kind, slotIdx) {
+          if (!soundOn || !AudioCtx) return;
+          try {
+            if (!audioCtx) audioCtx = new AudioCtx();
+            if (audioCtx.state === "suspended") audioCtx.resume();
+            if (kind === "place") {
+              tone(SLOT_NOTES[slotIdx] || 523, 0, 0.12, 0.09);
+            } else if (kind === "take") {
+              tone(392, 0, 0.09, 0.05);
+            } else if (kind === "sweep") {
+              tone(SLOT_NOTES[slotIdx] || 523, 0, 0.16, 0.07, "triangle");
+            } else if (kind === "correct") {
+              tone(660, 0, 0.14, 0.11);
+              tone(880, 0.12, 0.2, 0.11);
+            } else if (kind === "oops") {
+              // soft, kind "hmm" — never harsh
+              tone(294, 0, 0.14, 0.06);
+              tone(247, 0.13, 0.22, 0.05);
+            } else if (kind === "win") {
+              [523, 659, 784, 1047].forEach(function (f, i) {
+                tone(f, i * 0.13, 0.28, 0.11);
+              });
+            } else if (kind === "click") {
+              tone(500, 0, 0.05, 0.045);
+            }
+          } catch (e) { /* sound is optional */ }
+        }
+
+        // ---------- speech, strictly gated ----------
+        // Whole words only, and only through a LOCAL English voice. If none
+        // exists, every speaker affordance stays hidden and the game is
+        // fully playable silent. Letters never go to TTS — chimes only.
+        var speechVoice = null;
+        function pickVoice() {
+          speechVoice = null;
+          try {
+            if (window.speechSynthesis) {
+              var vs = window.speechSynthesis.getVoices();
+              for (var i = 0; i < vs.length; i++) {
+                if (vs[i].localService === true && vs[i].lang &&
+                    vs[i].lang.toLowerCase().indexOf("en") === 0) {
+                  speechVoice = vs[i];
+                  break;
+                }
+              }
+            }
+          } catch (e) { speechVoice = null; }
+          document.body.classList.toggle("has-voice", !!speechVoice);
+          if (speechVoice) {
+            picBtn.removeAttribute("aria-hidden");
+            picBtn.setAttribute("tabindex", "0");
+          } else {
+            picBtn.setAttribute("aria-hidden", "true");
+            picBtn.setAttribute("tabindex", "-1");
+          }
+        }
+        if (window.speechSynthesis) {
+          pickVoice();
+          window.speechSynthesis.onvoiceschanged = pickVoice;
+        }
+        function speakWord(word) {
+          if (!soundOn || !speechVoice || !word) return;
+          // only ever speak real words from the list — never letter strings
+          if (!wordSet[word]) return;
+          try {
+            window.speechSynthesis.cancel();
+            var u = new SpeechSynthesisUtterance(word);
+            u.voice = speechVoice;
+            u.lang = speechVoice.lang;
+            u.rate = 0.85;
+            window.speechSynthesis.speak(u);
+          } catch (e) { /* speech is optional */ }
+        }
+
+        // ---------- views ----------
+        function showView(name) {
+          pickView.hidden = name !== "pick";
+          playView.hidden = name !== "play";
+          resultsView.hidden = name !== "results";
+        }
+        function updateStats() {
+          statMode.textContent = mode === "ladder"
+            ? "🪜 Ladder"
+            : SET_ICONS[setId] + " " + SET_NAMES[setId];
+          statProgress.textContent = mode === "ladder"
+            ? "Rung " + Math.min(chainPos + 1, chain.length) + " of " + chain.length
+            : "Word " + Math.min(solvedCount + 1, roundTotal) + " of " + roundTotal;
+          statStreak.textContent = "🔥 Streak " + streak;
+          statBest.textContent = "🏆 Best " + best;
+        }
+
+        // ---------- rendering ----------
+        function renderSlots() {
+          slotsEl.innerHTML = "";
+          slots.forEach(function (s, i) {
+            var b = document.createElement("button");
+            b.className = "slot" + (s.ch ? " filled" : "") + (s.locked ? " locked" : "");
+            b.dataset.idx = String(i);
+            b.textContent = s.ch;
+            b.setAttribute("aria-label",
+              POS_NAMES[i] + " sound box: " + (s.ch ? s.ch : "empty"));
+            if (s.locked) b.disabled = true;
+            b.addEventListener("click", function () { returnLetter(i); });
+            slotsEl.appendChild(b);
+          });
+        }
+        function renderTray() {
+          trayEl.innerHTML = "";
+          tiles.forEach(function (t, i) {
+            var b = document.createElement("button");
+            b.className = "tile";
+            b.dataset.idx = String(i);
+            b.textContent = t.ch;
+            b.setAttribute("aria-label", "Letter " + t.ch);
+            b.disabled = t.used || phase !== "build";
+            b.addEventListener("click", function () { placeLetter(i); });
+            trayEl.appendChild(b);
+          });
+        }
+        function refreshBoard() {
+          renderSlots();
+          renderTray();
+        }
+
+        // ---------- placing and returning letters ----------
+        function nextEmptySlot() {
+          for (var i = 0; i < slots.length; i++) {
+            if (!slots[i].ch && !slots[i].locked) return i;
+          }
+          return -1;
+        }
+        function placeLetter(tileIdx) {
+          if (phase !== "build" || blending) return;
+          var t = tiles[tileIdx];
+          if (!t || t.used) return;
+          var idx = nextEmptySlot();
+          if (idx === -1) return;
+          t.used = true;
+          slots[idx].ch = t.ch;
+          slots[idx].fromTile = tileIdx;
+          playSound("place", idx);
+          refreshBoard();
+          srStatus.textContent = t.ch + " goes in the " + POS_NAMES[idx] + " box.";
+          // keep focus useful: hop to the next free tile, else the Check button
+          var freeTile = trayEl.querySelector(".tile:not(:disabled)");
+          if (freeTile) freeTile.focus(); else checkBtn.focus();
+        }
+        function returnLetter(slotIdx) {
+          if (phase !== "build" || blending) return;
+          var s = slots[slotIdx];
+          if (!s || !s.ch || s.locked) return;
+          var tileIdx = s.fromTile;
+          if (tiles[tileIdx]) tiles[tileIdx].used = false;
+          s.ch = "";
+          s.fromTile = undefined;
+          playSound("take");
+          refreshBoard();
+          srStatus.textContent = "The " + POS_NAMES[slotIdx] + " box is empty again.";
+          var tile = trayEl.querySelector('[data-idx="' + tileIdx + '"]');
+          if (tile) tile.focus();
+        }
+        function undoLast() {
+          for (var i = slots.length - 1; i >= 0; i--) {
+            if (slots[i].ch && !slots[i].locked) { returnLetter(i); return; }
+          }
+        }
+
+        // ---------- word setup ----------
+        function distractorFor(ch, avoid) {
+          var pool = (CONFUSABLE[ch] || []).slice();
+          shuffle(pool);
+          for (var i = 0; i < pool.length; i++) {
+            if (avoid.indexOf(pool[i]) === -1) return pool[i];
+          }
+          // fallback: any letter of the same class not already on the tray
+          var cls = VOWELS.indexOf(ch) !== -1 ? VOWELS : CONSONANTS;
+          var all = shuffle(cls.split(""));
+          for (var j = 0; j < all.length; j++) {
+            if (avoid.indexOf(all[j]) === -1) return all[j];
+          }
+          return ch === "z" ? "s" : "z";
+        }
+        function buildTray(letters, extraOld) {
+          // one tile per needed letter instance + confusable distractors
+          var list = letters.map(function (ch) { return { ch: ch, used: false }; });
+          var avoid = letters.slice();
+          if (extraOld && avoid.indexOf(extraOld) === -1) {
+            list.push({ ch: extraOld, used: false });
+            avoid.push(extraOld);
+          }
+          var wanted = letters.length === 3 ? 6 : 4; // full build: 6 tiles, ladder fix: 4
+          var source = letters.slice();
+          var k = 0;
+          while (list.length < wanted) {
+            var d = distractorFor(source[k % source.length], avoid);
+            list.push({ ch: d, used: false });
+            avoid.push(d);
+            k++;
+          }
+          return shuffle(list);
+        }
+
+        function setupWord(word, prevWord) {
+          target = word;
+          misses = 0;
+          phase = "build";
+          clearFeedback();
+          stopBlend();
+
+          var changedIdx = -1;
+          if (prevWord) {
+            for (var i = 0; i < 3; i++) {
+              if (prevWord[i] !== word[i]) changedIdx = i;
+            }
+          }
+          slots = [];
+          for (var s = 0; s < 3; s++) {
+            if (prevWord && s !== changedIdx) {
+              slots.push({ ch: word[s], locked: true });
+            } else {
+              slots.push({ ch: "", locked: false });
+            }
+          }
+          tiles = prevWord
+            ? buildTray([word[changedIdx]], prevWord[changedIdx])
+            : buildTray(word.split(""));
+
+          var emoji = emojiOf[word];
+          if (emoji) {
+            picGlyph.textContent = emoji;
+            picGlyph.className = "";
+            picBtn.classList.add("speakable");
+            promptEl.innerHTML = "";
+            promptEl.textContent = prevWord
+              ? "Change one sound to make the picture word!"
+              : "What is it? Build the word, sound by sound.";
+          } else {
+            // ladder-only word: no picture exists, so the printed word is the
+            // target — read it, then build it (classic word-ladder worksheet)
+            picGlyph.textContent = word;
+            picGlyph.className = "read-word";
+            picBtn.classList.add("speakable");
+            promptEl.textContent = "Read the new word, then build it!";
+          }
+          if (!reducedMotion) {
+            picBtn.classList.remove("pop");
+            void picBtn.offsetWidth;
+            picBtn.classList.add("pop");
+          }
+          picBtn.setAttribute("aria-label",
+            "Picture for this word. Tap to hear it spoken.");
+          renderRungs();
+          refreshBoard();
+          updateStats();
+
+          var intro = prevWord
+            ? "New rung. One sound changed — the " + POS_NAMES[changedIdx] +
+              " box is empty. Make the word " + word + "."
+            : (emoji
+              ? "New picture word: " + word + ". Three empty sound boxes."
+              : "New word to build: " + word + ".");
+          srStatus.textContent = intro + " Tap a letter tile to fill a box.";
+          var firstTile = trayEl.querySelector(".tile:not(:disabled)");
+          if (firstTile) firstTile.focus();
+        }
+
+        function renderRungs() {
+          if (mode !== "ladder") { rungsEl.hidden = true; return; }
+          rungsEl.hidden = false;
+          rungsEl.innerHTML = "";
+          chain.forEach(function (w, i) {
+            if (i > chainPos) return;
+            var span = document.createElement("span");
+            span.className = "rung" + (i === chainPos ? " rung-now" : "");
+            span.textContent = i === chainPos ? "❓" : w;
+            rungsEl.appendChild(span);
+          });
+        }
+
+        // ---------- the BLEND sweep: the heart of the game ----------
+        // A slow left-to-right highlight (~600ms a letter), then a fast one
+        // (~250ms), flowing into the whole word lit at once. The sweep alone
+        // teaches the blend — no audio needed. Under reduced motion the
+        // highlights still step in sequence, just with no scale or easing.
+        function slotButtons() { return slotsEl.querySelectorAll(".slot"); }
+        function clearBlendClasses() {
+          slotButtons().forEach(function (b) { b.classList.remove("blend-now", "blend-all"); });
+        }
+        function stopBlend() {
+          blendTimers.forEach(clearTimeout);
+          blendTimers = [];
+          blending = false;
+          clearBlendClasses();
+        }
+        function blend(onDone) {
+          if (blending) return;
+          var filled = [];
+          slots.forEach(function (s, i) { if (s.ch) filled.push(i); });
+          if (filled.length === 0) {
+            setFeedback("", "Put a letter in a box first, then blend!", "");
+            return;
+          }
+          blending = true;
+          var btns = slotButtons();
+          var t = 0;
+          var word = slots.map(function (s) { return s.ch; }).join("");
+          function at(delay, fn) { blendTimers.push(setTimeout(fn, delay)); }
+
+          [600, 250].forEach(function (per) {
+            filled.forEach(function (idx) {
+              at(t, function () {
+                clearBlendClasses();
+                btns[idx].classList.add("blend-now");
+                playSound("sweep", idx);
+              });
+              t += per;
+            });
+            at(t, clearBlendClasses);
+            t += per === 600 ? 350 : 120; // breath between passes
+          });
+          // ...flowing into the whole word at once
+          at(t, function () {
+            btns.forEach(function (b, i) { if (slots[i].ch) b.classList.add("blend-all"); });
+            if (filled.length === 3 && wordSet[word]) speakWord(word);
+          });
+          t += 900;
+          at(t, function () {
+            stopBlend();
+            if (onDone) onDone();
+          });
+          srStatus.textContent = "Blending: " + slots.map(function (s) {
+            return s.ch || "blank";
+          }).join(", ") + ".";
+        }
+
+        // ---------- feedback ----------
+        function setFeedback(kind, main, sub) {
+          feedbackEl.className = "feedback" + (kind ? " " + kind : "");
+          verdictEl.textContent = main;
+          verdictSub.textContent = sub || "";
+        }
+        function clearFeedback() {
+          setFeedback("", "", "");
+          advanceRow.classList.remove("show");
+        }
+
+        // ---------- checking: the attempt ladder ----------
+        function check() {
+          if (phase !== "build" || blending) return;
+          if (nextEmptySlot() !== -1) {
+            setFeedback("", "Fill every sound box first!", "");
+            return;
+          }
+          var built = slots.map(function (s) { return s.ch; }).join("");
+          if (built === target) { solveSuccess(); return; }
+
+          misses++;
+          if (misses === 1) {
+            // first miss: lock what's right, hint the first wrong sound
+            var wrongIdx = -1;
+            for (var i = 0; i < 3; i++) {
+              if (slots[i].ch === target[i]) {
+                slots[i].locked = true;
+              } else if (wrongIdx === -1) {
+                wrongIdx = i;
+              }
+            }
+            slots.forEach(function (s, idx) {
+              if (!s.locked && s.ch) {
+                if (tiles[s.fromTile]) tiles[s.fromTile].used = false;
+                s.ch = "";
+                s.fromTile = undefined;
+              }
+            });
+            var praise = wordSet[built] ? "You built “" + built + "” — a real word! But not this one. " : "";
+            setFeedback("oops",
+              "💛 " + praise + "Sound it out — the " + POS_NAMES[wrongIdx] +
+              " sound is /" + target[wrongIdx] + "/ … try again!",
+              "The right letters are staying put for you.");
+            playSound("oops");
+            refreshBoard();
+            var firstTile = trayEl.querySelector(".tile:not(:disabled)");
+            if (firstTile) firstTile.focus();
+          } else {
+            reveal();
+          }
+        }
+
+        function reveal() {
+          // second miss: show the word with warmth and blend it together
+          phase = "feedback";
+          streak = 0;
+          slots = target.split("").map(function (ch) { return { ch: ch, locked: true }; });
+          refreshBoard();
+          setFeedback("good",
+            "💚 It spells “" + target + "” — " + target.split("").join("… ") + "…",
+            "Watch it blend, then say it with me. On to the next one!");
+          playSound("correct");
+          updateStats();
+          blend(function () { showNext(); });
+        }
+
+        function solveSuccess() {
+          phase = "feedback";
+          var clean = misses === 0;
+          streak = clean ? streak + 1 : 0;
+          if (streak > best) best = streak;
+          slots.forEach(function (s) { s.locked = true; });
+          refreshBoard();
+          setFeedback("good",
+            (clean ? "🎉 Yes! It's “" + target + "”!" : "💚 You got it — “" + target + "”!"),
+            clean && streak >= 2 ? "🔥 " + streak + " first-tries in a row!" : "Watch it blend!");
+          playSound("correct");
+          updateStats();
+          if (clean && streak > 0 && streak % 3 === 0 && !reducedMotion) confetti(24);
+          blend(function () { showNext(); });
+        }
+
+        function showNext() {
+          var last = mode === "ladder"
+            ? chainPos >= chain.length - 1
+            : solvedCount >= roundTotal - 1;
+          nextBtn.textContent = last
+            ? "See how you did 🎉"
+            : (mode === "ladder" ? "Next rung ➜" : "Next word ➜");
+          advanceRow.classList.add("show");
+          nextBtn.focus();
+        }
+
+        // ---------- starting rounds ----------
+        function startSet(id) {
+          mode = "set";
+          setId = id;
+          var pool = picturedWords.filter(function (w) {
+            return id === "mix" || w[1] === id;
+          });
+          queue = sample(pool, Math.min(ROUND_SIZE, pool.length));
+          roundTotal = queue.length;
+          solvedCount = 0;
+          showView("play");
+          playSound("click");
+          setupWord(queue.shift(), null);
+        }
+
+        // walk the one-letter-apart graph for a fresh 4–6 word chain,
+        // preferring pictured words so most rungs come from a picture
+        function makeChain() {
+          var want = 4 + Math.floor(Math.random() * 3);
+          for (var attempt = 0; attempt < 300; attempt++) {
+            var start = picturedWords[Math.floor(Math.random() * picturedWords.length)];
+            var path = [start], used = {};
+            used[start] = true;
+            while (path.length < want) {
+              var here = path[path.length - 1];
+              var options = NEIGHBORS[here].filter(function (w) { return !used[w]; });
+              if (options.length === 0) break;
+              shuffle(options);
+              options.sort(function (a, b) {
+                return (emojiOf[b] ? 1 : 0) - (emojiOf[a] ? 1 : 0) + (Math.random() - 0.5);
+              });
+              var next = options[0];
+              path.push(next);
+              used[next] = true;
+            }
+            if (path.length >= 4) return path;
+          }
+          return ["cat", "cot", "cop", "cap"]; // the graph makes this unreachable
+        }
+        function startLadder() {
+          mode = "ladder";
+          chain = makeChain();
+          chainPos = 0;
+          showView("play");
+          playSound("click");
+          setupWord(chain[0], null);
+        }
+
+        // ---------- advancing ----------
+        function advance() {
+          if (phase !== "feedback") return;
+          if (mode === "ladder") {
+            if (chainPos >= chain.length - 1) { endRound(); return; }
+            chainPos++;
+            setupWord(chain[chainPos], chain[chainPos - 1]);
+          } else {
+            solvedCount++;
+            if (queue.length === 0) { endRound(); return; }
+            setupWord(queue.shift(), null);
+          }
+        }
+
+        function endRound() {
+          phase = "done";
+          var head, score;
+          if (mode === "ladder") {
+            head = "🎉 Ladder climbed!";
+            score = "You climbed all " + chain.length + " rungs, one sound at a time.";
+            $("climbedBox").hidden = false;
+            $("climbedBox").textContent = chain.join(" → ");
+          } else {
+            head = "🎉 " + SET_NAMES[setId] + " — set complete!";
+            score = "You built all " + roundTotal + " words, sound by sound.";
+            $("climbedBox").hidden = true;
+          }
+          $("resultsHead").textContent = head;
+          $("resultsScore").textContent = score;
+          $("resultsBest").textContent =
+            "Best streak this visit: " + best + " 🔥 (nothing is saved when you leave)";
+          $("againBtn").textContent = mode === "ladder" ? "🪜 New ladder" : "🔄 Same set again";
+          showView("results");
+          srStatus.textContent = head + " " + score;
+          $("resultsHead").focus();
+          playSound("win");
+          if (!reducedMotion) confetti(60);
+        }
+
+        // ---------- confetti (skipped under reduced motion) ----------
+        function confetti(count) {
+          var colors = ["#f59e0b", "#fbbf24", "#ff6b57", "#15803d", "#7c3aed", "#2563eb"];
+          for (var i = 0; i < count; i++) {
+            var bit = document.createElement("div");
+            bit.className = "confetti-bit";
+            bit.style.left = Math.random() * 100 + "vw";
+            bit.style.background = colors[i % colors.length];
+            bit.style.animationDuration = 2.2 + Math.random() * 1.8 + "s";
+            bit.style.animationDelay = Math.random() * 0.6 + "s";
+            document.body.appendChild(bit);
+            (function (b) { setTimeout(function () { b.remove(); }, 5000); })(bit);
+          }
+        }
+
+        // ---------- wiring ----------
+        pickView.querySelectorAll(".chip").forEach(function (chip) {
+          chip.addEventListener("click", function () {
+            if (chip.dataset.set === "ladder") startLadder();
+            else startSet(chip.dataset.set);
+          });
+        });
+
+        blendBtn.addEventListener("click", function () { blend(null); });
+        checkBtn.addEventListener("click", check);
+        nextBtn.addEventListener("click", advance);
+
+        // the picture speaks its word — only when a local voice exists
+        picBtn.addEventListener("click", function () {
+          if (speechVoice) speakWord(target);
+        });
+
+        function goPick() {
+          phase = "pick";
+          stopBlend();
+          playSound("click");
+          showView("pick");
+          var first = pickView.querySelector(".chip");
+          if (first) first.focus();
+        }
+        $("setsBtn").addEventListener("click", goPick);
+        $("anotherBtn").addEventListener("click", goPick);
+        $("againBtn").addEventListener("click", function () {
+          if (mode === "ladder") startLadder();
+          else startSet(setId);
+        });
+
+        var muteBtn = $("muteBtn");
+        muteBtn.addEventListener("click", function () {
+          soundOn = !soundOn;
+          muteBtn.textContent = soundOn ? "🔊 Sound on" : "🔇 Sound off";
+          muteBtn.setAttribute("aria-pressed", String(!soundOn));
+          if (!soundOn && window.speechSynthesis) {
+            try { window.speechSynthesis.cancel(); } catch (e) { /* optional */ }
+          }
+          if (soundOn) playSound("click");
+        });
+
+        // typing a letter presses its tile; Backspace takes one back;
+        // Enter checks (or advances via the focused Next button natively)
+        document.addEventListener("keydown", function (ev) {
+          if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
+          if (phase !== "build") return;
+          var key = ev.key.toLowerCase();
+          if (key.length === 1 && key >= "a" && key <= "z") {
+            for (var i = 0; i < tiles.length; i++) {
+              if (!tiles[i].used && tiles[i].ch === key) {
+                ev.preventDefault();
+                placeLetter(i);
+                return;
+              }
+            }
+          } else if (ev.key === "Backspace") {
+            ev.preventDefault();
+            undoLast();
+          } else if (ev.key === "Enter" && document.activeElement.tagName !== "BUTTON") {
+            ev.preventDefault();
+            check();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
