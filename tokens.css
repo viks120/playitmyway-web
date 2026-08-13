@@ -43,6 +43,20 @@
   --color-green: #15803d;
   --color-green-tint: #dcfce7;
 
+  /* Word-class colours (AA-safe as text on white/tint) + soft tints.
+     One visual system across every grammar game: a noun is always blue,
+     a verb always red, wherever a child meets it. */
+  --wc-noun: #1d4ed8;
+  --wc-noun-tint: #dbeafe;
+  --wc-verb: #b91c1c;
+  --wc-verb-tint: #fee2e2;
+  --wc-adjective: #15803d;
+  --wc-adjective-tint: #dcfce7;
+  --wc-adverb: #b45309;
+  --wc-adverb-tint: #fef3c7;
+  --wc-other: #6d28d9;
+  --wc-other-tint: #ede9fe;
+
   /* Typography */
   --font-display: "Fredoka", "Comic Sans MS", "Segoe UI", system-ui, sans-serif;
 

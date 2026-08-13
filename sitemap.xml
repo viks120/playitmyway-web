@@ -80,6 +80,16 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://playitmyway.com/games/sound-it-out/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://playitmyway.com/games/sort-it-out/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
   <!-- Games for Ages 7+ -->
   <url>
@@ -104,6 +114,21 @@
   </url>
   <url>
     <loc>https://playitmyway.com/games/one-line-draw/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://playitmyway.com/games/silly-story-builder/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://playitmyway.com/games/clock-shop/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://playitmyway.com/games/code-the-robot/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
