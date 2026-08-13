@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#b45309" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Sort It Out – Free Sorting Game for Kids | Play It My Way</title>
+    <meta name="description" content="Tap to sort! Living or not, odd or even, vowels, sinks or floats — every answer comes with a kid-sized reason why. Free sorting game for ages 5+. No ads, no download." />
+    <meta name="keywords" content="sorting game for kids, classifying game for children, living and nonliving things game, odd and even numbers game, vowels and consonants game, sink or float game" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Sort It Out – Free Sorting & Classifying Game for Kids" />
+    <meta property="og:description" content="A card appears, you tap the right bin — and every single answer teaches you why. Four packs: living things, odd & even, vowels, sink or float. Free, no ads!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/sort-it-out/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Sort It Out – Free Sorting Game for Kids" />
+    <meta name="twitter:description" content="Tap the right bin and learn the reason why, every time. Living things, odd & even, vowels, sink or float. Free, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/sort-it-out/" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <style>
+      :root {
+        --bg: var(--color-bg);
+        --surface: var(--color-surface);
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --band: var(--color-amber);         /* age band 5+ */
+        --band-tint: var(--color-amber-tint);
+        --good: var(--color-green);
+        --good-tint: var(--color-green-tint);
+        --coral-deep: var(--color-primary-deep);
+        --font: var(--font-display);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body {
+        background: var(--bg);
+        /* an accidental pull-to-refresh would wipe the round and the best score */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font);
+        color: var(--ink);
+        margin: 0;
+        padding: 14px 12px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: var(--font); touch-action: manipulation; }
+
+      .back-link {
+        align-self: flex-start;
+        color: var(--band);
+        background: var(--band-tint);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      header.game-head { text-align: center; margin: 10px 0 10px; }
+      header.game-head h1 {
+        font-size: clamp(26px, 7vw, 34px);
+        font-weight: 600;
+        margin: 0 0 4px;
+        text-wrap: balance;
+      }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        width: 100%;
+        max-width: 480px;
+        padding: 16px 14px 18px;
+      }
+
+      [hidden] { display: none !important; }
+
+      /* ---------- pack picker ---------- */
+      .pick-title { font-size: 20px; font-weight: 600; text-align: center; margin: 2px 0 12px; }
+      .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      @media (max-width: 380px) { .chips { grid-template-columns: 1fr; } }
+      .chip {
+        border: 2.5px solid var(--band-tint);
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        padding: 14px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        min-height: 104px;
+        transition: transform var(--ease-quick), border-color var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .chip:hover { transform: translateY(-2px); border-color: var(--band); box-shadow: var(--shadow-rest); }
+      .chip .chip-emoji { font-size: 30px; line-height: 1; }
+      .chip .chip-name { font-size: 16.5px; font-weight: 600; color: var(--ink); }
+      .chip .chip-sub { font-size: 13px; color: var(--ink-soft); }
+
+      /* ---------- play view ---------- */
+      .stats-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+      .stat {
+        background: var(--band-tint);
+        color: var(--band);
+        font-weight: 600;
+        font-size: 13.5px;
+        padding: 6px 12px;
+        border-radius: var(--radius-pill);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .prompt { text-align: center; color: var(--ink-soft); font-size: 16.5px; margin: 2px 0 6px; min-height: 24px; }
+
+      .stage {
+        min-height: 168px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        border: 2.5px dashed var(--band-tint);
+        border-radius: var(--radius-lg);
+        padding: 12px 10px;
+        margin-bottom: 12px;
+        position: relative;
+      }
+      .retry-chip {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        background: var(--band-tint);
+        color: var(--band);
+        font-size: 13px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+      }
+      .glyph { font-size: clamp(58px, 18vw, 84px); line-height: 1.15; user-select: none; }
+      .glyph.pop { animation: glyphPop 220ms ease; }
+      @keyframes glyphPop { 0% { transform: scale(0.7); opacity: 0.4; } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
+      .word { font-size: 22px; font-weight: 600; min-height: 28px; }
+
+      .bins { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .bin {
+        border: 3px solid var(--band);
+        background: var(--band-tint);
+        color: var(--band);
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        min-height: 96px;
+        padding: 10px 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        position: relative;
+        transition: transform var(--ease-quick), background var(--ease-quick), border-color var(--ease-quick), color var(--ease-quick);
+      }
+      .bin:hover:not(:disabled) { transform: translateY(-3px); box-shadow: var(--shadow-rest); }
+      .bin:disabled { cursor: default; opacity: 0.92; }
+      .bin .bin-key {
+        position: absolute;
+        top: 6px;
+        left: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1.5px solid currentColor;
+        border-radius: 6px;
+        padding: 1px 6px;
+        opacity: 0.7;
+      }
+      .bin .bin-emoji { font-size: 30px; line-height: 1; }
+      .bin .bin-label { font-size: 18px; font-weight: 600; }
+      .bin.is-right { background: var(--good-tint); border-color: var(--good); color: var(--good); }
+      .bin.is-wrong { background: #fee2e2; border-color: var(--coral-deep); color: var(--coral-deep); animation: binNudge 320ms ease; }
+      @keyframes binNudge {
+        25% { transform: translateX(-4px); }
+        50% { transform: translateX(4px); }
+        75% { transform: translateX(-2px); }
+      }
+
+      /* the reason ALWAYS renders here — height is reserved so the bins never jump */
+      .feedback {
+        min-height: 118px;
+        margin-top: 12px;
+        border-radius: var(--radius-md);
+        padding: 10px 12px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+        background: transparent;
+        transition: background var(--ease-quick);
+      }
+      .feedback.good { background: var(--good-tint); }
+      .feedback.oops { background: var(--band-tint); }
+      .verdict { font-size: 17px; font-weight: 600; margin: 0; }
+      .feedback.good .verdict { color: var(--good); }
+      .feedback.oops .verdict { color: var(--band); }
+      .reason { font-size: 15.5px; color: var(--ink); margin: 0; line-height: 1.5; }
+      .requeue-note { font-size: 13.5px; color: var(--ink-soft); margin: 0; }
+
+      .advance-row { display: flex; justify-content: center; margin-top: 12px; min-height: 48px; }
+      .advance-row .btn { visibility: hidden; }
+      .advance-row.show .btn { visibility: visible; }
+
+      .controls { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+      .btn {
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 15.5px;
+        padding: 11px 18px;
+        border-radius: var(--radius-pill);
+        min-height: 46px;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn-soft { background: var(--band-tint); color: var(--band); }
+      .btn-go { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
+
+      /* ---------- results ---------- */
+      .results { text-align: center; }
+      .results h2 { font-size: 24px; margin: 4px 0 10px; }
+      .results .score-line { font-size: 18px; font-weight: 600; margin: 4px 0; }
+      .results .best-line { font-size: 15px; color: var(--ink-soft); margin: 4px 0 10px; }
+      .tricky { background: var(--band-tint); border-radius: var(--radius-md); padding: 10px 12px; margin: 10px 0; }
+      .tricky p { margin: 0 0 6px; font-size: 14.5px; font-weight: 600; color: var(--band); }
+      .tricky-list { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+      .tricky-item {
+        background: var(--surface);
+        border-radius: var(--radius-pill);
+        padding: 4px 11px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .all-first-try { font-size: 15.5px; color: var(--good); font-weight: 600; margin: 8px 0; }
+
+      .how-to {
+        width: 100%;
+        max-width: 480px;
+        margin-top: 18px;
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 16px 18px;
+      }
+      .how-to h2 { font-size: 19px; margin: 0 0 8px; }
+      .how-to ul { margin: 0; padding-left: 20px; color: var(--ink-soft); font-size: 15.5px; line-height: 1.7; }
+      .how-to li::marker { color: var(--band); }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .confetti-bit {
+        position: fixed;
+        top: -14px;
+        width: 10px;
+        height: 14px;
+        border-radius: 3px;
+        pointer-events: none;
+        z-index: 50;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall { to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .confetti-bit { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🗂️ Sort It Out</h1>
+      <p>Tap the right bin — and find out why!</p>
+    </header>
+
+    <main class="card">
+      <!-- pack picker -->
+      <div id="pickView">
+        <h2 class="pick-title">📦 Pick a pack</h2>
+        <div class="chips" role="group" aria-label="Card packs">
+          <button class="chip" data-pack="living">
+            <span class="chip-emoji" aria-hidden="true">🌱</span>
+            <span class="chip-name">Living or not?</span>
+            <span class="chip-sub">Alive… or not? · 26 cards</span>
+          </button>
+          <button class="chip" data-pack="oddeven">
+            <span class="chip-emoji" aria-hidden="true">🔢</span>
+            <span class="chip-name">Odd or even?</span>
+            <span class="chip-sub">Numbers 1–99 · 20 a round</span>
+          </button>
+          <button class="chip" data-pack="vowels">
+            <span class="chip-emoji" aria-hidden="true">🔤</span>
+            <span class="chip-name">Vowel or consonant?</span>
+            <span class="chip-sub">All 26 letters</span>
+          </button>
+          <button class="chip" data-pack="floats">
+            <span class="chip-emoji" aria-hidden="true">🌊</span>
+            <span class="chip-name">Sinks or floats?</span>
+            <span class="chip-sub">22 everyday things</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- play -->
+      <div id="playView" hidden>
+        <div class="stats-row">
+          <span class="stat" id="statPack">📦 Pack</span>
+          <span class="stat" id="statSorted">Sorted 0 of 0</span>
+          <span class="stat" id="statScore">⭐ 0</span>
+        </div>
+
+        <p class="prompt" id="packPrompt"></p>
+
+        <div class="stage">
+          <span class="retry-chip" id="retryChip" hidden>👀 Second look!</span>
+          <div class="glyph" id="cardGlyph" aria-hidden="true"></div>
+          <div class="word" id="cardWord"></div>
+        </div>
+
+        <div class="bins" id="bins" role="group" aria-label="Sorting bins"></div>
+
+        <div class="feedback" id="feedback" aria-live="polite">
+          <p class="verdict" id="verdict"></p>
+          <p class="reason" id="reason"></p>
+          <p class="requeue-note" id="requeueNote"></p>
+        </div>
+
+        <div class="advance-row" id="advanceRow">
+          <button class="btn btn-go" id="nextBtn">Next card ➜</button>
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-soft" id="packsBtn">📦 Packs</button>
+          <button class="btn btn-soft" id="muteBtn" aria-pressed="false">🔊 Sound on</button>
+        </div>
+      </div>
+
+      <!-- results -->
+      <div id="resultsView" class="results" hidden>
+        <h2 id="resultsHead" tabindex="-1">🎉 Pack sorted!</h2>
+        <p class="score-line" id="resultsScore"></p>
+        <p class="best-line" id="resultsBest"></p>
+        <p class="all-first-try" id="resultsPerfect" hidden>🌟 First try on every single card!</p>
+        <div class="tricky" id="trickyBox" hidden>
+          <p id="trickyTitle">Cards that came back for a second look:</p>
+          <div class="tricky-list" id="trickyList"></div>
+        </div>
+        <div class="controls">
+          <button class="btn btn-go" id="againBtn">🔄 Same pack again</button>
+          <button class="btn btn-soft" id="anotherBtn">📦 Pick another pack</button>
+        </div>
+      </div>
+    </main>
+
+    <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ul>
+        <li>A card appears — look at it, then <strong>tap the bin</strong> where it belongs.</li>
+        <li>Every card tells you <strong>why</strong>, whether you were right or not. Reading the reason is the game!</li>
+        <li>Tricky cards pop back a few cards later for a second try — get them then for half the stars.</li>
+        <li>Keyboard: press <strong>1</strong> for the left bin, <strong>2</strong> for the right bin, and <strong>Enter</strong> for the next card.</li>
+        <li>Nothing is saved — your best score lasts only for this visit.</li>
+      </ul>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* ==PACK_DATA_START==
+           Pure data only — no DOM access in this section.
+           The build validator extracts and evaluates this slice in Node. */
+
+        // --- Odd / Even: numbers are generated, reasons are authored per ones-digit ---
+        var SINGLE_DIGIT_REASONS = {
+          1: "1 is odd — it's just one on its own, with no partner to pair up with.",
+          2: "2 is even — it makes one perfect pair.",
+          3: "3 is odd — one pair, and one left over.",
+          4: "4 is even — two tidy pairs.",
+          5: "5 is odd — two pairs, and one left over.",
+          6: "6 is even — three tidy pairs.",
+          7: "7 is odd — three pairs, and one left over.",
+          8: "8 is even — four tidy pairs.",
+          9: "9 is odd — four pairs, and one left over."
+        };
+        var TENS_REASONS = {
+          0: "{n} ends in 0, and 0 is even — so {n} is even. Numbers ending in 0, 2, 4, 6 or 8 are always even.",
+          1: "{n} ends in 1, and 1 is odd — so {n} is odd. Numbers ending in 1, 3, 5, 7 or 9 are always odd.",
+          2: "{n} ends in 2, and 2 is even — so {n} is even. Only the last digit decides!",
+          3: "{n} ends in 3, and 3 is odd — so {n} is odd. Only the last digit decides!",
+          4: "{n} ends in 4, and 4 is even — so {n} is even. The ones digit decides everything.",
+          5: "{n} ends in 5, and 5 is odd — so {n} is odd. The ones digit decides everything.",
+          6: "{n} ends in 6, and 6 is even — so {n} is even. Just check the last digit!",
+          7: "{n} ends in 7, and 7 is odd — so {n} is odd. Just check the last digit!",
+          8: "{n} ends in 8, and 8 is even — so {n} is even. The last digit is the boss.",
+          9: "{n} ends in 9, and 9 is odd — so {n} is odd. The last digit is the boss."
+        };
+        function buildOddEvenCards() {
+          var cards = [];
+          for (var n = 1; n <= 99; n++) {
+            var d = n % 10;
+            var reason = n < 10
+              ? SINGLE_DIGIT_REASONS[n]
+              : TENS_REASONS[d].split("{n}").join(String(n));
+            cards.push({
+              label: String(n),
+              emoji: String(n),
+              bin: n % 2 === 0 ? "even" : "odd",
+              reason: reason
+            });
+          }
+          return cards;
+        }
+
+        // --- Vowel / Consonant: every letter, reason names the sound ---
+        // [letter, bin, sound, "like ..." phrase, optional extra note]
+        var LETTER_FACTS = [
+          ["A", "vowel", "/a/", "like in apple"],
+          ["B", "consonant", "/b/", "like in ball"],
+          ["C", "consonant", "/k/", "like in cat"],
+          ["D", "consonant", "/d/", "like in dog"],
+          ["E", "vowel", "/e/", "like in egg"],
+          ["F", "consonant", "/f/", "like in fish"],
+          ["G", "consonant", "/g/", "like in goat"],
+          ["H", "consonant", "/h/", "like in hat"],
+          ["I", "vowel", "/i/", "like in igloo"],
+          ["J", "consonant", "/j/", "like in jam"],
+          ["K", "consonant", "/k/", "like in kite"],
+          ["L", "consonant", "/l/", "like in lion"],
+          ["M", "consonant", "/m/", "like in moon"],
+          ["N", "consonant", "/n/", "like in nest"],
+          ["O", "vowel", "/o/", "like in octopus"],
+          ["P", "consonant", "/p/", "like in pig"],
+          ["Q", "consonant", "/kw/", "like in queen", "It almost always brings U along with it!"],
+          ["R", "consonant", "/r/", "like in run"],
+          ["S", "consonant", "/s/", "like in sun"],
+          ["T", "consonant", "/t/", "like in tiger"],
+          ["U", "vowel", "/u/", "like in umbrella"],
+          ["V", "consonant", "/v/", "like in van"],
+          ["W", "consonant", "/w/", "like in water"],
+          ["X", "consonant", "/ks/", "like at the end of fox"],
+          ["Y", "consonant", "/y/", "like in yo-yo", "Sneaky Y sometimes helps out as a vowel, in words like ‘my’!"],
+          ["Z", "consonant", "/z/", "like in zebra"]
+        ];
+        function buildLetterCards() {
+          return LETTER_FACTS.map(function (f) {
+            var letter = f[0], bin = f[1], sound = f[2], phrase = f[3], extra = f[4];
+            var reason = bin === "vowel"
+              ? letter + " says " + sound + " " + phrase + " — it's one of the five vowels: A, E, I, O, U."
+              : letter + " says " + sound + " " + phrase + " — it's a consonant." + (extra ? " " + extra : "");
+            return { label: "Letter " + letter, emoji: letter, bin: bin, reason: reason };
+          });
+        }
+
+        var PACKS = [
+          {
+            id: "living",
+            name: "Living or not?",
+            emoji: "🌱",
+            prompt: "Is it living, or not living?",
+            bins: [
+              { id: "living", label: "Living", emoji: "🌱" },
+              { id: "notliving", label: "Not living", emoji: "🪨" }
+            ],
+            cards: [
+              { label: "Dog", emoji: "🐶", bin: "living", reason: "A dog eats, grows and has puppies — it's a living thing." },
+              { label: "Tree", emoji: "🌳", bin: "living", reason: "A tree grows from a tiny seed and drinks water through its roots — it's alive." },
+              { label: "Sunflower", emoji: "🌻", bin: "living", reason: "A sunflower grows, drinks water and turns to face the sun — it's alive." },
+              { label: "Butterfly", emoji: "🦋", bin: "living", reason: "A butterfly eats, flies and grew from a caterpillar — it's a living thing." },
+              { label: "Fish", emoji: "🐟", bin: "living", reason: "A fish eats, swims and grows bigger — it's a living thing." },
+              { label: "Frog", emoji: "🐸", bin: "living", reason: "A frog eats, hops and grew from a little tadpole — it's alive." },
+              { label: "Bird", emoji: "🐦", bin: "living", reason: "A bird eats, breathes and hatches from an egg — it's a living thing." },
+              { label: "Mushroom", emoji: "🍄", bin: "living", reason: "A mushroom grows bigger every day — it's living, even though it's not a plant or an animal." },
+              { label: "Snail", emoji: "🐌", bin: "living", reason: "A snail eats, moves and grows — it's a living thing, just a very slow one!" },
+              { label: "Bee", emoji: "🐝", bin: "living", reason: "A bee eats, flies and grows — it's a living thing." },
+              { label: "Cactus", emoji: "🌵", bin: "living", reason: "A cactus is a plant — it grows and drinks the water it stores inside, so it's alive." },
+              { label: "Grass", emoji: "🌿", bin: "living", reason: "Grass drinks water and keeps growing taller — it's alive. That's why lawns need mowing!" },
+              { label: "Elephant", emoji: "🐘", bin: "living", reason: "An elephant eats, breathes and grows — it's a living thing." },
+              { label: "Rock", emoji: "🪨", bin: "notliving", reason: "A rock never eats, grows or breathes — it's not living." },
+              { label: "Chair", emoji: "🪑", bin: "notliving", reason: "A chair can't eat, grow or move on its own — it's not living." },
+              { label: "Bicycle", emoji: "🚲", bin: "notliving", reason: "A bicycle moves only when someone pedals it — it doesn't eat or grow, so it's not living." },
+              { label: "Ball", emoji: "⚽", bin: "notliving", reason: "A ball bounces, but it can't eat, grow or breathe — it's not living." },
+              { label: "Car", emoji: "🚗", bin: "notliving", reason: "A car moves, but it doesn't eat, grow or have babies — machines are not living." },
+              { label: "Spoon", emoji: "🥄", bin: "notliving", reason: "A spoon can't eat, grow or move by itself — it's not living." },
+              { label: "Book", emoji: "📕", bin: "notliving", reason: "A book can't eat, grow or breathe — it's not living." },
+              { label: "Robot", emoji: "🤖", bin: "notliving", reason: "A robot can move and beep, but it doesn't eat, grow or have babies — it's not living." },
+              { label: "Teddy bear", emoji: "🧸", bin: "notliving", reason: "A teddy bear looks like an animal, but it can't eat, grow or breathe — it's not living." },
+              { label: "Cloud", emoji: "☁️", bin: "notliving", reason: "A cloud floats and changes shape, but it doesn't eat, breathe or have babies — it's not living." },
+              { label: "Pencil", emoji: "✏️", bin: "notliving", reason: "A pencil can't eat, grow or move on its own — it's not living." },
+              { label: "Kite", emoji: "🪁", bin: "notliving", reason: "A kite flies only when the wind pushes it — it doesn't eat or grow, so it's not living." },
+              { label: "Moon", emoji: "🌙", bin: "notliving", reason: "The Moon shines in the night sky, but it doesn't eat, grow or breathe — it's not living." }
+            ]
+          },
+          {
+            id: "oddeven",
+            name: "Odd or even?",
+            emoji: "🔢",
+            prompt: "Is this number odd, or even?",
+            roundSize: 20,
+            bins: [
+              { id: "odd", label: "Odd", emoji: "🧍" },
+              { id: "even", label: "Even", emoji: "👫" }
+            ],
+            cards: buildOddEvenCards()
+          },
+          {
+            id: "vowels",
+            name: "Vowel or consonant?",
+            emoji: "🔤",
+            prompt: "Is this letter a vowel, or a consonant?",
+            bins: [
+              { id: "vowel", label: "Vowel", emoji: "🎵" },
+              { id: "consonant", label: "Consonant", emoji: "🥁" }
+            ],
+            cards: buildLetterCards()
+          },
+          {
+            id: "floats",
+            name: "Sinks or floats?",
+            emoji: "🌊",
+            prompt: "In water, does it sink, or float?",
+            bins: [
+              { id: "sinks", label: "Sinks", emoji: "⬇️" },
+              { id: "floats", label: "Floats", emoji: "⬆️" }
+            ],
+            cards: [
+              { label: "Stone", emoji: "🪨", bin: "sinks", reason: "A stone is heavy for its size — heavy-for-its-size things always sink." },
+              { label: "Coin", emoji: "🪙", bin: "sinks", reason: "A coin is solid metal — heavy for its size, so it sinks." },
+              { label: "Key", emoji: "🔑", bin: "sinks", reason: "A key is solid metal — heavy for its size, so down it goes." },
+              { label: "Metal spoon", emoji: "🥄", bin: "sinks", reason: "A metal spoon is heavy for its size, so it sinks." },
+              { label: "Metal fork", emoji: "🍴", bin: "sinks", reason: "A metal fork is heavy for its size, so it sinks." },
+              { label: "Brick", emoji: "🧱", bin: "sinks", reason: "A brick is very heavy for its size — it sinks straight to the bottom." },
+              { label: "Metal bolt", emoji: "🔩", bin: "sinks", reason: "A bolt is a chunky piece of metal — heavy for its size, so it sinks." },
+              { label: "Scissors", emoji: "✂️", bin: "sinks", reason: "Scissors are made of metal — heavy for their size, so they sink." },
+              { label: "Anchor", emoji: "⚓", bin: "sinks", reason: "An anchor is a big lump of heavy metal — sinking is its job! It holds the boat still." },
+              { label: "Ring", emoji: "💍", bin: "sinks", reason: "A ring is solid metal — small but heavy for its size, so it sinks." },
+              { label: "Leaf", emoji: "🍃", bin: "floats", reason: "A leaf is light for its size — light-for-its-size things float." },
+              { label: "Feather", emoji: "🪶", bin: "floats", reason: "A feather is one of the lightest things for its size — it floats easily." },
+              { label: "Log", emoji: "🪵", bin: "floats", reason: "Wood is light for its size — logs float. That's how wooden rafts work!" },
+              { label: "Sailboat", emoji: "⛵", bin: "floats", reason: "A boat is full of air inside, so it's light for its size — floating is what boats do best." },
+              { label: "Canoe", emoji: "🛶", bin: "floats", reason: "A canoe is light for its size and full of air space — it floats, ready to paddle." },
+              { label: "Apple", emoji: "🍎", bin: "floats", reason: "An apple has tiny air pockets inside, so it's light for its size — that's why you can bob for apples!" },
+              { label: "Ice cube", emoji: "🧊", bin: "floats", reason: "Ice is a little lighter than water — ice cubes always bob up to the top." },
+              { label: "Soccer ball", emoji: "⚽", bin: "floats", reason: "A soccer ball is full of air — very light for its size, so it floats." },
+              { label: "Volleyball", emoji: "🏐", bin: "floats", reason: "A volleyball is full of air — light for its size, so it floats." },
+              { label: "Balloon", emoji: "🎈", bin: "floats", reason: "A balloon is full of air — super light for its size, so it floats on top." },
+              { label: "Duck", emoji: "🦆", bin: "floats", reason: "A duck is light for its size, and its feathers trap tiny air bubbles — it floats along happily." },
+              { label: "Wooden pencil", emoji: "✏️", bin: "floats", reason: "A wooden pencil is light for its size — wood floats." }
+            ]
+          }
+        ];
+        /* ==PACK_DATA_END== */
+
+        // ---------- helpers ----------
+        function $(id) { return document.getElementById(id); }
+        function shuffle(arr) {
+          for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+          }
+          return arr;
+        }
+        function sample(arr, n) { return shuffle(arr.slice()).slice(0, n); }
+
+        var reducedMotion = window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        // ---------- elements ----------
+        var pickView = $("pickView"), playView = $("playView"), resultsView = $("resultsView");
+        var binsEl = $("bins"), glyphEl = $("cardGlyph"), wordEl = $("cardWord"), retryChip = $("retryChip");
+        var promptEl = $("packPrompt"), feedbackEl = $("feedback");
+        var verdictEl = $("verdict"), reasonEl = $("reason"), requeueNote = $("requeueNote");
+        var advanceRow = $("advanceRow"), nextBtn = $("nextBtn"), srStatus = $("srStatus");
+        var statPack = $("statPack"), statSorted = $("statSorted"), statScore = $("statScore");
+
+        // ---------- in-memory state (nothing is ever stored) ----------
+        var FULL_POINTS = 10, HALF_POINTS = 5, REQUEUE_GAP = 3;
+        var pack = null, deck = [], current = null, phase = "pick";
+        var sorted = 0, total = 0, score = 0, revisited = [];
+        var bestByPack = {}; // "best this visit" — memory only
+        var soundOn = true;
+
+        // ---------- gentle WebAudio (fully playable silent) ----------
+        var AudioCtx = window.AudioContext || window.webkitAudioContext;
+        var audioCtx = null;
+        function tone(freq, when, dur, gainVal, type) {
+          var osc = audioCtx.createOscillator();
+          var gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.type = type || "sine";
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + when);
+          gain.gain.setValueAtTime(gainVal, audioCtx.currentTime + when);
+          gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + when + dur);
+          osc.start(audioCtx.currentTime + when);
+          osc.stop(audioCtx.currentTime + when + dur);
+        }
+        function playSound(kind) {
+          if (!soundOn || !AudioCtx) return;
+          try {
+            if (!audioCtx) audioCtx = new AudioCtx();
+            if (audioCtx.state === "suspended") audioCtx.resume();
+            if (kind === "correct") {
+              tone(660, 0, 0.14, 0.11);
+              tone(880, 0.12, 0.2, 0.11);
+            } else if (kind === "oops") {
+              // soft, kind "hmm" — never harsh
+              tone(294, 0, 0.14, 0.06);
+              tone(247, 0.13, 0.22, 0.05);
+            } else if (kind === "win") {
+              [523, 659, 784, 1047].forEach(function (f, i) {
+                tone(f, i * 0.13, 0.28, 0.11);
+              });
+            } else if (kind === "click") {
+              tone(500, 0, 0.05, 0.045);
+            }
+          } catch (e) { /* sound is optional */ }
+        }
+
+        // ---------- views ----------
+        function showView(name) {
+          pickView.hidden = name !== "pick";
+          playView.hidden = name !== "play";
+          resultsView.hidden = name !== "results";
+        }
+
+        // ---------- round ----------
+        function makeDeck(p) {
+          var cards;
+          if (p.roundSize) {
+            // odd/even: a fresh balanced sample of numbers every round
+            var half = p.roundSize / 2;
+            var odds = p.cards.filter(function (c) { return c.bin === "odd"; });
+            var evens = p.cards.filter(function (c) { return c.bin === "even"; });
+            cards = sample(odds, half).concat(sample(evens, half));
+          } else {
+            cards = p.cards.slice();
+          }
+          return shuffle(cards.map(function (c) { return { card: c, misses: 0 }; }));
+        }
+
+        function binLabelFor(binId) {
+          for (var i = 0; i < pack.bins.length; i++) {
+            if (pack.bins[i].id === binId) return pack.bins[i].label;
+          }
+          return binId;
+        }
+
+        function renderBins() {
+          binsEl.innerHTML = "";
+          pack.bins.forEach(function (b, i) {
+            var btn = document.createElement("button");
+            btn.className = "bin";
+            btn.dataset.bin = b.id;
+            btn.innerHTML =
+              '<span class="bin-key" aria-hidden="true">' + (i + 1) + "</span>" +
+              '<span class="bin-emoji" aria-hidden="true">' + b.emoji + "</span>" +
+              '<span class="bin-label"></span>';
+            btn.querySelector(".bin-label").textContent = b.label;
+            btn.addEventListener("click", function () { choose(b.id); });
+            binsEl.appendChild(btn);
+          });
+        }
+
+        function startRound(packId) {
+          pack = null;
+          for (var i = 0; i < PACKS.length; i++) {
+            if (PACKS[i].id === packId) pack = PACKS[i];
+          }
+          if (!pack) return;
+          deck = makeDeck(pack);
+          total = deck.length;
+          sorted = 0;
+          score = 0;
+          revisited = [];
+          statPack.textContent = pack.emoji + " " + pack.name;
+          promptEl.textContent = pack.prompt;
+          renderBins();
+          updateStats();
+          showView("play");
+          playSound("click");
+          nextCard();
+        }
+
+        function updateStats() {
+          statSorted.textContent = "Sorted " + sorted + " of " + total;
+          statScore.textContent = "⭐ " + score;
+        }
+
+        function clearFeedback() {
+          feedbackEl.className = "feedback";
+          verdictEl.textContent = "";
+          reasonEl.textContent = "";
+          requeueNote.textContent = "";
+          advanceRow.classList.remove("show");
+        }
+
+        function nextCard() {
+          phase = "choose";
+          current = deck.shift();
+          var card = current.card;
+          clearFeedback();
+          retryChip.hidden = current.misses === 0;
+          glyphEl.textContent = card.emoji;
+          // numbers show once, big — don't repeat "37" as the word too
+          wordEl.textContent = card.label === card.emoji ? "" : card.label;
+          if (!reducedMotion) {
+            glyphEl.classList.remove("pop");
+            void glyphEl.offsetWidth; // restart the pop animation
+            glyphEl.classList.add("pop");
+          }
+          var binBtns = binsEl.querySelectorAll(".bin");
+          binBtns.forEach(function (b) {
+            b.disabled = false;
+            b.classList.remove("is-right", "is-wrong");
+          });
+          srStatus.textContent =
+            (current.misses > 0 ? "Second look! " : "") +
+            "Card: " + card.label + ". " + pack.prompt +
+            " Press 1 for " + pack.bins[0].label + ", 2 for " + pack.bins[1].label + ".";
+          if (binBtns[0]) binBtns[0].focus();
+        }
+
+        function choose(binId) {
+          if (phase !== "choose" || !current) return;
+          phase = "feedback";
+          var card = current.card;
+          var right = binId === card.bin;
+          var binLabel = binLabelFor(card.bin);
+
+          var binBtns = binsEl.querySelectorAll(".bin");
+          binBtns.forEach(function (b) {
+            b.disabled = true;
+            if (b.dataset.bin === card.bin) b.classList.add("is-right");
+            else if (b.dataset.bin === binId && !right) b.classList.add("is-wrong");
+          });
+
+          if (right) {
+            var pts = current.misses === 0 ? FULL_POINTS
+                    : current.misses === 1 ? HALF_POINTS : 0;
+            score += pts;
+            sorted++;
+            feedbackEl.className = "feedback good";
+            verdictEl.textContent =
+              (current.misses === 0
+                ? "✅ Yes! " + card.label + " goes in the " + binLabel + " bin."
+                : "✅ You got it this time! " + card.label + " goes in the " + binLabel + " bin.") +
+              (pts > 0 ? " ⭐ +" + pts : "");
+            reasonEl.textContent = card.reason;
+            requeueNote.textContent = "";
+            playSound("correct");
+          } else {
+            current.misses++;
+            var already = revisited.some(function (r) { return r.label === card.label; });
+            if (!already) revisited.push({ label: card.label, emoji: card.emoji });
+            // the missed card comes back three cards later for a second meeting
+            deck.splice(Math.min(REQUEUE_GAP, deck.length), 0, current);
+            feedbackEl.className = "feedback oops";
+            verdictEl.textContent = "💛 Not quite — " + card.label + " belongs in the " + binLabel + " bin.";
+            reasonEl.textContent = card.reason;
+            requeueNote.textContent = "👀 It'll pop back in a few cards for another try!";
+            playSound("oops");
+          }
+
+          updateStats();
+          nextBtn.textContent = deck.length === 0 ? "See results 🎉" : "Next card ➜";
+          advanceRow.classList.add("show");
+          nextBtn.focus();
+        }
+
+        function advance() {
+          if (phase !== "feedback") return;
+          if (deck.length === 0) { endRound(); return; }
+          nextCard();
+        }
+
+        function endRound() {
+          phase = "done";
+          var max = total * FULL_POINTS;
+          var prevBest = bestByPack[pack.id];
+          var isNewBest = prevBest !== undefined && score > prevBest;
+          if (prevBest === undefined || score > prevBest) bestByPack[pack.id] = score;
+
+          $("resultsHead").textContent = "🎉 " + pack.name.replace("?", "") + " — pack sorted!";
+          $("resultsScore").textContent =
+            "You sorted all " + total + " cards and scored " + score + " of " + max + " ⭐";
+          $("resultsBest").textContent =
+            "Best this visit: " + bestByPack[pack.id] + " ⭐" +
+            (isNewBest ? " — 🏆 new best!" : "") +
+            " (nothing is saved when you leave)";
+
+          var perfect = revisited.length === 0;
+          $("resultsPerfect").hidden = !perfect;
+          $("trickyBox").hidden = perfect;
+          if (!perfect) {
+            $("trickyTitle").textContent =
+              revisited.length === 1
+                ? "1 tricky card came back for a second look — and you sorted it:"
+                : revisited.length + " tricky cards came back for a second look — and you sorted every one:";
+            var list = $("trickyList");
+            list.innerHTML = "";
+            revisited.forEach(function (r) {
+              var span = document.createElement("span");
+              span.className = "tricky-item";
+              span.textContent = (r.emoji === r.label ? "" : r.emoji + " ") + r.label;
+              list.appendChild(span);
+            });
+          }
+
+          showView("results");
+          srStatus.textContent = "Pack complete. " + $("resultsScore").textContent;
+          $("resultsHead").focus();
+          playSound("win");
+          if (!reducedMotion) confetti();
+        }
+
+        // ---------- confetti (skipped under reduced motion) ----------
+        function confetti() {
+          var colors = ["#f59e0b", "#fbbf24", "#ff6b57", "#15803d", "#7c3aed", "#2563eb"];
+          for (var i = 0; i < 60; i++) {
+            var bit = document.createElement("div");
+            bit.className = "confetti-bit";
+            bit.style.left = Math.random() * 100 + "vw";
+            bit.style.background = colors[i % colors.length];
+            bit.style.animationDuration = 2.2 + Math.random() * 1.8 + "s";
+            bit.style.animationDelay = Math.random() * 0.6 + "s";
+            document.body.appendChild(bit);
+            (function (b) { setTimeout(function () { b.remove(); }, 5000); })(bit);
+          }
+        }
+
+        // ---------- wiring ----------
+        pickView.querySelectorAll(".chip").forEach(function (chip) {
+          chip.addEventListener("click", function () { startRound(chip.dataset.pack); });
+        });
+
+        nextBtn.addEventListener("click", advance);
+
+        $("packsBtn").addEventListener("click", function () {
+          phase = "pick";
+          playSound("click");
+          showView("pick");
+          var first = pickView.querySelector(".chip");
+          if (first) first.focus();
+        });
+
+        $("againBtn").addEventListener("click", function () { startRound(pack.id); });
+
+        $("anotherBtn").addEventListener("click", function () {
+          phase = "pick";
+          playSound("click");
+          showView("pick");
+          var first = pickView.querySelector(".chip");
+          if (first) first.focus();
+        });
+
+        var muteBtn = $("muteBtn");
+        muteBtn.addEventListener("click", function () {
+          soundOn = !soundOn;
+          muteBtn.textContent = soundOn ? "🔊 Sound on" : "🔇 Sound off";
+          muteBtn.setAttribute("aria-pressed", String(!soundOn));
+          if (soundOn) playSound("click");
+        });
+
+        // number keys choose bins; Enter is handled natively by the focused button
+        document.addEventListener("keydown", function (ev) {
+          if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
+          if (phase !== "choose") return;
+          if (ev.key === "1" || ev.key === "2") {
+            var idx = ev.key === "1" ? 0 : 1;
+            var binBtns = binsEl.querySelectorAll(".bin");
+            if (binBtns[idx] && !binBtns[idx].disabled) {
+              ev.preventDefault();
+              choose(binBtns[idx].dataset.bin);
+            }
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
