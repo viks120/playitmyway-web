@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#7c3aed" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Silly Story Builder – Free Grammar Mad-Libs for Kids | Play It My Way</title>
+    <meta name="description" content="Build hilarious mad-libs stories by spotting nouns, verbs, adjectives and adverbs! A free grammar game for kids 7+. Print your story, change one word, laugh again. No ads, no download." />
+    <meta name="keywords" content="mad libs for kids, silly story maker, parts of speech game, noun verb adjective game, grammar game for kids, free word game for kids" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Silly Story Builder – Free Grammar Mad-Libs for Kids" />
+    <meta property="og:description" content="Pick the right kind of word, build a ridiculous story, then change one word and watch the whole thing go sideways. Free, no ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/silly-story-builder/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Silly Story Builder – Free Grammar Mad-Libs for Kids" />
+    <meta name="twitter:description" content="Fill the blanks with nouns, verbs, adjectives and adverbs to build a ridiculous story. Free, unlimited stories, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/silly-story-builder/" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <style>
+      :root {
+        --bg: var(--color-bg);
+        --surface: var(--color-surface);
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --band: var(--color-violet);
+        --band-tint: var(--color-violet-tint);
+        --coral-deep: var(--color-primary-deep);
+        --font: var(--font-display);
+        --chip-border: #ded4c7;
+        --chip-border-strong: #a89a8b;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body {
+        background: var(--bg);
+        /* an accidental pull-to-refresh would wipe the half-built story */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font);
+        color: var(--ink);
+        margin: 0;
+        padding: 14px 12px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: var(--font); }
+
+      .back-link {
+        align-self: flex-start;
+        color: var(--band);
+        background: var(--band-tint);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      header.game-head { text-align: center; margin: 10px 0 10px; }
+      header.game-head h1 {
+        font-size: clamp(26px, 7vw, 34px);
+        font-weight: 600;
+        margin: 0 0 4px;
+        text-wrap: balance;
+      }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        width: 100%;
+        max-width: 620px;
+        padding: 16px 18px 18px;
+      }
+
+      .stats-row {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .stat {
+        background: var(--band-tint);
+        color: var(--band);
+        font-weight: 600;
+        font-size: 13.5px;
+        padding: 6px 12px;
+        border-radius: var(--radius-pill);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      /* ---------- the story ---------- */
+      .story-title {
+        font-size: clamp(19px, 5vw, 23px);
+        font-weight: 600;
+        text-align: center;
+        margin: 2px 0 10px;
+        text-wrap: balance;
+      }
+      .story {
+        font-size: 18.5px;
+        line-height: 2.1;
+        margin: 0;
+      }
+
+      /* one visual system for word classes: the colour comes from tokens.css,
+         the border-bottom STYLE differs per class so colour is never the only
+         signal (and it survives black-and-white printing) */
+      .wc-noun      { --wc: var(--wc-noun);      --wc-tint: var(--wc-noun-tint);      --wc-line: solid;  }
+      .wc-verb      { --wc: var(--wc-verb);      --wc-tint: var(--wc-verb-tint);      --wc-line: dashed; }
+      .wc-adjective { --wc: var(--wc-adjective); --wc-tint: var(--wc-adjective-tint); --wc-line: dotted; }
+      .wc-adverb    { --wc: var(--wc-adverb);    --wc-tint: var(--wc-adverb-tint);    --wc-line: double; }
+
+      button.blank {
+        display: inline-block;
+        font: inherit;
+        font-weight: 600;
+        line-height: 1.35;
+        color: var(--wc);
+        background: var(--wc-tint);
+        border: 2px dashed var(--wc);
+        border-radius: 8px;
+        padding: 1px 10px 2px;
+        margin: 0 1px;
+        cursor: pointer;
+        vertical-align: baseline;
+        transition: transform var(--ease-quick);
+      }
+      button.blank:hover { transform: translateY(-1px); }
+      button.blank .tag {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      button.blank.filled {
+        border-color: transparent;
+        border-bottom: 3px var(--wc-line) var(--wc);
+        border-radius: 6px 6px 0 0;
+        padding: 1px 7px 0;
+      }
+      /* box-shadow, not outline: an outline here would mask the :focus-visible
+         ring, leaving the current blank with no visible focus state */
+      button.blank.current {
+        box-shadow: 0 0 0 3px var(--wc);
+        animation: blankPulse 1.6s ease infinite;
+      }
+      @keyframes blankPulse {
+        50% { box-shadow: 0 0 0 3px var(--wc), 0 0 0 7px var(--wc-tint); }
+      }
+
+      .fill {
+        display: inline-block;
+        line-height: 1.35;
+        font-weight: 600;
+        color: var(--wc);
+        background: var(--wc-tint);
+        border-bottom: 3px var(--wc-line) var(--wc);
+        border-radius: 6px 6px 0 0;
+        padding: 1px 5px 0;
+      }
+      .fill.swap { animation: swapPop 620ms ease; }
+      @keyframes swapPop {
+        0% { transform: scale(0.4); background: var(--surface); }
+        45% { transform: scale(1.28); }
+        100% { transform: scale(1); }
+      }
+
+      .message {
+        text-align: center;
+        min-height: 52px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        margin: 12px 0 4px;
+        font-size: 17px;
+        font-weight: 600;
+      }
+      .message .sub { font-size: 14.5px; font-weight: 400; color: var(--ink-soft); }
+      .message.good { color: var(--band); }
+      .message.bad { color: var(--coral-deep); }
+      .message.info { color: var(--ink-soft); font-weight: 400; }
+
+      /* ---------- the word tray ---------- */
+      .tray-head {
+        text-align: center;
+        font-size: 15px;
+        font-weight: 400;
+        color: var(--ink-soft);
+        margin: 4px 0 10px;
+      }
+      .tray {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+      }
+      button.chip {
+        font: inherit;
+        font-weight: 600;
+        font-size: 16.5px;
+        color: var(--ink);
+        background: var(--surface);
+        border: 2px solid var(--chip-border);
+        border-radius: var(--radius-pill);
+        padding: 8px 16px;
+        min-height: 44px;
+        cursor: pointer;
+        transition: transform var(--ease-quick), border-color var(--ease-quick);
+      }
+      button.chip:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--chip-border-strong); }
+      button.chip.dud {
+        opacity: 0.4;
+        cursor: default;
+        text-decoration: line-through;
+      }
+      /* the second-miss scaffold: words of the right class light up */
+      button.chip.reveal {
+        color: var(--wc);
+        background: var(--wc-tint);
+        border-color: var(--wc);
+      }
+      button.chip.shake { animation: chipShake 0.4s ease; }
+      @keyframes chipShake {
+        20% { transform: translateX(-4px); }
+        40% { transform: translateX(4px); }
+        60% { transform: translateX(-3px); }
+        80% { transform: translateX(3px); }
+      }
+
+      .controls { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+      .btn {
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 15.5px;
+        padding: 11px 18px;
+        border-radius: var(--radius-pill);
+        min-height: 46px;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn-soft { background: var(--band-tint); color: var(--band); }
+      .btn-go { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
+
+      /* ---------- how to play ---------- */
+      .how-to {
+        width: 100%;
+        max-width: 620px;
+        margin-top: 18px;
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 16px 18px;
+      }
+      .how-to h2 { font-size: 19px; margin: 0 0 8px; }
+      .how-to ul { margin: 0 0 10px; padding-left: 20px; color: var(--ink-soft); font-size: 15.5px; line-height: 1.7; }
+      .how-to li::marker { color: var(--band); }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 14px;
+        font-size: 14.5px;
+        color: var(--ink-soft);
+        align-items: center;
+      }
+      .legend-chip {
+        font-weight: 600;
+        color: var(--wc);
+        background: var(--wc-tint);
+        border-bottom: 3px var(--wc-line) var(--wc);
+        border-radius: 6px 6px 0 0;
+        padding: 1px 8px 0;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .confetti-bit {
+        position: fixed;
+        top: -14px;
+        width: 10px;
+        height: 14px;
+        border-radius: 3px;
+        pointer-events: none;
+        z-index: 50;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall { to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; } }
+
+      .print-credit { display: none; }
+
+      @media (max-width: 480px) {
+        .story { font-size: 17px; }
+        button.chip { font-size: 15.5px; padding: 8px 13px; }
+        .card { padding: 14px 12px 16px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .confetti-bit { display: none; }
+      }
+
+      /* ---------- print: just the finished story, one clean page ---------- */
+      @media print {
+        body { background: #fff; padding: 0; display: block; }
+        .back-link, header.game-head, .stats-row, .message,
+        .tray-section, .controls, .how-to, .confetti-bit { display: none !important; }
+        .card { box-shadow: none; max-width: 100%; padding: 0; border-radius: 0; }
+        .story-title { font-size: 24pt; margin: 0 0 14pt; }
+        .story { font-size: 14pt; line-height: 2.2; }
+        /* class colours stay if the printer has them; the per-class underline
+           style still tells noun from verb in plain black and white */
+        .fill, button.blank { background: none !important; box-shadow: none !important; animation: none !important; }
+        button.blank { border: none; border-bottom: 2px dashed #333; color: #333; border-radius: 0; }
+        .print-credit { display: block; margin-top: 20pt; font-size: 10pt; color: #666; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>📖 Silly Story Builder</h1>
+      <p>Pick the right kind of word and build a ridiculous story.</p>
+    </header>
+
+    <main class="card">
+      <div class="stats-row">
+        <span class="stat" id="statStory">Story 1 of 12</span>
+        <span class="stat" id="statBlanks">Blanks 0 of 0</span>
+        <span class="stat" id="statDone">Finished 0</span>
+      </div>
+
+      <section aria-label="Your story">
+        <h2 class="story-title" id="storyTitle"></h2>
+        <p class="story" id="story"></p>
+        <p class="print-credit">Made with Silly Story Builder — playitmyway.com</p>
+      </section>
+
+      <p class="message info" id="message" aria-live="polite"></p>
+      <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
+
+      <section class="tray-section" id="traySection" aria-label="Word tray">
+        <h3 class="tray-head" id="trayHead">Which word fits the glowing blank? Tap it.</h3>
+        <div class="tray" id="tray"></div>
+      </section>
+
+      <div class="controls">
+        <button class="btn btn-go" id="changeBtn" hidden>🎲 Change one word</button>
+        <button class="btn btn-soft" id="printBtn" hidden>🖨️ Print my story</button>
+        <button class="btn btn-soft" id="newBtn">✨ New story</button>
+      </div>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ul>
+        <li>Every blank in the story shows a colour and a label — that tells you which <strong>kind</strong> of word it needs.</li>
+        <li>The word tray mixes all four kinds together. Find a word of the right kind and tap it.</li>
+        <li>Picked the wrong kind? No problem — you get a friendly hint, and then the right kind of words start to glow.</li>
+        <li>When every blank is filled, read your story out loud. Then tap <strong>🎲 Change one word</strong> and watch one word flip the whole story.</li>
+        <li>Tap <strong>🖨️ Print my story</strong> to keep your story on paper — nothing is saved here, so every visit starts fresh.</li>
+      </ul>
+      <div class="legend" aria-label="Word class colours">
+        <span><span class="legend-chip wc-noun">noun</span> a naming word</span>
+        <span><span class="legend-chip wc-verb">verb</span> a doing word</span>
+        <span><span class="legend-chip wc-adjective">adjective</span> a describing word</span>
+        <span><span class="legend-chip wc-adverb">adverb</span> a how-word</span>
+      </div>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* ===== DATA START ===== */
+        var WC_LIST = ["noun", "verb", "adjective", "adverb"];
+
+        var WC_INFO = {
+          noun:      { name: "noun",      art: "a",  kid: "a naming word" },
+          verb:      { name: "verb",      art: "a",  kid: "a doing word" },
+          adjective: { name: "adjective", art: "an", kid: "a describing word" },
+          adverb:    { name: "adverb",    art: "an", kid: "a how-word" }
+        };
+
+        var WORDS = {
+          noun: [
+            "pickle", "walrus", "banana", "tuba", "sock", "toilet", "marshmallow",
+            "dinosaur", "unicorn", "meatball", "hamster", "cactus", "pancake",
+            "spaceship", "noodle", "penguin", "bathtub", "doughnut", "broccoli",
+            "flamingo", "mustache", "teapot", "pillow", "sausage", "octopus",
+            "waffle", "wig", "jellyfish", "umbrella", "burrito"
+          ],
+          /* every verb works on its own ("the pot galloped") and after "to"
+             ("started to gallop"), so any pick keeps the grammar intact */
+          verb: [
+            { b: "sneeze", p: "sneezed" }, { b: "wobble", p: "wobbled" },
+            { b: "bounce", p: "bounced" }, { b: "giggle", p: "giggled" },
+            { b: "snore", p: "snored" },   { b: "burp", p: "burped" },
+            { b: "hiccup", p: "hiccuped" },{ b: "twirl", p: "twirled" },
+            { b: "zoom", p: "zoomed" },    { b: "waddle", p: "waddled" },
+            { b: "gallop", p: "galloped" },{ b: "tiptoe", p: "tiptoed" },
+            { b: "march", p: "marched" },  { b: "hop", p: "hopped" },
+            { b: "wiggle", p: "wiggled" }, { b: "yodel", p: "yodelled" },
+            { b: "dance", p: "danced" },   { b: "faint", p: "fainted" },
+            { b: "squeak", p: "squeaked" },{ b: "roar", p: "roared" },
+            { b: "skip", p: "skipped" },   { b: "explode", p: "exploded" }
+          ],
+          adjective: [
+            "sparkly", "gigantic", "tiny", "smelly", "fluffy", "slimy", "bumpy",
+            "squishy", "invisible", "glittery", "grumpy", "cheesy", "soggy",
+            "crunchy", "wobbly", "stinky", "enormous", "purple", "hairy",
+            "sticky", "noisy", "itchy", "shiny", "ticklish"
+          ],
+          adverb: [
+            "loudly", "quietly", "wildly", "slowly", "gracefully", "clumsily",
+            "proudly", "secretly", "angrily", "sleepily", "dramatically",
+            "politely", "furiously", "backwards"
+          ]
+        };
+
+        /* a blank: id unique within its template, wc = word class,
+           form = "past"|"base" for verbs, caps = capitalise the filled word */
+        function B(id, wc, form, caps) {
+          return { id: id, wc: wc, form: form || null, caps: !!caps };
+        }
+
+        var TEMPLATES = [
+          { title: "The Space Picnic", emoji: "🚀", parts: [
+            "Last Saturday my pet ", B("b1", "noun"), " and I flew to the moon in a ",
+            B("b2", "adjective"), " rocket. We packed moon cheese, sandwiches and one giant ",
+            B("b3", "noun"), ". Halfway there the rocket ", B("b4", "verb", "past"), " ",
+            B("b5", "adverb"), ", and my helmet filled up with jelly. On the moon we met an alien who looked exactly like a ",
+            B("b6", "adjective"), " ", B("b7", "noun"),
+            ". It waved all six arms and started to ", B("b8", "verb", "base"),
+            ". Best. Picnic. Ever."
+          ] },
+          { title: "The Dog Ate My Homework", emoji: "🐶", parts: [
+            "On Monday I told my teacher the truth: my ", B("b1", "adjective"),
+            " dog really did eat my homework. First he sniffed it ", B("b2", "adverb"),
+            ". Then he ", B("b3", "verb", "past"),
+            " twice, swallowed the whole page and coughed up a little ", B("b4", "noun"),
+            ". My teacher stared at me for a long time. Then her pet ", B("b5", "noun"),
+            " climbed out of her desk drawer and started to ", B("b6", "verb", "base"),
+            ". She sighed and said, ‘Fine. Tonight’s homework: draw a ",
+            B("b7", "adjective"), " ", B("b8", "noun"), ".’"
+          ] },
+          { title: "Dinner Disaster", emoji: "🍝", parts: [
+            "Tonight I cooked dinner all by myself. The recipe said: take one ",
+            B("b1", "adjective"), " ", B("b2", "noun"), ", boil it ", B("b3", "adverb"),
+            ", and do not let it ", B("b4", "verb", "base"), ". I let it. The pot ",
+            B("b5", "verb", "past"), " across the kitchen, the sauce turned ",
+            B("b6", "adjective"), ", and something inside the oven growled like a ",
+            B("b7", "noun"), ". Dad took one bite and ", B("b8", "verb", "past"),
+            " right out of his chair. We ordered pizza."
+          ] },
+          { title: "Superhero for a Day", emoji: "🦸", parts: [
+            "Yesterday I woke up with superpowers. My cape was really just a ",
+            B("b1", "adjective"), " ", B("b2", "noun"),
+            ", but it worked. I could fly — well, mostly I flew ", B("b3", "adverb"),
+            ". My first mission was to rescue the mayor’s ", B("b4", "noun"),
+            ", which was stuck on the roof of the cheese factory. I ",
+            B("b5", "verb", "past"),
+            " into the sky, grabbed it and landed in front of a cheering crowd. The newspaper named me Captain ",
+            B("b6", "noun", null, true), "."
+          ] },
+          { title: "The Substitute Teacher", emoji: "🏫", parts: [
+            "Our teacher was off sick, so a substitute arrived riding a ", B("b1", "noun"),
+            ". She wrote her name ", B("b2", "adverb"),
+            " on the board, then announced that maths was cancelled because today we would study the ",
+            B("b3", "adjective"), " ", B("b4", "noun"), ". At lunchtime she ",
+            B("b5", "verb", "past"),
+            " in the corridor, and nobody even blinked. Home time came with a prize: one ",
+            B("b6", "adjective"), " sticker each, for being brilliant at nothing."
+          ] },
+          { title: "My Goldfish’s Secret Life", emoji: "🐟", parts: [
+            "I always thought my pet goldfish was ordinary. Then one night I saw him climb out of his tank wearing a ",
+            B("b1", "adjective"), " ", B("b2", "noun"), " on his head. He ",
+            B("b3", "verb", "past"), " down the stairs, opened the fridge ",
+            B("b4", "adverb"), " and built himself a sandwich with cheese, jam and a whole ",
+            B("b5", "noun"),
+            ". Before going back to bed he looked me in the eye and whispered, ‘Tell no one.’ Now every night I hear him ",
+            B("b6", "verb", "base"), " softly in the dark."
+          ] },
+          { title: "Birthday Cake Catastrophe", emoji: "🎂", parts: [
+            "For Grandma’s birthday we baked her favourite cake: three layers of ",
+            B("b1", "adjective"), " chocolate with a ", B("b2", "noun"),
+            " balanced on top. When Grandma blew out the candles, the whole cake suddenly ",
+            B("b3", "verb", "past"), ". Icing flew everywhere. A big blob landed on Grandpa, who ",
+            B("b4", "verb", "past"), " ", B("b5", "adverb"),
+            ", and his false teeth shot straight into the garden. Grandma said it was still better than the year we gave her a ",
+            B("b6", "noun"), "."
+          ] },
+          { title: "Deep-Sea Explorer", emoji: "🌊", parts: [
+            "Our submarine sank down and down, past a ", B("b1", "adjective"),
+            " shipwreck. Through the porthole I spotted a mermaid combing her hair with a ",
+            B("b2", "noun"), ". Deeper still, a giant squid ", B("b3", "verb", "past"),
+            " ", B("b4", "adverb"),
+            " when our lights switched on — I think we woke it up. At the very bottom of the sea sat a treasure chest. Inside we found a golden ",
+            B("b5", "noun"), " and a note that said, ‘Please stop knocking. We are trying to ",
+            B("b6", "verb", "base"), ".’"
+          ] },
+          { title: "The Zoo Trip", emoji: "🦁", parts: [
+            "On our school trip to the zoo, the keeper let me feed the lions. One lion sniffed my sandwich, pulled a face and then ",
+            B("b1", "verb", "past"), " ", B("b2", "adverb"),
+            ". After that the monkeys escaped. They stole Miss Patel’s ", B("b3", "noun"),
+            ", painted the gift shop in ", B("b4", "adjective"),
+            " stripes and tried to swap our school bus for a ", B("b5", "adjective"),
+            " ", B("b6", "noun"), ". The keeper said it was the quietest Tuesday all year."
+          ] },
+          { title: "Pirate Treasure", emoji: "🏴‍☠️", parts: [
+            "Captain Bluebeard’s map said the treasure was buried under the ",
+            B("b1", "adjective"), " palm tree. We dug for hours and found one rusty ",
+            B("b2", "noun"), ", three left boots and a crab that ", B("b3", "verb", "past"),
+            " ", B("b4", "adverb"),
+            " whenever anyone said the word ‘gold’. At last the chest creaked open. Inside sat a ",
+            B("b5", "adjective"), " ", B("b6", "noun"),
+            " wearing a little pirate hat. The ship’s parrot has not spoken since."
+          ] },
+          { title: "Robot Babysitter", emoji: "🤖", parts: [
+            "Mum and Dad hired a robot babysitter for the weekend. For dinner it served us a bowl of ",
+            B("b1", "adjective"), " cereal with a ", B("b2", "noun"),
+            " on the side. When I asked for dessert, its head spun right around and it ",
+            B("b3", "verb", "past"), " ", B("b4", "adverb"),
+            ". Bath time was worse: it filled the tub with green jelly and one rubber ",
+            B("b5", "noun"), ". At bedtime it read us a story about a brave little ",
+            B("b6", "noun"), ", then plugged itself into the wall and started to ",
+            B("b7", "verb", "base"), "."
+          ] },
+          { title: "Wizard School", emoji: "🧙", parts: [
+            "At wizard school our homework was one simple spell: turn a frog into a ",
+            B("b1", "noun"), ". I waved my wand ", B("b2", "adverb"),
+            " and shouted the magic words. There was a puff of ", B("b3", "adjective"),
+            " smoke. When it cleared, my frog had turned into a ", B("b4", "adjective"),
+            " ", B("b5", "noun"), " that ", B("b6", "verb", "past"),
+            " around the classroom until the teacher caught it in her hat. I got a B-minus, because at least my spell rhymed."
+          ] }
+        ];
+
+        function blanksOf(tpl) {
+          return tpl.parts.filter(function (p) { return typeof p !== "string"; });
+        }
+
+        /* the display form of a bank entry for a given slot */
+        function wordForm(entry, form) {
+          if (typeof entry === "string") return entry;
+          return form === "base" ? entry.b : entry.p;
+        }
+
+        function wordsFor(wc, form) {
+          return WORDS[wc].map(function (e) { return wordForm(e, form); });
+        }
+
+        function displayWord(blank, w) {
+          return blank.caps ? w.charAt(0).toUpperCase() + w.slice(1) : w;
+        }
+
+        /* keep "a"/"an" honest for whatever word lands after it
+           ("a octopus" → "an octopus"); uni-/use-/one-/eu- words sound like
+           consonants, so "a unicorn" stays "a unicorn" */
+        function fixArticle(prevText, word) {
+          var m = /(^|[^A-Za-z])(a|an|A|An)( )$/.exec(prevText);
+          if (!m) return prevText;
+          var wantsAn = /^[aeiou]/i.test(word) && !/^(uni|use|one|eu|ewe)/i.test(word);
+          var art = wantsAn ? (m[2].charAt(0) === "A" ? "An" : "an")
+                            : (m[2].charAt(0) === "A" ? "A" : "a");
+          return prevText.slice(0, m.index + m[1].length) + art + " ";
+        }
+
+        /* the single source of truth for rendering: a list of text pieces and
+           blank pieces, with articles already corrected for filled words */
+        function layout(tpl, fills) {
+          var items = [];
+          tpl.parts.forEach(function (p) {
+            if (typeof p === "string") {
+              items.push({ t: "text", s: p });
+              return;
+            }
+            var w = fills[p.id] || null;
+            if (w && items.length && items[items.length - 1].t === "text") {
+              items[items.length - 1].s = fixArticle(items[items.length - 1].s, w);
+            }
+            items.push({ t: "blank", b: p, w: w });
+          });
+          return items;
+        }
+
+        function storyText(tpl, fills) {
+          var out = "";
+          layout(tpl, fills).forEach(function (it) {
+            if (it.t === "text") out += it.s;
+            else out += it.w ? displayWord(it.b, it.w) : "____";
+          });
+          return out;
+        }
+        /* ===== DATA END ===== */
+
+        var storyEl = document.getElementById("story");
+        var storyTitleEl = document.getElementById("storyTitle");
+        var trayEl = document.getElementById("tray");
+        var traySection = document.getElementById("traySection");
+        var messageEl = document.getElementById("message");
+        var srStatus = document.getElementById("srStatus");
+        var statStory = document.getElementById("statStory");
+        var statBlanks = document.getElementById("statBlanks");
+        var statDone = document.getElementById("statDone");
+        var changeBtn = document.getElementById("changeBtn");
+        var printBtn = document.getElementById("printBtn");
+        var newBtn = document.getElementById("newBtn");
+        var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        var tpl = null;          // current template
+        var storyNum = 0;        // position in the current bag cycle
+        var templateBag = [];    // shuffled templates drawn without replacement
+        var fills = {};          // blank id -> chosen word (lowercase)
+        var used = {};           // word -> true, for every word placed in this story
+        var attempts = {};       // blank id -> wrong picks in a row
+        var currentId = null;    // id of the highlighted blank
+        var revealed = false;    // second-miss scaffold on?
+        var complete = false;
+        var finished = 0;        // stories completed this visit
+        var praiseAt = 0;
+
+        var PRAISE = ["Nice one!", "Got it!", "Perfect!", "Ha — lovely!", "Spot on!"];
+
+        function shuffle(arr) {
+          for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+          }
+          return arr;
+        }
+
+        // ---------- messaging ----------
+        function say(main, sub, mood) {
+          messageEl.className = "message " + (mood || "info");
+          messageEl.innerHTML = "";
+          messageEl.appendChild(document.createTextNode(main));
+          if (sub) {
+            var s = document.createElement("span");
+            s.className = "sub";
+            s.textContent = sub;
+            messageEl.appendChild(s);
+          }
+        }
+
+        function updateStats() {
+          var total = tpl ? blanksOf(tpl).length : 0;
+          var done = tpl ? blanksOf(tpl).filter(function (b) { return fills[b.id]; }).length : 0;
+          statStory.textContent = "Story " + storyNum + " of " + TEMPLATES.length;
+          statBlanks.textContent = "Blanks " + done + " of " + total;
+          statDone.textContent = "Finished " + finished;
+        }
+
+        // ---------- story rendering ----------
+        function currentBlank() {
+          if (!tpl || currentId === null) return null;
+          var list = blanksOf(tpl);
+          for (var i = 0; i < list.length; i++) if (list[i].id === currentId) return list[i];
+          return null;
+        }
+
+        function renderStory() {
+          storyEl.innerHTML = "";
+          var list = blanksOf(tpl);
+          var total = list.length;
+          layout(tpl, fills).forEach(function (it) {
+            if (it.t === "text") {
+              storyEl.appendChild(document.createTextNode(it.s));
+              return;
+            }
+            var b = it.b;
+            var idx = list.indexOf(b) + 1;
+            var info = WC_INFO[b.wc];
+            if (complete) {
+              var span = document.createElement("span");
+              span.className = "fill wc-" + b.wc;
+              span.setAttribute("data-id", b.id);
+              span.textContent = displayWord(b, it.w);
+              span.setAttribute("aria-label", displayWord(b, it.w) + ", " + info.name);
+              storyEl.appendChild(span);
+              return;
+            }
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "blank wc-" + b.wc + (it.w ? " filled" : "") +
+              (b.id === currentId ? " current" : "");
+            btn.setAttribute("data-id", b.id);
+            if (it.w) {
+              btn.textContent = displayWord(b, it.w);
+              btn.setAttribute("aria-label", "Blank " + idx + " of " + total + ", " +
+                info.name + ": " + it.w + ". Tap to choose a different word.");
+            } else {
+              var tag = document.createElement("span");
+              tag.className = "tag";
+              tag.textContent = info.name;
+              btn.appendChild(tag);
+              btn.setAttribute("aria-label", "Blank " + idx + " of " + total +
+                ". Needs " + info.art + " " + info.name + " — " + info.kid + "." +
+                (b.id === currentId ? " Selected." : ""));
+            }
+            btn.addEventListener("click", function () {
+              if (complete || b.id === currentId) return;
+              setCurrent(b);
+            });
+            storyEl.appendChild(btn);
+          });
+        }
+
+        function setCurrent(b) {
+          currentId = b.id;
+          attempts[b.id] = 0;
+          renderStory();
+          buildTray();
+          if (fills[b.id]) {
+            say("Pick a new word for this blank — or tap another blank.", "", "info");
+          } else {
+            say("This blank needs " + WC_INFO[b.wc].art + " " + WC_INFO[b.wc].name +
+              " — " + WC_INFO[b.wc].kid + ".", "Find one in the tray below.", "info");
+          }
+        }
+
+        // ---------- the tray ----------
+        function buildTray() {
+          trayEl.innerHTML = "";
+          revealed = false;
+          var b = currentBlank();
+          if (!b) return;
+
+          var right = shuffle(wordsFor(b.wc, b.form).filter(function (w) { return !used[w]; })).slice(0, 3);
+
+          // distractors: at least one from each other class, five in all
+          var wrong = [];
+          var rest = [];
+          shuffle(WC_LIST.filter(function (c) { return c !== b.wc; })).forEach(function (c) {
+            var pool = shuffle(wordsFor(c, "past").filter(function (w) { return !used[w]; }));
+            if (pool.length) wrong.push({ w: pool.pop(), wc: c });
+            pool.forEach(function (w) { rest.push({ w: w, wc: c }); });
+          });
+          shuffle(rest);
+          while (wrong.length < 5 && rest.length) wrong.push(rest.pop());
+
+          var chips = shuffle(right.map(function (w) { return { w: w, wc: b.wc }; }).concat(wrong));
+          chips.forEach(function (chip) {
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "chip wc-" + chip.wc;
+            btn.setAttribute("data-wc", chip.wc);
+            btn.textContent = chip.w;
+            btn.setAttribute("aria-label", chip.w);
+            btn.addEventListener("click", function (ev) {
+              pickChip(chip, btn, ev.detail === 0);
+            });
+            trayEl.appendChild(btn);
+          });
+        }
+
+        function applyReveal(wc) {
+          revealed = true;
+          Array.prototype.forEach.call(trayEl.children, function (btn) {
+            if (btn.getAttribute("data-wc") === wc && !btn.classList.contains("dud")) {
+              btn.classList.add("reveal");
+              btn.setAttribute("aria-label", btn.textContent + " — this one fits");
+            }
+          });
+        }
+
+        function shakeChip(btn) {
+          if (reducedMotion) return;
+          btn.classList.remove("shake");
+          requestAnimationFrame(function () { btn.classList.add("shake"); });
+          setTimeout(function () { btn.classList.remove("shake"); }, 420);
+        }
+
+        // ---------- play ----------
+        /* mark a word as used or free again — for verbs, both forms, so the
+           same lemma never lands in one story twice ("sneezed … to sneeze") */
+        function markUsed(wc, w, on) {
+          var surfaces = [w];
+          if (wc === "verb") {
+            WORDS.verb.forEach(function (e) {
+              if (e.b === w || e.p === w) surfaces = [e.b, e.p];
+            });
+          }
+          surfaces.forEach(function (s) {
+            if (on) used[s] = true; else delete used[s];
+          });
+        }
+
+        function pickChip(chip, btn, viaKeyboard) {
+          if (complete) return;
+          var b = currentBlank();
+          if (!b) return;
+          var info = WC_INFO[b.wc];
+
+          if (chip.wc === b.wc) {
+            if (fills[b.id]) markUsed(b.wc, fills[b.id], false);
+            fills[b.id] = chip.w;
+            markUsed(b.wc, chip.w, true);
+            attempts[b.id] = 0;
+
+            var list = blanksOf(tpl);
+            var allDone = list.every(function (x) { return fills[x.id]; });
+            if (allDone) {
+              completeStory();
+              return;
+            }
+            // advance to the next unfilled blank, wrapping around
+            var at = list.indexOf(b);
+            for (var i = 1; i <= list.length; i++) {
+              var cand = list[(at + i) % list.length];
+              if (!fills[cand.id]) { currentId = cand.id; break; }
+            }
+            say(PRAISE[praiseAt++ % PRAISE.length] + " ‘" + chip.w + "’ is " +
+              info.art + " " + info.name + ".", "", "good");
+            renderStory();
+            buildTray();
+            updateStats();
+            if (viaKeyboard && trayEl.firstChild) trayEl.firstChild.focus();
+          } else {
+            attempts[b.id] = (attempts[b.id] || 0) + 1;
+            var picked = WC_INFO[chip.wc];
+            shakeChip(btn);
+            btn.classList.add("dud");
+            btn.disabled = true;
+            if (viaKeyboard) {
+              // disabling the picked chip would drop keyboard focus to <body>
+              var next = trayEl.querySelector("button:not(:disabled)");
+              if (next) next.focus();
+            }
+            if (attempts[b.id] === 1) {
+              say("‘" + chip.w + "’ is " + picked.art + " " + picked.name + " — " +
+                picked.kid + ". This blank needs " + info.kid + ", " + info.art + " " +
+                info.name + ".", "Have another go — you’ve got this!", "bad");
+            } else {
+              applyReveal(b.wc);
+              say("Not that one — ‘" + chip.w + "’ is " + picked.art + " " +
+                picked.name + ".", "The " + info.name + "s in the tray are glowing now. Pick any glowing word!", "bad");
+            }
+          }
+        }
+
+        function completeStory() {
+          complete = true;
+          currentId = null;
+          finished++;
+          renderStory();
+          traySection.hidden = true;
+          changeBtn.hidden = false;
+          printBtn.hidden = false;
+          updateStats();
+          say("Your silly story is ready! 🎉",
+            "Read it out loud. Then tap ‘Change one word’ to make it even sillier.", "good");
+          srStatus.textContent = "Story complete! " + storyText(tpl, fills);
+          confetti();
+          changeBtn.focus();
+        }
+
+        // re-roll exactly one filled blank with a different word of the same
+        // class — one substitution, whole new story
+        function changeOneWord() {
+          var list = blanksOf(tpl);
+          var b = list[Math.floor(Math.random() * list.length)];
+          var old = fills[b.id];
+          var options = wordsFor(b.wc, b.form).filter(function (w) {
+            return w !== old && !used[w];
+          });
+          if (!options.length) return;
+          var next = options[Math.floor(Math.random() * options.length)];
+          markUsed(b.wc, old, false);
+          fills[b.id] = next;
+          markUsed(b.wc, next, true);
+          renderStory();
+          var span = storyEl.querySelector('[data-id="' + b.id + '"]');
+          if (span && !reducedMotion) {
+            requestAnimationFrame(function () { span.classList.add("swap"); });
+            setTimeout(function () { span.classList.remove("swap"); }, 700);
+          }
+          say("Swapped ‘" + old + "’ for ‘" + next + "’ — both " +
+            WC_INFO[b.wc].name + "s!", "Tap again to keep remixing.", "good");
+        }
+
+        function newStory() {
+          // draw without replacement so a session never repeats a story
+          // until every template has appeared once (in-memory only)
+          if (!templateBag.length) {
+            var last = tpl;
+            templateBag = shuffle(TEMPLATES.slice());
+            // never serve the same story twice in a row across a refill
+            if (templateBag.length > 1 && templateBag[templateBag.length - 1] === last) {
+              templateBag[templateBag.length - 1] = templateBag[0];
+              templateBag[0] = last;
+            }
+          }
+          tpl = templateBag.pop();
+          storyNum = TEMPLATES.length - templateBag.length;
+          fills = {};
+          used = {};
+          attempts = {};
+          complete = false;
+          revealed = false;
+          currentId = blanksOf(tpl)[0].id;
+          storyTitleEl.textContent = tpl.emoji + " " + tpl.title;
+          traySection.hidden = false;
+          changeBtn.hidden = true;
+          printBtn.hidden = true;
+          renderStory();
+          buildTray();
+          updateStats();
+          say("Tap a word below that fits the glowing blank.",
+            blanksOf(tpl).length + " blanks to fill. Each label tells you what kind of word it needs.", "info");
+          srStatus.textContent = "New story: " + tpl.title + ".";
+        }
+
+        function confetti() {
+          if (reducedMotion) return;
+          var colors = ["#ff6b57", "#7c3aed", "#1d4ed8", "#b45309", "#15803d", "#b91c1c"];
+          for (var i = 0; i < 70; i++) {
+            var bit = document.createElement("div");
+            bit.className = "confetti-bit";
+            bit.style.left = Math.random() * 100 + "vw";
+            bit.style.background = colors[i % colors.length];
+            bit.style.animationDuration = 1.6 + Math.random() * 1.6 + "s";
+            bit.style.animationDelay = Math.random() * 0.4 + "s";
+            document.body.appendChild(bit);
+            (function (bb) { setTimeout(function () { bb.remove(); }, 4000); })(bit);
+          }
+        }
+
+        // Clicking a button with the mouse leaves it focused, so a stray Enter
+        // later would re-trigger it. Drop focus after pointer clicks only —
+        // ev.detail is 0 for keyboard activation, so keyboard players keep
+        // their place.
+        document.addEventListener("click", function (ev) {
+          var bEl = ev.target.closest && ev.target.closest("button");
+          if (bEl && ev.detail > 0) bEl.blur();
+        });
+
+        // Some Android browsers ignore overscroll-behavior, so block
+        // pull-to-refresh directly (it would wipe the half-built story).
+        var ptrStartY = 0;
+        document.addEventListener("touchstart", function (ev) {
+          ptrStartY = ev.touches[0].clientY;
+        }, { passive: true });
+        document.addEventListener("touchmove", function (ev) {
+          if (ev.touches.length === 1 && window.scrollY <= 0 &&
+              ev.touches[0].clientY > ptrStartY && ev.cancelable) {
+            ev.preventDefault();
+          }
+        }, { passive: false });
+
+        changeBtn.addEventListener("click", changeOneWord);
+        printBtn.addEventListener("click", function () { window.print(); });
+        newBtn.addEventListener("click", newStory);
+
+        newStory();
+      })();
+    </script>
+  </body>
+</html>
