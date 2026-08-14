@@ -670,6 +670,17 @@
             g.l + (f.s ? " says " + f.s : "") + " — as in " + f.k + "</div>";
         }
 
+        // Navigation follows the CHOSEN order, not the index order — otherwise
+        // "Easy first" would only shuffle the picker chips while the board
+        // still opened on A and walked the alphabet.
+        function firstGlyph() { return orderFor()[0]; }
+
+        function nextGlyph(i) {
+          var o = orderFor();
+          var p = o.indexOf(i);
+          return (p !== -1 && p < o.length - 1) ? o[p + 1] : -1;
+        }
+
         // display order of glyph indices; the indices themselves never move,
         // so done/stage memory stays keyed to the same glyph
         function orderFor() {
@@ -979,7 +990,7 @@
             nextBtn.classList.remove("hidden");
           } else {
             nextBtn.textContent = "Next →";
-            nextBtn.classList.toggle("hidden", gi === set().glyphs.length - 1);
+            nextBtn.classList.toggle("hidden", nextGlyph(gi) === -1);
           }
           winOverlay.classList.remove("hidden");
           srStatus.textContent = "Finished tracing " + glyphName(g) + "!";
@@ -1072,7 +1083,7 @@
               if (i === si) return;
               if (busy) cancelDemo();
               si = i;
-              loadGlyph(current[s.key] || 0);
+              loadGlyph(current[s.key] !== undefined ? current[s.key] : firstGlyph());
               buildTabs();
               buildPicker();
               tabsEl.children[i].focus();
@@ -1140,16 +1151,19 @@
             stageOf[set().key][gi] = stage + 1;
             loadGlyph(gi);
             document.getElementById("demoBtn").focus();
-          } else if (gi < set().glyphs.length - 1) {
-            loadGlyph(gi + 1);
-            buildPicker();
-            document.getElementById("demoBtn").focus();
+          } else {
+            var nx = nextGlyph(gi);
+            if (nx !== -1) {
+              loadGlyph(nx);
+              buildPicker();
+              document.getElementById("demoBtn").focus();
+            }
           }
         });
 
         buildTabs();
         buildStages();
-        loadGlyph(0);
+        loadGlyph(firstGlyph());
         buildPicker();
       })();
     </script>

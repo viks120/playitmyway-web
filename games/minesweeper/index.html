@@ -406,11 +406,13 @@
 
     function handleClick(r, c) {
       if (gameOver) return;
+      // Flag Mode toggles BOTH ways — checked before the flagged guard below,
+      // or a flag placed in Flag Mode could never be taken off again
+      if (flagMode) { toggleFlag(r, c); return; }
       if (grid[r][c].flagged) {
         announce(`Row ${r + 1}, column ${c + 1} is flagged. Remove the flag before opening it.`);
         return;
       }
-      if (flagMode) { toggleFlag(r, c); return; }
       if (firstClick) {
         firstClick = false;
         placeMines(r, c);
