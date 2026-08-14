@@ -190,6 +190,28 @@
         .helper { min-height: 40px; }
       }
 
+      /* letter-sound / number-quantity strip: FIXED height so the board
+         starts at the same y for every glyph — the content centers inside
+         and may wrap to two lines, but the strip itself never resizes */
+      .fact-strip {
+        height: 58px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        text-align: center;
+        margin: 0 0 8px;
+        padding: 0 4px;
+        overflow: hidden;
+      }
+      .fact-sound { font-size: 15px; line-height: 1.3; color: var(--ink); font-weight: 600; }
+      .fact-line { font-size: 16px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+      .fact-frames { display: flex; align-items: center; gap: 6px; }
+      .tf { width: 52px; height: 22px; display: block; }
+      .tf-grid { fill: none; stroke: var(--guide-dash); stroke-width: 1; }
+      .tf-dot { fill: var(--band); }
+
       .board-wrap { position: relative; width: 100%; }
       svg.board {
         display: block;
@@ -284,7 +306,30 @@
       .hidden { display: none !important; }
 
       .picker { width: 100%; max-width: 520px; margin-top: 18px; }
-      .picker h2 { font-size: 19px; margin: 0 0 10px; }
+      .picker-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px 10px;
+        margin: 0 0 10px;
+      }
+      .picker h2 { font-size: 19px; margin: 0; }
+      .order-toggle { display: flex; gap: 6px; }
+      .order-btn {
+        border: 2px solid var(--band-tint);
+        background: var(--surface);
+        color: var(--ink-soft);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13.5px;
+        padding: 4px 12px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        transition: transform 150ms ease;
+      }
+      .order-btn:hover { transform: translateY(-2px); }
+      .order-btn[aria-pressed="true"] { background: var(--band-tint); border-color: var(--band); color: var(--band); }
       .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
       .glyph-chip {
         border: 2px solid #e4dbcf;
@@ -374,6 +419,8 @@
 
       <p class="helper" id="helper" aria-live="polite">Put your finger on the green dot and trace!</p>
 
+      <div class="fact-strip" id="factStrip"></div>
+
       <div class="board-wrap">
         <svg class="board" id="board" viewBox="0 0 100 100" role="img"
              aria-label="Tracing board"></svg>
@@ -398,7 +445,13 @@
     </main>
 
     <nav class="picker" aria-label="Pick something to trace">
-      <h2 id="pickerTitle">✏️ Pick one to trace</h2>
+      <div class="picker-head">
+        <h2 id="pickerTitle">✏️ Pick one to trace</h2>
+        <div class="order-toggle" id="orderToggle" role="group" aria-label="Order of letters in this list">
+          <button class="order-btn" id="easyOrderBtn" aria-pressed="true">✨ Easy first</button>
+          <button class="order-btn" id="abcOrderBtn" aria-pressed="false">🔤 ABC order</button>
+        </div>
+      </div>
       <div class="chip-grid" id="pickerGrid"></div>
     </nav>
 
@@ -446,7 +499,58 @@
         var stageRow = document.getElementById("stageRow");
         var tabsEl = document.getElementById("tabs");
         var pickerGrid = document.getElementById("pickerGrid");
+        var factStrip = document.getElementById("factStrip");
+        var orderToggle = document.getElementById("orderToggle");
         var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        // Letter facts. A sound string is given ONLY where the sound can
+        // honestly be held on its own — continuants and short vowels. Stop
+        // consonants get "as in" wording instead: saying "buh" for b teaches
+        // a vowel that isn't there and makes blending harder later.
+        var FACTS = {
+          a: { k: "apple", e: "🍎", s: "aaa" },
+          b: { k: "bear", e: "🐻" },
+          c: { k: "cat", e: "🐱" },
+          d: { k: "dog", e: "🐶" },
+          e: { k: "egg", e: "🥚", s: "eh" },
+          f: { k: "fish", e: "🐟", s: "fff" },
+          g: { k: "goat", e: "🐐" },
+          h: { k: "hat", e: "🎩", s: "hhh" },
+          i: { k: "igloo", e: "🧊", s: "ih" },
+          j: { k: "jam", e: "🍓" },
+          k: { k: "kite", e: "🪁" },
+          l: { k: "leaf", e: "🍃", s: "lll" },
+          m: { k: "monkey", e: "🐵", s: "mmm" },
+          n: { k: "nest", e: "🪺", s: "nnn" },
+          o: { k: "octopus", e: "🐙", s: "ooo" },
+          p: { k: "pig", e: "🐷" },
+          q: { k: "queen", e: "👑" },
+          r: { k: "rocket", e: "🚀", s: "rrr" },
+          s: { k: "sun", e: "☀️", s: "sss" },
+          t: { k: "tiger", e: "🐯" },
+          u: { k: "umbrella", e: "☂️", s: "uh" },
+          v: { k: "van", e: "🚐", s: "vvv" },
+          w: { k: "whale", e: "🐳" },
+          x: { k: "fox", e: "🦊" },
+          y: { k: "yo-yo", e: "🪀" },
+          z: { k: "zebra", e: "🦓", s: "zzz" }
+        };
+
+        var NUM_NAMES = ["zero", "one", "two", "three", "four", "five", "six",
+          "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen",
+          "fourteen", "fifteen", "sixteen", "seventeen", "eighteen",
+          "nineteen", "twenty"];
+
+        // Easy-first ordering. Alphabetical hands every child capital A
+        // first: three strokes, two diagonals, the hardest capital motor
+        // pattern there is. These run straight lines, then curves, then
+        // mixed, then diagonals; lowercase groups by shared starting stroke
+        // (c o a d g q all begin with the same movement).
+        var ORDER_EASY = {
+          abc: "LFEHTICOQSUJDPBRGKAMNVWXYZ",
+          lower: "coadgqiltjrnmhbpuvwxyzesfk"
+        };
+        var easyFirst = true;
 
         var si = 0;          // set index
         var gi = 0;          // glyph index within set
@@ -534,6 +638,54 @@
 
         function set() { return SETS[si]; }
         function noun() { return set().noun; }
+
+        // a 2x5 ten-frame, filled left-to-right along the top row first —
+        // the arrangement children meet in classrooms
+        function tenFrame(n) {
+          var s = '<svg class="tf" viewBox="0 0 50 20" aria-hidden="true">';
+          for (var r = 0; r < 2; r++)
+            for (var c = 0; c < 5; c++)
+              s += '<rect class="tf-grid" x="' + c * 10 + '" y="' + r * 10 + '" width="10" height="10"/>';
+          for (var i = 0; i < n; i++)
+            s += '<circle class="tf-dot" cx="' + ((i % 5) * 10 + 5) + '" cy="' + (Math.floor(i / 5) * 10 + 5) + '" r="3"/>';
+          return s + "</svg>";
+        }
+
+        // The strip is the only place this game says what a letter SOUNDS
+        // like; numerals show their quantity instead. Its height is fixed in
+        // CSS so the board never moves between glyphs.
+        function renderFact() {
+          var g = glyph;
+          if (set().key === "123") {
+            var n = parseInt(g.l, 10);
+            var frames = n <= 10 ? tenFrame(n) : tenFrame(10) + tenFrame(n - 10);
+            var tens = n > 10 ? " — ten and " + (n - 10) + " more" : "";
+            factStrip.innerHTML = '<div class="fact-line">' + g.l + " — " + (NUM_NAMES[n] || g.l) + tens + "</div>" +
+              '<div class="fact-frames">' + frames + "</div>";
+            return;
+          }
+          var f = FACTS[g.l.toLowerCase()];
+          if (!f) { factStrip.innerHTML = ""; return; }
+          factStrip.innerHTML = '<div class="fact-sound"><span aria-hidden="true">' + f.e + "</span> " +
+            g.l + (f.s ? " says " + f.s : "") + " — as in " + f.k + "</div>";
+        }
+
+        // display order of glyph indices; the indices themselves never move,
+        // so done/stage memory stays keyed to the same glyph
+        function orderFor() {
+          var glyphs = set().glyphs;
+          var spec = easyFirst ? ORDER_EASY[set().key] : null;
+          var out = [];
+          if (spec) {
+            var byChar = {};
+            glyphs.forEach(function (g, i) { byChar[g.l] = i; });
+            spec.split("").forEach(function (ch) {
+              if (byChar[ch] !== undefined && out.indexOf(byChar[ch]) === -1) out.push(byChar[ch]);
+            });
+          }
+          glyphs.forEach(function (g, i) { if (out.indexOf(i) === -1) out.push(i); });
+          return out;
+        }
         // glyphs with an emoji are named things ("Circle", "Zigzag") — their
         // label stands alone; bare characters get the noun ("letter A")
         function glyphName(g) { return g.e ? g.l : noun() + " " + g.l; }
@@ -608,6 +760,7 @@
           setHelper(stage === 2 ? "No line this time — start at the green dot!"
             : stage === 1 ? "The " + noun() + " is fading — you know the way!"
             : "Put your finger on the green dot and trace!", "");
+          renderFact();
           updateMarkers();
           updateStages();
           updateHud();
@@ -930,9 +1083,11 @@
 
         function buildPicker() {
           pickerGrid.innerHTML = "";
-          set().glyphs.forEach(function (g, i) {
+          orderFor().forEach(function (i) {
+            var g = set().glyphs[i];
             var b = document.createElement("button");
             b.className = "glyph-chip" + (i === gi ? " active" : "");
+            b.setAttribute("data-gi", i);
             b.setAttribute("aria-label", "Trace " + glyphName(g) + (done[set().key][i] ? " (done)" : ""));
             b.innerHTML = (g.e ? "<span aria-hidden='true'>" + g.e + "</span>" : g.l) +
               (done[set().key][i] ? "<span class='tick' aria-hidden='true'>✓</span>" : "");
@@ -941,12 +1096,34 @@
               if (i === gi && winOverlay.classList.contains("hidden")) return;
               loadGlyph(i);
               buildPicker();
-              pickerGrid.children[i].focus({ preventScroll: true });
+              focusChip(i);
               document.querySelector(".card").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
             });
             pickerGrid.appendChild(b);
           });
+          // ordering only means something for the letter sets
+          orderToggle.style.visibility = ORDER_EASY[set().key] ? "visible" : "hidden";
         }
+
+        // chips are laid out in display order, so find by glyph index
+        function focusChip(i) {
+          var b = pickerGrid.querySelector('[data-gi="' + i + '"]');
+          if (b) b.focus({ preventScroll: true });
+        }
+
+        function setOrder(easy) {
+          if (easyFirst === easy) return;
+          easyFirst = easy;
+          document.getElementById("easyOrderBtn").setAttribute("aria-pressed", easy ? "true" : "false");
+          document.getElementById("abcOrderBtn").setAttribute("aria-pressed", easy ? "false" : "true");
+          buildPicker();
+          srStatus.textContent = easy
+            ? "Easiest shapes first."
+            : "Alphabetical order.";
+        }
+
+        document.getElementById("easyOrderBtn").addEventListener("click", function () { setOrder(true); });
+        document.getElementById("abcOrderBtn").addEventListener("click", function () { setOrder(false); });
 
         // ---------------- buttons ----------------
         document.getElementById("demoBtn").addEventListener("click", demo);
