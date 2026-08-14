@@ -57,7 +57,7 @@ const FOOT = (up) => `
     <footer class="footer">
       <p>© <span id="currentYear">2026</span> PlayItMyWay.com — Learn, Play, Smile 😊</p>
       <nav class="footer-links" aria-label="Site policies">
-        <a href="${up}">Home</a>
+        <a href="${up || './'}">Home</a>
         <a href="${up}games/">All games</a>
         <a href="${up}for-teachers.html">For grown-ups</a>
         <a href="${up}disclaimer.html">Disclaimer</a>
