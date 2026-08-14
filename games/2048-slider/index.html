@@ -488,6 +488,8 @@
       }
 
       function playSound(type) {
+        // site-wide sound toggle (components.js)
+        if (window.pimwMuted) return;
         initAudio();
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
@@ -1024,5 +1026,7 @@ Good luck!`);
         game = new Game2048();
       });
     </script>
+    <script src="../../components.js"></script>
+
   </body>
 </html>

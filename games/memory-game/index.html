@@ -544,6 +544,8 @@
       }
 
       function playSound(type) {
+        // site-wide sound toggle (components.js)
+        if (window.pimwMuted) return;
         initAudio();
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
@@ -554,8 +556,11 @@
           case 'flip':
             oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
             oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gainNode.gain.exponentialDecayTo && gainNode.gain.exponentialDecayTo(0.01, audioCtx.currentTime + 0.1);
+            // exponentialDecayTo is not a Web Audio method — the old guard
+            // meant every flip played as a flat, un-enveloped blip
+            gainNode.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.008);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
             oscillator.start();
             oscillator.stop(audioCtx.currentTime + 0.1);
             break;
@@ -854,5 +859,6 @@
         <a href="mailto:contact@playitmyway.com">Contact</a>
       </nav>
     </footer>
+    <script src="../../components.js"></script>
   </body>
 </html>
