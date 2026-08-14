@@ -656,6 +656,7 @@
           isEraser = false;
           setActive(document.getElementById("eraserBtn"), false);
           clearActive(".color-btn");
+          updateBrushPreview();
           announce(`${btn.getAttribute("aria-label")} selected.`);
         });
       });
@@ -670,6 +671,9 @@
           clearActive(".color-btn");
           currentStamp = null;
         }
+        // without this the preview's isEraser branch never ran, so the swatch
+        // kept showing the last colour while the eraser was active
+        updateBrushPreview();
         announce(isEraser ? "Eraser on." : "Eraser off.");
       });
 
