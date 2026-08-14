@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#c2410c" />
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+    <title>Page Not Found | Play It My Way</title>
+    <meta name="description" content="That page does not exist. Browse all free educational games for kids instead." />
+    <meta name="keywords" content="play it my way, free educational games for kids" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="noindex, follow" />
+
+    <meta property="og:title" content="Page Not Found | Play It My Way" />
+    <meta property="og:description" content="That page does not exist. Browse all free educational games for kids instead." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://playitmyway.com/404.html" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Page Not Found | Play It My Way" />
+    <meta name="twitter:description" content="That page does not exist. Browse all free educational games for kids instead." />
+
+    <link rel="canonical" href="https://playitmyway.com/404.html" />
+    <link rel="stylesheet" href="tokens.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="components.css" />
+    <style>
+      .page-intro {
+        max-width: 760px;
+        margin: 0 auto 8px;
+        padding: 0 20px;
+        text-align: center;
+        color: var(--color-ink-soft);
+        font-size: 1.05rem;
+        line-height: 1.65;
+      }
+      .skill-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        max-width: 900px;
+        margin: 18px auto 6px;
+        padding: 0 20px;
+        list-style: none;
+      }
+      .skill-nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 44px;
+        padding: 8px 16px;
+        border-radius: var(--radius-pill);
+        background: var(--color-surface);
+        border: 2px solid #e8dcce;
+        color: var(--color-ink);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .skill-nav a:hover { border-color: var(--color-primary); }
+      .game-card-mins {
+        display: block;
+        font-size: 0.78rem;
+        color: var(--color-ink-soft);
+        margin-top: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <h1>🧭 That page went missing</h1>
+      <p class="tagline">The link may be old, or we may have moved something. Nothing is broken — let's find a game instead.</p>
+    </header>
+
+    <main>
+      <section class="age-section band-5" aria-labelledby="try-these">
+        <h2 id="try-these">✨ Try one of these</h2>
+        <div class="game-grid">
+          <a class="game-card" href="games/sound-it-out/">
+            <span class="game-icon" aria-hidden="true">🗣️</span>
+            <span class="game-card-name">Sound It Out</span>
+            <span class="game-card-age">5+</span>
+          </a>
+          <a class="game-card" href="games/counting-game/">
+            <span class="game-icon" aria-hidden="true">🔢</span>
+            <span class="game-card-name">Count With Me</span>
+            <span class="game-card-age">3+</span>
+          </a>
+          <a class="game-card" href="games/trace-letters/">
+            <span class="game-icon" aria-hidden="true">🔤</span>
+            <span class="game-card-name">Trace Letters &amp; Numbers</span>
+            <span class="game-card-age">3+</span>
+          </a>
+          <a class="game-card" href="games/sort-it-out/">
+            <span class="game-icon" aria-hidden="true">🧺</span>
+            <span class="game-card-name">Sort It Out</span>
+            <span class="game-card-age">5+</span>
+          </a>
+          <a class="game-card" href="games/clock-shop/">
+            <span class="game-icon" aria-hidden="true">🕰️</span>
+            <span class="game-card-name">Clock Shop</span>
+            <span class="game-card-age">7+</span>
+          </a>
+          <a class="game-card" href="games/code-the-robot/">
+            <span class="game-icon" aria-hidden="true">🤖</span>
+            <span class="game-card-name">Code the Robot</span>
+            <span class="game-card-age">7+</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="support-section">
+        <h2>Looking for something specific?</h2>
+        <p>
+          <a class="support-btn" href="games/">🎮 See all 29 games</a>
+        </p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>© <span id="currentYear">2026</span> PlayItMyWay.com — Learn, Play, Smile 😊</p>
+      <nav class="footer-links" aria-label="Site policies">
+        <a href="">Home</a>
+        <a href="games/">All games</a>
+        <a href="for-teachers.html">For grown-ups</a>
+        <a href="disclaimer.html">Disclaimer</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+      </nav>
+      <p class="footer-contact">
+        📧 <a href="mailto:contact@playitmyway.com">contact@playitmyway.com</a>
+      </p>
+    </footer>
+
+    <script>
+      document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+    </script>
+  </body>
+</html>
