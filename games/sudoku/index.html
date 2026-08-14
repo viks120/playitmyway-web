@@ -469,6 +469,10 @@
         const el = cellEl(focusR, focusC);
         if (el) el.focus();
       }
+      // the rebuild dropped the .selected class while selectedCell still
+      // points at that square — without this a hint leaves the next typed
+      // digit landing in a cell with no visible highlight
+      highlightCells();
     }
 
     function renderNumPad() {

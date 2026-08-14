@@ -1341,6 +1341,11 @@
         document.querySelectorAll("#answerOptions .answer-btn").forEach((btn) => {
           btn.disabled = true;
         });
+        // in countries mode the map IS the answer set — leaving it live let a
+        // child keep picking continents after the question was already over
+        document.querySelectorAll(".continent").forEach((c) => {
+          c.disabled = true;
+        });
         document.getElementById("hintBtn").disabled = true;
         const nextBtn = document.getElementById("nextBtn");
         nextBtn.style.display = "inline-block";

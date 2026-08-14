@@ -638,6 +638,9 @@
       // ---------- program edits ----------
       function editGuard() {
         if (running) { setHelper("Wait for the robot to finish!", "warn"); return false; }
+        // afterEdit() hides the win overlay, so an arrow key or a stray tap
+        // during the celebration would silently dismiss it
+        if (!winOverlay.classList.contains("hidden")) return false;
         return true;
       }
       function afterEdit() {

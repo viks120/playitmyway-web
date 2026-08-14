@@ -565,7 +565,8 @@
         // tabbable and stop being read out while it is open
         function setBackgroundInert(on) {
           [document.querySelector(".card"), document.querySelector(".back-link"),
-           document.querySelector(".game-head"), document.querySelector(".how-to")]
+           document.querySelector(".game-head"), document.querySelector(".how-to"),
+           document.querySelector(".site-footer")]
             .forEach(function (n) {
               if (!n) return;
               if (on) { n.setAttribute("inert", ""); n.setAttribute("aria-hidden", "true"); }
