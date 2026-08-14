@@ -65,6 +65,11 @@
     .cell:nth-child(3n) { border-right: 2px solid #2c3e50; }
     .cell:nth-child(n+19):nth-child(-n+27),
     .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid #2c3e50; }
+    /* cells sit edge to edge, so an outside ring is painted over by the next
+       cell — inset the ring and lift the focused cell above its neighbours */
+    .cell:focus-visible {
+      outline: 3px solid #1a5276; outline-offset: -3px; z-index: 2;
+    }
     .cell.given { background: #ecf0f1; color: #2c3e50; }
     .cell.selected { background: #aed6f1; }
     .cell.same-num { background: #d5f5e3; }
@@ -107,6 +112,15 @@
       border: none; padding: 12px 25px; border-radius: 25px;
       font-size: 1.1em; font-weight: bold; cursor: pointer; margin: 5px;
     }
+    .visually-hidden {
+      position: absolute;
+      width: 1px; height: 1px;
+      margin: -1px; padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
     .stars { font-size: 2.5em; margin: 10px 0; }
     .star { color: #ddd; }
     .star.filled { color: #f1c40f; }
@@ -128,31 +142,32 @@
 </head>
 <body>
   <a href="../../" class="back-link">← Back to Games</a>
-  <div class="header"><h1>🔢 Sudoku</h1></div>
+  <div class="header"><h1><span aria-hidden="true">🔢</span> Sudoku</h1></div>
   <div class="stats">
-    <div>⏱️ Time: <span id="timer">0:00</span></div>
-    <div>❌ Errors: <span id="errors">0</span>/3</div>
-    <div>🏆 Best this visit: <span id="best">-</span></div>
+    <div><span aria-hidden="true">⏱️</span> Time: <span id="timer">0:00</span></div>
+    <div><span aria-hidden="true">❌</span> Errors: <span id="errors">0</span>/3</div>
+    <div><span aria-hidden="true">🏆</span> Best this visit: <span id="best">-</span></div>
   </div>
-  <div class="difficulty-selector">
-    <button class="diff-btn active" onclick="setDifficulty('easy')">🌱 Easy</button>
-    <button class="diff-btn" onclick="setDifficulty('medium')">🌿 Medium</button>
-    <button class="diff-btn" onclick="setDifficulty('hard')">🌳 Hard</button>
+  <div class="difficulty-selector" role="group" aria-label="Difficulty">
+    <button type="button" class="diff-btn active" onclick="setDifficulty('easy')"><span aria-hidden="true">🌱</span> Easy</button>
+    <button type="button" class="diff-btn" onclick="setDifficulty('medium')"><span aria-hidden="true">🌿</span> Medium</button>
+    <button type="button" class="diff-btn" onclick="setDifficulty('hard')"><span aria-hidden="true">🌳</span> Hard</button>
   </div>
-  <div class="game-container">
-    <div class="grid" id="grid"></div>
-    <div class="num-pad" id="numPad"></div>
+  <main class="game-container">
+    <div class="grid" id="grid" role="group" aria-label="Sudoku board, 9 rows by 9 columns. Arrow keys move between squares, 1 to 9 types a digit, Backspace clears."></div>
+    <div class="num-pad" id="numPad" role="group" aria-label="Number pad"></div>
     <div class="controls">
-      <button class="btn" onclick="newGame()">🔄 New Game</button>
-      <button class="btn" id="hintBtn" onclick="getHint()">💡 Hint (3)</button>
+      <button type="button" class="btn" onclick="newGame()"><span aria-hidden="true">🔄</span> New Game</button>
+      <button type="button" class="btn" id="hintBtn" onclick="getHint()">💡 Hint (3)</button>
     </div>
-  </div>
+    <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
+  </main>
   <div class="modal-overlay" id="modal">
-    <div class="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <h2 id="modalTitle">🎉 Congratulations!</h2>
-      <div class="stars" id="starRating"><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+      <div class="stars" id="starRating" aria-hidden="true"><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
       <p id="modalMsg">You solved the puzzle!</p>
-      <button class="modal-btn" onclick="closeModal()">Play Again</button>
+      <button type="button" class="modal-btn" id="modalBtn" onclick="closeModal()">Play Again</button>
     </div>
   </div>
   <script>
@@ -207,9 +222,20 @@
       }
     }
 
+    // Everything a sighted player can see happen goes through here, so a
+    // screen reader hears the same events.
+    function announce(msg) {
+      const el = document.getElementById('srStatus');
+      if (!el) return;
+      // identical consecutive text is not re-announced, so alternate a hair space
+      el.textContent = el.textContent === msg ? msg + ' ' : msg;
+    }
+
     let difficulty = 'easy';
     let board = [], solution = [], given = [];
     let selectedCell = null, errors = 0, gameOver = false;
+    // roving tabindex: exactly one cell is in the tab order at a time
+    let focusR = 0, focusC = 0;
     let timerInterval, seconds = 0;
     let best = {};
     let hintsLeft = 3;
@@ -333,6 +359,7 @@
       }
 
       selectedCell = null; errors = 0; gameOver = false;
+      focusR = 0; focusC = 0;
       hintsLeft = 3;
       updateHintButton();
       clearInterval(timerInterval); seconds = 0;
@@ -359,8 +386,54 @@
       return positions;
     }
 
+    function cellEl(r, c) {
+      return document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+    }
+
+    function cellLabel(r, c) {
+      const v = board[r][c];
+      let state;
+      if (v === 0) state = 'empty';
+      else if (given[r][c]) state = v + ', given';
+      else if (v !== solution[r][c]) state = v + ', wrong';
+      else state = v + ', your answer';
+      return `Row ${r + 1}, column ${c + 1}, ${state}`;
+    }
+
+    function updateRovingTabindex() {
+      document.querySelectorAll('.cell').forEach(cell => {
+        const isFocus = Number(cell.dataset.r) === focusR && Number(cell.dataset.c) === focusC;
+        cell.tabIndex = isFocus ? 0 : -1;
+      });
+    }
+
+    function moveFocusTo(r, c) {
+      focusR = r; focusC = c;
+      updateRovingTabindex();
+      const el = cellEl(r, c);
+      if (el) el.focus();
+    }
+
+    // Arrows walk the board; Enter/Space picks the square. Digits and
+    // Backspace bubble up to the document handler, which already types them
+    // into the selected cell.
+    function handleCellKey(e, r, c) {
+      const moves = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
+      if (moves[e.key]) {
+        e.preventDefault();
+        const [dr, dc] = moves[e.key];
+        moveFocusTo(Math.min(8, Math.max(0, r + dr)), Math.min(8, Math.max(0, c + dc)));
+      } else if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        selectCell(r, c);
+      }
+    }
+
     function renderBoard() {
       const gridEl = document.getElementById('grid');
+      // re-rendering replaces every cell, so a keyboard player would lose
+      // their place unless focus is put back afterwards
+      const hadFocus = gridEl.contains(document.activeElement);
       gridEl.innerHTML = '';
       for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
@@ -373,9 +446,20 @@
           }
           if (board[r][c] !== 0) cell.textContent = board[r][c];
           cell.dataset.r = r; cell.dataset.c = c;
-          cell.addEventListener('click', () => selectCell(r, c));
+          cell.setAttribute('role', 'button');
+          cell.setAttribute('aria-label', cellLabel(r, c));
+          cell.tabIndex = (r === focusR && c === focusC) ? 0 : -1;
+          cell.addEventListener('click', () => { focusR = r; focusC = c; updateRovingTabindex(); selectCell(r, c); });
+          // tabbing or clicking into a square makes it the selected one, so
+          // typed digits always land where the focus ring is
+          cell.addEventListener('focus', () => { focusR = r; focusC = c; updateRovingTabindex(); selectCell(r, c); });
+          cell.addEventListener('keydown', (e) => handleCellKey(e, r, c));
           gridEl.appendChild(cell);
         }
+      }
+      if (hadFocus) {
+        const el = cellEl(focusR, focusC);
+        if (el) el.focus();
       }
     }
 
@@ -384,14 +468,18 @@
       pad.innerHTML = '';
       for (let n = 1; n <= 9; n++) {
         const btn = document.createElement('button');
+        btn.type = 'button';
         btn.className = 'num-btn';
         btn.textContent = n;
+        btn.setAttribute('aria-label', `Place ${n}`);
         btn.addEventListener('click', () => placeNumber(n));
         pad.appendChild(btn);
       }
       const eraseBtn = document.createElement('button');
+      eraseBtn.type = 'button';
       eraseBtn.className = 'num-btn erase';
       eraseBtn.textContent = '⌫';
+      eraseBtn.setAttribute('aria-label', 'Erase the selected square');
       eraseBtn.addEventListener('click', () => placeNumber(0));
       pad.appendChild(eraseBtn);
     }
@@ -423,21 +511,25 @@
     }
 
     function placeNumber(n) {
-      if (gameOver || !selectedCell) return;
+      if (gameOver) return;
+      if (!selectedCell) { announce('Choose a square on the board first.'); return; }
       const { r, c } = selectedCell;
-      if (given[r][c]) return;
-      
+      if (given[r][c]) { announce(`Row ${r + 1}, column ${c + 1} is fixed and cannot be changed.`); return; }
+
       if (n === 0) {
         board[r][c] = 0;
+        announce(`Cleared row ${r + 1}, column ${c + 1}.`);
         playSound('place');
       } else if (n === solution[r][c]) {
         board[r][c] = n;
+        announce(`${n} placed in row ${r + 1}, column ${c + 1}.`);
         playSound('place');
         checkWin();
       } else {
         board[r][c] = n;
         errors++;
         document.getElementById('errors').textContent = errors;
+        announce(`${n} is wrong for row ${r + 1}, column ${c + 1}. ${errors} of 3 errors.`);
         playSound('error');
         if (errors >= 3) {
           gameOver = true;
@@ -466,6 +558,7 @@
       given[r][c] = true;
       hintsLeft--;
       updateHintButton();
+      announce(`Hint: ${board[r][c]} placed in row ${r + 1}, column ${c + 1}. ${hintsLeft} hint${hintsLeft === 1 ? '' : 's'} left.`);
       playSound('place');
       renderBoard();
       checkWin();
@@ -473,6 +566,8 @@
 
     function updateHintButton() {
       const btn = document.getElementById('hintBtn');
+      // the count lives in the visible text, so no aria-label is added — an
+      // accessible name that dropped "(3)" would break voice control
       btn.textContent = `💡 Hint (${hintsLeft})`;
       btn.disabled = hintsLeft <= 0;
     }
@@ -513,7 +608,12 @@
       const stars = document.querySelectorAll('#starRating .star');
       const starCount = won ? (errors === 0 ? 3 : errors === 1 ? 2 : 1) : 0;
       stars.forEach((st, i) => st.classList.toggle('filled', i < starCount));
+      announce(won
+        ? `Puzzle solved in ${m}:${s.toString().padStart(2, '0')} with ${starCount} of 3 stars.`
+        : 'Game over — three errors. Press Play Again for a new puzzle.');
       document.getElementById('modal').classList.add('show');
+      // the dialog is the only thing on screen now, so send focus to it
+      document.getElementById('modalBtn').focus();
     }
 
     function closeModal() {

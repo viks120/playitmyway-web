@@ -97,6 +97,15 @@
         width: 100%;
       }
 
+      /* Landmark wrapper only — repeats the body's column layout so the
+         children sit exactly where they did before the landmark existed. */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
       .hint-area {
         text-align: center;
         margin-bottom: 15px;
@@ -150,6 +159,10 @@
         transition: all 0.2s;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         user-select: none;
+        /* the tappable words are real <button>s now (keyboard reachable) —
+           strip the UA chrome so they render exactly as the old spans did */
+        border: none;
+        font-family: inherit;
       }
 
       .word:hover {
@@ -304,6 +317,11 @@
         font-size: 1.5em;
         color: #999;
         cursor: pointer;
+        /* it is a real <button> now — strip the UA chrome so it looks the same */
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: inherit;
       }
 
       .modal-close:hover { color: #333; }
@@ -351,57 +369,70 @@
     <a href="../../" class="back-link">← Back to Games</a>
 
     <div class="header">
-      <h1>📝 Sentence Builder</h1>
+      <h1><span aria-hidden="true">📝</span> Sentence Builder</h1>
       <p>Arrange words to make correct sentences!</p>
     </div>
 
-    <div class="stats">
-      <div>Score: <span id="score">0</span></div>
-      <div>Best this visit: <span id="best">0</span></div>
-    </div>
-
-    <div class="difficulty-selector">
-      <button class="diff-btn active" onclick="setDifficulty('easy')">🌱 Easy</button>
-      <button class="diff-btn" onclick="setDifficulty('medium')">🌿 Medium</button>
-      <button class="diff-btn" onclick="setDifficulty('hard')">🌳 Hard</button>
-    </div>
-
-    <div class="game-container">
-      <div class="question-counter" id="questionCounter">Sentence 1 of 10</div>
-      
-      <div class="hint-area" id="hint">💡 Hint: What is the cat doing?</div>
-      
-      <div class="sentence-area" id="sentenceArea">
-        <span style="color: #999;">Tap words below to build your sentence</span>
+    <main>
+      <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Best this visit: <span id="best">0</span></div>
       </div>
-      
-      <div class="word-bank" id="wordBank"></div>
-      
-      <div class="feedback" id="feedback" aria-live="polite"></div>
 
-      <div class="hint-message" id="hintMessage" aria-live="polite"></div>
-
-      <div class="controls">
-        <button class="btn" onclick="checkSentence()" id="checkBtn">✓ Check</button>
-        <button class="btn" onclick="clearSentence()">↺ Clear</button>
-        <button class="btn" onclick="getHintHelp()">💡 Hint</button>
-        <button class="btn" onclick="nextSentence()" id="nextBtn" disabled>Next →</button>
+      <div class="difficulty-selector" role="group" aria-label="Choose difficulty">
+        <button type="button" class="diff-btn active" aria-pressed="true" onclick="setDifficulty('easy')"><span aria-hidden="true">🌱</span> Easy</button>
+        <button type="button" class="diff-btn" aria-pressed="false" onclick="setDifficulty('medium')"><span aria-hidden="true">🌿</span> Medium</button>
+        <button type="button" class="diff-btn" aria-pressed="false" onclick="setDifficulty('hard')"><span aria-hidden="true">🌳</span> Hard</button>
       </div>
-    </div>
 
-    <div class="modal-overlay" id="modal" onclick="closeModalOnOverlay(event)">
-      <div class="modal">
-        <span class="modal-close" onclick="closeModalOnly()">✕</span>
+      <div class="game-container">
+        <div class="question-counter" id="questionCounter">Sentence 1 of 10</div>
+
+        <div class="hint-area" id="hint">💡 Hint: What is the cat doing?</div>
+
+        <div class="sentence-area" id="sentenceArea" role="group" aria-label="Your sentence so far">
+          <span style="color: #999;">Tap words below to build your sentence</span>
+        </div>
+
+        <div
+          class="word-bank"
+          id="wordBank"
+          role="group"
+          aria-labelledby="questionCounter hint"
+        ></div>
+
+        <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+
+        <div class="hint-message" id="hintMessage" role="status" aria-live="polite"></div>
+
+        <div class="controls">
+          <button type="button" class="btn" onclick="checkSentence()" id="checkBtn"><span aria-hidden="true">✓</span> Check</button>
+          <button type="button" class="btn" onclick="clearSentence()"><span aria-hidden="true">↺</span> Clear</button>
+          <button type="button" class="btn" onclick="getHintHelp()"><span aria-hidden="true">💡</span> Hint</button>
+          <button type="button" class="btn" onclick="nextSentence()" id="nextBtn" disabled>Next <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal-overlay" id="modal">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+        aria-describedby="modalScoreLine modalCorrectLine"
+      >
+        <button type="button" class="modal-close" onclick="closeModalOnly()" aria-label="Close">✕</button>
         <h2 id="modalTitle">🎉 Great Job!</h2>
-        <div class="stars" id="starRating">
+        <div class="stars" id="starRating" aria-hidden="true">
           <span class="star">★</span>
           <span class="star">★</span>
           <span class="star">★</span>
         </div>
-        <p>You scored <span id="finalScore">0</span> points!</p>
-        <p>Sentences correct: <span id="correctCount">0</span>/10</p>
+        <p id="modalScoreLine">You scored <span id="finalScore">0</span> points!</p>
+        <p id="modalCorrectLine">Sentences correct: <span id="correctCount">0</span>/10</p>
         <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New best this visit!</p>
-        <button class="modal-btn" onclick="closeModal()">Play Again</button>
+        <button type="button" class="modal-btn" onclick="closeModal()">Play Again</button>
       </div>
     </div>
 
@@ -511,8 +542,17 @@
 
       function setDifficulty(d) {
         difficulty = d;
-        document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        // closest() because the click can land on the button's own
+        // aria-hidden emoji span
+        const clicked = event.target.closest('.diff-btn');
+        document.querySelectorAll('.diff-btn').forEach(btn => {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-pressed', 'false');
+        });
+        if (clicked) {
+          clicked.classList.add('active');
+          clicked.setAttribute('aria-pressed', 'true');
+        }
         startNewGame();
       }
 
@@ -557,7 +597,9 @@
         const wordBank = document.getElementById('wordBank');
         wordBank.innerHTML = '';
         shuffledWords.forEach((word, index) => {
-          const wordEl = document.createElement('span');
+          // real <button> so every word is reachable with the keyboard
+          const wordEl = document.createElement('button');
+          wordEl.type = 'button';
           wordEl.className = 'word';
           wordEl.textContent = word;
           wordEl.dataset.word = word;
@@ -567,8 +609,14 @@
         });
 
         clearSentence();
-        document.getElementById('feedback').style.display = 'none';
-        document.getElementById('hintMessage').style.display = 'none';
+        // Emptying the live regions as well as hiding them keeps them from
+        // re-announcing the last sentence's text when they reappear
+        const feedbackEl = document.getElementById('feedback');
+        feedbackEl.textContent = '';
+        feedbackEl.style.display = 'none';
+        const hintMessageEl = document.getElementById('hintMessage');
+        hintMessageEl.textContent = '';
+        hintMessageEl.style.display = 'none';
         document.getElementById('checkBtn').disabled = false;
         document.getElementById('nextBtn').disabled = true;
       }
@@ -597,8 +645,8 @@
           sentenceArea.innerHTML = '<span style="color: #999;">Tap words below to build your sentence</span>';
           sentenceArea.classList.remove('valid');
         } else {
-          sentenceArea.innerHTML = selectedWords.map(word => 
-            `<span class="word in-sentence" onclick="removeWordFromSentence('${word}')">${word}</span>`
+          sentenceArea.innerHTML = selectedWords.map(word =>
+            `<button type="button" class="word in-sentence" onclick="removeWordFromSentence('${word}')">${word}</button>`
           ).join('');
           
           // Check if all words are used
@@ -647,10 +695,11 @@
         const explanationHtml = `<div class="explanation">📚 ${sentence.explanation}</div>`;
 
         if (selectedWords.length < sentence.words.length) {
-          // Not a real attempt yet — every word needs a spot first
+          // Not a real attempt yet — every word needs a spot first.
+          // Visible before written, or the live region stays silent.
           const left = sentence.words.length - selectedWords.length;
-          hintMessage.innerHTML = `<div>🧩 Use all the words! ${left} ${left === 1 ? 'word is' : 'words are'} still in the word bank.</div>`;
           hintMessage.style.display = 'block';
+          hintMessage.innerHTML = `<div>🧩 Use all the words! ${left} ${left === 1 ? 'word is' : 'words are'} still in the word bank.</div>`;
           return;
         }
 
@@ -663,16 +712,19 @@
           correctCount++;
           roundOver = true;
 
+          feedback.className = 'feedback correct';
+          feedback.style.display = 'block';
           feedback.innerHTML = `
             <div>🎉 Correct!${attempts > 0 ? ' Great second try!' : ''} +${points} points</div>
             ${explanationHtml}
           `;
-          feedback.className = 'feedback correct';
-          feedback.style.display = 'block';
           hintMessage.style.display = 'none';
 
           document.getElementById('checkBtn').disabled = true;
-          document.getElementById('nextBtn').disabled = false;
+          const nextBtn = document.getElementById('nextBtn');
+          nextBtn.disabled = false;
+          // Check just disabled itself — hand the keyboard the only move left
+          nextBtn.focus({ preventScroll: true });
         } else {
           // Incorrect
           playSound('wrong');
@@ -683,18 +735,18 @@
             let firstWrong = 0;
             while (firstWrong < selectedWords.length && selectedWords[firstWrong] === sentence.words[firstWrong]) firstWrong++;
 
-            feedback.innerHTML = '<div>😅 Not quite right. Try again!</div>';
             feedback.className = 'feedback incorrect';
             feedback.style.display = 'block';
+            feedback.innerHTML = '<div>😅 Not quite right. Try again!</div>';
 
             const goodStart = firstWrong > 0
               ? `The first ${firstWrong === 1 ? 'word is' : firstWrong + ' words are'} right — `
               : '';
+            hintMessage.style.display = 'block';
             hintMessage.innerHTML = `
               <div>💡 ${sentence.hint}</div>
               <div>🔍 ${goodStart}check word ${firstWrong + 1}: "${selectedWords[firstWrong]}" isn't in the right spot.</div>
             `;
-            hintMessage.style.display = 'block';
 
             const sentenceArea = document.getElementById('sentenceArea');
             if (sentenceArea.children[firstWrong]) {
@@ -709,16 +761,19 @@
             ).join('');
             sentenceArea.classList.add('valid');
 
+            feedback.className = 'feedback incorrect';
+            feedback.style.display = 'block';
             feedback.innerHTML = `
               <div>😊 The correct sentence is: "${correctSentence}"</div>
               ${explanationHtml}
             `;
-            feedback.className = 'feedback incorrect';
-            feedback.style.display = 'block';
             hintMessage.style.display = 'none';
 
             document.getElementById('checkBtn').disabled = true;
-            document.getElementById('nextBtn').disabled = false;
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = false;
+            // Check just disabled itself — hand the keyboard the only move left
+            nextBtn.focus({ preventScroll: true });
           }
         }
 
@@ -733,13 +788,19 @@
         // Show first word hint — stays visible until the child acts
         const firstWord = sentence.words[0];
         const hintMessage = document.getElementById('hintMessage');
-        hintMessage.innerHTML = `<div>💡 The sentence starts with: "${firstWord}"</div>`;
         hintMessage.style.display = 'block';
+        hintMessage.innerHTML = `<div>💡 The sentence starts with: "${firstWord}"</div>`;
       }
 
       function nextSentence() {
         currentIndex++;
         loadCurrentSentence();
+        // Next just disabled itself; put the keyboard on the first word
+        // (unless the run ended and the results dialog took focus)
+        if (!document.getElementById('modal').classList.contains('show')) {
+          const firstWord = document.querySelector('#wordBank .word');
+          if (firstWord) firstWord.focus({ preventScroll: true });
+        }
       }
 
       function updateDisplay() {
@@ -762,13 +823,21 @@
         const starCount = correctCount >= 9 ? 3 : correctCount >= 6 ? 2 : 1;
         stars.forEach((s, i) => s.classList.toggle('filled', i < starCount));
 
-        document.getElementById('modal').classList.add('show');
+        const modal = document.getElementById('modal');
+        modal.classList.add('show');
+        // Send focus into the dialog so the result is announced and the
+        // keyboard lands on Play Again rather than back at the top of the page
+        const playAgain = modal.querySelector('.modal-btn');
+        if (playAgain) playAgain.focus();
         playSound('complete');
         createConfetti();
       }
 
       function closeModalOnly() {
         document.getElementById('modal').classList.remove('show');
+        // the button that was focused just went away with the dialog
+        const activeDiff = document.querySelector('.diff-btn.active');
+        if (activeDiff) activeDiff.focus({ preventScroll: true });
       }
 
       function closeModalOnOverlay(event) {
@@ -780,7 +849,22 @@
       function closeModal() {
         closeModalOnly();
         startNewGame();
+        const firstWord = document.querySelector('#wordBank .word');
+        if (firstWord) firstWord.focus({ preventScroll: true });
       }
+
+      document
+        .getElementById('modal')
+        .addEventListener('click', closeModalOnOverlay);
+
+      document.addEventListener('keydown', function (e) {
+        if (
+          e.key === 'Escape' &&
+          document.getElementById('modal').classList.contains('show')
+        ) {
+          closeModalOnly();
+        }
+      });
 
       // Initialize
       loadSentences().then(() => {

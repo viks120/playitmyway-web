@@ -425,6 +425,11 @@
         color: #999;
         cursor: pointer;
         line-height: 1;
+        /* real <button> now — strip the UA chrome so it looks as it always did */
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: inherit;
       }
 
       .modal-close:hover {
@@ -460,6 +465,24 @@
         100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
       }
 
+      /* <main> takes over the column stacking body was doing, so nothing shifts */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
       /* Star Rating */
       .stars {
         font-size: 2.5em;
@@ -479,45 +502,49 @@
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
 
-    <div class="header">
-      <h1>🧠 Memory Match</h1>
-      <p>Find matching pairs of cards!</p>
-    </div>
+    <main>
+      <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
 
-    <div class="difficulty-selector">
-      <h3>Choose Difficulty:</h3>
-      <button class="difficulty-btn active" onclick="setDifficulty('easy')">
-        Easy (2×2)
-      </button>
-      <button class="difficulty-btn" onclick="setDifficulty('medium')">
-        Medium (2×4)
-      </button>
-      <button class="difficulty-btn" onclick="setDifficulty('hard')">
-        Hard (4×4)
-      </button>
-    </div>
-
-    <div class="stats">
-      <div>Moves: <span id="moves">0</span></div>
-      <div>Time: <span id="time">0:00</span></div>
-      <div>
-        Pairs Found: <span id="pairs">0</span>/<span id="totalPairs">2</span>
+      <div class="header">
+        <h1><span aria-hidden="true">🧠</span> Memory Match</h1>
+        <p>Find matching pairs of cards!</p>
       </div>
-    </div>
 
-    <div class="game-container">
-      <div class="game-board easy" id="gameBoard"></div>
-      <div class="controls">
-        <button class="btn" onclick="resetGame()">New Game</button>
+      <div class="difficulty-selector">
+        <h3>Choose Difficulty:</h3>
+        <button type="button" class="difficulty-btn active" aria-pressed="true" onclick="setDifficulty('easy', this)">
+          Easy (2×2)
+        </button>
+        <button type="button" class="difficulty-btn" aria-pressed="false" onclick="setDifficulty('medium', this)">
+          Medium (2×4)
+        </button>
+        <button type="button" class="difficulty-btn" aria-pressed="false" onclick="setDifficulty('hard', this)">
+          Hard (4×4)
+        </button>
       </div>
-    </div>
+
+      <div class="stats">
+        <div>Moves: <span id="moves">0</span></div>
+        <div>Time: <span id="time">0:00</span></div>
+        <div>
+          Pairs Found: <span id="pairs">0</span>/<span id="totalPairs">2</span>
+        </div>
+      </div>
+
+      <div class="game-container">
+        <div class="game-board easy" id="gameBoard"></div>
+        <div class="controls">
+          <button type="button" class="btn" onclick="resetGame()">New Game</button>
+        </div>
+      </div>
+    </main>
 
     <!-- Win Modal -->
-    <div class="modal-overlay" id="winModal" onclick="closeModalOnOverlay(event)">
-      <div class="modal">
-        <span class="modal-close" onclick="closeModal()">✕</span>
-        <h2>🎉 You Won!</h2>
-        <div class="stars" id="starRating">
+    <div class="modal-overlay" id="winModal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="winModalTitle">
+        <button type="button" class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+        <h2 id="winModalTitle"><span aria-hidden="true">🎉</span> You Won!</h2>
+        <div class="stars" id="starRating" aria-hidden="true">
           <span class="star">★</span>
           <span class="star">★</span>
           <span class="star">★</span>
@@ -527,12 +554,21 @@
           <p>Time: <span id="finalTime">0:00</span></p>
           <p>Difficulty: <span id="finalDifficulty">Easy</span></p>
         </div>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
-        <button class="modal-btn" onclick="closeModalAndRestart()">Play Again</button>
+        <p id="highScoreMsg" class="high-score" style="display: none;"><span aria-hidden="true">🏆</span> New Best This Visit!</p>
+        <button type="button" class="modal-btn" onclick="closeModalAndRestart()">Play Again</button>
       </div>
     </div>
 
     <script>
+      // Screen-reader status line. Alternating a trailing no-break space keeps the
+      // text genuinely different, so repeats ("Match!" twice) still get announced.
+      const srStatus = document.getElementById("srStatus");
+      let srFlip = false;
+      function announce(message) {
+        srFlip = !srFlip;
+        srStatus.textContent = srFlip ? message : message + "\u00A0";
+      }
+
       // Sound effects using Web Audio API
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       let audioCtx = null;
@@ -655,8 +691,10 @@
         }
 
         modal.classList.add('show');
+        announce(`You won in ${moves} moves! ${stars} of 3 stars.`);
         playSound('win');
         createConfetti();
+        modal.querySelector('.modal-btn').focus();
       }
 
       function closeModal() {
@@ -673,6 +711,14 @@
         closeModal();
         resetGame();
       }
+
+      // Dismissing by clicking the backdrop is mouse-only, so Escape does the
+      // same job for the keyboard.
+      document.getElementById('winModal').addEventListener('click', closeModalOnOverlay);
+      document.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('winModal');
+        if (e.key === 'Escape' && modal.classList.contains('show')) closeModal();
+      });
       const emojis = [
         "🐶",
         "🐱",
@@ -707,14 +753,19 @@
         hard: { rows: 4, cols: 4, pairs: 8 },
       };
 
-      function setDifficulty(difficulty) {
+      function setDifficulty(difficulty, clickedBtn) {
         currentDifficulty = difficulty;
 
-        // Update active button
+        // Update active button — the button is passed in rather than read off the
+        // global event, so keyboard activation marks the right one too
         document.querySelectorAll(".difficulty-btn").forEach((btn) => {
           btn.classList.remove("active");
+          btn.setAttribute("aria-pressed", "false");
         });
-        event.target.classList.add("active");
+        if (clickedBtn) {
+          clickedBtn.classList.add("active");
+          clickedBtn.setAttribute("aria-pressed", "true");
+        }
 
         // Update game board class
         const gameBoard = document.getElementById("gameBoard");
@@ -737,18 +788,33 @@
       }
 
       function createCard(emoji, index) {
+        // Stays a <div> so the flip transform and grid sizing are untouched;
+        // role + tabindex + keydown give it the behaviour of a button.
         const card = document.createElement("div");
         card.className = "card";
         card.dataset.index = index;
         card.dataset.emoji = emoji;
+        card.setAttribute("role", "button");
+        card.setAttribute("tabindex", "0");
+        card.setAttribute("aria-label", `Card ${index + 1}, face down`);
 
         card.innerHTML = `
-                <div class="card-front">❓</div>
-                <div class="card-back">${emoji}</div>
+                <div class="card-front" aria-hidden="true">❓</div>
+                <div class="card-back" aria-hidden="true">${emoji}</div>
             `;
 
         card.addEventListener("click", () => flipCard(card));
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+            e.preventDefault(); // Space would otherwise scroll the page
+            flipCard(card);
+          }
+        });
         return card;
+      }
+
+      function cardNumber(card) {
+        return Number(card.dataset.index) + 1;
       }
 
       function flipCard(card) {
@@ -768,6 +834,8 @@
 
         playSound('flip');
         card.classList.add("flipped");
+        card.setAttribute("aria-label", `Card ${cardNumber(card)}, ${card.dataset.emoji}`);
+        announce(card.dataset.emoji);
         flippedCards.push(card);
 
         if (flippedCards.length === 2) {
@@ -786,6 +854,12 @@
               flippedCards = [];
 
               const config = difficultyConfig[currentDifficulty];
+              [card1, card2].forEach((c) => {
+                c.setAttribute("aria-label", `Card ${cardNumber(c)}, ${c.dataset.emoji}, matched`);
+                c.setAttribute("aria-disabled", "true");
+              });
+              announce(`Match! ${matchedPairs} of ${config.pairs} pairs found.`);
+
               if (matchedPairs === config.pairs) {
                 setTimeout(() => {
                   clearInterval(timerInterval);
@@ -799,9 +873,13 @@
           } else {
             // No match
             playSound('noMatch');
+            announce("No match. Try again!");
             setTimeout(() => {
               card1.classList.remove("flipped");
               card2.classList.remove("flipped");
+              [card1, card2].forEach((c) => {
+                c.setAttribute("aria-label", `Card ${cardNumber(c)}, face down`);
+              });
               flippedCards = [];
             }, 1000);
           }
@@ -829,6 +907,7 @@
         document.getElementById("time").textContent = "0:00";
         document.getElementById("pairs").textContent = "0";
 
+        announce(`New game — ${difficultyConfig[currentDifficulty].pairs} pairs to find.`);
         initializeGame();
       }
 

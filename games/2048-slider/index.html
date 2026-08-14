@@ -352,6 +352,18 @@
         transform: translateY(-2px);
       }
 
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
       @media (max-width: 600px) {
         .cell {
           width: 60px;
@@ -440,18 +452,24 @@
     </div>
 
     <div class="controls">
-      <button class="btn" onclick="newGame()">New Game</button>
-      <button class="btn" onclick="showInstructions()">How to Play</button>
+      <button type="button" class="btn" onclick="newGame()">New Game</button>
+      <button type="button" class="btn" onclick="showInstructions()">How to Play</button>
     </div>
 
-    <div class="game-container">
-      <div class="grid" id="grid"></div>
-    </div>
+    <main class="game-container">
+      <div
+        class="grid"
+        id="grid"
+        role="group"
+        aria-label="2048 board, 4 rows by 4 columns. Use the arrow keys to slide the tiles."
+      ></div>
+      <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
+    </main>
 
     <div class="game-over" id="gameOver">
-      <div class="game-over-content">
+      <div class="game-over-content" role="dialog" aria-modal="true" aria-labelledby="gameOverTitle">
         <h2 id="gameOverTitle">Game Over!</h2>
-        <div class="stars" id="starRating">
+        <div class="stars" id="starRating" aria-hidden="true">
           <span class="star">★</span>
           <span class="star">★</span>
           <span class="star">★</span>
@@ -460,9 +478,9 @@
           Your final score: <span id="finalScore">0</span>
         </p>
         <p id="mathFact"></p>
-        <p id="highScoreMsg" class="high-score-msg" style="display: none;">🏆 New best this visit!</p>
-        <button class="btn" id="keepGoingBtn" onclick="keepGoing()" style="display: none;">Keep going ✨</button>
-        <button class="btn" onclick="newGame()">Play Again</button>
+        <p id="highScoreMsg" class="high-score-msg" style="display: none;"><span aria-hidden="true">🏆</span> New best this visit!</p>
+        <button type="button" class="btn" id="keepGoingBtn" onclick="keepGoing()" style="display: none;">Keep going <span aria-hidden="true">✨</span></button>
+        <button type="button" class="btn" onclick="newGame()">Play Again</button>
       </div>
     </div>
 
@@ -554,6 +572,16 @@
           document.body.appendChild(confetti);
           setTimeout(() => confetti.remove(), 5000);
         }
+      }
+
+      // Announcements for a player who can't watch the tiles glide: the same
+      // events a sighted player sees — score moving, tiles merging, game over.
+      let announcedScore = 0;
+      function announce(msg) {
+        const el = document.getElementById("srStatus");
+        if (!el) return;
+        // identical consecutive text is not re-announced, so alternate a space
+        el.textContent = el.textContent === msg ? msg + " " : msg;
       }
 
       function displayStars(score) {
@@ -884,6 +912,16 @@
         updateScore() {
           document.getElementById("score").textContent = this.score;
           this.updateBest();
+          // score only ever climbs on a merge, so the rise is the merge result
+          const gained = this.score - announcedScore;
+          announcedScore = this.score;
+          if (gained > 0) {
+            const biggest = Math.max.apply(null, [].concat.apply([], this.grid));
+            announce(
+              "Merged for " + gained + " points. Score " + this.score +
+              ". Biggest tile " + biggest + "."
+            );
+          }
         }
 
         updateBest() {
@@ -969,6 +1007,7 @@
             title === "You Win!" ? "inline-block" : "none";
 
           document.getElementById("gameOver").classList.add("show");
+          announce(title + " " + message + " Final score " + this.score + ".");
 
           if (title === "You Win!") {
             playSound('win');

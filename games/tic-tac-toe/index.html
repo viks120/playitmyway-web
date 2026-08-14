@@ -257,6 +257,11 @@
         color: #999;
         cursor: pointer;
         line-height: 1;
+        /* real <button> now — strip the UA chrome so it looks as it always did */
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: inherit;
       }
 
       .modal-close:hover {
@@ -274,6 +279,24 @@
         top: -10px;
         z-index: 1001;
         animation: confettiFall 3s linear forwards;
+      }
+
+      /* <main> takes over the column stacking body was doing, so nothing shifts */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
       }
 
       @keyframes scaleIn {
@@ -303,41 +326,54 @@
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
 
-    <div class="header">
-      <h1>⭕ Tic Tac Toe ❌</h1>
-      <p>Get three in a row to win!</p>
-    </div>
+    <main>
+      <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
 
-    <div class="stats">
-      <div>❌ Wins: <span id="xWins">0</span></div>
-      <div>⭕ Wins: <span id="oWins">0</span></div>
-      <div>Draws: <span id="draws">0</span></div>
-    </div>
-
-    <div class="mode-selector">
-      <button class="mode-btn active" onclick="setMode('friend')">👫 vs Friend</button>
-      <button class="mode-btn" onclick="setMode('computer')">🤖 vs Computer</button>
-    </div>
-
-    <div class="game-container">
-      <div class="status" id="status">❌ Player X's turn</div>
-      <div class="board" id="board"></div>
-      <div class="controls">
-        <button class="btn" onclick="resetGame()">New Game</button>
-        <button class="btn" onclick="resetScores()">Reset Scores</button>
+      <div class="header">
+        <h1><span aria-hidden="true">⭕</span> Tic Tac Toe <span aria-hidden="true">❌</span></h1>
+        <p>Get three in a row to win!</p>
       </div>
-    </div>
 
-    <div class="modal-overlay" id="modal" onclick="closeModalOnOverlay(event)">
-      <div class="modal">
-        <span class="modal-close" onclick="closeModalOnly()">✕</span>
+      <div class="stats">
+        <div>❌ Wins: <span id="xWins">0</span></div>
+        <div>⭕ Wins: <span id="oWins">0</span></div>
+        <div>Draws: <span id="draws">0</span></div>
+      </div>
+
+      <div class="mode-selector">
+        <button type="button" class="mode-btn active" aria-pressed="true" onclick="setMode('friend', this)"><span aria-hidden="true">👫</span> vs Friend</button>
+        <button type="button" class="mode-btn" aria-pressed="false" onclick="setMode('computer', this)"><span aria-hidden="true">🤖</span> vs Computer</button>
+      </div>
+
+      <div class="game-container">
+        <div class="status" id="status">❌ Player X's turn</div>
+        <div class="board" id="board"></div>
+        <div class="controls">
+          <button type="button" class="btn" onclick="resetGame()">New Game</button>
+          <button type="button" class="btn" onclick="resetScores()">Reset Scores</button>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal-overlay" id="modal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button type="button" class="modal-close" onclick="closeModalOnly()" aria-label="Close">✕</button>
         <h2 id="modalTitle">🎉 Winner!</h2>
         <p id="modalMessage">Player X wins!</p>
-        <button class="modal-btn" onclick="closeModal()">Play Again</button>
+        <button type="button" class="modal-btn" onclick="closeModal()">Play Again</button>
       </div>
     </div>
 
     <script>
+      // Screen-reader status line. Alternating a trailing no-break space keeps the
+      // text genuinely different, so repeats still get announced.
+      const srStatus = document.getElementById('srStatus');
+      let srFlip = false;
+      function announce(message) {
+        srFlip = !srFlip;
+        srStatus.textContent = srFlip ? message : message + "\u00A0";
+      }
+
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       let audioCtx = null;
 
@@ -402,21 +438,46 @@
         [0, 4, 8], [2, 4, 6]
       ];
 
-      function setMode(m) {
+      function setMode(m, clickedBtn) {
         mode = m;
-        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        // the button is passed in rather than read off the global event, so
+        // keyboard activation (and clicks landing on the emoji) mark the right one
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-pressed', 'false');
+        });
+        if (clickedBtn) {
+          clickedBtn.classList.add('active');
+          clickedBtn.setAttribute('aria-pressed', 'true');
+        }
         resetGame();
+      }
+
+      function cellLabel(index, mark) {
+        const row = Math.floor(index / 3) + 1;
+        const col = (index % 3) + 1;
+        return `Row ${row}, column ${col}, ${mark || 'empty'}`;
       }
 
       function createBoard() {
         const boardEl = document.getElementById('board');
         boardEl.innerHTML = '';
         for (let i = 0; i < 9; i++) {
+          // Stays a <div> so the 3-column grid sizing is untouched; role +
+          // tabindex + keydown give it the behaviour of a button.
           const cell = document.createElement('div');
           cell.className = 'cell';
           cell.dataset.index = i;
+          cell.setAttribute('role', 'button');
+          cell.setAttribute('tabindex', '0');
+          cell.setAttribute('aria-label', cellLabel(i, ''));
           cell.addEventListener('click', () => handleClick(i));
+          cell.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+              e.preventDefault(); // Space would otherwise scroll the page
+              handleClick(i);
+            }
+          });
           boardEl.appendChild(cell);
         }
       }
@@ -436,22 +497,29 @@
         const cell = document.querySelectorAll('.cell')[index];
         cell.textContent = player === 'X' ? '❌' : '⭕';
         cell.classList.add('taken', player.toLowerCase());
+        cell.setAttribute('aria-label', cellLabel(index, player));
+        cell.setAttribute('aria-disabled', 'true');
         playSound('place');
+
+        const move = cellLabel(index, player);
 
         if (checkWin(player)) {
           gameActive = false;
           highlightWin();
           scores[player]++;
           updateScores();
+          announce(`${move}. Player ${player} wins!`);
           setTimeout(() => showModal('🎉 Winner!', player === 'X' ? '❌ Player X Wins!' : '⭕ Player O Wins!'), 300);
         } else if (board.every(cell => cell !== '')) {
           gameActive = false;
           scores.draws++;
           updateScores();
+          announce(`${move}. It's a draw!`);
           setTimeout(() => showModal("🤝 It's a Draw!", 'Good game! Try again?'), 300);
         } else {
           currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
           updateStatus();
+          announce(`${move}. Player ${currentPlayer}'s turn.`);
         }
       }
 
@@ -518,7 +586,9 @@
       function showModal(title, message) {
         document.getElementById('modalTitle').textContent = title;
         document.getElementById('modalMessage').textContent = message || '';
-        document.getElementById('modal').classList.add('show');
+        const modal = document.getElementById('modal');
+        modal.classList.add('show');
+        modal.querySelector('.modal-btn').focus();
         if (!title.includes('Draw')) {
           playSound('win');
           createConfetti();
@@ -546,12 +616,22 @@
         gameActive = true;
         createBoard();
         updateStatus();
+        announce("New game! Player X's turn.");
       }
 
       function resetScores() {
         scores = { X: 0, O: 0, draws: 0 };
         updateScores();
+        announce('Scores reset.');
       }
+
+      // Dismissing by clicking the backdrop is mouse-only, so Escape does the
+      // same job for the keyboard.
+      document.getElementById('modal').addEventListener('click', closeModalOnOverlay);
+      document.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('modal');
+        if (e.key === 'Escape' && modal.classList.contains('show')) closeModalOnly();
+      });
 
       createBoard();
       updateScores();

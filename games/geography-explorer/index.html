@@ -133,6 +133,15 @@
         width: 100%;
       }
 
+      /* Landmark wrapper only — repeats the body's column layout so the
+         children sit exactly where they did before the landmark existed. */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
       .question-area {
         text-align: center;
         margin-bottom: 25px;
@@ -184,6 +193,10 @@
         font-weight: bold;
         color: #333;
         font-size: clamp(0.8em, 2vw, 1em);
+        /* the map regions are real <button>s now (keyboard reachable) —
+           strip the UA chrome so they render exactly as the old divs did */
+        font-family: inherit;
+        padding: 0;
       }
 
       .continent:hover {
@@ -514,6 +527,11 @@
         color: #999;
         cursor: pointer;
         line-height: 1;
+        /* it is a real <button> now — strip the UA chrome so it looks the same */
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: inherit;
       }
 
       .modal-close:hover {
@@ -568,67 +586,85 @@
     <a href="../../" class="back-link">← Back to Games</a>
 
     <div class="header">
-      <h1>🌍 Geography Explorer</h1>
+      <h1><span aria-hidden="true">🌍</span> Geography Explorer</h1>
       <p>Explore the world through countries, capitals, and flags!</p>
     </div>
 
-    <div class="stats">
-      <div>Score: <span id="score">0</span></div>
-      <div>Level: <span id="level">1</span></div>
-      <div>Countries Found: <span id="found">0</span></div>
-    </div>
-
-    <div class="mode-selector">
-      <h3>Choose Challenge Type:</h3>
-      <button class="mode-btn active" onclick="setMode('countries')">
-        Countries
-      </button>
-      <button class="mode-btn" onclick="setMode('capitals')">Capitals</button>
-      <button class="mode-btn" onclick="setMode('flags')">Flags</button>
-    </div>
-
-    <div class="game-container">
-      <div class="feedback" id="feedback"></div>
-      <div class="hint" id="hint"></div>
-
-      <div class="question-area">
-        <div class="question" id="question">Find the country on the map</div>
-        <div class="flag-display" id="flagDisplay">🏳️</div>
+    <main>
+      <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>Countries Found: <span id="found">0</span></div>
       </div>
 
-      <div class="world-map" id="worldMap">
-        <!-- Continents will be generated here -->
-      </div>
-
-      <div class="answer-options" id="answerOptions">
-        <!-- Answer options will be generated here -->
-      </div>
-
-      <div class="controls">
-        <button class="btn" id="hintBtn" onclick="getHint()">Get Hint</button>
-        <button class="btn" onclick="newChallenge()">New Challenge</button>
-        <button class="btn" id="nextBtn" onclick="newChallenge()" style="display: none">
-          Next
+      <div class="mode-selector" role="group" aria-labelledby="modeHeading">
+        <h3 id="modeHeading">Choose Challenge Type:</h3>
+        <button type="button" class="mode-btn active" aria-pressed="true" onclick="setMode('countries')">
+          Countries
         </button>
+        <button type="button" class="mode-btn" aria-pressed="false" onclick="setMode('capitals')">Capitals</button>
+        <button type="button" class="mode-btn" aria-pressed="false" onclick="setMode('flags')">Flags</button>
       </div>
-    </div>
+
+      <div class="game-container">
+        <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+        <div class="hint" id="hint" role="status" aria-live="polite"></div>
+
+        <div class="question-area">
+          <div class="question" id="question">Find the country on the map</div>
+          <div class="flag-display" id="flagDisplay">🏳️</div>
+        </div>
+
+        <div
+          class="world-map"
+          id="worldMap"
+          role="group"
+          aria-label="World map — pick the continent"
+        >
+          <!-- Continents will be generated here -->
+        </div>
+
+        <div
+          class="answer-options"
+          id="answerOptions"
+          role="group"
+          aria-labelledby="question"
+        >
+          <!-- Answer options will be generated here -->
+        </div>
+
+        <div class="controls">
+          <button type="button" class="btn" id="hintBtn" onclick="getHint()">Get Hint</button>
+          <button type="button" class="btn" onclick="newChallenge()">New Challenge</button>
+          <button type="button" class="btn" id="nextBtn" onclick="nextChallenge()" style="display: none">
+            Next
+          </button>
+        </div>
+      </div>
+    </main>
 
     <!-- Level Up Modal -->
-    <div class="modal-overlay" id="levelModal" onclick="closeModalOnOverlay(event)">
-      <div class="modal">
-        <span class="modal-close" onclick="closeModal()">✕</span>
+    <div class="modal-overlay" id="levelModal">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+        aria-describedby="modalStats"
+      >
+        <button type="button" class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
         <h2 id="modalTitle">🎊 Level Up!</h2>
-        <div class="stars" id="starRating">
+        <div class="stars" id="starRating" aria-hidden="true">
           <span class="star">★</span>
           <span class="star">★</span>
           <span class="star">★</span>
         </div>
-        <div class="stats-display">
+        <div class="stats-display" id="modalStats">
           <p>Score: <span id="modalScore">0</span></p>
           <p>Level: <span id="modalLevel">1</span></p>
           <p>Countries Found: <span id="modalFound">0</span></p>
         </div>
-        <button class="modal-btn" onclick="closeModal()">Continue</button>
+        <button type="button" class="modal-btn" onclick="closeModal()">Continue</button>
       </div>
     </div>
 
@@ -727,6 +763,10 @@
         displayStars(starCount);
 
         modal.classList.add('show');
+        // Send focus into the dialog so the level-up is announced and the
+        // keyboard lands on Continue rather than back at the top of the page
+        const continueBtn = modal.querySelector('.modal-btn');
+        if (continueBtn) continueBtn.focus();
         playSound('levelUp');
         createConfetti();
       }
@@ -734,6 +774,7 @@
       function closeModal() {
         document.getElementById('levelModal').classList.remove('show');
         newChallenge();
+        focusFirstOption();
       }
 
       function closeModalOnOverlay(event) {
@@ -741,6 +782,27 @@
           closeModal();
         }
       }
+
+      // Focus is otherwise dropped on the body when the button that was
+      // clicked disappears or is disabled
+      function focusFirstOption() {
+        if (document.getElementById("levelModal").classList.contains("show")) return;
+        const first = document.querySelector("#answerOptions .answer-btn");
+        if (first) first.focus({ preventScroll: true });
+      }
+
+      document
+        .getElementById("levelModal")
+        .addEventListener("click", closeModalOnOverlay);
+
+      document.addEventListener("keydown", function (e) {
+        if (
+          e.key === "Escape" &&
+          document.getElementById("levelModal").classList.contains("show")
+        ) {
+          closeModal();
+        }
+      });
       let currentMode = "countries";
       let currentChallenge = {};
       let score = 0;
@@ -1032,10 +1094,15 @@
         currentMode = mode;
 
         // Update active button
+        const clicked = event.target.closest(".mode-btn");
         document.querySelectorAll(".mode-btn").forEach((btn) => {
           btn.classList.remove("active");
+          btn.setAttribute("aria-pressed", "false");
         });
-        event.target.classList.add("active");
+        if (clicked) {
+          clicked.classList.add("active");
+          clicked.setAttribute("aria-pressed", "true");
+        }
 
         // Generate new challenge
         newChallenge();
@@ -1046,7 +1113,9 @@
         mapContainer.innerHTML = "";
 
         Object.entries(continentPositions).forEach(([continent, pos]) => {
-          const continentDiv = document.createElement("div");
+          // real <button> so the map is reachable with the keyboard
+          const continentDiv = document.createElement("button");
+          continentDiv.type = "button";
           continentDiv.className = "continent";
           continentDiv.textContent = continent;
           continentDiv.style.top = pos.top;
@@ -1083,6 +1152,7 @@
 
         continents.forEach((continent) => {
           const btn = document.createElement("button");
+          btn.type = "button";
           btn.className = "answer-btn";
           btn.textContent = continent;
           btn.onclick = () => checkAnswer(continent, btn);
@@ -1117,6 +1187,7 @@
 
         capitalOptions.forEach((capital) => {
           const btn = document.createElement("button");
+          btn.type = "button";
           btn.className = "answer-btn";
           btn.textContent = capital;
           btn.onclick = () => checkAnswer(capital, btn);
@@ -1151,6 +1222,7 @@
 
         countryOptions.forEach((countryName) => {
           const btn = document.createElement("button");
+          btn.type = "button";
           btn.className = "answer-btn";
           btn.textContent = countryName;
           btn.onclick = () => checkAnswer(countryName, btn);
@@ -1177,22 +1249,37 @@
             break;
         }
 
-        // Clear feedback, hint and reset map
+        // Clear feedback, hint and reset map. Emptying the live regions as
+        // well as hiding them keeps them from re-announcing the last
+        // challenge's text when they reappear.
         if (feedbackTimer) {
           clearTimeout(feedbackTimer);
           feedbackTimer = null;
         }
-        document.getElementById("feedback").style.display = "none";
-        document.getElementById("hint").style.display = "none";
+        const feedbackEl = document.getElementById("feedback");
+        feedbackEl.textContent = "";
+        feedbackEl.style.display = "none";
+        const hintEl = document.getElementById("hint");
+        hintEl.textContent = "";
+        hintEl.style.display = "none";
         document.getElementById("hintBtn").disabled = false;
         document.getElementById("nextBtn").style.display = "none";
         document.querySelectorAll(".continent").forEach((c) => {
           c.classList.remove("correct", "incorrect", "eliminated");
+          // continents are buttons now, so an eliminated one must be re-enabled
+          c.disabled = false;
         });
         document.querySelectorAll(".answer-btn").forEach((btn) => {
           btn.classList.remove("correct", "incorrect", "eliminated");
           btn.disabled = false;
         });
+      }
+
+      // The Next button: same challenge reset, plus focus so the keyboard
+      // isn't dumped on the body when the button hides itself
+      function nextChallenge() {
+        newChallenge();
+        focusFirstOption();
       }
 
       function showFeedback(message, type, autoHideMs) {
@@ -1201,9 +1288,11 @@
           clearTimeout(feedbackTimer);
           feedbackTimer = null;
         }
-        feedback.textContent = message;
+        // Visible first, then written: a live region that is display:none when
+        // its text changes is not announced.
         feedback.className = "feedback" + (type ? " " + type : "");
         feedback.style.display = "block";
+        feedback.textContent = message;
         if (autoHideMs) {
           feedbackTimer = setTimeout(() => {
             feedback.style.display = "none";
@@ -1214,8 +1303,8 @@
 
       function showHint(message) {
         const hintElement = document.getElementById("hint");
-        hintElement.textContent = message;
         hintElement.style.display = "block";
+        hintElement.textContent = message;
       }
 
       function findOptionElements(value) {
@@ -1253,7 +1342,11 @@
           btn.disabled = true;
         });
         document.getElementById("hintBtn").disabled = true;
-        document.getElementById("nextBtn").style.display = "inline-block";
+        const nextBtn = document.getElementById("nextBtn");
+        nextBtn.style.display = "inline-block";
+        // the option that was just used is now disabled, so hand the keyboard
+        // the only thing left to do
+        nextBtn.focus({ preventScroll: true });
       }
 
       function checkAnswer(selected, element) {

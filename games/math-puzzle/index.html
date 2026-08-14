@@ -133,6 +133,15 @@
         width: 100%;
       }
 
+      /* Landmark wrapper only — repeats the body's column layout so the
+         children sit exactly where they did before the landmark existed. */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
       .puzzle-area {
         text-align: center;
         margin-bottom: 30px;
@@ -490,6 +499,11 @@
         color: #999;
         cursor: pointer;
         line-height: 1;
+        /* it is a real <button> now — strip the UA chrome so it looks the same */
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: inherit;
       }
 
       .modal-close:hover {
@@ -545,62 +559,70 @@
     <a href="../../" class="back-link">← Back to Games</a>
 
     <div class="header">
-      <h1>🧮 Math Puzzle</h1>
+      <h1><span aria-hidden="true">🧮</span> Math Puzzle</h1>
       <p>Solve equations, patterns, and logic puzzles!</p>
     </div>
 
-    <div class="stats">
-      <div>Score: <span id="score">0</span></div>
-      <div>Level: <span id="level">1</span></div>
-      <div>Puzzles Solved: <span id="solved">0</span></div>
-    </div>
+    <main>
+      <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>Puzzles Solved: <span id="solved">0</span></div>
+      </div>
 
-    <div class="mode-selector">
-      <h3>Choose Puzzle Type:</h3>
-      <button class="mode-btn active" onclick="setMode('equations')">
-        Equations
-      </button>
-      <button class="mode-btn" onclick="setMode('patterns')">Patterns</button>
-      <button class="mode-btn" onclick="setMode('logic')">Logic</button>
-    </div>
+      <div class="mode-selector" role="group" aria-labelledby="modeHeading">
+        <h3 id="modeHeading">Choose Puzzle Type:</h3>
+        <button type="button" class="mode-btn active" aria-pressed="true" onclick="setMode('equations')">
+          Equations
+        </button>
+        <button type="button" class="mode-btn" aria-pressed="false" onclick="setMode('patterns')">Patterns</button>
+        <button type="button" class="mode-btn" aria-pressed="false" onclick="setMode('logic')">Logic</button>
+      </div>
 
-    <div class="game-container">
-      <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
-      <div class="hint-box" id="hint" role="status" aria-live="polite"></div>
+      <div class="game-container">
+        <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+        <div class="hint-box" id="hint" role="status" aria-live="polite"></div>
 
-      <div class="puzzle-area">
-        <div class="puzzle-question" id="question">Solve the equation</div>
-        <div class="equation-display" id="equation">5 + ? = 12</div>
-        <div id="puzzleContent">
-          <!-- Puzzle content will be generated here -->
+        <div class="puzzle-area">
+          <div class="puzzle-question" id="question">Solve the equation</div>
+          <div class="equation-display" id="equation">5 + ? = 12</div>
+          <div id="puzzleContent">
+            <!-- Puzzle content will be generated here -->
+          </div>
+        </div>
+
+        <div class="controls">
+          <button type="button" class="btn" id="checkBtn" onclick="checkAnswer()">Check Answer</button>
+          <button type="button" class="btn" id="nextBtn" onclick="nextPuzzle()" style="display: none">Next Puzzle <span aria-hidden="true">→</span></button>
+          <button type="button" class="btn" id="hintBtn" onclick="getHint()">Get Hint</button>
+          <button type="button" class="btn" onclick="newPuzzle()">New Puzzle</button>
         </div>
       </div>
-
-      <div class="controls">
-        <button class="btn" id="checkBtn" onclick="checkAnswer()">Check Answer</button>
-        <button class="btn" id="nextBtn" onclick="newPuzzle()" style="display: none">Next Puzzle →</button>
-        <button class="btn" id="hintBtn" onclick="getHint()">Get Hint</button>
-        <button class="btn" onclick="newPuzzle()">New Puzzle</button>
-      </div>
-    </div>
+    </main>
 
     <!-- Milestone Modal -->
-    <div class="modal-overlay" id="milestoneModal" onclick="closeModalOnOverlay(event)">
-      <div class="modal">
-        <span class="modal-close" onclick="closeModal()">✕</span>
+    <div class="modal-overlay" id="milestoneModal">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="milestoneTitle"
+        aria-describedby="modalStats"
+      >
+        <button type="button" class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
         <h2 id="milestoneTitle">🎉 Level Up!</h2>
-        <div class="stars" id="starRating">
+        <div class="stars" id="starRating" aria-hidden="true">
           <span class="star">★</span>
           <span class="star">★</span>
           <span class="star">★</span>
         </div>
-        <div class="stats-display">
+        <div class="stats-display" id="modalStats">
           <p>Score: <span id="modalScore">0</span></p>
           <p>Level: <span id="modalLevel">1</span></p>
           <p>Puzzles Solved: <span id="modalSolved">0</span></p>
         </div>
         <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
-        <button class="modal-btn" onclick="closeModal()">Continue</button>
+        <button type="button" class="modal-btn" onclick="closeModal()">Continue</button>
       </div>
     </div>
 
@@ -710,6 +732,10 @@
         }
 
         modal.classList.add('show');
+        // Send focus into the dialog so the milestone is announced and the
+        // keyboard lands on Continue rather than back at the top of the page
+        const continueBtn = modal.querySelector('.modal-btn');
+        if (continueBtn) continueBtn.focus();
         playSound('levelUp');
         createConfetti();
       }
@@ -717,6 +743,7 @@
       function closeModal() {
         document.getElementById('milestoneModal').classList.remove('show');
         newPuzzle();
+        focusAnswerInput();
       }
 
       function closeModalOnOverlay(event) {
@@ -724,6 +751,31 @@
           closeModal();
         }
       }
+
+      // Focus is otherwise dropped on the body when the control that was used
+      // is disabled or hidden
+      function focusAnswerInput() {
+        if (
+          document.getElementById("milestoneModal").classList.contains("show")
+        ) {
+          return;
+        }
+        const input = document.getElementById("answerInput");
+        if (input && !input.disabled) input.focus({ preventScroll: true });
+      }
+
+      document
+        .getElementById("milestoneModal")
+        .addEventListener("click", closeModalOnOverlay);
+
+      document.addEventListener("keydown", function (e) {
+        if (
+          e.key === "Escape" &&
+          document.getElementById("milestoneModal").classList.contains("show")
+        ) {
+          closeModal();
+        }
+      });
       let currentMode = "equations";
       let currentPuzzle = {};
       let score = 0;
@@ -889,10 +941,15 @@
         currentMode = mode;
 
         // Update active button
+        const clicked = event.target.closest(".mode-btn");
         document.querySelectorAll(".mode-btn").forEach((btn) => {
           btn.classList.remove("active");
+          btn.setAttribute("aria-pressed", "false");
         });
-        event.target.classList.add("active");
+        if (clicked) {
+          clicked.classList.add("active");
+          clicked.setAttribute("aria-pressed", "true");
+        }
 
         // Generate new puzzle
         newPuzzle();
@@ -909,7 +966,7 @@
         // Create answer input
         const puzzleContent = document.getElementById("puzzleContent");
         puzzleContent.innerHTML = `
-                <input type="number" class="answer-input" id="answerInput" placeholder="?" min="0" max="100">
+                <input type="number" class="answer-input" id="answerInput" placeholder="?" min="0" max="100" aria-labelledby="question equation">
             `;
 
         return puzzle;
@@ -926,7 +983,7 @@
         // Create pattern grid
         const puzzleContent = document.getElementById("puzzleContent");
         puzzleContent.innerHTML = `
-                <div class="pattern-grid">
+                <div class="pattern-grid" id="patternGrid" role="group" aria-label="The pattern so far">
                     ${puzzle.pattern
                       .map(
                         (num, index) =>
@@ -938,7 +995,7 @@
                       )
                       .join("")}
                 </div>
-                <input type="number" class="answer-input" id="answerInput" placeholder="Answer" min="0" max="200" step="0.01">
+                <input type="number" class="answer-input" id="answerInput" placeholder="Answer" min="0" max="200" step="0.01" aria-labelledby="question patternGrid">
             `;
 
         return puzzle;
@@ -955,7 +1012,7 @@
         // Create answer input (text for logic puzzles)
         const puzzleContent = document.getElementById("puzzleContent");
         puzzleContent.innerHTML = `
-                <input type="text" class="answer-input" id="answerInput" placeholder="Your answer" style="width: 150px;">
+                <input type="text" class="answer-input" id="answerInput" placeholder="Your answer" style="width: 150px;" aria-labelledby="question">
             `;
 
         return puzzle;
@@ -989,9 +1046,11 @@
 
       function showFeedback(text, type) {
         const el = document.getElementById("feedback");
-        el.textContent = text;
+        // Visible first, then written: a live region that is display:none when
+        // its text changes is not announced.
         el.className = "feedback " + type;
         el.style.display = "block";
+        el.textContent = text;
       }
 
       function hideFeedback() {
@@ -1003,8 +1062,8 @@
 
       function showHint(text) {
         const el = document.getElementById("hint");
-        el.textContent = text;
         el.style.display = "block";
+        el.textContent = text;
       }
 
       function hideHint() {
@@ -1021,7 +1080,18 @@
         }
         document.getElementById("checkBtn").disabled = true;
         document.getElementById("hintBtn").disabled = true;
-        document.getElementById("nextBtn").style.display = "inline-block";
+        const nextBtn = document.getElementById("nextBtn");
+        nextBtn.style.display = "inline-block";
+        // the input and Check are disabled now, so hand the keyboard the only
+        // thing left to do
+        nextBtn.focus({ preventScroll: true });
+      }
+
+      // The Next button: same puzzle reset, plus focus so the keyboard isn't
+      // dumped on the body when the button hides itself
+      function nextPuzzle() {
+        newPuzzle();
+        focusAnswerInput();
       }
 
       // Split "5 + ? = 12" into its pieces so hints can reason about it
@@ -1214,16 +1284,18 @@
       }
 
       // Enter key support
-      document.addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-          if (puzzleResolved) {
-            // Advance only if the milestone modal isn't waiting for its own Continue
-            if (!document.getElementById("milestoneModal").classList.contains("show")) {
-              newPuzzle();
-            }
-          } else {
-            checkAnswer();
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "Enter") return;
+        // A focused button already fires its own click on Enter — without this
+        // the shortcut ran twice and skipped a rung of the attempt ladder
+        if (e.target && e.target.closest && e.target.closest("button")) return;
+        if (puzzleResolved) {
+          // Advance only if the milestone modal isn't waiting for its own Continue
+          if (!document.getElementById("milestoneModal").classList.contains("show")) {
+            nextPuzzle();
           }
+        } else {
+          checkAnswer();
         }
       });
 

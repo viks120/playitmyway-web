@@ -94,6 +94,29 @@
         flex-wrap: wrap;
       }
 
+      /* the pad keeps the same column layout the body used to give its
+         children directly — the main landmark is semantics, not a new look */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      /* announced by screen readers, invisible on screen */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+      }
+
       .color-btn {
         width: 30px;
         height: 30px;
@@ -101,6 +124,12 @@
         border-radius: 50%;
         cursor: pointer;
         transition: transform 0.2s;
+        /* real <button>s now, so the UA chrome is reset to keep the swatch
+           exactly 30px of colour inside its 3px ring */
+        padding: 0;
+        font: inherit;
+        -webkit-appearance: none;
+        appearance: none;
       }
 
       .color-btn:hover {
@@ -218,6 +247,12 @@
         cursor: pointer;
         transition: all 0.2s;
         background: white;
+        /* real <button>s now — match the <div> metrics they replaced */
+        font-family: inherit;
+        line-height: inherit;
+        color: inherit;
+        -webkit-appearance: none;
+        appearance: none;
       }
 
       .stamp-btn:hover {
@@ -238,6 +273,12 @@
         transition: all 0.2s;
         background: white;
         font-size: 14px;
+        /* real <button> now — match the <div> metrics it replaced */
+        font-family: inherit;
+        line-height: inherit;
+        color: inherit;
+        -webkit-appearance: none;
+        appearance: none;
       }
 
       .eraser-btn:hover {
@@ -374,93 +415,131 @@
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
 
-    <div class="header">
-      <h1>🎨 Drawing Pad</h1>
-      <p>Create your own masterpiece!</p>
-    </div>
+    <main>
+      <div id="srStatus" class="sr-only" role="status" aria-live="polite"></div>
 
-    <div class="drawing-container">
+      <div class="header">
+        <h1><span aria-hidden="true">🎨</span> Drawing Pad</h1>
+        <p>Create your own masterpiece!</p>
+      </div>
+
+      <div class="drawing-container">
       <div class="toolbar">
-        <div class="color-palette">
-          <div
+        <div class="color-palette" role="group" aria-label="Pen colour">
+          <button
+            type="button"
             class="color-btn active"
             style="background: #000000"
             data-color="#000000"
-          ></div>
-          <div
+            aria-pressed="true"
+            aria-label="Black"
+          ></button>
+          <button
+            type="button"
             class="color-btn"
             style="background: #ff0000"
             data-color="#ff0000"
-          ></div>
-          <div
+            aria-pressed="false"
+            aria-label="Red"
+          ></button>
+          <button
+            type="button"
             class="color-btn"
             style="background: #00ff00"
             data-color="#00ff00"
-          ></div>
-          <div
+            aria-pressed="false"
+            aria-label="Bright green"
+          ></button>
+          <button
+            type="button"
             class="color-btn"
             style="background: #0000ff"
             data-color="#0000ff"
-          ></div>
-          <div
+            aria-pressed="false"
+            aria-label="Blue"
+          ></button>
+          <button
+            type="button"
             class="color-btn"
             style="background: #ffff00"
             data-color="#ffff00"
-          ></div>
-          <div
+            aria-pressed="false"
+            aria-label="Yellow"
+          ></button>
+          <button
+            type="button"
             class="color-btn"
             style="background: #ff00ff"
             data-color="#ff00ff"
-          ></div>
-          <div
+            aria-pressed="false"
+            aria-label="Pink"
+          ></button>
+          <button
+            type="button"
             class="color-btn"
             style="background: #00ffff"
             data-color="#00ffff"
-          ></div>
-          <div
+            aria-pressed="false"
+            aria-label="Light blue"
+          ></button>
+          <button
+            type="button"
             class="color-btn"
             style="background: #ffa500"
             data-color="#ffa500"
-          ></div>
-          <div
+            aria-pressed="false"
+            aria-label="Orange"
+          ></button>
+          <button
+            type="button"
             class="color-btn"
             style="background: #800080"
             data-color="#800080"
-          ></div>
-          <div
+            aria-pressed="false"
+            aria-label="Purple"
+          ></button>
+          <button
+            type="button"
             class="color-btn"
             style="background: #008000"
             data-color="#008000"
-          ></div>
+            aria-pressed="false"
+            aria-label="Dark green"
+          ></button>
         </div>
 
         <div class="brush-controls">
           <div class="brush-size">
-            <label>Size:</label>
+            <label for="brushSize">Size:</label>
             <input type="range" id="brushSize" min="1" max="50" value="5" />
-            <div class="brush-preview" id="brushPreview"></div>
+            <div class="brush-preview" id="brushPreview" aria-hidden="true"></div>
           </div>
         </div>
 
-        <div class="stamp-container">
-          <div class="stamp-btn" data-stamp="⭐">⭐</div>
-          <div class="stamp-btn" data-stamp="❤️">❤️</div>
-          <div class="stamp-btn" data-stamp="🌟">🌟</div>
-          <div class="stamp-btn" data-stamp="🎈">🎈</div>
-          <div class="stamp-btn" data-stamp="🌸">🌸</div>
-          <div class="eraser-btn" id="eraserBtn">🧽</div>
+        <div class="stamp-container" role="group" aria-label="Stamps and eraser">
+          <button type="button" class="stamp-btn" data-stamp="⭐" aria-pressed="false" aria-label="Star stamp">⭐</button>
+          <button type="button" class="stamp-btn" data-stamp="❤️" aria-pressed="false" aria-label="Heart stamp">❤️</button>
+          <button type="button" class="stamp-btn" data-stamp="🌟" aria-pressed="false" aria-label="Sparkle stamp">🌟</button>
+          <button type="button" class="stamp-btn" data-stamp="🎈" aria-pressed="false" aria-label="Balloon stamp">🎈</button>
+          <button type="button" class="stamp-btn" data-stamp="🌸" aria-pressed="false" aria-label="Flower stamp">🌸</button>
+          <button type="button" class="eraser-btn" id="eraserBtn" aria-pressed="false" aria-label="Eraser">🧽</button>
         </div>
       </div>
 
       <div class="canvas-container">
-        <canvas id="drawingCanvas"></canvas>
+        <canvas
+          id="drawingCanvas"
+          role="img"
+          aria-label="Drawing canvas. Draw here with a mouse, a finger or a stylus."
+        ></canvas>
       </div>
 
       <div class="controls">
-        <button class="btn clear" onclick="clearCanvas()">Clear Canvas</button>
-        <button class="btn" onclick="downloadDrawing()">Download</button>
+        <button type="button" class="btn clear" onclick="clearCanvas()">Clear Canvas</button>
+        <button type="button" class="btn" onclick="downloadDrawing()">Download</button>
       </div>
-    </div>
+      </div>
+    </main>
 
     <script>
       const canvas = document.getElementById("drawingCanvas");
@@ -528,21 +607,36 @@
       // Resize canvas on window resize
       window.addEventListener("resize", resizeCanvas);
 
+      // one polite live region: every tool change a sighted child sees in the
+      // toolbar is spoken here
+      function announce(text) {
+        const region = document.getElementById("srStatus");
+        if (region) region.textContent = text;
+      }
+
+      // the "active" class is the only thing that used to say which tool is
+      // chosen — mirror it into aria-pressed so it is not a colour-only cue
+      function setActive(el, on) {
+        el.classList.toggle("active", on);
+        el.setAttribute("aria-pressed", on ? "true" : "false");
+      }
+
+      function clearActive(selector) {
+        document.querySelectorAll(selector).forEach((el) => setActive(el, false));
+      }
+
       // Color selection
       document.querySelectorAll(".color-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
-          document
-            .querySelectorAll(".color-btn")
-            .forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
+          clearActive(".color-btn");
+          setActive(btn, true);
           currentColor = btn.dataset.color;
           isEraser = false;
-          document.getElementById("eraserBtn").classList.remove("active");
-          document
-            .querySelectorAll(".stamp-btn")
-            .forEach((s) => s.classList.remove("active"));
+          setActive(document.getElementById("eraserBtn"), false);
+          clearActive(".stamp-btn");
           currentStamp = null;
           updateBrushPreview();
+          announce(`${btn.getAttribute("aria-label")} pen selected.`);
         });
       });
 
@@ -550,39 +644,33 @@
       document.getElementById("brushSize").addEventListener("input", (e) => {
         currentBrushSize = parseInt(e.target.value);
         updateBrushPreview();
+        announce(`Brush size ${currentBrushSize}.`);
       });
 
       // Stamp selection
       document.querySelectorAll(".stamp-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
-          document
-            .querySelectorAll(".stamp-btn")
-            .forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
+          clearActive(".stamp-btn");
+          setActive(btn, true);
           currentStamp = btn.dataset.stamp;
           isEraser = false;
-          document.getElementById("eraserBtn").classList.remove("active");
-          document
-            .querySelectorAll(".color-btn")
-            .forEach((c) => c.classList.remove("active"));
+          setActive(document.getElementById("eraserBtn"), false);
+          clearActive(".color-btn");
+          announce(`${btn.getAttribute("aria-label")} selected.`);
         });
       });
 
       // Eraser
       document.getElementById("eraserBtn").addEventListener("click", () => {
-        document.getElementById("eraserBtn").classList.toggle("active");
-        isEraser = document
-          .getElementById("eraserBtn")
-          .classList.contains("active");
+        const eraserBtn = document.getElementById("eraserBtn");
+        setActive(eraserBtn, !eraserBtn.classList.contains("active"));
+        isEraser = eraserBtn.classList.contains("active");
         if (isEraser) {
-          document
-            .querySelectorAll(".stamp-btn")
-            .forEach((s) => s.classList.remove("active"));
-          document
-            .querySelectorAll(".color-btn")
-            .forEach((c) => c.classList.remove("active"));
+          clearActive(".stamp-btn");
+          clearActive(".color-btn");
           currentStamp = null;
         }
+        announce(isEraser ? "Eraser on." : "Eraser off.");
       });
 
       function updateBrushPreview() {
@@ -714,12 +802,14 @@
       function clearCanvas() {
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        announce("Canvas cleared. Blank page ready.");
       }
 
       function downloadDrawing() {
         try {
           // Create canvas data URL
           const dataURL = canvas.toDataURL("image/png");
+          announce("Saving your drawing.");
 
           // For mobile browsers, we need a different approach
           if (
@@ -793,16 +883,7 @@
                       <p><strong>On desktop:</strong> Right-click the image and select "Save Image As"</p>
                     </div>
                   </div>
-    <footer class="site-footer">
-      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
-      <nav class="site-footer-links" aria-label="Site links">
-        <a href="../../">🏠 All games</a>
-        <a href="../../privacy-policy.html">Privacy</a>
-        <a href="../../disclaimer.html">Disclaimer</a>
-        <a href="mailto:contact@playitmyway.com">Contact</a>
-      </nav>
-    </footer>
-  </body>
+                </body>
               </html>
             `);
             newWindow.document.close();
@@ -826,5 +907,15 @@
       // Initialize
       updateBrushPreview();
     </script>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
   </body>
 </html>
