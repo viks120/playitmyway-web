@@ -773,6 +773,20 @@
             hint: "Famous for tacos and ancient pyramids",
           },
           {
+            name: "Cuba",
+            capital: "Havana",
+            continent: "North America",
+            flag: "🇨🇺",
+            hint: "Known for classic cars and salsa music",
+          },
+          {
+            name: "Jamaica",
+            capital: "Kingston",
+            continent: "North America",
+            flag: "🇯🇲",
+            hint: "Famous for reggae music and super-fast sprinters",
+          },
+          {
             name: "Brazil",
             capital: "Brasília",
             continent: "South America",
@@ -785,6 +799,27 @@
             continent: "South America",
             flag: "🇦🇷",
             hint: "Known for tango dancing and beef",
+          },
+          {
+            name: "Peru",
+            capital: "Lima",
+            continent: "South America",
+            flag: "🇵🇪",
+            hint: "Home to Machu Picchu and llamas",
+          },
+          {
+            name: "Chile",
+            capital: "Santiago",
+            continent: "South America",
+            flag: "🇨🇱",
+            hint: "Known for the Andes mountains and its long, thin shape",
+          },
+          {
+            name: "Colombia",
+            capital: "Bogotá",
+            continent: "South America",
+            flag: "🇨🇴",
+            hint: "Famous for coffee beans and emeralds",
           },
           {
             name: "United Kingdom",
@@ -843,11 +878,53 @@
             hint: "Known for Bollywood movies and the Taj Mahal",
           },
           {
+            name: "South Korea",
+            capital: "Seoul",
+            continent: "Asia",
+            flag: "🇰🇷",
+            hint: "Known for K-pop music and kimchi",
+          },
+          {
+            name: "Thailand",
+            capital: "Bangkok",
+            continent: "Asia",
+            flag: "🇹🇭",
+            hint: "Famous for golden temples and elephants",
+          },
+          {
             name: "Australia",
             capital: "Canberra",
             continent: "Oceania",
             flag: "🇦🇺",
             hint: "Home to kangaroos and the Great Barrier Reef",
+          },
+          {
+            name: "New Zealand",
+            capital: "Wellington",
+            continent: "Oceania",
+            flag: "🇳🇿",
+            hint: "Home to kiwi birds and hobbit movie sets",
+          },
+          {
+            name: "Fiji",
+            capital: "Suva",
+            continent: "Oceania",
+            flag: "🇫🇯",
+            hint: "Known for tropical islands and coral reefs",
+          },
+          {
+            name: "Papua New Guinea",
+            capital: "Port Moresby",
+            continent: "Oceania",
+            flag: "🇵🇬",
+            hint: "Home to rainforests and birds of paradise",
+          },
+          {
+            name: "Samoa",
+            capital: "Apia",
+            continent: "Oceania",
+            flag: "🇼🇸",
+            hint: "Known for Polynesian islands and coconut palms",
           },
           {
             name: "South Africa",
@@ -862,6 +939,27 @@
             continent: "Africa",
             flag: "🇪🇬",
             hint: "Famous for pyramids and the Nile River",
+          },
+          {
+            name: "Kenya",
+            capital: "Nairobi",
+            continent: "Africa",
+            flag: "🇰🇪",
+            hint: "Famous for safaris and long-distance runners",
+          },
+          {
+            name: "Nigeria",
+            capital: "Abuja",
+            continent: "Africa",
+            flag: "🇳🇬",
+            hint: "Known for Nollywood movies and jollof rice",
+          },
+          {
+            name: "Morocco",
+            capital: "Rabat",
+            continent: "Africa",
+            flag: "🇲🇦",
+            hint: "Known for colorful markets and the Sahara Desert",
           },
         ],
       };
@@ -884,6 +982,49 @@
         Asia: { top: "20%", left: "70%", width: "25%", height: "40%" },
         Oceania: { top: "60%", left: "75%", width: "20%", height: "25%" },
       };
+
+      // Nearest continents first, so any top-up distractors stay confusable
+      const continentNeighbors = {
+        "North America": ["South America", "Europe", "Asia", "Oceania", "Africa"],
+        "South America": ["North America", "Africa", "Europe", "Oceania", "Asia"],
+        Europe: ["Asia", "Africa", "North America", "South America", "Oceania"],
+        Africa: ["Europe", "Asia", "South America", "North America", "Oceania"],
+        Asia: ["Europe", "Oceania", "Africa", "North America", "South America"],
+        Oceania: ["Asia", "South America", "North America", "Africa", "Europe"],
+      };
+
+      function shuffleArray(items) {
+        const shuffled = items.slice();
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      }
+
+      // Wrong options come from the answer's own continent, so knowing the
+      // continent alone doesn't give the answer away. If a continent ever
+      // runs short of entries, top up from the nearest continents instead
+      // of the whole world.
+      function pickDistractors(answerCountry, count) {
+        const others = geographyDatabase.countries.filter(
+          (c) => c.name !== answerCountry.name
+        );
+        const picks = shuffleArray(
+          others.filter((c) => c.continent === answerCountry.continent)
+        ).slice(0, count);
+        (continentNeighbors[answerCountry.continent] || []).forEach(
+          (continent) => {
+            if (picks.length >= count) return;
+            shuffleArray(
+              others.filter((c) => c.continent === continent)
+            ).forEach((c) => {
+              if (picks.length < count) picks.push(c);
+            });
+          }
+        );
+        return picks;
+      }
 
       function setMode(mode) {
         currentMode = mode;
@@ -962,28 +1103,23 @@
         // Hide the world map for capital challenges
         document.getElementById("worldMap").style.display = "none";
 
-        // Create answer options (capitals)
-        const allCapitals = geographyDatabase.countries.map((c) => c.capital);
-        const shuffledCapitals = allCapitals
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 4);
-
-        if (!shuffledCapitals.includes(country.capital)) {
-          shuffledCapitals[0] = country.capital;
-        }
+        // Create answer options: wrong capitals from the same continent
+        const capitalOptions = shuffleArray(
+          [country.capital].concat(
+            pickDistractors(country, 3).map((c) => c.capital)
+          )
+        );
 
         const answerOptions = document.getElementById("answerOptions");
         answerOptions.innerHTML = "";
 
-        shuffledCapitals
-          .sort(() => Math.random() - 0.5)
-          .forEach((capital) => {
-            const btn = document.createElement("button");
-            btn.className = "answer-btn";
-            btn.textContent = capital;
-            btn.onclick = () => checkAnswer(capital, btn);
-            answerOptions.appendChild(btn);
-          });
+        capitalOptions.forEach((capital) => {
+          const btn = document.createElement("button");
+          btn.className = "answer-btn";
+          btn.textContent = capital;
+          btn.onclick = () => checkAnswer(capital, btn);
+          answerOptions.appendChild(btn);
+        });
 
         return { country, correctAnswer: country.capital };
       }
@@ -1001,28 +1137,23 @@
         // Hide the world map for flag challenges
         document.getElementById("worldMap").style.display = "none";
 
-        // Create answer options (countries)
-        const allCountries = geographyDatabase.countries.map((c) => c.name);
-        const shuffledCountries = allCountries
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 4);
-
-        if (!shuffledCountries.includes(country.name)) {
-          shuffledCountries[0] = country.name;
-        }
+        // Create answer options: wrong countries from the same continent
+        const countryOptions = shuffleArray(
+          [country.name].concat(
+            pickDistractors(country, 3).map((c) => c.name)
+          )
+        );
 
         const answerOptions = document.getElementById("answerOptions");
         answerOptions.innerHTML = "";
 
-        shuffledCountries
-          .sort(() => Math.random() - 0.5)
-          .forEach((countryName) => {
-            const btn = document.createElement("button");
-            btn.className = "answer-btn";
-            btn.textContent = countryName;
-            btn.onclick = () => checkAnswer(countryName, btn);
-            answerOptions.appendChild(btn);
-          });
+        countryOptions.forEach((countryName) => {
+          const btn = document.createElement("button");
+          btn.className = "answer-btn";
+          btn.textContent = countryName;
+          btn.onclick = () => checkAnswer(countryName, btn);
+          answerOptions.appendChild(btn);
+        });
 
         return { country, correctAnswer: country.name };
       }
@@ -1106,7 +1237,7 @@
           if (currentMode === "capitals") {
             reason = `The capital starts with "${country.capital[0]}"`;
           } else if (currentMode === "flags") {
-            reason = `This country is in ${country.continent}`;
+            reason = `The capital of this country is ${country.capital}`;
           } else {
             reason = `The continent starts with "${country.continent[0]}"`;
           }
