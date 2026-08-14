@@ -788,12 +788,17 @@
             if (l.t !== tier.key) return;
             var b = document.createElement("button");
             b.className = "lvl-chip" + (i === li ? " active" : "");
+            b.setAttribute("data-li", i);
             b.setAttribute("aria-label", "Level " + (i + 1) + ": " + l.n + (completed[i] ? " (completed)" : ""));
             b.innerHTML = "<span aria-hidden='true'>" + l.e + "</span> " + (i + 1) +
               (completed[i] ? " <span class='done-mark' aria-hidden='true'>✓</span>" : "");
             b.addEventListener("click", function () {
               loadLevel(i);
               buildPicker();
+              // rebuilding destroyed the focused chip — move focus to the new
+              // one so a keyboard player is not dropped onto <body>
+              var again = pickerGroups.querySelector('[data-li="' + i + '"]');
+              if (again) again.focus({ preventScroll: true });
               document.querySelector(".card").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
             });
             grid.appendChild(b);

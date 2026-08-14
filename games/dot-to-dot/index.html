@@ -771,6 +771,10 @@
             b.addEventListener("click", function () {
               loadPicture(i);
               buildPicker();
+              // the rebuild just destroyed the button that had focus — hand it
+              // to its replacement, or a keyboard player lands on <body>
+              var again = pickerGrid.children[i];
+              if (again) again.focus({ preventScroll: true });
               document.querySelector(".card").scrollIntoView({
                 behavior: reducedMotion ? "auto" : "smooth", block: "start",
               });

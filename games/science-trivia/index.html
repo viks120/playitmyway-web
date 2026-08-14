@@ -764,6 +764,7 @@
       // where the correct answer landed in this question's shuffled order
       let currentCorrectIndex = 0;
       let level = 1;
+      let answeredThisVisit = 0;   // cumulative across quizzes, so level can climb
       let questionsAnswered = 0;
       let currentQuestionIndex = 0;
       let currentQuestions = [];
@@ -910,7 +911,11 @@
       function resolveQuestion() {
         questionResolved = true;
         questionsAnswered++;
-        if (questionsAnswered >= level * 5) {
+        // levelled off the VISIT total, not the per-quiz counter: quizzes cap
+        // at 10 questions while questionsAnswered resets each quiz, so the old
+        // check could never reach level*5 beyond 3 and the level froze there
+        answeredThisVisit++;
+        if (answeredThisVisit >= level * 5) {
           level++;
         }
         updateStats();

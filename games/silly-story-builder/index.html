@@ -747,10 +747,18 @@
         }
 
         function setCurrent(b) {
+          var hadFocus = document.activeElement &&
+            document.activeElement.classList.contains("blank");
           currentId = b.id;
           attempts[b.id] = 0;
           renderStory();
           buildTray();
+          // renderStory replaced the blank that was just activated; a keyboard
+          // player would otherwise be dropped onto <body> mid-story
+          if (hadFocus) {
+            var again = storyEl.querySelector('.blank[data-id="' + b.id + '"]');
+            if (again) again.focus({ preventScroll: true });
+          }
           if (fills[b.id]) {
             say("Pick a new word for this blank — or tap another blank.", "", "info");
           } else {
