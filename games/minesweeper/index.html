@@ -494,7 +494,8 @@
         gameOver = true; clearInterval(timerInterval);
         playSound('win'); createConfetti();
         announce(`Board cleared in ${seconds} seconds. You win!`);
-        if (!best[difficulty] || seconds < best[difficulty]) {
+        // === undefined, not falsy: a 0-second win is a real best time
+        if (best[difficulty] === undefined || seconds < best[difficulty]) {
           best[difficulty] = seconds;
           updateBest();
         }
@@ -503,7 +504,8 @@
     }
 
     function updateBest() {
-      document.getElementById('best').textContent = best[difficulty] ? best[difficulty] : '-';
+      document.getElementById('best').textContent =
+        best[difficulty] === undefined ? '-' : best[difficulty];
     }
 
     function showModal(won) {

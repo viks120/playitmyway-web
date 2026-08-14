@@ -557,7 +557,15 @@
           num.textContent = i + 1;
           b.appendChild(num);
           b.appendChild(document.createTextNode(DIRS[d].e));
-          b.addEventListener("click", function () { removeAt(i); });
+          b.addEventListener("click", function () {
+            removeAt(i);
+            // buildStrip() has just replaced every tile; keep the keyboard on
+            // the step that slid into this position, or on the last one
+            var tiles = strip.querySelectorAll(".tile");
+            var next = tiles[Math.min(i, tiles.length - 1)];
+            if (next) next.focus({ preventScroll: true });
+            else document.getElementById("runBtn").focus({ preventScroll: true });
+          });
           strip.appendChild(b);
         });
         for (var i = program.length; i < CAP; i++) {
@@ -834,6 +842,10 @@
           b.addEventListener("click", function () {
             loadLevel(i);
             buildPicker();
+            // the rebuild destroyed this very button — pass focus to its
+            // replacement rather than dropping the keyboard onto <body>
+            var again = pickerGrid.children[i];
+            if (again) again.focus({ preventScroll: true });
             document.querySelector(".card").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
           });
           pickerGrid.appendChild(b);

@@ -1273,8 +1273,12 @@
       function getHint() {
         if (puzzleResolved) return;
         playSound('hint');
-        hintsUsed++;
+        // one charge per puzzle: the hint text never changes, so repeated
+        // presses were taking 10 points each for the same sentence — enough
+        // of them zeroed a first-try-correct answer
+        if (hintsUsed === 0) hintsUsed++;
         showHint(`💡 Hint: ${currentPuzzle.hint}`);
+        document.getElementById("hintBtn").disabled = true;
       }
 
       function updateStats() {

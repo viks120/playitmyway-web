@@ -571,6 +571,12 @@
         var VOWELS = "aeiou";
         var CONSONANTS = "bcdfghjklmnpqrstvwxyz";
         var POS_NAMES = ["first", "middle", "last"];
+
+        // A letter is not always its sound. Naming /x/ as the last sound of
+        // "fox" teaches a phoneme that does not exist; x says /ks/, c says
+        // /k/, q says /kw/. Every other CVC letter reads as itself.
+        var SOUND_OF = { c: "k", x: "ks", q: "kw" };
+        function soundFor(ch) { return SOUND_OF[ch] || ch; }
         var SET_NAMES = { a: "Short a", e: "Short e", i: "Short i", o: "Short o", u: "Short u", mix: "Mixed" };
         var SET_ICONS = { a: "🐱", e: "🛏️", i: "🐷", o: "🦊", u: "☀️", mix: "🎲" };
         var ROUND_SIZE = 8;
@@ -1029,7 +1035,7 @@
             var praise = wordSet[built] ? "You built “" + built + "” — a real word! But not this one. " : "";
             setFeedback("oops",
               "💛 " + praise + "Sound it out — the " + POS_NAMES[wrongIdx] +
-              " sound is /" + target[wrongIdx] + "/ … try again!",
+              " sound is /" + soundFor(target[wrongIdx]) + "/ … try again!",
               "The right letters are staying put for you.");
             playSound("oops");
             refreshBoard();

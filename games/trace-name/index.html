@@ -501,7 +501,9 @@
         var current = {};    // remembered glyph index per set
         var stage = 0;         // index into STAGES for the current word
         var wordStage = 0;     // stage the current word is being traced at
-        var wordStageMem = {}; // word string → stage, session memory only
+        // Object.create(null): a plain {} would return an inherited function
+        // for names like "toString" or "valueOf", making wordStage a function
+        var wordStageMem = Object.create(null); // word string → stage, session memory only
         var devSum = 0, devN = 0;  // deviation over the WHOLE word, for praise
         var rawTrace = [];     // current letter's raw polylines (stage 3)
         var rawStroke = null;
