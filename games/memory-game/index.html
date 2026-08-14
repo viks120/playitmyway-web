@@ -637,7 +637,13 @@
         }
       }
 
+      const reducedMotion =
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
       function createConfetti() {
+        // every other game skips the shower for players who asked for less
+        // motion; this one was the exception
+        if (reducedMotion) return;
         const colors = ['#ff6b6b', '#4ecdc4', '#ffd700', '#a8e6cf', '#ff9ff3', '#54a0ff'];
         for (let i = 0; i < 50; i++) {
           const confetti = document.createElement('div');

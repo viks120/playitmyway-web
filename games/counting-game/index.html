@@ -811,6 +811,16 @@
         region.textContent = spoken.replace(/\s{2,}/g, ' ').trim();
       }
 
+      // adds to what is already queued instead of replacing it, so a level-up
+      // does not swallow the feedback for the answer that triggered it
+      function appendAnnounce(text) {
+        const region = document.getElementById('srStatus');
+        if (!region) return;
+        const existing = region.textContent;
+        announce(text);
+        if (existing) region.textContent = existing + ' ' + region.textContent;
+      }
+
       function showEndModal() {
         const modal = document.getElementById('endModal');
         document.getElementById('finalScore').textContent = score;
@@ -1269,7 +1279,10 @@
         if (score >= level * 50) {
           level++;
           document.getElementById("level").textContent = level;
-          announce(`Level ${level}! Score ${score}.`);
+          // appended, not announced separately: replacing the region in the
+          // same task meant a screen reader only ever heard the level-up and
+          // never the result of the answer that earned it
+          appendAnnounce(`Level ${level}! Score ${score}.`);
         }
       }
 

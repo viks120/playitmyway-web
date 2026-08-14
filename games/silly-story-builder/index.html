@@ -655,7 +655,6 @@
         var used = {};           // word -> true, for every word placed in this story
         var attempts = {};       // blank id -> wrong picks in a row
         var currentId = null;    // id of the highlighted blank
-        var revealed = false;    // second-miss scaffold on?
         var complete = false;
         var finished = 0;        // stories completed this visit
         var praiseAt = 0;
@@ -769,8 +768,7 @@
 
         // ---------- the tray ----------
         function buildTray() {
-          trayEl.innerHTML = "";
-          revealed = false;
+          trayEl.innerHTML = "";
           var b = currentBlank();
           if (!b) return;
 
@@ -802,8 +800,7 @@
           });
         }
 
-        function applyReveal(wc) {
-          revealed = true;
+        function applyReveal(wc) {
           Array.prototype.forEach.call(trayEl.children, function (btn) {
             if (btn.getAttribute("data-wc") === wc && !btn.classList.contains("dud")) {
               btn.classList.add("reveal");
@@ -944,8 +941,7 @@
           fills = {};
           used = {};
           attempts = {};
-          complete = false;
-          revealed = false;
+          complete = false;
           currentId = blanksOf(tpl)[0].id;
           storyTitleEl.textContent = tpl.emoji + " " + tpl.title;
           traySection.hidden = false;

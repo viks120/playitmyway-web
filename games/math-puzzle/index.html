@@ -190,10 +190,9 @@
         transition: all 0.3s ease;
       }
 
-      .pattern-cell:hover {
-        transform: scale(1.1);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      }
+      /* the cells are read, not clicked — nothing is bound to them, so a
+         hover that lifts them like a button only promises an interaction
+         that does not exist */
 
       .pattern-cell.empty {
         background: rgba(255, 255, 255, 0.3);

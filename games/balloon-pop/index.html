@@ -178,7 +178,10 @@
         height: 0;
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
-        border-top: 12px solid inherit;
+        /* `solid inherit` is invalid in a shorthand, so the whole declaration
+           was dropped and the knot never drew — the balloon's colour comes
+           through a custom property instead */
+        border-top: 12px solid var(--balloon-color, #ff6b6b);
       }
 
       .balloon-string {
@@ -588,7 +591,7 @@
         const color = balloonColors[Math.floor(Math.random() * balloonColors.length)];
         
         balloon.innerHTML = `
-          <div class="balloon-body" style="background: ${color}; border-bottom-color: ${color}">
+          <div class="balloon-body" style="background: ${color}; --balloon-color: ${color}">
             ${displayValue}
           </div>
           <div class="balloon-string"></div>
