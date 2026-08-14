@@ -64,6 +64,29 @@
         z-index: 10;
       }
 
+      /* the game keeps the same column layout the body used to give its
+         children directly — the main landmark is semantics, not a new look */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      /* announced by screen readers, invisible on screen */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+      }
+
       .game-area {
         position: relative;
         width: 100%;
@@ -223,6 +246,10 @@
         color: #999;
         cursor: pointer;
         line-height: 1;
+        padding: 0;
+        border: none;
+        background: transparent;
+        font-family: inherit;
       }
 
       .modal-close:hover {
@@ -278,47 +305,51 @@
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
 
-    <div class="header">
-      <h1>🧺 Catch the Fruit!</h1>
-    </div>
+    <main>
+      <div id="srStatus" class="sr-only" role="status" aria-live="polite"></div>
 
-    <div class="stats">
-      <div>Score: <span id="score">0</span></div>
-      <div>Level: <span id="level">1</span></div>
-      <div>Best this visit: <span id="best">0</span></div>
-    </div>
-
-    <div class="game-area" id="gameArea">
-      <div class="lives" id="lives">❤️❤️❤️</div>
-      <div class="basket" id="basket">🧺</div>
-      <div class="start-screen" id="startScreen">
-        <h2>🍎 Catch the Fruit! 🍊</h2>
-        <p>Move the basket to catch fruits</p>
-        <p>🍎🍊🍋🍇🍓 = +10 points</p>
-        <p>⭐ = +50 bonus!</p>
-        <p>🔥 Catch 5 in a row = +20 combo!</p>
-        <p>💣 = Lose a life!</p>
-        <br>
-        <button class="btn" onclick="startGame()">Start Game</button>
+      <div class="header">
+        <h1><span aria-hidden="true">🧺</span> Catch the Fruit!</h1>
       </div>
-      <div class="start-screen" id="pauseScreen" style="display: none;">
-        <h2>⏸️ Paused</h2>
-        <p>Take a break!</p>
-        <br>
-        <button class="btn" onclick="togglePause()">▶️ Resume</button>
+
+      <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>Best this visit: <span id="best">0</span></div>
       </div>
-    </div>
 
-    <div class="controls">
-      <button class="btn" id="pauseBtn" onclick="togglePause()">⏸️ Pause</button>
-      <button class="btn" onclick="startGame()">New Game</button>
-    </div>
+      <div class="game-area" id="gameArea">
+        <div class="lives" id="lives" role="img" aria-label="3 lives left">❤️❤️❤️</div>
+        <div class="basket" id="basket" aria-hidden="true">🧺</div>
+        <div class="start-screen" id="startScreen">
+          <h2><span aria-hidden="true">🍎</span> Catch the Fruit! <span aria-hidden="true">🍊</span></h2>
+          <p>Move the basket with your finger, the mouse, or the left and right arrow keys</p>
+          <p>🍎🍊🍋🍇🍓 = +10 points</p>
+          <p>⭐ = +50 bonus!</p>
+          <p>🔥 Catch 5 in a row = +20 combo!</p>
+          <p>💣 = Lose a life!</p>
+          <br>
+          <button type="button" class="btn" onclick="startGame()">Start Game</button>
+        </div>
+        <div class="start-screen" id="pauseScreen" style="display: none;">
+          <h2><span aria-hidden="true">⏸️</span> Paused</h2>
+          <p>Take a break!</p>
+          <br>
+          <button type="button" class="btn" onclick="togglePause()"><span aria-hidden="true">▶️</span> Resume</button>
+        </div>
+      </div>
 
-    <div class="modal-overlay" id="modal" onclick="closeModalOnOverlay(event)">
-      <div class="modal">
-        <span class="modal-close" onclick="closeModal()">✕</span>
+      <div class="controls">
+        <button type="button" class="btn" id="pauseBtn" onclick="togglePause()"><span aria-hidden="true">⏸️</span> Pause</button>
+        <button type="button" class="btn" onclick="startGame()">New Game</button>
+      </div>
+    </main>
+
+    <div class="modal-overlay" id="modal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button type="button" class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
         <h2 id="modalTitle">Game Over!</h2>
-        <div class="stars" id="starRating">
+        <div class="stars" id="starRating" aria-hidden="true">
           <span class="star">★</span>
           <span class="star">★</span>
           <span class="star">★</span>
@@ -326,7 +357,7 @@
         <p>Score: <span id="finalScore">0</span></p>
         <p>Level: <span id="finalLevel">1</span></p>
         <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
-        <button class="modal-btn" onclick="closeModal(); startGame();">Play Again</button>
+        <button type="button" class="modal-btn" id="playAgainBtn" onclick="closeModal(); startGame();">Play Again</button>
       </div>
     </div>
 
@@ -400,11 +431,21 @@
       const gameArea = document.getElementById('gameArea');
       const basket = document.getElementById('basket');
 
+      // one polite live region: everything a sighted player sees on the
+      // board is spoken here, and nowhere else
+      function announce(text) {
+        const region = document.getElementById('srStatus');
+        if (region) region.textContent = text;
+      }
+
       function updateDisplay() {
         document.getElementById('score').textContent = score;
         document.getElementById('level').textContent = level;
         document.getElementById('best').textContent = best;
-        document.getElementById('lives').textContent = '❤️'.repeat(lives) + '🖤'.repeat(3 - lives);
+        const livesEl = document.getElementById('lives');
+        livesEl.textContent = '❤️'.repeat(lives) + '🖤'.repeat(3 - lives);
+        // a row of heart emoji reads as noise — say the number instead
+        livesEl.setAttribute('aria-label', lives === 1 ? '1 life left' : lives + ' lives left');
       }
 
       function moveBasket(x) {
@@ -463,6 +504,9 @@
 
         item.className = type === 'bad' ? 'bad-item' : 'fruit';
         item.textContent = emoji;
+        // falling props: the live region narrates catches, so these must not
+        // fill a screen reader with a stream of loose emoji
+        item.setAttribute('aria-hidden', 'true');
         item.dataset.type = type;
         item.style.left = Math.random() * (areaRect.width - 50) + 'px';
         
@@ -506,17 +550,20 @@
               score += 50;
               playSound('bonus');
               showEffect(itemRect.left, itemRect.top, '+50');
+              announce(`Star caught! Plus 50. Score ${score}.`);
             } else {
               combo++;
               score += 10;
               playSound('catch');
               showEffect(itemRect.left, itemRect.top, '+10');
+              announce(`Caught! Plus 10. Score ${score}.`);
             }
 
             if (combo > 0 && combo % 5 === 0) {
               score += 20;
               playSound('bonus');
               showEffect(itemRect.left, itemRect.top - 30, '🔥 +20');
+              announce(`${combo} in a row! Plus 20 combo. Score ${score}.`);
             }
 
             updateDisplay();
@@ -528,6 +575,7 @@
       function showEffect(x, y, text) {
         const effect = document.createElement('div');
         effect.className = 'catch-effect';
+        effect.setAttribute('aria-hidden', 'true');
         effect.textContent = text;
         effect.style.left = x + 'px';
         effect.style.top = y + 'px';
@@ -540,6 +588,9 @@
         lives--;
         playSound('miss');
         updateDisplay();
+        if (lives > 0) {
+          announce(`Oh no, a bomb! ${lives === 1 ? '1 life' : lives + ' lives'} left.`);
+        }
         if (lives <= 0) endGame();
       }
 
@@ -548,6 +599,7 @@
         if (newLevel > level) {
           level = newLevel;
           updateDisplay();
+          announce(`Level ${level}! Score ${score}.`);
         }
       }
 
@@ -563,10 +615,14 @@
         paused = false;
         gameArea.classList.remove('paused');
         document.getElementById('pauseScreen').style.display = 'none';
-        document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+        setPauseBtnLabel(false);
         basketX = gameArea.offsetWidth / 2 - 40;
         basket.style.left = basketX + 'px';
         updateDisplay();
+        announce('New game. Use the left and right arrow keys to move the basket. 3 lives.');
+        // the Start button just vanished with its overlay — keep the keyboard
+        // on a control that still exists
+        document.getElementById('pauseBtn').focus({ preventScroll: true });
 
         // self-rescheduling timeout so the spawn gap tightens as the level
         // climbs (a fixed setInterval would ignore the ramp)
@@ -583,12 +639,24 @@
         gameLoop = setInterval(checkCollisions, 50);
       }
 
+      // the emoji lives in its own aria-hidden span, so the label is rebuilt
+      // rather than overwritten with textContent
+      function setPauseBtnLabel(isPaused) {
+        const btn = document.getElementById('pauseBtn');
+        btn.innerHTML = isPaused
+          ? '<span aria-hidden="true">▶️</span> Resume'
+          : '<span aria-hidden="true">⏸️</span> Pause';
+      }
+
       function togglePause() {
         if (!gameRunning) return;
         paused = !paused;
         gameArea.classList.toggle('paused', paused);
         document.getElementById('pauseScreen').style.display = paused ? 'flex' : 'none';
-        document.getElementById('pauseBtn').textContent = paused ? '▶️ Resume' : '⏸️ Pause';
+        setPauseBtnLabel(paused);
+        announce(paused ? 'Paused.' : 'Resumed.');
+        // Resume lives on a screen that is about to disappear
+        if (!paused) document.getElementById('pauseBtn').focus({ preventScroll: true });
       }
 
       function endGame() {
@@ -612,6 +680,12 @@
         stars.forEach((s, i) => s.classList.toggle('filled', i < starCount));
 
         document.getElementById('modal').classList.add('show');
+        announce(
+          `Game over. Score ${score}, level ${level}, ${starCount} ${starCount === 1 ? 'star' : 'stars'}.` +
+          (isNewBest ? ' New best this visit!' : '')
+        );
+        // send the keyboard into the dialog that just appeared
+        document.getElementById('playAgainBtn').focus();
         if (score >= 200) createConfetti();
       }
 
@@ -622,8 +696,21 @@
       function closeModalOnOverlay(event) {
         if (event.target === event.currentTarget) {
           closeModal();
+          document.getElementById('pauseBtn').focus({ preventScroll: true });
         }
       }
+
+      // backdrop click and Escape both dismiss the dialog — no inline handler
+      // on a plain <div>, which no keyboard could ever reach
+      document.getElementById('modal').addEventListener('click', closeModalOnOverlay);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        const modal = document.getElementById('modal');
+        if (!modal.classList.contains('show')) return;
+        closeModal();
+        document.getElementById('pauseBtn').focus({ preventScroll: true });
+      });
 
       updateDisplay();
     </script>

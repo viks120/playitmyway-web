@@ -133,6 +133,12 @@
         touch-action: none;
       }
 
+      /* the rule above kills the native ring, so put a clear one back for keyboards */
+      .slider:focus-visible {
+        outline: 3px solid #333;
+        outline-offset: 3px;
+      }
+
       .slider::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
@@ -434,6 +440,11 @@
         color: #999;
         cursor: pointer;
         line-height: 1;
+        /* real <button> now — strip the UA chrome so it looks as it always did */
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: inherit;
       }
 
       .modal-close:hover {
@@ -469,6 +480,24 @@
         100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
       }
 
+      /* <main> takes over the column stacking body was doing, so nothing shifts */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
       /* Star Rating */
       .stars {
         font-size: 2.5em;
@@ -488,80 +517,84 @@
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
 
-    <div class="header">
-      <h1>🎨 Color Matcher</h1>
-      <p>Match the target color by mixing RGB values!</p>
-    </div>
+    <main>
+      <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
 
-    <div class="game-container">
-      <div class="stats">
-        <div>Score: <span id="score">0</span></div>
-        <div>Level: <span id="level">1</span></div>
+      <div class="header">
+        <h1><span aria-hidden="true">🎨</span> Color Matcher</h1>
+        <p>Match the target color by mixing RGB values!</p>
       </div>
 
-      <div class="target-section">
-        <h3>Target Color</h3>
-        <div class="target-color" id="targetColor"></div>
-      </div>
-
-      <div class="target-section">
-        <h3>Your Color</h3>
-        <div class="player-color" id="playerColor"></div>
-      </div>
-
-      <div class="controls">
-        <div class="color-control">
-          <label>Red</label>
-          <input
-            type="range"
-            min="0"
-            max="255"
-            value="128"
-            class="slider red-slider"
-            id="redSlider"
-          />
-          <div class="value-display" id="redValue">128</div>
+      <div class="game-container">
+        <div class="stats">
+          <div>Score: <span id="score">0</span></div>
+          <div>Level: <span id="level">1</span></div>
         </div>
-        <div class="color-control">
-          <label>Green</label>
-          <input
-            type="range"
-            min="0"
-            max="255"
-            value="128"
-            class="slider green-slider"
-            id="greenSlider"
-          />
-          <div class="value-display" id="greenValue">128</div>
+
+        <div class="target-section">
+          <h3>Target Color</h3>
+          <div class="target-color" id="targetColor"></div>
         </div>
-        <div class="color-control">
-          <label>Blue</label>
-          <input
-            type="range"
-            min="0"
-            max="255"
-            value="128"
-            class="slider blue-slider"
-            id="blueSlider"
-          />
-          <div class="value-display" id="blueValue">128</div>
+
+        <div class="target-section">
+          <h3>Your Color</h3>
+          <div class="player-color" id="playerColor"></div>
+        </div>
+
+        <div class="controls">
+          <div class="color-control">
+            <label for="redSlider">Red</label>
+            <input
+              type="range"
+              min="0"
+              max="255"
+              value="128"
+              class="slider red-slider"
+              id="redSlider"
+            />
+            <div class="value-display" id="redValue">128</div>
+          </div>
+          <div class="color-control">
+            <label for="greenSlider">Green</label>
+            <input
+              type="range"
+              min="0"
+              max="255"
+              value="128"
+              class="slider green-slider"
+              id="greenSlider"
+            />
+            <div class="value-display" id="greenValue">128</div>
+          </div>
+          <div class="color-control">
+            <label for="blueSlider">Blue</label>
+            <input
+              type="range"
+              min="0"
+              max="255"
+              value="128"
+              class="slider blue-slider"
+              id="blueSlider"
+            />
+            <div class="value-display" id="blueValue">128</div>
+          </div>
+        </div>
+
+        <div class="accuracy" id="accuracy"></div>
+
+        <div class="controls-buttons">
+          <button type="button" class="btn" onclick="checkMatch()">Check Match</button>
+          <button type="button" class="btn" onclick="newColor()">New Color</button>
         </div>
       </div>
-
-      <div class="accuracy" id="accuracy"></div>
-
-      <div class="controls-buttons">
-        <button class="btn" onclick="checkMatch()">Check Match</button>
-        <button class="btn" onclick="newColor()">New Color</button>
-      </div>
-    </div>
+    </main>
 
     <!-- Level Up Modal -->
-    <div class="modal-overlay" id="levelModal" onclick="closeModalOnOverlay(event)">
-      <div class="modal">
-        <span class="modal-close" onclick="closeModal()">✕</span>
+    <div class="modal-overlay" id="levelModal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button type="button" class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
         <h2 id="modalTitle">🎊 Level Up!</h2>
-        <div class="stars" id="starRating">
+        <div class="stars" id="starRating" aria-hidden="true">
           <span class="star">★</span>
           <span class="star">★</span>
           <span class="star">★</span>
@@ -571,12 +604,24 @@
           <p>Level: <span id="modalLevel">1</span></p>
           <p>Accuracy: <span id="modalAccuracy">0</span>%</p>
         </div>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
-        <button class="modal-btn" onclick="closeModal()">Continue</button>
+        <p id="highScoreMsg" class="high-score" style="display: none;"><span aria-hidden="true">🏆</span> New Best This Visit!</p>
+        <button type="button" class="modal-btn" onclick="closeModal()">Continue</button>
       </div>
     </div>
 
     <script>
+      // Screen-reader status line. Alternating a trailing no-break space keeps the
+      // text genuinely different, so repeats still get announced. Stays quiet until
+      // the first paint is done so the page doesn't talk over itself on load.
+      const srStatus = document.getElementById("srStatus");
+      let srFlip = false;
+      let srReady = false;
+      function announce(message) {
+        if (!srReady) return;
+        srFlip = !srFlip;
+        srStatus.textContent = srFlip ? message : message + "\u00A0";
+      }
+
       // Sound effects using Web Audio API
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       let audioCtx = null;
@@ -680,8 +725,10 @@
         }
 
         modal.classList.add('show');
+        announce(`Level ${level}! ${starCount} of 3 stars.`);
         playSound('perfect');
         createConfetti();
+        modal.querySelector('.modal-btn').focus();
       }
 
       function closeModal() {
@@ -694,6 +741,15 @@
           closeModal();
         }
       }
+
+      // Dismissing by clicking the backdrop is mouse-only, so Escape does the
+      // same job for the keyboard.
+      document.getElementById('levelModal').addEventListener('click', closeModalOnOverlay);
+      document.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('levelModal');
+        if (e.key === 'Escape' && modal.classList.contains('show')) closeModal();
+      });
+
       let targetColor = { r: 0, g: 0, b: 0 };
       let playerColor = { r: 128, g: 128, b: 128 };
       let score = 0;
@@ -750,24 +806,29 @@
         const accuracy = calculateAccuracy();
         let message = "";
         let className = "";
+        let spoken = "";
 
         if (accuracy >= 95) {
           message = `🎉 Perfect! ${accuracy}% accuracy!`;
+          spoken = `Perfect! ${accuracy}% accuracy.`;
           className = "perfect";
           score += 100;
           playSound('perfect');
         } else if (accuracy >= 80) {
           message = `👍 Good job! ${accuracy}% accuracy!`;
+          spoken = `Good job! ${accuracy}% accuracy.`;
           className = "good";
           score += 50;
           playSound('good');
         } else if (accuracy >= 60) {
           message = `😊 Not bad! ${accuracy}% accuracy!`;
+          spoken = `Not bad! ${accuracy}% accuracy.`;
           className = "good";
           score += 25;
           playSound('good');
         } else {
           message = `😅 Keep trying! ${accuracy}% accuracy!`;
+          spoken = `Keep trying! ${accuracy}% accuracy.`;
           className = "poor";
           playSound('poor');
         }
@@ -776,6 +837,7 @@
         accuracyDiv.className = `accuracy ${className}`;
 
         document.getElementById("score").textContent = score;
+        announce(`${spoken} Score ${score}.`);
 
         const previousLevel = level;
         if (score >= level * 200) {
@@ -790,6 +852,7 @@
         updateTargetColor();
         accuracyDiv.textContent = "";
         accuracyDiv.className = "accuracy";
+        announce("New target color. Mix it with the sliders!");
       }
 
       // Enhanced slider functionality for mobile
@@ -850,6 +913,7 @@
       // Initialize game
       newColor();
       updatePlayerColor();
+      srReady = true;
     </script>
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>

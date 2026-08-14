@@ -133,6 +133,15 @@
         width: 100%;
       }
 
+      /* Landmark wrapper only — repeats the body's column layout so the
+         children sit exactly where they did before the landmark existed. */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
       .question-area {
         text-align: center;
         margin-bottom: 30px;
@@ -462,6 +471,11 @@
         color: #999;
         cursor: pointer;
         line-height: 1;
+        /* it is a real <button> now — strip the UA chrome so it looks the same */
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: inherit;
       }
 
       .modal-close:hover {
@@ -516,68 +530,81 @@
     <a href="../../" class="back-link">← Back to Games</a>
 
     <div class="header">
-      <h1>🔬 Science Trivia</h1>
+      <h1><span aria-hidden="true">🔬</span> Science Trivia</h1>
       <p>Test your knowledge in Chemistry, Physics, and General Science!</p>
     </div>
 
-    <div class="stats">
-      <div>Score: <span id="score">0</span></div>
-      <div>Level: <span id="level">1</span></div>
-      <div>Questions: <span id="questions">0</span></div>
-    </div>
+    <main>
+      <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>Questions: <span id="questions">0</span></div>
+      </div>
 
-    <div class="category-selector">
-      <h3>Choose Category:</h3>
-      <button class="category-btn active" onclick="setCategory('chemistry')">
-        🧪 Chemistry
-      </button>
-      <button class="category-btn" onclick="setCategory('physics')">
-        ⚡ Physics
-      </button>
-      <button class="category-btn" onclick="setCategory('general')">
-        🌍 General Science
-      </button>
-    </div>
+      <div class="category-selector" role="group" aria-labelledby="categoryHeading">
+        <h3 id="categoryHeading">Choose Category:</h3>
+        <button type="button" class="category-btn active" aria-pressed="true" onclick="setCategory('chemistry')">
+          <span aria-hidden="true">🧪</span> Chemistry
+        </button>
+        <button type="button" class="category-btn" aria-pressed="false" onclick="setCategory('physics')">
+          <span aria-hidden="true">⚡</span> Physics
+        </button>
+        <button type="button" class="category-btn" aria-pressed="false" onclick="setCategory('general')">
+          <span aria-hidden="true">🌍</span> General Science
+        </button>
+      </div>
 
-    <div class="game-container">
-      <div class="feedback" id="feedback"></div>
-      <div class="hint" id="hint"></div>
+      <div class="game-container">
+        <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+        <div class="hint" id="hint" role="status" aria-live="polite"></div>
 
-      <div class="question-area">
-        <div class="question-number" id="questionNumber">Question 1 of 10</div>
-        <div class="question" id="question">
-          What is the chemical symbol for gold?
+        <div class="question-area">
+          <div class="question-number" id="questionNumber">Question 1 of 10</div>
+          <div class="question" id="question">
+            What is the chemical symbol for gold?
+          </div>
+        </div>
+
+        <div
+          class="answer-options"
+          id="answerOptions"
+          role="group"
+          aria-labelledby="questionNumber question"
+        >
+          <!-- Answer options will be generated here -->
+        </div>
+
+        <div class="controls">
+          <button type="button" class="btn" id="hintBtn" onclick="getHint()">Get Hint</button>
+          <button type="button" class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Next Question</button>
+          <button type="button" class="btn" onclick="newQuiz()">New Quiz</button>
         </div>
       </div>
-
-      <div class="answer-options" id="answerOptions">
-        <!-- Answer options will be generated here -->
-      </div>
-
-      <div class="controls">
-        <button class="btn" id="hintBtn" onclick="getHint()">Get Hint</button>
-        <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Next Question</button>
-        <button class="btn" onclick="newQuiz()">New Quiz</button>
-      </div>
-    </div>
+    </main>
 
     <!-- Quiz Complete Modal -->
-    <div class="modal-overlay" id="quizModal" onclick="closeModalOnOverlay(event)">
-      <div class="modal">
-        <span class="modal-close" onclick="closeModal()">✕</span>
+    <div class="modal-overlay" id="quizModal">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+        aria-describedby="modalStats"
+      >
+        <button type="button" class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
         <h2 id="modalTitle">🎊 Quiz Complete!</h2>
-        <div class="stars" id="starRating">
+        <div class="stars" id="starRating" aria-hidden="true">
           <span class="star">★</span>
           <span class="star">★</span>
           <span class="star">★</span>
         </div>
-        <div class="stats-display">
+        <div class="stats-display" id="modalStats">
           <p>Final Score: <span id="modalScore">0</span></p>
           <p>Level Reached: <span id="modalLevel">1</span></p>
           <p>Questions Answered: <span id="modalQuestions">0</span></p>
         </div>
         <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New Best This Visit!</p>
-        <button class="modal-btn" onclick="closeModal()">Play Again</button>
+        <button type="button" class="modal-btn" onclick="closeModal()">Play Again</button>
       </div>
     </div>
 
@@ -684,6 +711,10 @@
         }
 
         modal.classList.add('show');
+        // Send focus into the dialog so the result is announced and the
+        // keyboard lands on Play Again rather than back at the top of the page
+        const playAgain = modal.querySelector('.modal-btn');
+        if (playAgain) playAgain.focus();
         playSound('complete');
         createConfetti();
       }
@@ -695,6 +726,7 @@
         document.getElementById("question").style.display = "block";
         document.getElementById("answerOptions").style.display = "grid";
         newQuiz();
+        focusFirstOption();
       }
 
       function closeModalOnOverlay(event) {
@@ -702,6 +734,27 @@
           closeModal();
         }
       }
+
+      // Focus is otherwise dropped on the body when the button that was
+      // clicked disappears or is disabled
+      function focusFirstOption() {
+        if (document.getElementById("quizModal").classList.contains("show")) return;
+        const first = document.querySelector("#answerOptions .answer-btn");
+        if (first) first.focus({ preventScroll: true });
+      }
+
+      document
+        .getElementById("quizModal")
+        .addEventListener("click", closeModalOnOverlay);
+
+      document.addEventListener("keydown", function (e) {
+        if (
+          e.key === "Escape" &&
+          document.getElementById("quizModal").classList.contains("show")
+        ) {
+          closeModal();
+        }
+      });
       let currentCategory = "chemistry";
       let score = 0;
       let bestScore = 0;
@@ -767,11 +820,17 @@
       function setCategory(category) {
         currentCategory = category;
 
-        // Update active button
+        // Update active button. closest() because the click can land on the
+        // button's own aria-hidden emoji span.
+        const clicked = event.target.closest(".category-btn");
         document.querySelectorAll(".category-btn").forEach((btn) => {
           btn.classList.remove("active");
+          btn.setAttribute("aria-pressed", "false");
         });
-        event.target.classList.add("active");
+        if (clicked) {
+          clicked.classList.add("active");
+          clicked.setAttribute("aria-pressed", "true");
+        }
 
         // Generate new quiz
         newQuiz();
@@ -847,6 +906,7 @@
 
         order.forEach((optionIndex, domIndex) => {
           const btn = document.createElement("button");
+          btn.type = "button";
           btn.className = "answer-btn";
           btn.textContent = question.options[optionIndex];
           btn.onclick = () => checkAnswer(domIndex);
@@ -859,17 +919,25 @@
         hintShown = false;
         questionResolved = false;
 
-        // Clear feedback and hint, lock Next until this question is scored
-        document.getElementById("feedback").style.display = "none";
-        document.getElementById("hint").style.display = "none";
+        // Clear feedback and hint, lock Next until this question is scored.
+        // Emptying them as well as hiding them keeps the live regions from
+        // re-announcing last question's text when they reappear.
+        const feedbackEl = document.getElementById("feedback");
+        feedbackEl.textContent = "";
+        feedbackEl.style.display = "none";
+        const hintEl = document.getElementById("hint");
+        hintEl.textContent = "";
+        hintEl.style.display = "none";
         document.getElementById("nextBtn").disabled = true;
         document.getElementById("hintBtn").disabled = false;
       }
 
       function showHint(text) {
         const hint = document.getElementById("hint");
-        hint.textContent = `💡 Hint: ${text}`;
+        // Visible first, then written: a live region that is display:none when
+        // its text changes is not announced.
         hint.style.display = "block";
+        hint.textContent = `💡 Hint: ${text}`;
         hintShown = true;
         // One hint per question — grey the button once it's on screen
         document.getElementById("hintBtn").disabled = true;
@@ -911,12 +979,12 @@
           buttons[currentCorrectIndex].classList.add("correct");
           resolveQuestion();
 
+          feedback.className = "feedback correct";
+          feedback.style.display = "block";
           feedback.innerHTML = `
                     <div>🎉 Correct! +${points} points</div>
                     <div class="explanation">${question.explanation}</div>
                 `;
-          feedback.className = "feedback correct";
-          feedback.style.display = "block";
           return;
         }
 
@@ -926,11 +994,11 @@
         if (attemptCount === 1) {
           // First miss — grey out that choice, share the hint, and let them try again
           buttons[selectedIndex].classList.add("eliminated");
+          feedback.className = "feedback incorrect";
+          feedback.style.display = "block";
           feedback.innerHTML = `
                     <div>😅 Not "${buttons[selectedIndex].textContent}" — try again!</div>
                 `;
-          feedback.className = "feedback incorrect";
-          feedback.style.display = "block";
           showHint(question.hint);
         } else {
           // Second miss — reveal the answer with the full explanation, no points
@@ -938,14 +1006,14 @@
           buttons[selectedIndex].classList.add("incorrect");
           resolveQuestion();
 
+          feedback.className = "feedback incorrect";
+          feedback.style.display = "block";
           feedback.innerHTML = `
                     <div>😅 Incorrect! The correct answer was: ${
                       question.options[question.correct]
                     }</div>
                     <div class="explanation">${question.explanation}</div>
                 `;
-          feedback.className = "feedback incorrect";
-          feedback.style.display = "block";
         }
       }
 
@@ -954,6 +1022,7 @@
         if (!questionResolved) return;
         currentQuestionIndex++;
         displayQuestion();
+        focusFirstOption();
       }
 
       function getHint() {

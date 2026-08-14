@@ -281,6 +281,11 @@
         color: #999;
         cursor: pointer;
         line-height: 1;
+        /* real <button> now — strip the UA chrome so it looks as it always did */
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: inherit;
       }
 
       .modal-close:hover { color: #333; }
@@ -341,6 +346,24 @@
         margin-bottom: 5px;
       }
 
+      /* <main> takes over the column stacking body was doing, so nothing shifts */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
       @media (max-width: 480px) {
         body { padding: 5px; padding-top: 35px; }
         .header { margin-bottom: 5px; }
@@ -360,59 +383,72 @@
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
 
-    <div class="header">
-      <h1>🐹 Whack-a-Mole!</h1>
-      <p>Tap the animals when they pop up!</p>
-    </div>
+    <main>
+      <p class="visually-hidden" id="srStatus" aria-live="polite"></p>
 
-    <div class="stats">
-      <div>Score: <span id="score">0</span></div>
-      <div>Best this visit: <span id="best">0</span></div>
-    </div>
-
-    <div class="mode-selector">
-      <button class="mode-btn active" onclick="setDifficulty('easy')">🐢 Easy</button>
-      <button class="mode-btn" onclick="setDifficulty('medium')">🐇 Medium</button>
-      <button class="mode-btn" onclick="setDifficulty('hard')">🚀 Hard</button>
-    </div>
-
-    <div class="time-display">⏱️ <span id="timeLeft">2:00</span></div>
-    <div class="timer-bar"><div class="timer-fill" id="timerFill" style="width: 100%"></div></div>
-
-    <div class="message" id="message">Tap to start! 🎮</div>
-
-    <div class="game-area" id="gameArea">
-      <div class="mole-grid" id="moleGrid"></div>
-      <div class="start-screen" id="startScreen">
-        <h2>🐹 Whack-a-Mole! 🐰</h2>
-        <div class="animals-preview">🐹 🐰 🐸 🐱</div>
-        <p>Tap the cute animals when they pop up!</p>
-        <p>You have 2 minutes - score as many as you can!</p>
-        <br>
-        <button class="btn" onclick="startGame()">Let's Play!</button>
+      <div class="header">
+        <h1><span aria-hidden="true">🐹</span> Whack-a-Mole!</h1>
+        <p>Tap the animals when they pop up!</p>
       </div>
-    </div>
 
-    <div class="controls">
-      <button class="btn" onclick="startGame()">New Game</button>
-    </div>
+      <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Best this visit: <span id="best">0</span></div>
+      </div>
 
-    <div class="modal-overlay" id="modal" onclick="closeModalOnOverlay(event)">
-      <div class="modal">
-        <span class="modal-close" onclick="closeModalOnly()">✕</span>
+      <div class="mode-selector">
+        <button type="button" class="mode-btn active" aria-pressed="true" onclick="setDifficulty('easy', this)"><span aria-hidden="true">🐢</span> Easy</button>
+        <button type="button" class="mode-btn" aria-pressed="false" onclick="setDifficulty('medium', this)"><span aria-hidden="true">🐇</span> Medium</button>
+        <button type="button" class="mode-btn" aria-pressed="false" onclick="setDifficulty('hard', this)"><span aria-hidden="true">🚀</span> Hard</button>
+      </div>
+
+      <div class="time-display"><span aria-hidden="true">⏱️</span> <span id="timeLeft">2:00</span></div>
+      <div class="timer-bar"><div class="timer-fill" id="timerFill" style="width: 100%"></div></div>
+
+      <div class="message" id="message">Tap to start! 🎮</div>
+
+      <div class="game-area" id="gameArea">
+        <div class="mole-grid" id="moleGrid"></div>
+        <div class="start-screen" id="startScreen">
+          <h2><span aria-hidden="true">🐹</span> Whack-a-Mole! <span aria-hidden="true">🐰</span></h2>
+          <div class="animals-preview" aria-hidden="true">🐹 🐰 🐸 🐱</div>
+          <p>Tap the cute animals when they pop up!</p>
+          <p>You have 2 minutes - score as many as you can!</p>
+          <br>
+          <button type="button" class="btn" onclick="startGame()">Let's Play!</button>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button type="button" class="btn" onclick="startGame()">New Game</button>
+      </div>
+    </main>
+
+    <div class="modal-overlay" id="modal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button type="button" class="modal-close" onclick="closeModalOnly()" aria-label="Close">✕</button>
         <h2 id="modalTitle">🎉 Time's Up!</h2>
-        <div class="stars" id="starRating">
+        <div class="stars" id="starRating" aria-hidden="true">
           <span class="star">★</span>
           <span class="star">★</span>
           <span class="star">★</span>
         </div>
         <p>You tapped <span id="finalScore">0</span> animals!</p>
-        <p id="highScoreMsg" class="high-score" style="display: none;">🏆 New best this visit!</p>
-        <button class="modal-btn" onclick="closeModal()">Play Again</button>
+        <p id="highScoreMsg" class="high-score" style="display: none;"><span aria-hidden="true">🏆</span> New best this visit!</p>
+        <button type="button" class="modal-btn" onclick="closeModal()">Play Again</button>
       </div>
     </div>
 
     <script>
+      // Screen-reader status line. Alternating a trailing no-break space keeps the
+      // text genuinely different, so repeats still get announced.
+      const srStatus = document.getElementById('srStatus');
+      let srFlip = false;
+      function announce(message) {
+        srFlip = !srFlip;
+        srStatus.textContent = srFlip ? message : message + "\u00A0";
+      }
+
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       let audioCtx = null;
 
@@ -502,31 +538,54 @@
       const moleGrid = document.getElementById('moleGrid');
       const holes = [];
 
-      function setDifficulty(d) {
+      function setDifficulty(d, clickedBtn) {
         difficulty = d;
-        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        // the button is passed in rather than read off the global event, so
+        // keyboard activation (and clicks landing on the emoji) mark the right one
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-pressed', 'false');
+        });
+        if (clickedBtn) {
+          clickedBtn.classList.add('active');
+          clickedBtn.setAttribute('aria-pressed', 'true');
+        }
         if (gameRunning) {
           startGame();
         }
       }
 
+      function setAnimalLabel(animal, index, isUp) {
+        animal.setAttribute('aria-label', `Hole ${index + 1}, ${isUp ? 'animal up' : 'empty'}`);
+      }
+
       function createGrid() {
         moleGrid.innerHTML = '';
         holes.length = 0;
-        
+
         // 9 holes (3 rows x 3 columns)
         for (let i = 0; i < 9; i++) {
           const hole = document.createElement('div');
           hole.className = 'hole';
           hole.innerHTML = `
-            <div class="hole-bg"></div>
+            <div class="hole-bg" aria-hidden="true"></div>
             <div class="animal" data-index="${i}">${animals[Math.floor(Math.random() * animals.length)]}</div>
           `;
-          
+
+          // The animal stays a <div> so its pop-up transform and the hole's
+          // clipping still work; role + tabindex + keydown make it a button.
           const animal = hole.querySelector('.animal');
+          animal.setAttribute('role', 'button');
+          animal.setAttribute('tabindex', '0');
+          setAnimalLabel(animal, i, false);
           animal.addEventListener('click', () => hitAnimal(animal, i));
-          
+          animal.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+              e.preventDefault(); // Space would otherwise scroll the page
+              hitAnimal(animal, i);
+            }
+          });
+
           moleGrid.appendChild(hole);
           holes.push({ element: hole, animal: animal, isUp: false });
         }
@@ -559,7 +618,9 @@
         
         animal.classList.add('hit');
         holes[index].isUp = false;
-        
+        setAnimalLabel(animal, index, false);
+        announce(`Got it! Score ${score}.`);
+
         // Show score popup
         const rect = animal.getBoundingClientRect();
         const popup = document.createElement('div');
@@ -600,8 +661,9 @@
         hole.animal.textContent = animals[Math.floor(Math.random() * animals.length)];
         hole.animal.classList.remove('hit');
         hole.animal.classList.add('visible');
+        setAnimalLabel(hole.animal, index, true);
         playSound('pop');
-        
+
         // Hide after a while based on difficulty
         const settings = difficulties[difficulty];
         const hideDelay = getRandomInRange(settings.showTime[0], settings.showTime[1]);
@@ -609,6 +671,7 @@
           if (hole.isUp && gameRunning) {
             hole.animal.classList.remove('visible');
             hole.isUp = false;
+            setAnimalLabel(hole.animal, index, false);
           }
         }, hideDelay);
         hideTimeouts.push(hideTimeout);
@@ -634,14 +697,16 @@
         clearInterval(timerInterval);
         
         // Reset all holes
-        holes.forEach(h => {
+        holes.forEach((h, i) => {
           h.isUp = false;
           h.animal.classList.remove('visible', 'hit');
+          setAnimalLabel(h.animal, i, false);
         });
-        
+
         updateDisplay();
         updateTimer();
         showMessage('Tap the animals! 🎯');
+        announce('Game on! Two minutes on the clock.');
         
         // Start timer
         timerInterval = setInterval(() => {
@@ -664,11 +729,12 @@
         clearInterval(timerInterval);
         
         // Hide all animals
-        holes.forEach(h => {
+        holes.forEach((h, i) => {
           h.isUp = false;
           h.animal.classList.remove('visible');
+          setAnimalLabel(h.animal, i, false);
         });
-        
+
         const isNewBest = score > best;
         if (isNewBest) {
           best = score;
@@ -682,10 +748,13 @@
         const starCount = score >= 300 ? 3 : score >= 150 ? 2 : 1;
         stars.forEach((s, i) => s.classList.toggle('filled', i < starCount));
         
-        document.getElementById('modal').classList.add('show');
+        const modal = document.getElementById('modal');
+        modal.classList.add('show');
+        announce(`Time's up! Score ${score}. ${starCount} of 3 stars.`);
+        modal.querySelector('.modal-btn').focus();
         playSound('win');
         createConfetti();
-        
+
         showMessage('Great game! 🎉');
       }
 
@@ -703,6 +772,14 @@
         closeModalOnly();
         startGame();
       }
+
+      // Dismissing by clicking the backdrop is mouse-only, so Escape does the
+      // same job for the keyboard.
+      document.getElementById('modal').addEventListener('click', closeModalOnOverlay);
+      document.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('modal');
+        if (e.key === 'Escape' && modal.classList.contains('show')) closeModalOnly();
+      });
 
       // Initialize
       createGrid();
