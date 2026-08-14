@@ -634,10 +634,13 @@
         showMessage(messages[Math.floor(Math.random() * messages.length)]);
         updateDisplay();
         
-        setTimeout(() => {
+        // tracked with the other hide timers: untracked, this could fire after
+        // a restart and hide an animal the new game had just raised, leaving
+        // an invisible-but-active mole sitting in that hole
+        hideTimeouts.push(setTimeout(() => {
           animal.classList.remove('hit', 'visible');
           animal.textContent = animals[Math.floor(Math.random() * animals.length)];
-        }, 300);
+        }, 300));
       }
 
       function getRandomInRange(min, max) {
@@ -717,8 +720,9 @@
           }
         }, 1000);
         
-        // Start spawning animals after a short delay
-        setTimeout(showRandomAnimal, 800);
+        // Start spawning animals after a short delay. Stored, or restarting
+        // inside this window leaves two spawn chains running at once.
+        spawnTimeout = setTimeout(showRandomAnimal, 800);
       }
 
       function endGame() {
