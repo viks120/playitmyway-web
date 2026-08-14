@@ -161,6 +161,34 @@
         transform: scale(1.1);
       }
 
+      .ten-frame {
+        --tf-cell: clamp(40px, 11vw, 54px);
+        display: grid;
+        grid-template-columns: repeat(5, var(--tf-cell));
+        grid-auto-rows: var(--tf-cell);
+        gap: 5px;
+        padding: 8px;
+        background: white;
+        border: 3px solid #667eea;
+        border-radius: 12px;
+      }
+
+      .tf-cell {
+        border: 2px solid #c9cff2;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .tf-cell.filled::after {
+        content: "";
+        width: 68%;
+        height: 68%;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 30%, #ff9a8b, #ff6b6b);
+      }
+
       .answer-options {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -542,6 +570,20 @@
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.1); }
       }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+
+        .confetti {
+          display: none;
+        }
+      }
     </style>
   </head>
   <body>
@@ -575,6 +617,9 @@
           </button>
           <button class="mode-btn" onclick="setMode('subtraction')">
             Subtraction
+          </button>
+          <button class="mode-btn" onclick="setMode('tenframe')">
+            Ten Frame
           </button>
         </div>
       </div>
@@ -712,7 +757,7 @@
         document.getElementById('finalScore').textContent = score;
         document.getElementById('finalLevel').textContent = level;
         document.getElementById('finalStreak').textContent = bestStreak;
-        document.getElementById('finalMode').textContent = currentMode.charAt(0).toUpperCase() + currentMode.slice(1);
+        document.getElementById('finalMode').textContent = modeNames[currentMode] || currentMode;
 
         const stars = getStarRating(score);
         displayStars(stars);
@@ -754,6 +799,14 @@
       let streak = 0;
       let bestStreak = 0;
       let highScore = 0;
+      let tfAskEmpty = false;
+
+      const modeNames = {
+        counting: "Counting",
+        addition: "Addition",
+        subtraction: "Subtraction",
+        tenframe: "Ten Frame",
+      };
 
       const objects = [
         "🍎",
@@ -778,17 +831,77 @@
         resetGame();
       }
 
+      // Every wrong option encodes a real counting mistake — no random junk.
+      // Candidates are tried in order; the first two valid ones become the distractors.
+      function pickDistractors(answer, candidates, floor) {
+        const picked = [];
+        for (const candidate of candidates) {
+          if (candidate >= floor && candidate !== answer && !picked.includes(candidate)) {
+            picked.push(candidate);
+          }
+          if (picked.length === 2) break;
+        }
+        return picked;
+      }
+
+      function countingDistractors(answer, total) {
+        const candidates = [];
+        if (total > answer) candidates.push(total); // counted the other fruit too
+        candidates.push(answer + 1, answer - 1, answer + 2, answer - 2); // off-by-one slips
+        return pickDistractors(answer, candidates, 1);
+      }
+
+      function additionDistractors(num1, num2) {
+        const answer = num1 + num2;
+        // num1 = stopped counting at the first group; ±1 = off-by-one
+        return pickDistractors(answer, [num1, answer + 1, answer - 1, answer + 2, answer - 2], 1);
+      }
+
+      function subtractionDistractors(num1, num2) {
+        const answer = num1 - num2;
+        // num1 + num2 = added instead of taking away; ±1 = off-by-one
+        return pickDistractors(answer, [num1 + num2, answer + 1, answer - 1, answer + 2, answer - 2], 0);
+      }
+
+      function tenFrameDistractors(dots, askEmpty) {
+        if (dots > 10) {
+          const ones = dots - 10;
+          // ones alone = ignored the full frame; ±1 = off-by-one
+          return pickDistractors(dots, [ones, dots + 1, dots - 1, dots + 2, dots - 2], 1);
+        }
+        if (askEmpty) {
+          const answer = 10 - dots;
+          // dots = counted the dots instead of the empty boxes
+          return pickDistractors(answer, [dots, answer + 1, answer - 1, answer + 2, answer - 2], 0);
+        }
+        return pickDistractors(dots, [dots + 1, dots - 1, dots + 2, dots - 2, dots + 3], 1);
+      }
+
       function generateCountingQuestion() {
         const count = Math.floor(Math.random() * 5) + 1;
         const object = objects[Math.floor(Math.random() * objects.length)];
-        const objectArray = Array(count).fill(object);
+        let extraCount = 0;
+        let objectArray = Array(count).fill(object);
+
+        // Half the time, sprinkle in a different fruit so "count only the 🍎"
+        // takes real attention — and "counted everything" becomes a catchable mistake.
+        if (count >= 2 && Math.random() < 0.5) {
+          extraCount = Math.floor(Math.random() * 3) + 1;
+          let extraObject = object;
+          while (extraObject === object) {
+            extraObject = objects[Math.floor(Math.random() * objects.length)];
+          }
+          objectArray = shuffleArray(objectArray.concat(Array(extraCount).fill(extraObject)));
+        }
 
         return {
           type: "counting",
           question: `How many ${object} do you see?`,
           objects: objectArray,
+          object: object,
+          total: count + extraCount,
           answer: count,
-          options: generateOptions(count),
+          options: shuffleArray([count].concat(countingDistractors(count, count + extraCount))),
         };
       }
 
@@ -804,7 +917,7 @@
           num1: num1,
           num2: num2,
           answer: answer,
-          options: generateOptions(answer),
+          options: shuffleArray([answer].concat(additionDistractors(num1, num2))),
         };
       }
 
@@ -820,19 +933,37 @@
           num1: num1,
           num2: num2,
           answer: answer,
-          options: generateOptions(answer),
+          options: shuffleArray([answer].concat(subtractionDistractors(num1, num2))),
         };
       }
 
-      function generateOptions(correctAnswer) {
-        const options = [correctAnswer];
-        while (options.length < 3) {
-          const option = Math.floor(Math.random() * 10) + 1;
-          if (!options.includes(option)) {
-            options.push(option);
-          }
+      function generateTenFrameQuestion() {
+        const dots = Math.floor(Math.random() * 20) + 1;
+
+        if (dots > 10) {
+          // Teens: a full frame plus some more — ask only "how many dots?"
+          return {
+            type: "tenframe",
+            question: "How many dots do you see?",
+            objects: [],
+            dots: dots,
+            askEmpty: false,
+            answer: dots,
+            options: shuffleArray([dots].concat(tenFrameDistractors(dots, false))),
+          };
         }
-        return shuffleArray(options);
+
+        tfAskEmpty = !tfAskEmpty;
+        const answer = tfAskEmpty ? 10 - dots : dots;
+        return {
+          type: "tenframe",
+          question: tfAskEmpty ? "How many empty boxes do you see?" : "How many dots do you see?",
+          objects: [],
+          dots: dots,
+          askEmpty: tfAskEmpty,
+          answer: answer,
+          options: shuffleArray([answer].concat(tenFrameDistractors(dots, tfAskEmpty))),
+        };
       }
 
       function shuffleArray(array) {
@@ -861,6 +992,8 @@
             objectDiv.addEventListener("click", () => toggleObject(objectDiv));
             objectsContainer.appendChild(objectDiv);
           });
+        } else if (currentQuestion.type === "tenframe") {
+          renderTenFrames(objectsContainer, currentQuestion.dots);
         }
 
         // Display answer options
@@ -875,6 +1008,23 @@
 
         selectedObjects = [];
         attemptCount = 0;
+      }
+
+      function renderTenFrames(container, dots) {
+        // Teens show a full frame plus a second partial frame — "ten and some more".
+        const frames = dots > 10 ? [10, dots - 10] : [dots];
+        frames.forEach((filled) => {
+          const frame = document.createElement("div");
+          frame.className = "ten-frame";
+          frame.setAttribute("role", "img");
+          frame.setAttribute("aria-label", "Ten frame");
+          for (let i = 0; i < 10; i++) {
+            const cell = document.createElement("div");
+            cell.className = i < filled ? "tf-cell filled" : "tf-cell";
+            frame.appendChild(cell);
+          }
+          container.appendChild(frame);
+        });
       }
 
       function toggleObject(objectDiv) {
@@ -898,19 +1048,56 @@
         return counts.join(", ");
       }
 
-      function getHintText() {
-        if (currentQuestion.type === "counting") {
+      // The chosen wrong answer tells us WHICH mistake was made — name it when we can.
+      function getHintText(selected) {
+        const q = currentQuestion;
+        if (q.type === "counting") {
+          if (q.total > q.answer && selected === q.total) {
+            return `🤔 You counted every fruit! Count only the ${q.object}. 👆`;
+          }
           return "🤔 Count again! Point to each one as you count. 👆";
         }
-        if (currentQuestion.type === "addition") {
-          return `🤔 Not that one! Hold up ${currentQuestion.num1} fingers, then ${currentQuestion.num2} more, and count them all. ✋`;
+        if (q.type === "addition") {
+          if (selected === q.num1) {
+            return `🤔 That's just the first group — there ${q.num2 === 1 ? "is" : "are"} still ${q.num2} more to count on! ✋`;
+          }
+          return `🤔 Not that one! Hold up ${q.num1} fingers, then ${q.num2} more, and count them all. ✋`;
         }
-        return `🤔 Not that one! Hold up ${currentQuestion.num1} fingers, put ${currentQuestion.num2} down, and count what is left. ✋`;
+        if (q.type === "subtraction") {
+          if (selected === q.num1 + q.num2) {
+            return "🤔 You added! The minus sign means we take away. ✋";
+          }
+          return `🤔 Not that one! Hold up ${q.num1} fingers, put ${q.num2} down, and count what is left. ✋`;
+        }
+        if (q.dots > 10) {
+          if (selected === q.dots - 10) {
+            return "🤔 That's just the extra dots! Don't forget the full frame of 10. 👆";
+          }
+          return "🤔 The first frame is full — that's 10! Now count the extra dots. 👆";
+        }
+        if (q.askEmpty) {
+          if (selected === q.dots) {
+            return "🤔 You counted the dots! Count the empty boxes instead. 👆";
+          }
+          return "🤔 Count the boxes with no dot inside. 👆";
+        }
+        return "🤔 Count again! Touch each dot as you count. 👆";
       }
 
       function getRevealText() {
         const answer = currentQuestion.answer;
         if (currentQuestion.type === "counting") {
+          return `There ${answer === 1 ? "is" : "are"} ${answer}! ${countAlong(answer)} 🎉`;
+        }
+        if (currentQuestion.type === "tenframe") {
+          if (currentQuestion.dots > 10) {
+            return `Ten and ${currentQuestion.dots - 10} more — ${answer}! 🎉`;
+          }
+          if (currentQuestion.askEmpty) {
+            return answer === 0
+              ? `Every box is full — 0 empty boxes! ${currentQuestion.dots} dots fill the whole frame. 🎉`
+              : `There ${answer === 1 ? "is" : "are"} ${answer} empty ${answer === 1 ? "box" : "boxes"}! ${currentQuestion.dots} dots and ${answer} empty make 10. 🎉`;
+          }
           return `There ${answer === 1 ? "is" : "are"} ${answer}! ${countAlong(answer)} 🎉`;
         }
         if (currentQuestion.type === "addition") {
@@ -961,7 +1148,7 @@
           if (attemptCount === 1) {
             button.disabled = true;
             button.classList.add("eliminated");
-            hint.textContent = getHintText();
+            hint.textContent = getHintText(selectedAnswer);
             hint.style.display = "block";
           } else {
             buttons.forEach((btn) => {
@@ -1011,6 +1198,9 @@
           case "subtraction":
             currentQuestion = generateSubtractionQuestion();
             break;
+          case "tenframe":
+            currentQuestion = generateTenFrameQuestion();
+            break;
         }
 
         displayQuestion();
@@ -1043,6 +1233,9 @@
             break;
           case "subtraction":
             currentQuestion = generateSubtractionQuestion();
+            break;
+          case "tenframe":
+            currentQuestion = generateTenFrameQuestion();
             break;
         }
 
