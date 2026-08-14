@@ -1,0 +1,54 @@
+/* ==========================================================================
+   Play It My Way — shared cross-page components
+   Game pages link this AFTER their own styles:
+     <link rel="stylesheet" href="../../components.css" />
+   Deliberately self-sufficient: no tokens.css variables, so the older game
+   pages (which don't link tokens.css yet) render it identically.
+   ========================================================================== */
+
+/* Trust footer: the site's promise, visible on every game page.
+   Translucent white card so it reads on both the warm cream pages and the
+   gradient-background legacy pages. */
+.site-footer {
+  max-width: 640px;
+  margin: 32px auto 10px;
+  padding: 14px 18px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #33302e;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(51, 48, 46, 0.10);
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.site-footer-badges {
+  margin: 0 0 6px;
+  color: #5f5751;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px 18px;
+}
+
+.site-footer-links a {
+  color: #9a3412;
+  font-weight: 600;
+  text-decoration: none;
+  /* comfortable touch target without inflating the card */
+  padding: 8px 2px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.site-footer-links a:hover {
+  text-decoration: underline;
+}
