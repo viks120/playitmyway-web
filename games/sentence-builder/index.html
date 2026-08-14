@@ -603,7 +603,9 @@
           wordEl.className = 'word';
           wordEl.textContent = word;
           wordEl.dataset.word = word;
-          wordEl.dataset.originalIndex = sentence.words.indexOf(word);
+          // identity, not text: 20 of the 50 hard sentences repeat a word,
+          // and matching by text removed every copy at once
+          wordEl.dataset.slotId = String(index);
           wordEl.onclick = () => toggleWord(wordEl);
           wordBank.appendChild(wordEl);
         });
@@ -624,19 +626,33 @@
       function toggleWord(wordEl) {
         if (roundOver) return;
         playSound('click');
-        const word = wordEl.dataset.word;
-        
+        const slotId = wordEl.dataset.slotId;
+
         if (wordEl.classList.contains('in-sentence')) {
           // Remove from sentence
           wordEl.classList.remove('in-sentence');
-          selectedWords = selectedWords.filter(w => w !== word);
+          selectedWords = selectedWords.filter(id => id !== slotId);
         } else {
           // Add to sentence
           wordEl.classList.add('in-sentence');
-          selectedWords.push(word);
+          selectedWords.push(slotId);
         }
-        
+
         updateSentenceArea();
+      }
+
+      // selectedWords holds bank-tile ids; these turn them back into text
+      function bankTile(slotId) {
+        return document.querySelector('#wordBank .word[data-slot-id="' + slotId + '"]');
+      }
+
+      function wordAt(slotId) {
+        const el = bankTile(slotId);
+        return el ? el.dataset.word : '';
+      }
+
+      function selectedText() {
+        return selectedWords.map(wordAt);
       }
 
       function updateSentenceArea() {
@@ -645,8 +661,8 @@
           sentenceArea.innerHTML = '<span style="color: #999;">Tap words below to build your sentence</span>';
           sentenceArea.classList.remove('valid');
         } else {
-          sentenceArea.innerHTML = selectedWords.map(word =>
-            `<button type="button" class="word in-sentence" onclick="removeWordFromSentence('${word}')">${word}</button>`
+          sentenceArea.innerHTML = selectedWords.map(id =>
+            `<button type="button" class="word in-sentence" onclick="removeWordFromSentence('${id}')">${wordAt(id)}</button>`
           ).join('');
           
           // Check if all words are used
@@ -659,18 +675,15 @@
         }
       }
 
-      function removeWordFromSentence(word) {
+      function removeWordFromSentence(slotId) {
         if (roundOver) return;
         playSound('click');
-        selectedWords = selectedWords.filter(w => w !== word);
-        
-        // Update word bank
-        document.querySelectorAll('#wordBank .word').forEach(el => {
-          if (el.dataset.word === word) {
-            el.classList.remove('in-sentence');
-          }
-        });
-        
+        selectedWords = selectedWords.filter(id => id !== slotId);
+
+        // free only the tile that was actually used, not every copy of its word
+        const el = bankTile(slotId);
+        if (el) el.classList.remove('in-sentence');
+
         updateSentenceArea();
       }
 
@@ -687,7 +700,8 @@
         if (roundOver) return;
         const sentence = currentSentences[currentIndex];
         const correctSentence = sentence.words.join(' ');
-        const userSentence = selectedWords.join(' ');
+        const chosen = selectedText();
+        const userSentence = chosen.join(' ');
 
         const feedback = document.getElementById('feedback');
         const hintMessage = document.getElementById('hintMessage');
@@ -733,7 +747,7 @@
           if (attempts === 1) {
             // First miss: keep their arrangement and point at the first wrong word
             let firstWrong = 0;
-            while (firstWrong < selectedWords.length && selectedWords[firstWrong] === sentence.words[firstWrong]) firstWrong++;
+            while (firstWrong < chosen.length && chosen[firstWrong] === sentence.words[firstWrong]) firstWrong++;
 
             feedback.className = 'feedback incorrect';
             feedback.style.display = 'block';
@@ -745,7 +759,7 @@
             hintMessage.style.display = 'block';
             hintMessage.innerHTML = `
               <div>💡 ${sentence.hint}</div>
-              <div>🔍 ${goodStart}check word ${firstWrong + 1}: "${selectedWords[firstWrong]}" isn't in the right spot.</div>
+              <div>🔍 ${goodStart}check word ${firstWrong + 1}: "${chosen[firstWrong]}" isn't in the right spot.</div>
             `;
 
             const sentenceArea = document.getElementById('sentenceArea');

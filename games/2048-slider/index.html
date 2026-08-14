@@ -193,27 +193,31 @@
         animation: merge 0.3s ease;
       }
 
+      /* These animate the independent `scale` property, NOT `transform`.
+         Animation declarations outrank inline styles, so keyframes touching
+         `transform` would discard each tile's inline translate and snap it
+         to the board's top-left corner for the whole animation. */
       @keyframes pop {
         0% {
-          transform: scale(0);
+          scale: 0;
         }
         50% {
-          transform: scale(1.1);
+          scale: 1.1;
         }
         100% {
-          transform: scale(1);
+          scale: 1;
         }
       }
 
       @keyframes merge {
         0% {
-          transform: scale(1);
+          scale: 1;
         }
         50% {
-          transform: scale(1.2);
+          scale: 1.2;
         }
         100% {
-          transform: scale(1);
+          scale: 1;
         }
       }
 

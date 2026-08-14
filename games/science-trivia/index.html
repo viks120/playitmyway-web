@@ -847,16 +847,16 @@
         }
 
         // Filter out questions that have already been used in this session
-        const availableQuestions = allQuestions.filter(
+        let availableQuestions = allQuestions.filter(
           (q) => !usedQuestions.has(q.question)
         );
 
-        // If we've used most questions, reset the used questions set
+        // If we've used most questions, reset the used questions set — and
+        // re-filter, or the quiz would still be drawn from the stale short
+        // list (a 3-question round, or an instantly-complete empty one)
         if (availableQuestions.length < 5) {
           usedQuestions.clear();
-          console.log(
-            "Resetting used questions - all questions available again"
-          );
+          availableQuestions = allQuestions.slice();
         }
 
         // Shuffle and select questions
@@ -872,6 +872,9 @@
 
         // Mark selected questions as used
         shuffledQuestions.forEach((q) => usedQuestions.add(q.question));
+
+        // repaint the header, or it keeps showing the previous quiz's numbers
+        updateStats();
 
         displayQuestion();
         console.log(
@@ -992,8 +995,11 @@
         playSound('wrong');
 
         if (attemptCount === 1) {
-          // First miss — grey out that choice, share the hint, and let them try again
+          // First miss — grey out that choice, share the hint, and let them try
+          // again. disabled, not just pointer-events:none — a keyboard player
+          // could otherwise press Enter on it again and burn the second attempt.
           buttons[selectedIndex].classList.add("eliminated");
+          buttons[selectedIndex].disabled = true;
           feedback.className = "feedback incorrect";
           feedback.style.display = "block";
           feedback.innerHTML = `

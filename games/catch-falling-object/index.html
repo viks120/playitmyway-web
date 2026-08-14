@@ -527,42 +527,49 @@
       }
 
       function checkCollisions() {
+        // fruit still in the air when the game ends must not keep scoring
+        if (!gameRunning || paused) return;
         const basketRect = basket.getBoundingClientRect();
         const items = document.querySelectorAll('.fruit, .bad-item');
 
+        const areaRect = gameArea.getBoundingClientRect();
+
         items.forEach(item => {
           const itemRect = item.getBoundingClientRect();
-          
+
           if (itemRect.bottom >= basketRect.top &&
               itemRect.top <= basketRect.bottom &&
               itemRect.right >= basketRect.left &&
               itemRect.left <= basketRect.right) {
-            
+
+            // showEffect wants coordinates inside the game area
+            const fxX = itemRect.left - areaRect.left;
+            const fxY = itemRect.top - areaRect.top;
             const type = item.dataset.type;
             item.remove();
 
             if (type === 'bad') {
               combo = 0;
               loseLife();
-              showEffect(itemRect.left, itemRect.top, '💥');
+              showEffect(fxX, fxY, '💥');
             } else if (type === 'bonus') {
               combo++;
               score += 50;
               playSound('bonus');
-              showEffect(itemRect.left, itemRect.top, '+50');
+              showEffect(fxX, fxY, '+50');
               announce(`Star caught! Plus 50. Score ${score}.`);
             } else {
               combo++;
               score += 10;
               playSound('catch');
-              showEffect(itemRect.left, itemRect.top, '+10');
+              showEffect(fxX, fxY, '+10');
               announce(`Caught! Plus 10. Score ${score}.`);
             }
 
             if (combo > 0 && combo % 5 === 0) {
               score += 20;
               playSound('bonus');
-              showEffect(itemRect.left, itemRect.top - 30, '🔥 +20');
+              showEffect(fxX, fxY - 30, '🔥 +20');
               announce(`${combo} in a row! Plus 20 combo. Score ${score}.`);
             }
 
@@ -572,20 +579,24 @@
         });
       }
 
-      function showEffect(x, y, text) {
+      // x/y are GAME-AREA coordinates, not viewport ones — the effect is
+      // appended inside the (relatively positioned, overflow:hidden) area,
+      // so viewport values would land it outside and clip it away
+      function showEffect(x, y, text, color) {
         const effect = document.createElement('div');
         effect.className = 'catch-effect';
         effect.setAttribute('aria-hidden', 'true');
         effect.textContent = text;
         effect.style.left = x + 'px';
         effect.style.top = y + 'px';
-        effect.style.color = text.includes('+') ? '#4ecdc4' : '#ff6b6b';
+        effect.style.color = color || (text.includes('+') ? '#4ecdc4' : '#ff6b6b');
         gameArea.appendChild(effect);
         setTimeout(() => effect.remove(), 800);
       }
 
       function loseLife() {
-        lives--;
+        // floored: a negative count would throw in String.repeat below
+        lives = Math.max(0, lives - 1);
         playSound('miss');
         updateDisplay();
         if (lives > 0) {
@@ -606,10 +617,15 @@
       function startGame() {
         document.getElementById('startScreen').style.display = 'none';
         document.getElementById('modal').classList.remove('show');
-        
+
+        // Starting again mid-play would otherwise leave the previous spawn
+        // chain and collision loop running forever alongside the new ones
+        clearTimeout(spawnTimer);
+        clearInterval(gameLoop);
+
         // Clear existing items
         document.querySelectorAll('.fruit, .bad-item').forEach(i => i.remove());
-        
+
         score = 0; level = 1; lives = 3; combo = 0;
         gameRunning = true;
         paused = false;
