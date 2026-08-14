@@ -429,6 +429,7 @@
       let board = ['', '', '', '', '', '', '', '', ''];
       let currentPlayer = 'X';
       let gameActive = true;
+      let computerTimer = null;   // pending computer move, so it can be cancelled
       let mode = 'friend';
       let scores = { X: 0, O: 0, draws: 0 };
 
@@ -484,11 +485,18 @@
 
       function handleClick(index) {
         if (!gameActive || board[index] !== '') return;
-        
+        // while the computer is "thinking" the board is not yours — without
+        // this a second tap places the computer's mark and inverts the turn
+        // order for the rest of the game
+        if (computerTimer) return;
+
         makeMove(index, currentPlayer);
-        
+
         if (gameActive && mode === 'computer' && currentPlayer === 'O') {
-          setTimeout(computerMove, 500);
+          computerTimer = setTimeout(function () {
+            computerTimer = null;
+            computerMove();
+          }, 500);
         }
       }
 
@@ -611,6 +619,9 @@
       }
 
       function resetGame() {
+        // a move queued a moment ago would otherwise land on the new board
+        clearTimeout(computerTimer);
+        computerTimer = null;
         board = ['', '', '', '', '', '', '', '', ''];
         currentPlayer = 'X';
         gameActive = true;

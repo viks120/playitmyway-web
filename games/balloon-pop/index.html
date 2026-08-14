@@ -533,6 +533,7 @@
       let currentTarget = 1;
       let maxTarget = 10;
       let timeLeft = 30;
+      let timerMax = 30;   // high-water mark, so the bar scales with bonus time
       let gameRunning = false;
       let timerInterval, spawnInterval;
       let best = 0;
@@ -690,6 +691,7 @@
         currentTarget = 1;
         maxTarget = Math.min((mode === 'letters' ? 6 : 10) + level * 2, 26);
         timeLeft += 15;
+        timerMax = Math.max(timerMax, timeLeft);
         playSound('levelUp');
         createConfetti();
         spawnBalloons();
@@ -770,8 +772,13 @@
 
       function updateTimer() {
         timeLeft -= 0.1;
-        const percent = (timeLeft / 30) * 100;
-        document.getElementById('timerFill').style.width = Math.max(0, percent) + '%';
+        // measured against the most time this run has held, not a fixed 30 —
+        // a level-up adds 15s, which used to peg the bar at full and make it
+        // look frozen until the clock dropped back under 30
+        timerMax = Math.max(timerMax, timeLeft);
+        const percent = (timeLeft / timerMax) * 100;
+        document.getElementById('timerFill').style.width =
+          Math.min(100, Math.max(0, percent)) + '%';
 
         if (timeLeft <= 0) {
           endGame();
@@ -791,6 +798,7 @@
         // starting at all 26 made level 2's "10 + level*2" a step backwards
         maxTarget = mode === 'letters' ? 6 : 10;
         timeLeft = 30;
+        timerMax = 30;
         gameRunning = true;
         document.getElementById('startOverlay').classList.add('hidden');
         showFeedback('');
