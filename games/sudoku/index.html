@@ -149,9 +149,9 @@
     <div><span aria-hidden="true">🏆</span> Best this visit: <span id="best">-</span></div>
   </div>
   <div class="difficulty-selector" role="group" aria-label="Difficulty">
-    <button type="button" class="diff-btn active" onclick="setDifficulty('easy')"><span aria-hidden="true">🌱</span> Easy</button>
-    <button type="button" class="diff-btn" onclick="setDifficulty('medium')"><span aria-hidden="true">🌿</span> Medium</button>
-    <button type="button" class="diff-btn" onclick="setDifficulty('hard')"><span aria-hidden="true">🌳</span> Hard</button>
+    <button type="button" class="diff-btn active" onclick="setDifficulty('easy', this)" aria-pressed="true"><span aria-hidden="true">🌱</span> Easy</button>
+    <button type="button" class="diff-btn" onclick="setDifficulty('medium', this)" aria-pressed="false"><span aria-hidden="true">🌿</span> Medium</button>
+    <button type="button" class="diff-btn" onclick="setDifficulty('hard', this)" aria-pressed="false"><span aria-hidden="true">🌳</span> Hard</button>
   </div>
   <main class="game-container">
     <div class="grid" id="grid" role="group" aria-label="Sudoku board, 9 rows by 9 columns. Arrow keys move between squares, 1 to 9 types a digit, Backspace clears."></div>
@@ -242,10 +242,18 @@
 
     const removeCounts = { easy: 35, medium: 45, hard: 55 };
 
-    function setDifficulty(d) {
+    function setDifficulty(d, clickedBtn) {
       difficulty = d;
-      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
+      document.querySelectorAll('.diff-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      // the button is passed in: a click landing on its emoji span would
+      // otherwise mark the span, leaving no difficulty highlighted at all
+      if (clickedBtn) {
+        clickedBtn.classList.add('active');
+        clickedBtn.setAttribute('aria-pressed', 'true');
+      }
       newGame();
     }
 

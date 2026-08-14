@@ -1070,7 +1070,7 @@
 
         // Touch support for mobile
         tile.addEventListener("touchstart", handleTouchStart);
-        tile.addEventListener("touchmove", handleTouchMove);
+        tile.addEventListener("touchmove", handleTouchMove, { passive: true });
         tile.addEventListener("touchend", handleTouchEnd);
 
         return tile;
@@ -1101,7 +1101,7 @@
 
         // Touch support for mobile
         slot.addEventListener("touchstart", handleTouchStart);
-        slot.addEventListener("touchmove", handleTouchMove);
+        slot.addEventListener("touchmove", handleTouchMove, { passive: true });
         slot.addEventListener("touchend", handleTouchEnd);
 
         return slot;
@@ -1466,9 +1466,11 @@
         touchElement = this;
       }
 
-      function handleTouchMove(e) {
-        e.preventDefault();
-      }
+      // No preventDefault here: letters are placed by TAP, so swallowing every
+      // touchmove only stopped the child scrolling the page whenever their
+      // finger started on a tile or a slot. handleTouchEnd's 10px threshold
+      // already tells a tap from a scroll.
+      function handleTouchMove() {}
 
       function handleTouchEnd(e) {
         if (!touchElement) return;

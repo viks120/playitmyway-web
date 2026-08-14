@@ -739,6 +739,8 @@
       ];
       let cards = [];
       let flippedCards = [];
+      let flipTimer = null;   // pending match / no-match resolution
+      let winTimer = null;    // pending win modal
       let matchedPairs = 0;
       let moves = 0;
       let gameStarted = false;
@@ -846,7 +848,8 @@
           if (card1.dataset.emoji === card2.dataset.emoji) {
             // Match found
             playSound('match');
-            setTimeout(() => {
+            flipTimer = setTimeout(() => {
+              flipTimer = null;
               card1.classList.add("matched");
               card2.classList.add("matched");
               matchedPairs++;
@@ -861,7 +864,8 @@
               announce(`Match! ${matchedPairs} of ${config.pairs} pairs found.`);
 
               if (matchedPairs === config.pairs) {
-                setTimeout(() => {
+                winTimer = setTimeout(() => {
+                  winTimer = null;
                   clearInterval(timerInterval);
                   const timeElapsed = Math.floor(
                     (Date.now() - startTime) / 1000
@@ -874,7 +878,8 @@
             // No match
             playSound('noMatch');
             announce("No match. Try again!");
-            setTimeout(() => {
+            flipTimer = setTimeout(() => {
+              flipTimer = null;
               card1.classList.remove("flipped");
               card2.classList.remove("flipped");
               [card1, card2].forEach((c) => {
@@ -897,6 +902,13 @@
 
       function resetGame() {
         clearInterval(timerInterval);
+        // pending flip resolutions belong to the old board: left running they
+        // would clear the new board's flipped pair, or count a pair towards
+        // the new game and trigger the win early
+        clearTimeout(flipTimer);
+        clearTimeout(winTimer);
+        flipTimer = null;
+        winTimer = null;
         flippedCards = [];
         matchedPairs = 0;
         moves = 0;
