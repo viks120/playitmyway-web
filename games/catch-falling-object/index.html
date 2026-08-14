@@ -339,6 +339,8 @@
       }
 
       function playSound(type) {
+        // site-wide sound toggle (components.js)
+        if (window.pimwMuted) return;
         initAudio();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -634,5 +636,7 @@
         <a href="mailto:contact@playitmyway.com">Contact</a>
       </nav>
     </footer>
+    <script src="../../components.js"></script>
+
   </body>
 </html>

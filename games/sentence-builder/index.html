@@ -414,6 +414,8 @@
       }
 
       function playSound(type) {
+        // site-wide sound toggle (components.js)
+        if (window.pimwMuted) return;
         initAudio();
         if (type === 'correct') {
           [523, 659, 784].forEach((freq, i) => {
@@ -795,5 +797,6 @@
         <a href="mailto:contact@playitmyway.com">Contact</a>
       </nav>
     </footer>
+    <script src="../../components.js"></script>
   </body>
 </html>

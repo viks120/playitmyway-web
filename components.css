@@ -52,3 +52,41 @@
 .site-footer-links a:hover {
   text-decoration: underline;
 }
+
+/* Site-wide sound toggle (see components.js). Fixed bottom-right so it sits
+   in the same place on every game regardless of that page's own layout —
+   a classroom and a sensory-sensitive child both need it findable without
+   hunting. Kept below modal overlays (z-index 1000+) on purpose. */
+.pimw-sound-btn {
+  position: fixed;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 500;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 2px solid rgba(51, 48, 46, 0.15);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 2px 10px rgba(51, 48, 46, 0.22);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pimw-sound-btn:hover {
+  transform: translateY(-2px);
+}
+
+.pimw-sound-btn.is-off {
+  background: rgba(240, 235, 228, 0.94);
+  border-color: rgba(51, 48, 46, 0.3);
+}
+
+@media print {
+  .pimw-sound-btn { display: none !important; }
+}
