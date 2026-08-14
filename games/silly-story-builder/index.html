@@ -29,6 +29,7 @@
     <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
     <link rel="canonical" href="https://playitmyway.com/games/silly-story-builder/" />
     <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
     <style>
       :root {
         --bg: var(--color-bg);
@@ -341,7 +342,8 @@
       @media print {
         body { background: #fff; padding: 0; display: block; }
         .back-link, header.game-head, .stats-row, .message,
-        .tray-section, .controls, .how-to, .confetti-bit { display: none !important; }
+        .tray-section, .controls, .how-to, .confetti-bit,
+        .site-footer { display: none !important; }
         .card { box-shadow: none; max-width: 100%; padding: 0; border-radius: 0; }
         .story-title { font-size: 24pt; margin: 0 0 14pt; }
         .story { font-size: 14pt; line-height: 2.2; }
@@ -993,5 +995,14 @@
         newStory();
       })();
     </script>
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
   </body>
 </html>
