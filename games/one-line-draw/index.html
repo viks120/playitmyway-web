@@ -76,7 +76,15 @@
         background: var(--violet-tint);
         align-self: flex-start;
         margin-bottom: 6px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        /* candy: hard shadow in a darker sibling of the violet tint */
+        box-shadow: 0 3px 0 0 #ddd6fe;
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 #ddd6fe; }
+      .back-link:active { transform: translateY(2px); box-shadow: 0 1px 0 0 #ddd6fe; }
     
       header.game-head { text-align: center; margin: 8px 0 14px; }
       header.game-head h1 {
@@ -183,33 +191,42 @@
         display: flex; gap: 10px; justify-content: center;
         margin-top: 12px; flex-wrap: wrap;
       }
+      /* candy buttons: fill on a hard darker-sibling shadow; hover lifts,
+         :active sinks onto a 1px shadow */
       .btn {
         border: none; cursor: pointer; font-weight: 600; font-size: 16px;
         padding: 12px 20px; border-radius: var(--radius-pill);
-        min-height: 48px; transition: transform 150ms ease, box-shadow 150ms ease;
+        min-height: 48px;
+        background: var(--btn-fill); color: var(--btn-ink);
+        box-shadow: 0 4px 0 0 var(--btn-candy);
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
-      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
-      .btn:active { transform: translateY(0); }
-      .btn-outline { background: var(--violet-tint); color: var(--violet); }
-      .btn-hint { background: var(--amber-tint); color: var(--amber); }
+      .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 0 var(--btn-candy); }
+      .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--btn-candy); }
+      .btn-outline { --btn-fill: var(--violet-tint); --btn-ink: var(--violet); --btn-candy: #ddd6fe; }
+      .btn-hint { --btn-fill: var(--amber-tint); --btn-ink: var(--amber); --btn-candy: #fde68a; }
       /* box-shadow, not outline, so the :focus-visible ring stays visible */
-      .btn[aria-pressed="true"] { box-shadow: inset 0 0 0 2.5px var(--violet); }
+      .btn[aria-pressed="true"] { box-shadow: inset 0 0 0 2.5px var(--violet), 0 4px 0 0 var(--btn-candy); }
+      .btn[aria-pressed="true"]:hover { box-shadow: inset 0 0 0 2.5px var(--violet), 0 6px 0 0 var(--btn-candy); }
+      .btn[aria-pressed="true"]:active { box-shadow: inset 0 0 0 2.5px var(--violet), 0 1px 0 0 var(--btn-candy); }
     
+      /* the celebration card goes deep: blueberry ground, cream title,
+         periwinkle secondary — the page around it stays light */
       .win-overlay {
         position: absolute; inset: 0; border-radius: var(--radius-md);
-        background: rgba(255, 253, 249, 0.94);
+        background: var(--color-deep);
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         gap: 10px; text-align: center; padding: 20px;
         animation: fadeIn 300ms ease;
       }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-      .win-overlay h2 { margin: 0; font-size: clamp(26px, 6vw, 34px); color: var(--green); }
-      .win-overlay p { margin: 0; color: var(--ink-soft); font-size: 17px; }
+      .win-overlay h2 { margin: 0; font-size: clamp(26px, 6vw, 34px); color: var(--color-deep-ink); }
+      .win-overlay p { margin: 0; color: var(--color-deep-soft); font-size: 17px; }
       .btn-next {
-        background: var(--coral-deep); color: #fff; font-size: 18px;
-        box-shadow: var(--shadow-rest);
+        --btn-fill: var(--coral); --btn-ink: var(--color-deep);
+        --btn-candy: var(--candy-coral); font-size: 18px;
       }
-      .btn-again { background: var(--green-tint); color: var(--green); }
+      .btn-again { --btn-fill: var(--green-tint); --btn-ink: var(--green); --btn-candy: #bbf7d0; }
       .hidden { display: none !important; }
     
       .picker { width: 100%; max-width: 520px; margin-top: 18px; }

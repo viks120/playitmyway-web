@@ -50,6 +50,9 @@
         --font: var(--font-display);
         --hand-hour: var(--violet);
         --hand-minute: var(--teal);
+        /* Candy & Cream: hard-shadow siblings for the violet band */
+        --violet-deep: var(--candy-violet); /* under violet fills */
+        --violet-tint-deep: #c4b5fd;        /* under violet tints */
       }
 
       *, *::before, *::after { box-sizing: border-box; }
@@ -83,7 +86,11 @@
         display: inline-flex;
         align-items: center;
         margin-bottom: 6px;
+        box-shadow: 0 3px 0 0 var(--violet-tint-deep);
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--violet-tint-deep); }
+      .back-link:active { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--violet-tint-deep); }
 
       header.game-head { text-align: center; margin: 8px 0 12px; }
       header.game-head h1 {
@@ -127,10 +134,12 @@
         transition: transform var(--ease-quick), border-color var(--ease-quick), background var(--ease-quick);
       }
       .chip:hover { transform: translateY(-2px); }
+      .chip:active { transform: translateY(2px); }
       .chip[aria-pressed="true"] {
         border-color: var(--violet);
-        background: var(--violet-tint);
-        color: var(--violet);
+        background: var(--violet);
+        color: #fff;
+        box-shadow: 0 3px 0 0 var(--violet-deep);
       }
       .rung-row .chip { font-size: 14px; padding: 6px 12px; }
 
@@ -295,13 +304,27 @@
         min-height: 46px;
         transition: transform 150ms ease, box-shadow 150ms ease;
       }
-      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
-      .btn:active { transform: translateY(0); }
-      .btn-soft { background: var(--violet-tint); color: var(--violet); }
-      .btn-go { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
-      .btn-go:disabled { opacity: 0.6; cursor: default; transform: none; }
+      /* candy: each fill sits on its darker sibling and presses onto it */
+      .btn-soft {
+        background: var(--violet-tint);
+        color: var(--violet);
+        box-shadow: 0 3px 0 0 var(--violet-tint-deep);
+      }
+      .btn-soft:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--violet-tint-deep); }
+      .btn-soft:active { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--violet-tint-deep); }
+      .btn-go {
+        background: var(--violet);
+        color: #fff;
+        box-shadow: 0 4px 0 0 var(--violet-deep);
+      }
+      .btn-go:hover { transform: translateY(-2px); box-shadow: 0 6px 0 0 var(--violet-deep); }
+      .btn-go:active { transform: translateY(4px); box-shadow: 0 1px 0 0 var(--violet-deep); }
+      .btn-go:disabled { opacity: 0.6; cursor: default; transform: none; box-shadow: 0 4px 0 0 var(--violet-deep); }
       /* box-shadow, not outline, so the :focus-visible ring stays visible */
-      .btn[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--violet); }
+      /* the toggle ring joins the candy shadow rather than replacing it */
+      .btn[aria-pressed="true"] {
+        box-shadow: inset 0 0 0 2px var(--violet), 0 3px 0 0 var(--violet-tint-deep);
+      }
       .hidden { display: none !important; }
 
       .how-to {
