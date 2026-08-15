@@ -42,9 +42,11 @@ body {
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
 
+/* The vw term has to be able to win on a phone: with an em-based minimum
+   this rendered at 43px on a 390px screen and pushed the games off-screen. */
 .hero h1 {
   margin: 0;
-  font-size: clamp(2.4em, 6vw, 3.6em);
+  font-size: clamp(1.75rem, 7.5vw, 3.4em);
   font-weight: 700;
   line-height: 1.05;
 }
@@ -52,7 +54,7 @@ body {
 .tagline {
   margin: var(--space-2) auto 0;
   max-width: 34em;
-  font-size: clamp(1.1em, 3vw, 1.4em);
+  font-size: clamp(1rem, 3.6vw, 1.4em);
   font-weight: 400;
   color: var(--color-deep-soft);
 }
@@ -313,13 +315,64 @@ body {
 
 /* --- Small screens ------------------------------------------------------- */
 
+/* Phones: the hero has to leave room for the games. Everything here exists to
+   keep the band short — tighter padding and gaps, buttons that stay on ONE
+   row, and smaller stamps — so the first row of cards is reachable with a
+   short scroll instead of a full screen of header. */
+@media (max-width: 560px) {
+  .hero {
+    padding: var(--space-5) var(--space-3);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  }
+
+  .tagline {
+    margin-top: var(--space-1);
+  }
+
+  .hero-links {
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  /* smaller pills so "Pick a game" and "For grown-ups" fit side by side */
+  .hero-links .candy {
+    font-size: 15px;
+    padding: 11px 16px;
+  }
+
+  .trust-badges {
+    gap: 6px;
+    margin-top: var(--space-4);
+  }
+
+  .trust-badges li {
+    font-size: 0.72em;
+    padding: 5px 10px;
+    border-width: 1px;
+  }
+
+  .support-section {
+    padding: var(--space-5) var(--space-4);
+  }
+}
+
+/* Very narrow phones (iPhone SE and friends): shave the pills again so the
+   two hero buttons still share one row rather than stacking. */
+@media (max-width: 360px) {
+  .hero-links .candy {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .trust-badges li {
+    font-size: 0.68em;
+    padding: 4px 9px;
+  }
+}
+
 @media (max-width: 480px) {
   .hide-mobile {
     display: none;
-  }
-
-  .hero {
-    padding: var(--space-6) var(--space-3) var(--space-5);
   }
 
   .game-grid {
