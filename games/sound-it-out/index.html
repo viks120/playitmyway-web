@@ -42,6 +42,9 @@
         --good-tint: var(--color-green-tint);
         --coral-deep: var(--color-primary-deep);
         --font: var(--font-display);
+        /* Candy & Cream: hard-shadow siblings for the amber band */
+        --band-deep: #7c3a06;      /* under amber fills */
+        --band-tint-deep: #d8c897; /* under amber tints */
       }
 
       *, *::before, *::after { box-sizing: border-box; }
@@ -74,7 +77,11 @@
         min-height: 44px;
         display: inline-flex;
         align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
 
       header.game-head { text-align: center; margin: 10px 0 10px; }
       header.game-head h1 {
@@ -111,13 +118,22 @@
         align-items: center;
         gap: 3px;
         min-height: 92px;
+        box-shadow: 0 3px 0 0 var(--candy-card);
         transition: transform var(--ease-quick), border-color var(--ease-quick), box-shadow var(--ease-quick);
       }
-      .chip:hover { transform: translateY(-2px); border-color: var(--band); box-shadow: var(--shadow-rest); }
+      .chip:hover { transform: translateY(-2px); border-color: var(--band); box-shadow: 0 5px 0 0 var(--candy-card); }
+      .chip:active { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--candy-card); }
       .chip .chip-emoji { font-size: 28px; line-height: 1; }
       .chip .chip-name { font-size: 16.5px; font-weight: 600; color: var(--ink); }
       .chip .chip-sub { font-size: 13px; color: var(--ink-soft); }
-      .chip.chip-wide { grid-column: 1 / -1; border-color: var(--band); background: var(--band-tint); }
+      .chip.chip-wide {
+        grid-column: 1 / -1;
+        border-color: var(--band);
+        background: var(--band-tint);
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+      }
+      .chip.chip-wide:hover { box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .chip.chip-wide:active { box-shadow: 0 1px 0 0 var(--band-tint-deep); }
       .chip.chip-wide .chip-name { color: var(--band); }
 
       /* ---------- play view ---------- */
@@ -295,19 +311,28 @@
         padding: 11px 18px;
         border-radius: var(--radius-pill);
         min-height: 46px;
+        box-shadow: 0 3px 0 0 var(--press, var(--band-tint-deep));
         transition: transform 150ms ease, box-shadow 150ms ease;
       }
-      .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--press, var(--band-tint-deep)); }
+      .btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--press, var(--band-tint-deep)); }
       .btn:disabled { opacity: 0.55; cursor: default; }
       .btn-soft { background: var(--band-tint); color: var(--band); }
-      .btn-go { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
-      .btn-blend { background: var(--band); color: #fff; box-shadow: var(--shadow-rest); }
+      .btn-go { background: var(--band); color: #fff; --press: var(--band-deep); }
+      .btn-blend { background: var(--band); color: #fff; --press: var(--band-deep); }
 
-      /* ---------- results ---------- */
-      .results { text-align: center; }
-      .results h2 { font-size: 24px; margin: 4px 0 10px; }
-      .results .score-line { font-size: 18px; font-weight: 600; margin: 4px 0; }
-      .results .best-line { font-size: 15px; color: var(--ink-soft); margin: 4px 0 10px; }
+      /* ---------- results: the celebration card sits on the deep anchor ---------- */
+      .results {
+        text-align: center;
+        background: var(--color-deep);
+        border-radius: var(--radius-lg);
+        padding: 18px 14px 20px;
+      }
+      .results h2 { font-size: 24px; margin: 4px 0 10px; color: var(--color-deep-ink); }
+      .results .score-line { font-size: 18px; font-weight: 600; margin: 4px 0; color: var(--color-deep-ink); }
+      .results .best-line { font-size: 15px; color: var(--color-deep-soft); margin: 4px 0 10px; }
+      .results .btn-go { background: var(--color-primary); color: var(--color-deep); --press: var(--candy-coral); }
+      .results .btn-soft { background: var(--color-deep-ink); color: var(--color-deep); --press: var(--candy-cream); }
       .climbed {
         background: var(--band-tint);
         border-radius: var(--radius-md);

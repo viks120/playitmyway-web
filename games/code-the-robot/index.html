@@ -38,6 +38,9 @@
         --ink-soft: var(--color-ink-soft);
         --band: var(--color-violet);
         --band-tint: var(--color-violet-tint);
+        /* darker siblings of the tint fills — candy under-shadows */
+        --band-tint-deep: #c4b5fd;
+        --amber-tint-deep: #fcd34d;
         --coral-deep: var(--color-primary-deep);
         --teal: var(--color-teal);
         --teal-tint: var(--color-teal-tint);
@@ -75,11 +78,15 @@
         background: var(--band-tint);
         align-self: flex-start; margin-bottom: 6px;
         min-height: 44px; display: inline-flex; align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
       }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
 
       header.game-head { text-align: center; margin: 8px 0 14px; }
       header.game-head h1 {
-        font-size: clamp(26px, 7vw, 34px); font-weight: 600; margin: 0 0 4px;
+        font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0 0 4px;
         text-wrap: balance;
       }
       header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
@@ -214,21 +221,28 @@
         border-radius: 10px; cursor: pointer;
         font-size: 21px; padding: 0;
         display: inline-flex; align-items: center; justify-content: center;
-        transition: transform 120ms ease, background 150ms ease;
+        /* tactile candy under-shadow in the tile's own border colour */
+        box-shadow: 0 2px 0 0 var(--band);
+        transition: transform 120ms ease, background 150ms ease, box-shadow 120ms ease;
       }
-      .tile:hover { transform: translateY(-2px); }
+      .tile:hover { transform: translateY(-2px); box-shadow: 0 4px 0 0 var(--band); }
+      .tile:active { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--band); }
       .tile .num {
         position: absolute; top: 1px; left: 4px;
         font-size: 10.5px; font-weight: 600; color: var(--band);
         font-variant-numeric: tabular-nums;
       }
+      /* pedagogy states below the hover/press rules, so they win the cascade
+         and keep reading even mid-interaction */
       .tile.current {
         background: var(--band); border-color: var(--band);
+        box-shadow: 0 2px 0 0 var(--candy-violet);
         transform: scale(1.1);
       }
       .tile.current .num { color: #fff; }
       .tile.crashed {
         background: var(--crash-tint); border-color: var(--crash);
+        box-shadow: 0 2px 0 0 var(--crash);
         animation: crashFlash 0.5s ease 3;
       }
       .tile.crashed .num { color: var(--crash); }
@@ -249,42 +263,69 @@
         background: var(--band-tint); color: var(--band);
         font-size: 26px; cursor: pointer;
         display: inline-flex; align-items: center; justify-content: center;
-        transition: transform 120ms ease, box-shadow 150ms ease;
-        box-shadow: var(--shadow-rest);
+        --candy-under: var(--band-tint-deep);
+        box-shadow: 0 3px 0 0 var(--candy-under);
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
-      .pad-btn:hover { transform: translateY(-2px); }
-      .pad-btn:active { transform: translateY(0); }
-      .pad-btn.erase { background: var(--amber-tint); color: var(--amber); font-size: 23px; }
+      .pad-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--candy-under); }
+      .pad-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--candy-under); }
+      .pad-btn.erase {
+        background: var(--amber-tint); color: var(--amber); font-size: 23px;
+        --candy-under: var(--amber-tint-deep);
+      }
 
       .controls {
         display: flex; gap: 10px; justify-content: center;
         margin-top: 14px; flex-wrap: wrap;
       }
+      /* candy buttons: hard un-blurred shadow in a darker sibling of the
+         fill; hover lifts, :active sinks the pill onto a 1px shadow */
       .btn {
         border: none; cursor: pointer; font-weight: 600; font-size: 16px;
         padding: 12px 18px; border-radius: var(--radius-pill);
-        min-height: 48px; transition: transform 150ms ease, box-shadow 150ms ease;
+        min-height: 48px;
+        --candy-under: var(--band-tint-deep);
+        box-shadow: 0 3px 0 0 var(--candy-under);
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
-      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
-      .btn:active { transform: translateY(0); }
-      .btn-run { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
+      .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--candy-under); }
+      .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--candy-under); }
+      .btn-run {
+        background: var(--band); color: #fff;
+        --candy-under: var(--candy-violet);
+        box-shadow: 0 4px 0 0 var(--candy-under);
+      }
+      .btn-run:hover { box-shadow: 0 6px 0 0 var(--candy-under); }
+      .btn-run:active { transform: translateY(4px); box-shadow: 0 1px 0 0 var(--candy-under); }
       .btn-soft { background: var(--band-tint); color: var(--band); }
-      /* box-shadow, not outline, so the :focus-visible ring stays visible */
-      .btn[aria-pressed="true"] { box-shadow: inset 0 0 0 2.5px var(--band); }
+      /* box-shadow, not outline, so the :focus-visible ring stays visible;
+         the candy under-shadow rides along so the button stays tactile.
+         Last in the .btn block so the ring survives hover and press. */
+      .btn[aria-pressed="true"] { box-shadow: inset 0 0 0 2.5px var(--band), 0 3px 0 0 var(--candy-under); }
 
+      /* the celebration sits on the deep blueberry band */
       .win-overlay {
         position: absolute; inset: 0; border-radius: var(--radius-md);
-        background: rgba(255, 253, 249, 0.95);
+        background: var(--color-deep);
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         gap: 8px; text-align: center; padding: 20px; z-index: 3;
         animation: fadeIn 300ms ease;
       }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       .win-stars { font-size: clamp(30px, 9vw, 44px); letter-spacing: 4px; }
-      .win-overlay h2 { margin: 0; font-size: clamp(24px, 6vw, 32px); color: var(--green); }
-      .win-overlay p { margin: 0; color: var(--ink-soft); font-size: 16.5px; }
-      .btn-next { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
-      .btn-again { background: var(--green-tint); color: var(--green); }
+      .win-overlay h2 { margin: 0; font-size: clamp(24px, 6vw, 32px); color: var(--color-deep-ink); }
+      .win-overlay p { margin: 0; color: var(--color-deep-soft); font-size: 16.5px; }
+      .btn-next {
+        background: var(--color-primary); color: var(--color-deep);
+        --candy-under: var(--candy-coral);
+        box-shadow: 0 4px 0 0 var(--candy-under);
+      }
+      .btn-next:hover { box-shadow: 0 6px 0 0 var(--candy-under); }
+      .btn-next:active { transform: translateY(4px); box-shadow: 0 1px 0 0 var(--candy-under); }
+      .btn-again {
+        background: var(--color-deep-ink); color: var(--color-deep);
+        --candy-under: var(--candy-cream);
+      }
       .hidden { display: none !important; }
 
       .picker { width: 100%; max-width: 520px; margin-top: 18px; }

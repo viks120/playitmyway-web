@@ -46,6 +46,9 @@
         --amber-tint: var(--color-amber-tint);
         --guide: #e8dfd2;
         --guide-dash: #c4b6a4;
+        /* candy siblings: hard under-shadows for the teal chrome */
+        --band-shadow: #0b4f4a;  /* under a solid band fill */
+        --tint-shadow: #a7e8dc;  /* under a band-tint fill  */
         --font: var(--font-display);
       }
 
@@ -79,7 +82,11 @@
         min-height: 44px;
         display: inline-flex;
         align-items: center;
+        box-shadow: 0 3px 0 0 var(--tint-shadow);
+        transition: transform 150ms ease, box-shadow 150ms ease;
       }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--tint-shadow); }
+      .back-link:active { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--tint-shadow); }
 
       header.game-head { text-align: center; margin: 10px 0 12px; }
       header.game-head h1 {
@@ -115,10 +122,12 @@
         padding: 9px 18px;
         border-radius: var(--radius-pill);
         min-height: 46px;
-        transition: transform 150ms ease;
+        box-shadow: 0 2px 0 0 var(--band-tint);
+        transition: transform 150ms ease, box-shadow 150ms ease;
       }
       .tab:hover { transform: translateY(-2px); }
-      .tab[aria-pressed="true"] { background: var(--band); border-color: var(--band); color: #fff; }
+      .tab[aria-pressed="true"] { background: var(--band); border-color: var(--band); color: #fff; box-shadow: 0 2px 0 0 var(--band-shadow); }
+      .tab:active { transform: translateY(2px); box-shadow: 0 0 0 0 var(--band-tint); }
 
       .status-row {
         display: flex;
@@ -162,7 +171,8 @@
         align-items: center;
         gap: 7px;
         white-space: nowrap;
-        transition: transform 150ms ease;
+        box-shadow: 0 2px 0 0 var(--band-tint);
+        transition: transform 150ms ease, box-shadow 150ms ease;
       }
       .stage-btn:hover { transform: translateY(-2px); }
       .stage-btn .dot {
@@ -172,8 +182,9 @@
         border: 2px solid var(--band);
         background: transparent;
       }
-      .stage-btn[aria-pressed="true"] { background: var(--band-tint); border-color: var(--band); color: var(--band); }
+      .stage-btn[aria-pressed="true"] { background: var(--band-tint); border-color: var(--band); color: var(--band); box-shadow: 0 2px 0 0 var(--band); }
       .stage-btn[aria-pressed="true"] .dot { background: var(--band); }
+      .stage-btn:active { transform: translateY(2px); box-shadow: 0 0 0 0 var(--band-tint); }
 
       .helper {
         min-height: 26px;
@@ -261,6 +272,9 @@
         margin-top: 12px;
         flex-wrap: wrap;
       }
+      /* candy buttons: a hard un-blurred shadow in a darker sibling of the
+         fill; hover lifts off it, :active sinks onto 1px. Shadow and
+         transform are paint-only, so the rows keep their exact height. */
       .btn {
         border: none;
         cursor: pointer;
@@ -269,18 +283,22 @@
         padding: 12px 20px;
         border-radius: var(--radius-pill);
         min-height: 48px;
+        --candy: var(--tint-shadow);
+        --candy-rest: 3px;
+        box-shadow: 0 var(--candy-rest) 0 0 var(--candy);
         transition: transform 150ms ease, box-shadow 150ms ease;
       }
-      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn:hover { transform: translateY(-2px); box-shadow: 0 calc(var(--candy-rest) + 2px) 0 0 var(--candy); }
+      .btn:active { transform: translateY(calc(var(--candy-rest) - 1px)); box-shadow: 0 1px 0 0 var(--candy); }
       .btn-soft { background: var(--band-tint); color: var(--band); }
-      .btn-go { background: var(--coral-deep); color: #fff; font-size: 18px; box-shadow: var(--shadow-rest); }
+      .btn-go { background: var(--band); color: #fff; font-size: 18px; --candy: var(--band-shadow); --candy-rest: 5px; }
       .btn-again { background: var(--green-tint); color: var(--green); }
 
       .win-overlay {
         position: absolute;
         inset: 0;
         border-radius: var(--radius-md);
-        background: rgba(255, 253, 249, 0.95);
+        background: var(--color-deep);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -297,12 +315,18 @@
         font-weight: 600;
         color: var(--coral);
       }
-      .win-overlay h2 { margin: 4px 0 0; font-size: clamp(22px, 6vw, 30px); color: var(--green); }
-      .win-overlay p { margin: 0; color: var(--ink-soft); font-size: 17px; }
-      .win-overlay .win-praise { color: var(--band); font-weight: 600; font-size: 15.5px; }
+      .win-overlay h2 { margin: 4px 0 0; font-size: clamp(22px, 6vw, 30px); color: var(--color-deep-ink); }
+      .win-overlay p { margin: 0; color: var(--color-deep-soft); font-size: 17px; }
+      .win-overlay .win-praise { color: var(--color-deep-soft); font-weight: 600; font-size: 15.5px; }
       /* stage-3 self-check: the child's own line drawn over the true letter */
       .win-trace { width: 42%; max-width: 170px; aspect-ratio: 1 / 1; }
       .own-trace { stroke: var(--band); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      /* the band teal is ~2.5:1 on the deep card — lift only the overlay
+         copy; the board's own guide and paint colours stay untouched */
+      .win-trace .own-trace { stroke: #2dd4bf; }
+      /* deep-card buttons: coral primary pops on navy, cream secondary */
+      .win-overlay .btn-go { background: var(--coral); color: var(--color-deep); --candy: var(--candy-coral); }
+      .win-overlay .btn-again { background: var(--color-deep-ink); color: var(--color-deep); --candy: var(--candy-cream); }
       .hidden { display: none !important; }
 
       .picker { width: 100%; max-width: 520px; margin-top: 18px; }
@@ -326,10 +350,12 @@
         padding: 4px 12px;
         border-radius: var(--radius-pill);
         min-height: 44px;
-        transition: transform 150ms ease;
+        box-shadow: 0 2px 0 0 var(--band-tint);
+        transition: transform 150ms ease, box-shadow 150ms ease;
       }
       .order-btn:hover { transform: translateY(-2px); }
-      .order-btn[aria-pressed="true"] { background: var(--band-tint); border-color: var(--band); color: var(--band); }
+      .order-btn[aria-pressed="true"] { background: var(--band-tint); border-color: var(--band); color: var(--band); box-shadow: 0 2px 0 0 var(--band); }
+      .order-btn:active { transform: translateY(2px); box-shadow: 0 0 0 0 var(--band-tint); }
       .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
       .glyph-chip {
         border: 2px solid #e4dbcf;
@@ -346,10 +372,12 @@
         align-items: center;
         justify-content: center;
         gap: 3px;
-        transition: transform 150ms ease, border-color 150ms ease;
+        box-shadow: 0 2px 0 0 #e4dbcf;
+        transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
       }
       .glyph-chip:hover { transform: translateY(-2px); }
-      .glyph-chip.active { border-color: var(--band); background: var(--band-tint); color: var(--band); }
+      .glyph-chip.active { border-color: var(--band); background: var(--band-tint); color: var(--band); box-shadow: 0 2px 0 0 var(--band); }
+      .glyph-chip:active { transform: translateY(2px); box-shadow: 0 0 0 0 #e4dbcf; }
       .glyph-chip .tick { font-size: 12px; color: var(--green); }
 
       .how-to {

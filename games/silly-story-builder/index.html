@@ -38,6 +38,8 @@
         --ink-soft: var(--color-ink-soft);
         --band: var(--color-violet);
         --band-tint: var(--color-violet-tint);
+        /* darker sibling of the violet tint — the candy under-shadow for tint pills */
+        --band-tint-deep: #c4b5fd;
         --coral-deep: var(--color-primary-deep);
         --font: var(--font-display);
         --chip-border: #ded4c7;
@@ -75,12 +77,16 @@
         min-height: 44px;
         display: inline-flex;
         align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
       }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
 
       header.game-head { text-align: center; margin: 10px 0 10px; }
       header.game-head h1 {
         font-size: clamp(26px, 7vw, 34px);
-        font-weight: 600;
+        font-weight: 700;
         margin: 0 0 4px;
         text-wrap: balance;
       }
@@ -232,19 +238,25 @@
         padding: 8px 16px;
         min-height: 44px;
         cursor: pointer;
-        transition: transform var(--ease-quick), border-color var(--ease-quick);
+        /* tactile candy under-shadow in the chip's own border colour */
+        --chip-under: var(--chip-border);
+        box-shadow: 0 2px 0 0 var(--chip-under);
+        transition: transform var(--ease-quick), border-color var(--ease-quick), box-shadow var(--ease-quick);
       }
-      button.chip:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--chip-border-strong); }
+      button.chip:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--chip-border-strong); box-shadow: 0 4px 0 0 var(--chip-under); }
+      button.chip:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--chip-under); }
       button.chip.dud {
         opacity: 0.4;
         cursor: default;
         text-decoration: line-through;
+        box-shadow: none; /* a spent chip sits flat — it can't be pressed */
       }
       /* the second-miss scaffold: words of the right class light up */
       button.chip.reveal {
         color: var(--wc);
         background: var(--wc-tint);
         border-color: var(--wc);
+        --chip-under: var(--wc);
       }
       button.chip.shake { animation: chipShake 0.4s ease; }
       @keyframes chipShake {
@@ -255,6 +267,8 @@
       }
 
       .controls { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+      /* candy buttons: a hard un-blurred shadow in a darker sibling of the
+         fill; hover lifts, :active sinks the pill onto a 1px shadow */
       .btn {
         border: none;
         cursor: pointer;
@@ -263,11 +277,21 @@
         padding: 11px 18px;
         border-radius: var(--radius-pill);
         min-height: 46px;
-        transition: transform 150ms ease, box-shadow 150ms ease;
+        --candy-under: var(--band-tint-deep);
+        box-shadow: 0 3px 0 0 var(--candy-under);
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
-      .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-rest); }
+      .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--candy-under); }
+      .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--candy-under); }
       .btn-soft { background: var(--band-tint); color: var(--band); }
-      .btn-go { background: var(--coral-deep); color: #fff; box-shadow: var(--shadow-rest); }
+      .btn-go {
+        background: var(--band);
+        color: #fff;
+        --candy-under: var(--candy-violet);
+        box-shadow: 0 4px 0 0 var(--candy-under);
+      }
+      .btn-go:hover { box-shadow: 0 6px 0 0 var(--candy-under); }
+      .btn-go:active { transform: translateY(4px); box-shadow: 0 1px 0 0 var(--candy-under); }
 
       /* ---------- how to play ---------- */
       .how-to {
@@ -768,7 +792,7 @@
 
         // ---------- the tray ----------
         function buildTray() {
-          trayEl.innerHTML = "";
+          trayEl.innerHTML = "";
           var b = currentBlank();
           if (!b) return;
 
@@ -800,7 +824,7 @@
           });
         }
 
-        function applyReveal(wc) {
+        function applyReveal(wc) {
           Array.prototype.forEach.call(trayEl.children, function (btn) {
             if (btn.getAttribute("data-wc") === wc && !btn.classList.contains("dud")) {
               btn.classList.add("reveal");
@@ -941,7 +965,7 @@
           fills = {};
           used = {};
           attempts = {};
-          complete = false;
+          complete = false;
           currentId = blanksOf(tpl)[0].id;
           storyTitleEl.textContent = tpl.emoji + " " + tpl.title;
           traySection.hidden = false;
