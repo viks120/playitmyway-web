@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#667eea" />
+    <meta name="theme-color" content="#7c3aed" />
     <meta name="mobile-web-app-capable" content="yes" />
     <!-- SEO Meta Tags -->
     <title>Sentence Builder – Free Grammar Game | Play It My Way</title>
@@ -17,6 +17,7 @@
     <meta property="og:url" content="https://playitmyway.com/games/sentence-builder/" />
     <meta property="og:site_name" content="Play It My Way" />
     <link rel="canonical" href="https://playitmyway.com/games/sentence-builder/" />
+    <link rel="stylesheet" href="../../tokens.css" />
     <link rel="stylesheet" href="../../components.css" />
     <style>
       * {
@@ -25,8 +26,9 @@
       }
 
       body {
-        font-family: "Comic Sans MS", "Arial Rounded MT Bold", "Arial", sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: var(--font-display);
+        background: var(--color-bg);
+        color: var(--color-ink);
         margin: 0;
         padding: 10px;
         min-height: 100vh;
@@ -37,62 +39,96 @@
         font-size: 18px;
       }
 
+      button {
+        font-family: var(--font-display);
+      }
+
       .header {
         text-align: center;
-        color: white;
+        color: var(--color-ink);
         margin-bottom: 15px;
       }
 
       .header h1 {
         font-size: clamp(1.5em, 5vw, 2em);
-        font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        font-weight: 700;
         margin: 0;
       }
 
       .header p {
         font-size: clamp(0.9em, 3vw, 1.1em);
         margin: 5px 0 0;
-        opacity: 0.9;
+        color: var(--color-ink-soft);
       }
 
       .stats {
         display: flex;
-        gap: 20px;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
         margin-bottom: 15px;
-        color: white;
-        font-size: clamp(1em, 3vw, 1.2em);
-        font-weight: bold;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        font-size: clamp(0.95em, 3vw, 1.05em);
+      }
+
+      .stats > div {
+        background: var(--color-violet-tint);
+        color: var(--color-violet);
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: var(--radius-pill);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
       }
 
       .difficulty-selector {
         margin-bottom: 15px;
       }
 
+      /* candy toggle pills: tint at rest, solid violet when active; hard
+         shadow in a darker sibling of the fill, :active sinks onto it */
       .diff-btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        --db-fill: var(--color-violet-tint);
+        --db-ink: var(--color-violet);
+        --db-candy: #c4b5fd;
+        background: var(--db-fill);
+        color: var(--db-ink);
         border: none;
         padding: 8px 18px;
-        border-radius: 20px;
+        border-radius: var(--radius-pill);
         font-size: clamp(0.85em, 2.5vw, 1em);
-        font-weight: bold;
+        font-weight: 600;
         cursor: pointer;
         margin: 3px;
-        transition: transform 0.2s;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 0 0 var(--db-candy);
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
 
       .diff-btn.active {
-        background: linear-gradient(45deg, #4ecdc4, #44a08d);
-        transform: scale(1.05);
+        --db-fill: var(--color-violet);
+        --db-ink: #ffffff;
+        --db-candy: var(--candy-violet);
+        box-shadow: 0 4px 0 0 var(--db-candy);
+      }
+
+      .diff-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 0 var(--db-candy);
+      }
+
+      .diff-btn:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 0 var(--db-candy);
       }
 
       .game-container {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 15px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
         padding: 20px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        box-shadow: var(--shadow-rest);
         max-width: 700px;
         width: 100%;
       }
@@ -106,14 +142,16 @@
         width: 100%;
       }
 
+      /* the always-on question hint stays green — flattened from the old
+         gradient to the band's green tint tokens */
       .hint-area {
         text-align: center;
         margin-bottom: 15px;
         padding: 12px;
-        background: linear-gradient(45deg, #a8e6cf, #88d8c0);
-        border-radius: 10px;
+        background: var(--color-green-tint);
+        border-radius: var(--radius-md);
         font-size: clamp(1em, 3vw, 1.2em);
-        color: #2d5a3d;
+        color: var(--color-green);
         font-weight: bold;
       }
 
@@ -148,16 +186,19 @@
         border-radius: 12px;
       }
 
+      /* word chips: coral candy in the bank, green once they join the
+         sentence — the two fills stay clearly distinct */
       .word {
-        background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+        --wd-candy: var(--candy-coral);
+        background: var(--color-primary);
         color: white;
         padding: 10px 18px;
-        border-radius: 25px;
+        border-radius: var(--radius-pill);
         font-size: clamp(1em, 3vw, 1.2em);
-        font-weight: bold;
+        font-weight: 600;
         cursor: grab;
+        box-shadow: 0 2px 0 0 var(--wd-candy);
         transition: all 0.2s;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         user-select: none;
         /* the tappable words are real <button>s now (keyboard reachable) —
            strip the UA chrome so they render exactly as the old spans did */
@@ -166,11 +207,18 @@
       }
 
       .word:hover {
-        transform: scale(1.05);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 0 0 var(--wd-candy);
+      }
+
+      .word:active {
+        transform: translateY(2px);
+        box-shadow: 0 0 0 0 var(--wd-candy);
       }
 
       .word.in-sentence {
-        background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        --wd-candy: #0d4f26;
+        background: var(--color-green);
       }
 
       .word.dragging {
@@ -181,7 +229,7 @@
       .feedback {
         text-align: center;
         padding: 15px;
-        border-radius: 12px;
+        border-radius: var(--radius-md);
         margin-bottom: 15px;
         font-size: clamp(1.1em, 3vw, 1.3em);
         font-weight: bold;
@@ -189,24 +237,24 @@
       }
 
       .feedback.correct {
-        background: #a8e6cf;
-        color: #2d5a3d;
+        background: var(--color-green-tint);
+        color: var(--color-green);
       }
 
       .feedback.incorrect {
-        background: #ffb3b3;
-        color: #8b0000;
+        background: #fee2e2;
+        color: #b91c1c;
       }
 
       .hint-message {
         text-align: center;
         padding: 15px;
-        border-radius: 12px;
+        border-radius: var(--radius-md);
         margin-bottom: 15px;
         font-size: clamp(1em, 3vw, 1.15em);
         font-weight: bold;
-        background: #fff3cd;
-        color: #7a5a00;
+        background: var(--color-amber-tint);
+        color: var(--color-amber);
         display: none;
       }
 
@@ -229,40 +277,73 @@
         flex-wrap: wrap;
       }
 
+      /* primary candy button: violet fill on a hard darker-sibling shadow;
+         hover lifts, :active sinks onto a 1px shadow */
       .btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        background: var(--color-violet);
+        color: #ffffff;
         border: none;
         padding: 12px 24px;
-        border-radius: 25px;
+        border-radius: var(--radius-pill);
         font-size: clamp(0.95em, 3vw, 1.1em);
-        font-weight: bold;
+        font-weight: 600;
         cursor: pointer;
-        transition: transform 0.2s;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 0 0 var(--candy-violet);
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
 
-      .btn:hover { transform: scale(1.05); }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 0 var(--candy-violet);
+      }
+
+      .btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 0 var(--candy-violet);
+      }
 
       .btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
       }
 
+      .btn:disabled:hover {
+        transform: none;
+        box-shadow: 0 4px 0 0 var(--candy-violet);
+      }
+
       .back-link {
         position: absolute;
         top: 15px;
         left: 15px;
-        color: white;
+        color: var(--color-violet);
+        background: var(--color-violet-tint);
         text-decoration: none;
+        font-weight: 600;
         font-size: clamp(0.9em, 3vw, 1em);
-        background: rgba(255, 255, 255, 0.2);
-        padding: 8px 12px;
-        border-radius: 20px;
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 3px 0 0 #c4b5fd;
+        transition: transform 120ms ease, box-shadow 120ms ease;
         z-index: 100;
       }
 
-      .back-link:hover { background: rgba(255, 255, 255, 0.3); }
+      .back-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 0 #c4b5fd;
+      }
+
+      .back-link:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 0 #c4b5fd;
+      }
 
       /* Modal */
       .modal-overlay {
@@ -278,36 +359,57 @@
 
       .modal-overlay.show { display: flex; }
 
+      /* Celebration modal sits on the deep blueberry, like the homepage
+         hero — cream heading, periwinkle body, coral candy button. */
       .modal {
-        background: white;
-        border-radius: 20px;
+        background: var(--color-deep);
+        border-radius: var(--radius-lg);
         padding: 30px;
         text-align: center;
         max-width: 380px;
         width: 90%;
+        box-shadow: var(--shadow-lift);
         animation: scaleIn 0.3s ease;
         position: relative;
       }
 
-      .modal h2 { font-size: 1.8em; margin-bottom: 10px; color: #333; }
-      .modal p { font-size: 1.2em; color: #666; margin: 10px 0; }
+      .modal h2 { font-size: 1.8em; margin-bottom: 10px; color: var(--color-deep-ink); }
+      .modal p { font-size: 1.2em; color: var(--color-deep-soft); margin: 10px 0; }
 
+      /* gold on the deep blueberry; unfilled stars are a faint cream so
+         they read on the dark modal */
       .stars { font-size: 2.5em; margin: 10px 0; }
-      .star { color: #ddd; }
+      .star { color: rgba(255, 246, 234, 0.3); }
       .star.filled { color: #ffd700; }
 
-      .high-score { color: #ff6b6b; font-weight: bold; }
+      .high-score { color: var(--color-primary); font-weight: bold; }
 
       .modal-btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        background: var(--color-primary);
+        color: var(--color-deep);
         border: none;
         padding: 12px 25px;
-        border-radius: 25px;
+        border-radius: var(--radius-pill);
         font-size: 1.1em;
-        font-weight: bold;
+        font-weight: 600;
         cursor: pointer;
         margin: 5px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 0 0 var(--candy-coral);
+        transition: transform 120ms ease, box-shadow 120ms ease;
+      }
+
+      .modal-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 0 var(--candy-coral);
+      }
+
+      .modal-btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 0 var(--candy-coral);
       }
 
       .modal-close {
@@ -315,7 +417,7 @@
         top: 10px;
         right: 15px;
         font-size: 1.5em;
-        color: #999;
+        color: var(--color-deep-soft);
         cursor: pointer;
         /* it is a real <button> now — strip the UA chrome so it looks the same */
         background: none;
@@ -324,7 +426,7 @@
         font-family: inherit;
       }
 
-      .modal-close:hover { color: #333; }
+      .modal-close:hover { color: var(--color-deep-ink); }
 
       .confetti {
         position: fixed;
@@ -346,7 +448,7 @@
 
       .question-counter {
         text-align: center;
-        color: #666;
+        color: var(--color-ink-soft);
         font-size: clamp(0.9em, 2.5vw, 1em);
         margin-bottom: 10px;
       }

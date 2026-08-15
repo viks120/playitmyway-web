@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f9f6f2" />
+    <meta name="theme-color" content="#15803d" />
     <meta name="mobile-web-app-capable" content="yes" />
     
     <!-- SEO Meta Tags -->
@@ -18,6 +18,7 @@
     <meta property="og:url" content="https://playitmyway.com/games/2048-slider/" />
     <meta property="og:site_name" content="Play It My Way" />
     <link rel="canonical" href="https://playitmyway.com/games/2048-slider/" />
+    <link rel="stylesheet" href="../../tokens.css" />
     <link rel="stylesheet" href="../../components.css" />
     <style>
       * {
@@ -33,8 +34,9 @@
       }
 
       body {
-        font-family: "Arial", sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: var(--font-display);
+        background: var(--color-bg);
+        color: var(--color-ink);
         min-height: 100vh;
         display: flex;
         flex-direction: column;
@@ -42,16 +44,24 @@
         padding: 20px;
       }
 
+      button {
+        font-family: inherit;
+      }
+
       .header {
         text-align: center;
-        color: white;
+        color: var(--color-ink);
         margin-bottom: 30px;
       }
 
       .header h1 {
         font-size: 3rem;
+        font-weight: 700;
         margin-bottom: 10px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header p {
+        color: var(--color-ink-soft);
       }
 
       .score-container {
@@ -61,30 +71,30 @@
       }
 
       .score-box {
-        background: rgba(255, 255, 255, 0.9);
-        padding: 15px 25px;
-        border-radius: 10px;
+        background: var(--color-green-tint);
+        color: var(--color-green);
+        padding: 12px 22px;
+        border-radius: var(--radius-pill);
         text-align: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
       }
 
       .score-label {
         font-size: 0.9rem;
-        color: #666;
+        font-weight: 600;
         margin-bottom: 5px;
       }
 
       .score-value {
         font-size: 1.5rem;
-        font-weight: bold;
-        color: #333;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
       }
 
       .game-container {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--color-surface);
         padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
         margin-bottom: 20px;
       }
 
@@ -236,21 +246,35 @@
         margin-bottom: 20px;
       }
 
+      /* primary candy button: green fill on a hard darker-sibling shadow;
+         hover lifts, :active sinks onto a 1px shadow */
       .btn {
-        background: #8f7a66;
-        color: white;
+        background: var(--color-green);
+        color: #ffffff;
         border: none;
         padding: 12px 24px;
-        border-radius: 8px;
+        border-radius: var(--radius-pill);
         font-size: 1rem;
+        font-weight: 600;
         cursor: pointer;
         margin: 0 10px;
-        transition: all 0.3s ease;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        box-shadow: 0 4px 0 0 #0d4f26;
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
 
       .btn:hover {
-        background: #7f6a56;
         transform: translateY(-2px);
+        box-shadow: 0 6px 0 0 #0d4f26;
+      }
+
+      .btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 0 #0d4f26;
       }
 
       .game-over {
@@ -270,25 +294,56 @@
         display: flex;
       }
 
+      /* Celebration modal sits on the deep blueberry — cream heading,
+         periwinkle body, coral candy button. */
       .game-over-content {
-        background: white;
+        background: var(--color-deep);
         padding: 40px;
-        border-radius: 15px;
+        border-radius: var(--radius-lg);
         text-align: center;
         max-width: 400px;
         animation: scaleIn 0.3s ease;
       }
 
       .game-over h2 {
-        color: #333;
+        color: var(--color-deep-ink);
         margin-bottom: 20px;
         font-size: 2em;
       }
 
       .game-over p {
-        color: #666;
+        color: var(--color-deep-soft);
         margin-bottom: 25px;
         font-size: 1.2em;
+      }
+
+      .game-over .btn {
+        background: var(--color-primary);
+        color: var(--color-deep);
+        box-shadow: 0 4px 0 0 var(--candy-coral);
+      }
+
+      .game-over .btn:hover {
+        box-shadow: 0 6px 0 0 var(--candy-coral);
+      }
+
+      .game-over .btn:active {
+        box-shadow: 0 1px 0 0 var(--candy-coral);
+      }
+
+      /* "Keep going" is the quieter choice: cream pill on the deep card */
+      .game-over #keepGoingBtn {
+        background: #fff6ea;
+        color: var(--color-deep);
+        box-shadow: 0 4px 0 0 var(--candy-cream);
+      }
+
+      .game-over #keepGoingBtn:hover {
+        box-shadow: 0 6px 0 0 var(--candy-cream);
+      }
+
+      .game-over #keepGoingBtn:active {
+        box-shadow: 0 1px 0 0 var(--candy-cream);
       }
 
       .stars {
@@ -306,7 +361,7 @@
       }
 
       .high-score-msg {
-        color: #ff6b6b;
+        color: var(--color-primary);
         font-weight: bold;
         font-size: 1.2em;
         margin-bottom: 15px;
@@ -341,19 +396,28 @@
         position: fixed;
         top: 20px;
         left: 20px;
-        background: rgba(255, 255, 255, 0.9);
-        color: #333;
+        background: var(--color-green-tint);
+        color: var(--color-green);
         text-decoration: none;
-        padding: 10px 15px;
-        border-radius: 8px;
-        font-weight: bold;
-        transition: all 0.3s ease;
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        font-weight: 600;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 3px 0 0 #a7e6bd;
+        transition: transform 120ms ease, box-shadow 120ms ease;
         z-index: 100;
       }
 
       .back-link:hover {
-        background: white;
         transform: translateY(-2px);
+        box-shadow: 0 5px 0 0 #a7e6bd;
+      }
+
+      .back-link:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 0 #a7e6bd;
       }
 
       .visually-hidden {

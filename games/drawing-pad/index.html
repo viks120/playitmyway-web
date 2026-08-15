@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0"
     />
-    <meta name="theme-color" content="#667eea" />
+    <meta name="theme-color" content="#0f766e" />
     <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- SEO Meta Tags -->
@@ -33,12 +33,13 @@
     <meta name="classification" content="Educational Art Game for Children" />
     <meta name="audience" content="children, kids, parents, teachers" />
     <link rel="canonical" href="https://playitmyway.com/games/drawing-pad/" />
+    <link rel="stylesheet" href="../../tokens.css" />
     <link rel="stylesheet" href="../../components.css" />
     <style>
       body {
-        font-family: "Comic Sans MS", "Arial Rounded MT Bold", "Arial",
-          sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: var(--font-display);
+        background: var(--color-bg);
+        color: var(--color-ink);
         margin: 0;
         padding: 20px;
         min-height: 100vh;
@@ -49,30 +50,33 @@
         line-height: 1.6;
       }
 
+      button {
+        font-family: var(--font-display);
+      }
+
       .header {
         text-align: center;
-        color: white;
+        color: var(--color-ink);
         margin-bottom: 25px;
       }
 
       .header h1 {
-        font-size: clamp(2em, 7vw, 2.5em);
-        font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        font-size: clamp(26px, 7vw, 34px);
+        font-weight: 700;
         margin-bottom: 10px;
       }
 
       .header p {
-        font-size: clamp(1.2em, 4vw, 1.4em);
+        font-size: 16px;
         font-weight: 500;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        color: var(--color-ink-soft);
       }
 
       .drawing-container {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 15px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
         padding: 20px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        box-shadow: var(--shadow-rest);
         max-width: 800px;
         width: 100%;
       }
@@ -134,6 +138,10 @@
         transform: scale(1.1);
       }
 
+      .color-btn:active {
+        transform: scale(0.92) translateY(1px);
+      }
+
       .color-btn.active {
         border-color: #fff;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -155,13 +163,13 @@
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        border: 2px solid #333;
+        border: 2px solid var(--color-ink);
       }
 
       .canvas-container {
         position: relative;
-        border: 3px solid #333;
-        border-radius: 10px;
+        border: 3px solid var(--color-ink);
+        border-radius: var(--radius-md);
         overflow: hidden;
         background: white;
         width: 100%;
@@ -193,42 +201,55 @@
       }
 
       .btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        background: var(--color-teal);
+        color: #fff;
         border: none;
         padding: 12px 24px;
-        border-radius: 25px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
         font-size: clamp(1em, 4vw, 1.2em);
-        font-weight: bold;
+        font-weight: 600;
         cursor: pointer;
-        transition: transform 0.2s;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        transition: transform 120ms ease, box-shadow 120ms ease;
+        box-shadow: 0 4px 0 0 #0b4f4a;
       }
 
       .btn:hover {
-        transform: scale(1.05);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 0 #0b4f4a;
       }
 
-      .btn.clear {
-        background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+      .btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 0 #0b4f4a;
       }
 
       .back-link {
         position: absolute;
         top: 20px;
         left: 20px;
-        color: white;
+        color: var(--color-teal);
         text-decoration: none;
-        font-size: 18px;
-        background: rgba(255, 255, 255, 0.2);
-        padding: 10px 15px;
-        border-radius: 20px;
-        transition: background 0.3s;
+        font-size: 15px;
+        font-weight: 600;
+        background: var(--color-teal-tint);
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 3px 0 0 #99e5d3;
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
 
       .back-link:hover {
-        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 0 #99e5d3;
+      }
+
+      .back-link:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 0 #99e5d3;
       }
 
       .stamp-container {
@@ -240,67 +261,85 @@
       .stamp-btn {
         font-size: 24px;
         padding: 5px 10px;
-        border: 2px solid #ddd;
-        border-radius: 10px;
+        min-height: 44px;
+        min-width: 44px;
+        border: none;
+        border-radius: var(--radius-md);
         cursor: pointer;
-        transition: all 0.2s;
-        background: white;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+        background: var(--color-teal-tint);
+        color: var(--color-teal);
+        box-shadow: 0 3px 0 0 #99e5d3;
         /* real <button>s now — match the <div> metrics they replaced */
         font-family: inherit;
         line-height: inherit;
-        color: inherit;
         -webkit-appearance: none;
         appearance: none;
       }
 
       .stamp-btn:hover {
-        border-color: #333;
-        transform: scale(1.1);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 0 #99e5d3;
+      }
+
+      .stamp-btn:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 0 #99e5d3;
       }
 
       .stamp-btn.active {
-        border-color: #4ecdc4;
-        background: #e8f5e8;
+        background: var(--color-teal);
+        color: #fff;
+        box-shadow: 0 4px 0 0 #0b4f4a;
+      }
+
+      .stamp-btn.active:active {
+        box-shadow: 0 1px 0 0 #0b4f4a;
       }
 
       .eraser-btn {
         padding: 5px 10px;
-        border: 2px solid #ddd;
-        border-radius: 10px;
+        min-height: 44px;
+        min-width: 44px;
+        border: none;
+        border-radius: var(--radius-md);
         cursor: pointer;
-        transition: all 0.2s;
-        background: white;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+        background: var(--color-teal-tint);
+        color: var(--color-teal);
+        box-shadow: 0 3px 0 0 #99e5d3;
         font-size: 14px;
         /* real <button> now — match the <div> metrics it replaced */
         font-family: inherit;
         line-height: inherit;
-        color: inherit;
         -webkit-appearance: none;
         appearance: none;
       }
 
       .eraser-btn:hover {
-        border-color: #333;
-        transform: scale(1.1);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 0 #99e5d3;
+      }
+
+      .eraser-btn:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 0 #99e5d3;
       }
 
       .eraser-btn.active {
-        border-color: #ff6b6b;
-        background: #ffe8e8;
+        background: var(--color-teal);
+        color: #fff;
+        box-shadow: 0 4px 0 0 #0b4f4a;
+      }
+
+      .eraser-btn.active:active {
+        box-shadow: 0 1px 0 0 #0b4f4a;
       }
 
       @media (max-width: 768px) {
         body {
           padding: 10px;
           padding-top: 60px; /* Space for back link */
-        }
-
-        .header h1 {
-          font-size: clamp(1.5em, 6vw, 2em);
-        }
-
-        .header p {
-          font-size: clamp(0.9em, 3vw, 1em);
         }
 
         .drawing-container {

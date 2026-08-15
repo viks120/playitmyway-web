@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0"
     />
-    <meta name="theme-color" content="#667eea" />
+    <meta name="theme-color" content="#0f766e" />
     <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- SEO Meta Tags -->
@@ -33,12 +33,13 @@
     <meta name="classification" content="Educational Math Game for Children" />
     <meta name="audience" content="children, kids, parents, teachers" />
     <link rel="canonical" href="https://playitmyway.com/games/counting-game/" />
+    <link rel="stylesheet" href="../../tokens.css" />
     <link rel="stylesheet" href="../../components.css" />
     <style>
       body {
-        font-family: "Comic Sans MS", "Arial Rounded MT Bold", "Arial",
-          sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: var(--font-display);
+        background: var(--color-bg);
+        color: var(--color-ink);
         margin: 0;
         padding: 20px;
         min-height: 100vh;
@@ -49,42 +50,54 @@
         line-height: 1.6;
       }
 
+      button {
+        font-family: inherit;
+      }
+
       .header {
         text-align: center;
-        color: white;
+        color: var(--color-ink);
         margin-bottom: 25px;
       }
 
       .header h1 {
-        font-size: clamp(2em, 7vw, 2.5em);
-        font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        font-size: clamp(26px, 7vw, 34px);
+        font-weight: 700;
         margin-bottom: 10px;
       }
 
       .header p {
-        font-size: clamp(1.2em, 4vw, 1.4em);
+        font-size: 16px;
         font-weight: 500;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        color: var(--color-ink-soft);
       }
 
       .game-container {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 15px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
         padding: 30px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        box-shadow: var(--shadow-rest);
         max-width: 600px;
         width: 100%;
       }
 
       .stats {
         display: flex;
-        justify-content: space-around;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
         margin-bottom: 25px;
-        color: #333;
-        font-size: clamp(1.1em, 4vw, 1.3em);
-        font-weight: bold;
-        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        font-size: 15.5px;
+        font-weight: 600;
+      }
+
+      .stats > div {
+        background: var(--color-teal-tint);
+        color: var(--color-teal);
+        padding: 8px 14px;
+        border-radius: var(--radius-pill);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
       }
 
       .game-mode {
@@ -100,22 +113,36 @@
       }
 
       .mode-btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        background: var(--color-teal-tint);
+        color: var(--color-teal);
         border: none;
         padding: 10px 20px;
-        border-radius: 20px;
-        font-size: 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        font-size: 15px;
+        font-weight: 600;
         cursor: pointer;
-        transition: transform 0.2s;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+        box-shadow: 0 3px 0 0 #99e5d3;
       }
 
       .mode-btn.active {
-        background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        background: var(--color-teal);
+        color: #fff;
+        box-shadow: 0 4px 0 0 #0b4f4a;
       }
 
       .mode-btn:hover {
-        transform: scale(1.05);
+        transform: translateY(-2px);
+      }
+
+      .mode-btn:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 0 #99e5d3;
+      }
+
+      .mode-btn.active:active {
+        box-shadow: 0 1px 0 0 #0b4f4a;
       }
 
       .question-area {
@@ -129,7 +156,7 @@
 
       .question {
         font-size: 24px;
-        color: #333;
+        color: var(--color-ink);
         margin-bottom: 20px;
       }
 
@@ -228,36 +255,49 @@
       }
 
       .answer-btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        background: var(--color-teal);
+        color: #fff;
         border: none;
         padding: 15px;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
+        min-height: 44px;
         font-size: 18px;
+        font-weight: 600;
         cursor: pointer;
-        transition: transform 0.2s;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+        box-shadow: 0 4px 0 0 #0b4f4a;
       }
 
       .answer-btn:hover {
-        transform: scale(1.05);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 0 #0b4f4a;
+      }
+
+      .answer-btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 0 #0b4f4a;
       }
 
       .answer-btn.correct {
-        background: linear-gradient(45deg, #a8e6cf, #88d8c0);
+        background: var(--color-green);
+        box-shadow: 0 4px 0 0 #14532d;
       }
 
       .answer-btn.incorrect {
-        background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        background: #b91c1c;
+        box-shadow: 0 4px 0 0 #7f1d1d;
       }
 
       .answer-btn.eliminated {
-        background: #cfcfcf;
-        color: #777;
+        background: #e7e5e4;
+        color: #78716c;
         cursor: not-allowed;
+        box-shadow: 0 4px 0 0 #d6d3d1;
       }
 
       .answer-btn.eliminated:hover {
         transform: none;
+        box-shadow: 0 4px 0 0 #d6d3d1;
       }
 
       .hint {
@@ -268,8 +308,8 @@
         padding: 15px;
         border-radius: 10px;
         display: none;
-        background: #fff3cd;
-        color: #7a5c00;
+        background: var(--color-amber-tint);
+        color: var(--color-amber);
       }
 
       .feedback {
@@ -283,13 +323,13 @@
       }
 
       .feedback.correct {
-        background: #a8e6cf;
-        color: #2d5a3d;
+        background: var(--color-green-tint);
+        color: var(--color-green);
       }
 
       .feedback.incorrect {
-        background: #ff6b6b;
-        color: white;
+        background: #fee2e2;
+        color: var(--color-primary-deep);
       }
 
       .controls {
@@ -297,50 +337,85 @@
       }
 
       .btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        background: var(--color-teal);
+        color: #fff;
         border: none;
         padding: 12px 25px;
-        border-radius: 25px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
         font-size: 16px;
+        font-weight: 600;
         cursor: pointer;
         margin: 0 10px;
-        transition: transform 0.2s;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+        box-shadow: 0 4px 0 0 #0b4f4a;
       }
 
       .btn:hover {
-        transform: scale(1.05);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 0 #0b4f4a;
+      }
+
+      .btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 0 #0b4f4a;
+      }
+
+      /* New Game is the quieter sibling of Next Question */
+      .controls .btn:last-child {
+        background: var(--color-teal-tint);
+        color: var(--color-teal);
+        box-shadow: 0 3px 0 0 #99e5d3;
+      }
+
+      .controls .btn:last-child:hover {
+        box-shadow: 0 5px 0 0 #99e5d3;
+      }
+
+      .controls .btn:last-child:active {
+        box-shadow: 0 1px 0 0 #99e5d3;
       }
 
       .back-link {
         position: absolute;
         top: 20px;
         left: 20px;
-        color: white;
+        color: var(--color-teal);
         text-decoration: none;
-        font-size: 18px;
-        background: rgba(255, 255, 255, 0.2);
-        padding: 10px 15px;
-        border-radius: 20px;
-        transition: background 0.3s;
+        font-size: 15px;
+        font-weight: 600;
+        background: var(--color-teal-tint);
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 3px 0 0 #99e5d3;
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
 
       .back-link:hover {
-        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 0 #99e5d3;
+      }
+
+      .back-link:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 0 #99e5d3;
       }
 
       .progress-bar {
         width: 100%;
         height: 20px;
-        background: #f0f0f0;
-        border-radius: 10px;
+        background: var(--color-teal-tint);
+        border-radius: var(--radius-pill);
         overflow: hidden;
         margin-bottom: 20px;
       }
 
       .progress-fill {
         height: 100%;
-        background: linear-gradient(45deg, #a8e6cf, #88d8c0);
+        background: var(--color-teal);
         transition: width 0.3s ease;
       }
 
@@ -349,14 +424,6 @@
         body {
           padding: 10px;
           padding-top: 60px; /* Space for back link */
-        }
-
-        .header h1 {
-          font-size: clamp(1.5em, 6vw, 2em);
-        }
-
-        .header p {
-          font-size: clamp(0.9em, 3vw, 1em);
         }
 
         .game-container {
@@ -426,8 +493,8 @@
 
         .stats {
           flex-direction: column;
+          align-items: center;
           gap: 10px;
-          font-size: clamp(0.8em, 2.5vw, 1em);
         }
 
         .question-area {
@@ -467,8 +534,8 @@
       }
 
       .modal {
-        background: white;
-        border-radius: 20px;
+        background: var(--color-deep);
+        border-radius: var(--radius-lg);
         padding: 30px;
         text-align: center;
         max-width: 400px;
@@ -480,48 +547,56 @@
       .modal h2 {
         font-size: 2em;
         margin-bottom: 15px;
-        color: #333;
+        color: var(--color-deep-ink);
       }
 
       .modal p {
         font-size: 1.2em;
-        color: #666;
+        color: var(--color-deep-soft);
         margin-bottom: 10px;
       }
 
       .modal .stats-display {
-        background: linear-gradient(45deg, #a8e6cf, #88d8c0);
+        background: var(--color-teal-tint);
         padding: 15px;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         margin: 15px 0;
       }
 
       .modal .stats-display p {
         margin: 5px 0;
-        color: #2d5a3d;
+        color: var(--color-teal);
         font-weight: bold;
       }
 
       .modal .high-score {
-        color: #ff6b6b;
+        color: #ffd700;
         font-weight: bold;
       }
 
       .modal-btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        background: var(--color-primary);
+        color: var(--color-deep);
         border: none;
         padding: 15px 30px;
-        border-radius: 25px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
         font-size: 1.1em;
         font-weight: bold;
         cursor: pointer;
         margin: 10px;
-        transition: transform 0.2s;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+        box-shadow: 0 4px 0 0 var(--candy-coral);
       }
 
       .modal-btn:hover {
-        transform: scale(1.05);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 0 var(--candy-coral);
+      }
+
+      .modal-btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 0 var(--candy-coral);
       }
 
       .modal-close {
@@ -529,7 +604,7 @@
         top: 10px;
         right: 15px;
         font-size: 1.5em;
-        color: #999;
+        color: var(--color-deep-soft);
         cursor: pointer;
         line-height: 1;
         padding: 0;
@@ -539,7 +614,7 @@
       }
 
       .modal-close:hover {
-        color: #333;
+        color: var(--color-deep-ink);
       }
 
       .modal {
@@ -586,18 +661,19 @@
         color: #ffd700;
       }
 
-      /* Streak indicator */
-      .streak-indicator {
-        background: linear-gradient(45deg, #ffd700, #ffaa00);
-        color: white;
-        padding: 5px 15px;
-        border-radius: 20px;
+      /* Streak indicator — amber tint pill; selector carries .stats so it
+         out-weighs the .stats > div pill rule */
+      .stats .streak-indicator {
+        background: var(--color-amber-tint);
+        color: var(--color-amber);
+        padding: 8px 14px;
+        border-radius: var(--radius-pill);
         font-weight: bold;
         display: none;
         animation: pulse 0.5s ease;
       }
 
-      .streak-indicator.show {
+      .stats .streak-indicator.show {
         display: inline-block;
       }
 
