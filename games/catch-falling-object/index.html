@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#667eea" />
+    <meta name="theme-color" content="#b45309" />
     <meta name="mobile-web-app-capable" content="yes" />
     <!-- SEO Meta Tags -->
     <title>Catch the Fruit – Free Kids Arcade Game | Play It My Way</title>
@@ -17,6 +17,7 @@
     <meta property="og:url" content="https://playitmyway.com/games/catch-falling-object/" />
     <meta property="og:site_name" content="Play It My Way" />
     <link rel="canonical" href="https://playitmyway.com/games/catch-falling-object/" />
+    <link rel="stylesheet" href="../../tokens.css" />
     <link rel="stylesheet" href="../../components.css" />
     <style>
       * {
@@ -26,8 +27,9 @@
       }
 
       body {
-        font-family: "Comic Sans MS", "Arial Rounded MT Bold", "Arial", sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: var(--font-display);
+        background: var(--color-bg);
+        color: var(--color-ink);
         margin: 0;
         padding: 10px;
         min-height: 100vh;
@@ -39,17 +41,18 @@
         overflow-x: hidden;
       }
 
+      button { font-family: var(--font-display); }
+
       .header {
         text-align: center;
-        color: white;
+        color: var(--color-ink);
         margin-bottom: 10px;
         z-index: 10;
       }
 
       .header h1 {
         font-size: clamp(1.5em, 5vw, 2em);
-        font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        font-weight: 700;
         margin: 0;
       }
 
@@ -57,11 +60,16 @@
         display: flex;
         gap: 20px;
         margin-bottom: 10px;
-        color: white;
+        color: var(--color-amber);
         font-size: clamp(1em, 3vw, 1.2em);
         font-weight: bold;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         z-index: 10;
+      }
+
+      .stats > div {
+        background: var(--color-amber-tint);
+        padding: 6px 14px;
+        border-radius: var(--radius-pill);
       }
 
       /* the game keeps the same column layout the body used to give its
@@ -164,34 +172,45 @@
       }
 
       .btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        background: var(--color-amber);
+        color: #ffffff;
         border: none;
         padding: 12px 24px;
-        border-radius: 25px;
+        border-radius: var(--radius-pill);
         font-size: clamp(1em, 3vw, 1.1em);
         font-weight: bold;
         cursor: pointer;
-        transition: transform 0.2s;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        min-height: 44px;
+        box-shadow: 0 4px 0 0 #7c3a06;
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
 
-      .btn:hover { transform: scale(1.05); }
+      .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 0 #7c3a06; }
+
+      .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 0 #7c3a06; }
 
       .back-link {
         position: absolute;
         top: 15px;
         left: 15px;
-        color: white;
+        color: var(--color-amber);
         text-decoration: none;
+        font-weight: 600;
         font-size: clamp(0.9em, 3vw, 1em);
-        background: rgba(255, 255, 255, 0.2);
+        background: var(--color-amber-tint);
         padding: 8px 12px;
-        border-radius: 20px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 3px 0 0 #fde68a;
+        transition: transform 120ms ease, box-shadow 120ms ease;
         z-index: 100;
       }
 
-      .back-link:hover { background: rgba(255, 255, 255, 0.3); }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 #fde68a; }
+
+      .back-link:active { transform: translateY(2px); box-shadow: 0 1px 0 0 #fde68a; }
 
       /* Modal */
       .modal-overlay {
@@ -208,8 +227,8 @@
       .modal-overlay.show { display: flex; }
 
       .modal {
-        background: white;
-        border-radius: 20px;
+        background: var(--color-deep);
+        border-radius: var(--radius-lg);
         padding: 30px;
         text-align: center;
         max-width: 350px;
@@ -217,33 +236,40 @@
         animation: scaleIn 0.3s ease;
       }
 
-      .modal h2 { font-size: 1.8em; margin-bottom: 10px; color: #333; }
-      .modal p { font-size: 1.2em; color: #666; margin: 10px 0; }
+      .modal h2 { font-size: 1.8em; margin-bottom: 10px; color: var(--color-deep-ink); }
+      .modal p { font-size: 1.2em; color: var(--color-deep-soft); margin: 10px 0; }
 
       .stars { font-size: 2.5em; margin: 10px 0; }
-      .star { color: #ddd; }
+      .star { color: rgba(255, 246, 234, 0.3); }
       .star.filled { color: #ffd700; }
 
-      .high-score { color: #ff6b6b; font-weight: bold; }
+      .high-score { color: var(--color-primary); font-weight: bold; }
 
       .modal-btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        background: var(--color-primary);
+        color: var(--color-deep);
         border: none;
         padding: 12px 25px;
-        border-radius: 25px;
+        border-radius: var(--radius-pill);
         font-size: 1.1em;
         font-weight: bold;
         cursor: pointer;
         margin: 5px;
+        min-height: 44px;
+        box-shadow: 0 4px 0 0 #9a3412;
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
+
+      .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 0 #9a3412; }
+
+      .modal-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 0 #9a3412; }
 
       .modal-close {
         position: absolute;
         top: 10px;
         right: 15px;
         font-size: 1.5em;
-        color: #999;
+        color: var(--color-deep-soft);
         cursor: pointer;
         line-height: 1;
         padding: 0;
@@ -253,7 +279,7 @@
       }
 
       .modal-close:hover {
-        color: #333;
+        color: var(--color-deep-ink);
       }
 
       .modal {
@@ -282,12 +308,12 @@
         position: absolute;
         top: 0; left: 0;
         width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.8);
+        background: rgba(43, 42, 94, 0.9);
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        color: white;
+        color: var(--color-deep-ink);
         z-index: 50;
       }
 

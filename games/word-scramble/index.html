@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0"
     />
-    <meta name="theme-color" content="#667eea" />
+    <meta name="theme-color" content="#7c3aed" />
     <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- SEO Meta Tags -->
@@ -34,6 +34,7 @@
     <meta name="audience" content="children, kids, parents, teachers" />
     <link rel="canonical" href="https://playitmyway.com/games/word-scramble/" />
 
+    <link rel="stylesheet" href="../../tokens.css" />
     <link rel="stylesheet" href="../../components.css" />
     <style>
       * {
@@ -42,9 +43,9 @@
       }
 
       body {
-        font-family: "Comic Sans MS", "Arial Rounded MT Bold", "Arial",
-          sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: var(--font-display);
+        background: var(--color-bg);
+        color: var(--color-ink);
         margin: 0;
         padding: 10px;
         min-height: 100vh;
@@ -56,33 +57,45 @@
         line-height: 1.6;
       }
 
+      button {
+        font-family: var(--font-display);
+      }
+
       .header {
         text-align: center;
-        color: white;
+        color: var(--color-ink);
         margin-bottom: 25px;
       }
 
       .header h1 {
         font-size: clamp(2em, 7vw, 2.5em);
-        font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        font-weight: 700;
         margin-bottom: 10px;
       }
 
       .header p {
         font-size: clamp(1.2em, 4vw, 1.4em);
         font-weight: 500;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        color: var(--color-ink-soft);
       }
 
       .stats {
         display: flex;
-        gap: 25px;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
         margin-bottom: 25px;
-        color: white;
-        font-size: clamp(1.1em, 4vw, 1.3em);
-        font-weight: bold;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        font-size: clamp(0.95em, 3.5vw, 1.05em);
+      }
+
+      .stats > div {
+        background: var(--color-violet-tint);
+        color: var(--color-violet);
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: var(--radius-pill);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
       }
 
       .difficulty-selector {
@@ -92,41 +105,56 @@
 
       .difficulty-selector h3 {
         font-size: clamp(1.3em, 5vw, 1.6em);
-        color: white;
-        font-weight: bold;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        color: var(--color-ink);
+        font-weight: 700;
         margin-bottom: 15px;
       }
 
+      /* candy toggle pills: tint at rest, solid violet when active; hard
+         shadow in a darker sibling of the fill, :active sinks onto it */
       .difficulty-btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        --db-fill: var(--color-violet-tint);
+        --db-ink: var(--color-violet);
+        --db-candy: #c4b5fd;
+        background: var(--db-fill);
+        color: var(--db-ink);
         border: none;
         padding: 12px 24px;
-        border-radius: 25px;
+        border-radius: var(--radius-pill);
         font-size: clamp(1em, 4vw, 1.2em);
-        font-weight: bold;
+        font-weight: 600;
         cursor: pointer;
         margin: 0 12px;
-        transition: transform 0.2s;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 0 0 var(--db-candy);
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
 
       .difficulty-btn.active {
-        background: linear-gradient(45deg, #4ecdc4, #44a08d);
-        transform: scale(1.05);
+        --db-fill: var(--color-violet);
+        --db-ink: #ffffff;
+        --db-candy: var(--candy-violet);
+        box-shadow: 0 4px 0 0 var(--db-candy);
       }
 
       .difficulty-btn:hover {
-        transform: scale(1.05);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 0 var(--db-candy);
+      }
+
+      .difficulty-btn:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 0 var(--db-candy);
       }
 
       .game-container {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 15px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
         padding: 20px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        box-shadow: var(--shadow-rest);
         max-width: 600px;
         width: 100%;
       }
@@ -138,21 +166,21 @@
 
       .category {
         font-size: clamp(1.2em, 4vw, 1.5em);
-        color: #333;
+        color: var(--color-ink);
         font-weight: bold;
         margin-bottom: 10px;
       }
 
       .hint {
         font-size: clamp(1em, 3vw, 1.2em);
-        color: #666;
+        color: var(--color-ink-soft);
         font-style: italic;
         margin-bottom: 15px;
       }
 
       .hint-status {
         font-size: clamp(0.95em, 3vw, 1.1em);
-        color: #2d5a3d;
+        color: var(--color-green);
         font-weight: bold;
         min-height: 1.4em;
         margin-bottom: 10px;
@@ -166,27 +194,35 @@
         flex-wrap: wrap;
       }
 
+      /* game-internal tile fill stays as it was — only the chrome changes:
+         token radius, a subtle hard under-shadow, and a press that sinks */
       .letter-tile {
         width: 50px;
         height: 50px;
         background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
         color: white;
         border: 3px solid #333;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.5em;
         font-weight: bold;
         cursor: grab;
+        box-shadow: 0 2px 0 0 rgba(51, 48, 46, 0.25);
         transition: all 0.3s ease;
         user-select: none;
         touch-action: manipulation;
       }
 
       .letter-tile:hover {
-        transform: scale(1.1);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 0 0 rgba(51, 48, 46, 0.25);
+      }
+
+      .letter-tile:active {
+        transform: translateY(2px);
+        box-shadow: 0 0 0 0 rgba(51, 48, 46, 0.25);
       }
 
       .letter-tile.dragging {
@@ -201,7 +237,7 @@
         margin-bottom: 30px;
         min-height: 60px;
         border: 3px dashed #ccc;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         padding: 10px;
         background: rgba(255, 255, 255, 0.5);
       }
@@ -210,7 +246,7 @@
         width: 50px;
         height: 50px;
         border: 2px dashed #999;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -220,6 +256,12 @@
       .answer-slot.filled {
         border-color: #4ecdc4;
         background: rgba(78, 205, 196, 0.2);
+        box-shadow: 0 2px 0 0 rgba(51, 48, 46, 0.15);
+      }
+
+      .answer-slot.filled:active {
+        transform: translateY(2px);
+        box-shadow: 0 0 0 0 rgba(51, 48, 46, 0.15);
       }
 
       .controls {
@@ -229,23 +271,34 @@
         margin-bottom: 20px;
       }
 
+      /* primary candy button: violet fill on a hard darker-sibling shadow;
+         hover lifts, :active sinks onto a 1px shadow */
       .btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        background: var(--color-violet);
+        color: #ffffff;
         border: none;
         padding: 12px 24px;
-        border-radius: 25px;
+        border-radius: var(--radius-pill);
         font-size: clamp(1em, 4vw, 1.2em);
-        font-weight: bold;
+        font-weight: 600;
         cursor: pointer;
         margin: 0 12px;
-        transition: transform 0.2s;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 0 0 var(--candy-violet);
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
 
       .btn:hover {
-        transform: scale(1.05);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 0 var(--candy-violet);
+      }
+
+      .btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 0 var(--candy-violet);
       }
 
       .feedback {
@@ -254,36 +307,46 @@
         font-weight: bold;
         margin: 20px 0;
         padding: 15px;
-        border-radius: 12px;
+        border-radius: var(--radius-md);
         display: none;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
       }
 
       .feedback.correct {
-        background: #a8e6cf;
-        color: #2d5a3d;
+        background: var(--color-green-tint);
+        color: var(--color-green);
       }
 
       .feedback.incorrect {
-        background: #ff6b6b;
-        color: white;
+        background: #fee2e2;
+        color: #b91c1c;
       }
 
       .back-link {
         position: absolute;
         top: 20px;
         left: 20px;
-        color: white;
+        color: var(--color-violet);
+        background: var(--color-violet-tint);
         text-decoration: none;
+        font-weight: 600;
         font-size: clamp(0.9em, 3vw, 1em);
-        background: rgba(255, 255, 255, 0.2);
-        padding: 8px 12px;
-        border-radius: 20px;
-        transition: background 0.3s;
+        padding: 9px 14px;
+        border-radius: var(--radius-pill);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 3px 0 0 #c4b5fd;
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
 
       .back-link:hover {
-        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 0 #c4b5fd;
+      }
+
+      .back-link:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 0 #c4b5fd;
       }
 
       /* Mobile-specific improvements */
@@ -323,7 +386,7 @@
         }
 
         .difficulty-btn {
-          display: block;
+          display: flex;
           margin: 8px auto;
           width: 200px;
           max-width: 90%;
@@ -397,58 +460,71 @@
         display: flex;
       }
 
+      /* Celebration modal sits on the deep blueberry, like the homepage
+         hero — cream heading, periwinkle body, coral candy button. */
       .modal {
-        background: white;
-        border-radius: 20px;
+        background: var(--color-deep);
+        border-radius: var(--radius-lg);
         padding: 30px;
         text-align: center;
         max-width: 400px;
         width: 90%;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        box-shadow: var(--shadow-lift);
         animation: scaleIn 0.3s ease;
       }
 
       .modal h2 {
         font-size: 2em;
         margin-bottom: 15px;
-        color: #333;
+        color: var(--color-deep-ink);
       }
 
       .modal .stats-display {
-        background: linear-gradient(45deg, #a8e6cf, #88d8c0);
+        background: rgba(255, 255, 255, 0.08);
         padding: 15px;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         margin: 15px 0;
       }
 
       .modal .stats-display p {
         margin: 5px 0;
-        color: #2d5a3d;
+        color: var(--color-deep-soft);
         font-weight: bold;
         font-size: 1.1em;
       }
 
       .modal .high-score {
-        color: #ff6b6b;
+        color: var(--color-primary);
         font-weight: bold;
         font-size: 1.2em;
       }
 
       .modal-btn {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
+        background: var(--color-primary);
+        color: var(--color-deep);
         border: none;
         padding: 15px 30px;
-        border-radius: 25px;
+        border-radius: var(--radius-pill);
         font-size: 1.1em;
-        font-weight: bold;
+        font-weight: 600;
         cursor: pointer;
         margin: 10px;
-        transition: transform 0.2s;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 0 0 var(--candy-coral);
+        transition: transform 120ms ease, box-shadow 120ms ease;
       }
 
       .modal-btn:hover {
-        transform: scale(1.05);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 0 var(--candy-coral);
+      }
+
+      .modal-btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 0 var(--candy-coral);
       }
 
       /* a real <button> now, so the browser's own styling is stripped back to
@@ -458,7 +534,7 @@
         top: 10px;
         right: 15px;
         font-size: 1.5em;
-        color: #999;
+        color: var(--color-deep-soft);
         cursor: pointer;
         line-height: 1;
         background: none;
@@ -468,7 +544,7 @@
       }
 
       .modal-close:hover {
-        color: #333;
+        color: var(--color-deep-ink);
       }
 
       .modal {
@@ -512,14 +588,15 @@
         border: 0;
       }
 
-      /* Star Rating */
+      /* Star Rating — gold on the deep blueberry; unfilled stars are a
+         faint cream so they read on the dark modal */
       .stars {
         font-size: 2.5em;
         margin: 10px 0;
       }
 
       .star {
-        color: #ddd;
+        color: rgba(255, 246, 234, 0.3);
         transition: color 0.3s;
       }
 
@@ -527,12 +604,13 @@
         color: #ffd700;
       }
 
-      /* Streak indicator */
-      .streak-indicator {
-        background: linear-gradient(45deg, #ffd700, #ffaa00);
-        color: white;
+      /* Streak indicator: an amber pill so the hot streak still reads warm
+         (child selector outranks the violet .stats > div pill) */
+      .stats > .streak-indicator {
+        background: var(--color-amber-tint);
+        color: var(--color-amber);
         padding: 5px 15px;
-        border-radius: 20px;
+        border-radius: var(--radius-pill);
         font-weight: bold;
         display: none;
         animation: pulse 0.5s ease;
