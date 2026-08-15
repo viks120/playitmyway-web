@@ -82,7 +82,7 @@ const PAGE_CSS = `      .page-intro {
         padding: 0 20px;
         text-align: center;
         color: var(--color-ink-soft);
-        font-size: 1.05rem;
+        font-size: 1.1rem;
         line-height: 1.65;
       }
       .game-card-mins {
