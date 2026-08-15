@@ -23,6 +23,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Fredoka";
+  src: url("fonts/fredoka-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Base colors */
   --color-bg: #fff8ef;
@@ -32,6 +40,20 @@
   --color-primary: #ff6b57;
   --color-primary-deep: #9a3412;
   --color-focus: #2563eb;
+
+  /* The dark anchor ("blueberry") — hero and support bands sit on this.
+     Navy-indigo, the classic complement to the coral primary; deliberately
+     NOT the purple of the sites that inspired it. */
+  --color-deep: #2b2a5e;
+  --color-deep-ink: #fff6ea;   /* cream text on deep      */
+  --color-deep-soft: #c9c7f5;  /* periwinkle secondary    */
+
+  /* Candy shadows: each button colour has a darker sibling that renders as
+     a hard, un-blurred 0 5px 0 shadow — pressing sinks onto it. */
+  --candy-coral: #9a3412;      /* under --color-primary   */
+  --candy-violet: #4c1d95;     /* under --color-violet    */
+  --candy-cream: #d9c8ae;      /* under cream/white pills */
+  --candy-card: #efe4d3;       /* under white cards       */
 
   /* Age-band accents (AA-safe as text on white/tint) + soft tints */
   --color-teal: #0f766e;
@@ -71,7 +93,8 @@
 
   /* Corner radius */
   --radius-md: 12px;
-  --radius-lg: 20px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
   --radius-pill: 999px;
 
   /* Shadows */

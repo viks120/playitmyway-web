@@ -20,8 +20,8 @@ body {
 /* --- Support banner ------------------------------------------------------ */
 
 .support-banner {
-  background: var(--color-ink);
-  color: #fff;
+  background: var(--color-deep);
+  color: var(--color-deep-soft);
   text-align: center;
   padding: var(--space-2) var(--space-4);
   font-size: 0.85em;
@@ -32,57 +32,40 @@ body {
   font-weight: 600;
 }
 
-/* --- Hero ---------------------------------------------------------------- */
+/* --- Hero: flat deep band, no gradient, no text shadows ------------------ */
 
 .hero {
   text-align: center;
-  color: #fff;
-  background: linear-gradient(135deg, #c2410c 0%, #ef4444 45%, #7c3aed 100%);
+  color: var(--color-deep-ink);
+  background: var(--color-deep);
   padding: var(--space-7) var(--space-4) var(--space-6);
-  border-radius: 0 0 32px 32px;
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
 
 .hero h1 {
   margin: 0;
-  font-size: clamp(2.2em, 6vw, 3.2em);
-  font-weight: 600;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  font-size: clamp(2.4em, 6vw, 3.6em);
+  font-weight: 700;
+  line-height: 1.05;
 }
 
 .tagline {
   margin: var(--space-2) auto 0;
   max-width: 34em;
   font-size: clamp(1.05em, 3vw, 1.3em);
-  font-weight: 600;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  font-weight: 400;
+  color: var(--color-deep-soft);
 }
 
 .hero-links {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
-  margin: 14px 0 0;
+  gap: 12px;
+  margin: var(--space-5) 0 0;
 }
 
-.hero-links a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 9px 18px;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  color: var(--color-primary-deep);
-  border: 2px solid var(--color-primary);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.hero-links a:hover {
-  background: var(--color-primary);
-  color: #fff;
-}
-
+/* trust stamps: terse, bordered, sitting quietly on the deep band */
 .trust-badges {
   list-style: none;
   display: flex;
@@ -94,9 +77,10 @@ body {
 }
 
 .trust-badges li {
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--color-ink);
-  font-size: 0.78em;
+  background: rgba(255, 246, 234, 0.12);
+  border: 1.5px solid rgba(201, 199, 245, 0.45);
+  color: #e6e4ff;
+  font-size: 0.8em;
   font-weight: 600;
   padding: 6px 14px;
   border-radius: var(--radius-pill);
@@ -127,12 +111,30 @@ body {
   --band-tint: var(--color-green-tint);
 }
 
-.age-section h2 {
-  margin: 0 0 var(--space-4);
+.age-eyebrow {
+  margin: 0 0 2px;
   text-align: center;
-  color: var(--band-color);
-  font-size: clamp(1.4em, 4vw, 1.9em);
+  font-size: 0.78em;
   font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--band-color);
+}
+
+.age-section h2 {
+  margin: 0 0 var(--space-1);
+  text-align: center;
+  color: var(--color-ink);
+  font-size: clamp(1.5em, 4vw, 2em);
+  font-weight: 600;
+}
+
+/* the parent's one-line answer to "what does this section build?" */
+.age-outcome {
+  margin: 0 0 var(--space-5);
+  text-align: center;
+  font-size: 0.94em;
+  color: var(--color-ink-soft);
 }
 
 .game-grid {
@@ -148,21 +150,27 @@ body {
   gap: var(--space-2);
   padding: var(--space-5) var(--space-3);
   background: var(--color-surface);
-  border: 2px solid transparent;
+  border: 2.5px solid var(--candy-card);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-rest);
+  box-shadow: 0 5px 0 0 var(--candy-card);
   text-decoration: none;
   text-align: center;
   color: var(--color-ink);
-  transition: transform var(--ease-move), box-shadow var(--ease-move),
-    border-color var(--ease-move);
+  transition: transform var(--ease-quick), box-shadow var(--ease-quick),
+    border-color var(--ease-quick);
 }
 
 .game-card:hover,
 .game-card:focus-visible {
   transform: translateY(-4px);
   border-color: var(--band-color);
-  box-shadow: var(--shadow-lift);
+  box-shadow: 0 9px 0 0 var(--band-tint);
+}
+
+/* cards press like the buttons do */
+.game-card:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 var(--candy-card);
 }
 
 .game-icon {
@@ -216,9 +224,13 @@ body {
   margin: var(--space-7) var(--space-4) 0;
   padding: var(--space-6) var(--space-4);
   text-align: center;
-  color: #fff;
-  background: linear-gradient(135deg, #c2410c, #dc2626);
-  border-radius: var(--radius-lg);
+  color: var(--color-deep-ink);
+  background: var(--color-deep);
+  border-radius: var(--radius-xl);
+}
+
+.support-section p {
+  color: var(--color-deep-soft);
 }
 
 @media (min-width: 732px) {
@@ -229,35 +241,41 @@ body {
 }
 
 .support-section h2 {
-  margin: 0 0 var(--space-3);
-  font-size: clamp(1.4em, 4vw, 1.9em);
-  font-weight: 600;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25);
+  margin: 0 0 var(--space-1);
+  font-size: clamp(1.5em, 4vw, 2em);
+  font-weight: 700;
 }
 
 .support-section p {
   margin: 0 0 var(--space-4);
   font-size: 1.05em;
-  font-weight: 600;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  font-weight: 400;
 }
 
+/* candy pill: coral fill on its darker sibling, pressable */
 .support-btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 14px 28px;
-  background: #fff;
-  color: var(--color-primary-deep);
+  background: var(--color-primary);
+  color: var(--color-deep);
   font-weight: 600;
   font-size: 1.05em;
   text-decoration: none;
   border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-rest);
+  box-shadow: 0 5px 0 0 var(--candy-coral);
   transition: transform var(--ease-quick), box-shadow var(--ease-quick);
 }
 
 .support-btn:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow-lift);
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 0 var(--candy-coral);
+}
+
+.support-btn:active {
+  transform: translateY(5px);
+  box-shadow: 0 1px 0 0 var(--candy-coral);
 }
 
 /* --- Footer -------------------------------------------------------------- */
