@@ -13,11 +13,16 @@ module.exports = {
   ],
 
   bands: [
-    { id: '2',  label: 'Ages 2+',  title: 'First Steps',    band: 'band-3'  },
-    { id: '3',  label: 'Ages 3+',  title: 'Little Learners', band: 'band-3'  },
-    { id: '5',  label: 'Ages 5+',  title: 'Fun & Games',     band: 'band-5'  },
-    { id: '7',  label: 'Ages 7+',  title: 'Brain Boosters',  band: 'band-7'  },
-    { id: '14', label: 'Ages 14+', title: 'Challenge Zone',  band: 'band-14' }
+    { id: '2',  label: 'Ages 2+',  title: 'First Steps',     band: 'band-3',
+      outcome: 'The straight lines and curves that come before letters.' },
+    { id: '3',  label: 'Ages 3+',  title: 'Little Learners', band: 'band-3',
+      outcome: 'Counting, colours, memory and first pen strokes.' },
+    { id: '5',  label: 'Ages 5+',  title: 'Fun & Games',     band: 'band-5',
+      outcome: 'Phonics, sorting, quick reactions and fair play.' },
+    { id: '7',  label: 'Ages 7+',  title: 'Brain Boosters',  band: 'band-7',
+      outcome: 'Time, grammar, coding, maps and logic.' },
+    { id: '14', label: 'Ages 14+', title: 'Challenge Zone',  band: 'band-14',
+      outcome: 'Real puzzles — sudoku, minesweeper, words and numbers.' }
   ],
 
   games: [

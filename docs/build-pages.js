@@ -179,19 +179,19 @@ function buildGamesIndex() {
   h += `
     <header class="hero">
       <h1>🎮 All Games</h1>
-      <p class="tagline">Every game we make, grouped by age. ${C.games.length} of them, all free.</p>
+      <p class="tagline">${C.games.length} games. Every one worth playing.</p>
       <ul class="trust-badges">
-        <li>🚫 No ads</li>
-        <li>🔒 No tracking</li>
-        <li>🍪 Nothing stored</li>
-        <li>💯 100% free</li>
+        <li>No ads. Ever.</li>
+        <li>No tracking. Ever.</li>
+        <li>Nothing stored. Ever.</li>
+        <li>Free. Actually free.</li>
       </ul>
     </header>
 
     <p class="page-intro">
-      Not sure where to start? Pick the age band closest to your child and let them
-      choose by picture — that is how children pick anyway. Grown-ups looking for a
-      specific skill can use <a href="../for-teachers.html">the skills list</a>.
+      Pick the age band closest to your child and let them choose by picture —
+      that is how children pick anyway. Grown-ups looking for a specific skill
+      can use <a href="../for-teachers.html">the skills list</a>.
     </p>
 
     <main>`;
@@ -202,7 +202,9 @@ function buildGamesIndex() {
     const hid = 'band-' + band.id;
     h += `
       <section class="age-section ${band.band}" aria-labelledby="${hid}">
-        <h2 id="${hid}">${band.label} · ${band.title}</h2>
+        <p class="age-eyebrow">${band.label}</p>
+        <h2 id="${hid}">${band.title}</h2>
+        <p class="age-outcome">${esc(band.outcome)}</p>
         <div class="game-grid">`;
     for (const g of games) {
       h += `
@@ -238,13 +240,13 @@ function buildTeachers() {
 
   h += `
     <header class="hero">
-      <h1>👋 For Parents &amp; Teachers</h1>
-      <p class="tagline">What each game actually builds — in plain words, with nothing oversold.</p>
+      <h1>👋 For Grown-Ups</h1>
+      <p class="tagline">Guilt-free screen time. We can prove it.</p>
       <ul class="trust-badges">
-        <li>🚫 No ads</li>
-        <li>🔒 No tracking</li>
-        <li>🍪 Nothing stored</li>
-        <li>💯 100% free</li>
+        <li>No ads. Ever.</li>
+        <li>No tracking. Ever.</li>
+        <li>Nothing stored. Ever.</li>
+        <li>Free. Actually free.</li>
       </ul>
     </header>
 
