@@ -161,7 +161,10 @@
         transform: translateY(0);
       }
 
-      .animal:hover {
+      /* .visible only: bare .animal:hover popped HIDDEN animals fully into
+         view on mouse-over — they looked up but were not "up" in the game,
+         so clicking them did nothing and the whole game read as broken */
+      .animal.visible:hover {
         transform: translateY(0) scale(1.1);
       }
 
@@ -587,7 +590,10 @@
           });
 
           moleGrid.appendChild(hole);
-          holes.push({ element: hole, animal: animal, isUp: false });
+          // seq is a raise counter: timers capture it when scheduled and
+          // no-op if the hole has been raised again since, so a stale timer
+          // can never hide or repaint a newer mole
+          holes.push({ element: hole, animal: animal, isUp: false, seq: 0 });
         }
       }
 
@@ -634,12 +640,17 @@
         showMessage(messages[Math.floor(Math.random() * messages.length)]);
         updateDisplay();
         
-        // tracked with the other hide timers: untracked, this could fire after
-        // a restart and hide an animal the new game had just raised, leaving
-        // an invisible-but-active mole sitting in that hole
+        // Tracked (restart safety) AND seq-guarded (in-game safety): the hole
+        // is free the moment it is hit, so the spawner can raise a fresh mole
+        // here inside this 300ms window — the cleanup must then leave the new
+        // mole alone instead of wiping it invisible while the hole stays busy.
+        const mySeq = holes[index].seq;
         hideTimeouts.push(setTimeout(() => {
-          animal.classList.remove('hit', 'visible');
-          animal.textContent = animals[Math.floor(Math.random() * animals.length)];
+          animal.classList.remove('hit');
+          if (holes[index].seq === mySeq && !holes[index].isUp) {
+            animal.classList.remove('visible');
+            animal.textContent = animals[Math.floor(Math.random() * animals.length)];
+          }
         }, 300));
       }
 
@@ -661,17 +672,22 @@
         const index = holes.indexOf(hole);
         
         hole.isUp = true;
+        hole.seq++;
+        const mySeq = hole.seq;
         hole.animal.textContent = animals[Math.floor(Math.random() * animals.length)];
         hole.animal.classList.remove('hit');
         hole.animal.classList.add('visible');
         setAnimalLabel(hole.animal, index, true);
         playSound('pop');
 
-        // Hide after a while based on difficulty
+        // Hide after a while based on difficulty. The seq check matters: a
+        // hit frees the hole immediately, so it can be raised again while
+        // this timer is still pending — without the check the stale timer
+        // hid the NEW mole early.
         const settings = difficulties[difficulty];
         const hideDelay = getRandomInRange(settings.showTime[0], settings.showTime[1]);
         const hideTimeout = setTimeout(() => {
-          if (hole.isUp && gameRunning) {
+          if (hole.isUp && gameRunning && hole.seq === mySeq) {
             hole.animal.classList.remove('visible');
             hole.isUp = false;
             setAnimalLabel(hole.animal, index, false);
