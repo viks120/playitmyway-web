@@ -18,6 +18,8 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Minesweeper – Free Classic Logic Game">
   <meta name="twitter:description" content="Play classic Minesweeper free online. Clear the board without hitting a mine across three difficulty levels of pure logic. No ads, no download.">
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="../../tokens.css" />
     <link rel="stylesheet" href="../../components.css" />
   <style>
@@ -574,5 +576,13 @@
       </nav>
     </footer>
     <script src="../../components.js"></script>
+    <script>
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
   </body>
 </html>

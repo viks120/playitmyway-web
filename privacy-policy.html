@@ -38,6 +38,8 @@
     <meta name="classification" content="Legal Information" />
     <link rel="canonical" href="https://playitmyway.com/privacy-policy.html" />
 
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="tokens.css" />
 
     <style>
@@ -254,9 +256,17 @@
             cookies
           </li>
           <li>
-            <strong>No Browser Storage:</strong> We do not use local storage,
-            session storage, or any other browser storage — nothing is saved
-            on your device
+            <strong>No Tracking Storage:</strong> We do not use cookies, local
+            storage or session storage. Nothing about you or your child is
+            recorded — not on your device, and not anywhere else
+          </li>
+          <li>
+            <strong>Offline Copy (only if you install):</strong> If you add our
+            games to your home screen, your browser keeps a copy of the game
+            files themselves — the pages, fonts and pictures — so they work with
+            no internet. That copy is only the games. It holds nothing about
+            your child, and it disappears if you uninstall the games or clear
+            your browser data
           </li>
         </ul>
 
@@ -404,6 +414,14 @@
       // Update copyright year
       document.getElementById("footerYear").textContent =
         new Date().getFullYear();
+    </script>
+    <script>
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
     </script>
   </body>
 </html>
