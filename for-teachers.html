@@ -25,6 +25,8 @@
     <meta name="twitter:description" content="What every Play It My Way game actually practises, the age it suits, and how long it takes. Free, ad-free and storage-free games for home and the classroom." />
 
     <link rel="canonical" href="https://playitmyway.com/for-teachers.html" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="tokens.css" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="components.css" />
@@ -100,11 +102,18 @@
       <div class="note">
         <h2>What this site does and doesn't do</h2>
         <p>
-          Every game here runs entirely in the browser. Nothing is saved — no scores,
-          no names, no progress, no cookies, no accounts. Close the tab and it is gone.
-          That is deliberate, and it has one consequence worth knowing: a child cannot
-          pick up where they left off. Where a game has difficulty levels, they are
-          chosen rather than earned, so you can put a child straight back where they were.
+          Every game here runs entirely in the browser. Nothing about your child is
+          saved — no scores, no names, no progress, no cookies, no accounts. Close the
+          tab and it is gone. That is deliberate, and it has one consequence worth
+          knowing: a child cannot pick up where they left off. Where a game has
+          difficulty levels, they are chosen rather than earned, so you can put a child
+          straight back where they were.
+        </p>
+        <p>
+          You can also add the games to a phone or tablet home screen, and they will
+          work with no internet at all — on a plane, in a car, anywhere. Installing
+          saves a copy of the games themselves onto the device; it still saves nothing
+          about your child.
         </p>
         <p>
           There are no ads and no third-party scripts of any kind, so nothing follows
@@ -460,6 +469,14 @@
     <script>
       document.getElementById("currentYear").textContent =
         new Date().getFullYear();
+    </script>
+    <script>
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
     </script>
   </body>
 </html>

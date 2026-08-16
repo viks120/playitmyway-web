@@ -25,6 +25,8 @@
     <meta name="twitter:description" content="Browse all 29 free educational games for kids ages 2-14 — phonics, maths, tracing, logic, geography and more. No ads, no tracking, nothing saved." />
 
     <link rel="canonical" href="https://playitmyway.com/games/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="../tokens.css" />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="../components.css" />
@@ -513,6 +515,14 @@
     <script>
       document.getElementById("currentYear").textContent =
         new Date().getFullYear();
+    </script>
+    <script>
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
     </script>
   </body>
 </html>
