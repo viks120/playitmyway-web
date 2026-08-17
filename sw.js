@@ -5,20 +5,20 @@
  * analytics. There is deliberately no push code here — push would require a
  * per-device subscription held by a third party, which this site does not do.
  */
-const CACHE = 'pimw-d20a4e06';
+const CACHE = 'pimw-e343a6e1';
 
 const PRECACHE = [
   "/",
-  "/404.html",
+  "/404",
   "/apple-touch-icon.png",
   "/components.css",
   "/components.js",
-  "/disclaimer.html",
+  "/disclaimer",
   "/favicon.svg",
   "/fonts/fredoka-400.woff2",
   "/fonts/fredoka-600.woff2",
   "/fonts/fredoka-700.woff2",
-  "/for-teachers.html",
+  "/for-teachers",
   "/games/",
   "/games/2048-slider/",
   "/games/balloon-pop/",
@@ -52,7 +52,7 @@ const PRECACHE = [
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/icon-maskable-512.png",
-  "/privacy-policy.html",
+  "/privacy-policy",
   "/styles.css",
   "/tokens.css"
 ];
@@ -84,25 +84,52 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;   // never touch third parties
 
-  event.respondWith(
-    caches.match(req).then((hit) => {
-      const fresh = fetch(req)
-        .then((res) => {
-          if (res && res.status === 200 && res.type === 'basic') {
-            const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => null);
+  /* Pages are cached under the spelling the host serves (/for-teachers) but
+     linked as for-teachers.html, because the .html links are what let the site
+     open straight off a memory stick over file://. So either spelling can
+     arrive here; a miss checks the other one before giving up on the cache. */
+  const leaf = url.pathname.slice(url.pathname.lastIndexOf('/') + 1);
+  const alt = url.pathname.endsWith('.html')
+    ? url.pathname.slice(0, -5)
+    : leaf && leaf.indexOf('.') === -1 ? url.pathname + '.html' : null;
 
-      if (hit) return hit;
-      return fresh.then((res) => {
-        if (res) return res;
-        // offline and never cached: hand back a friendly page, not a browser error
-        if (req.mode === 'navigate') return caches.match('/404.html');
-        return new Response('', { status: 504, statusText: 'Offline' });
-      });
-    })
+  event.respondWith(
+    caches.match(req)
+      .then((hit) => hit || (alt ? caches.match(alt) : undefined))
+      .then((hit) => {
+        const fresh = fetch(req)
+          .then((res) => {
+            if (res && res.status === 200 && res.type === 'basic') {
+              const copy = res.clone();
+              caches.open(CACHE).then((c) => c.put(req, copy));
+            }
+            return res;
+          })
+          .catch(() => null);
+
+        if (hit) return hit;
+        return fresh.then((res) => {
+          if (res) return res;
+          // offline and never cached: hand back a friendly page, not a browser
+          // error. respondWith(undefined) throws, so this must always resolve
+          // to a real Response even if the fallback page is missing too.
+          if (req.mode === 'navigate') {
+            return caches.match('/404')
+              .then((r) => r || caches.match('/404.html'))
+              .then((r) => r || OFFLINE());
+          }
+          return new Response('', { status: 504, statusText: 'Offline' });
+        });
+      })
   );
 });
+
+function OFFLINE() {
+  return new Response(
+    '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>Offline</title><body style="font-family:system-ui;text-align:center;padding:3em 1.5em;color:#2b2a5e">' +
+    '<h1>No connection</h1><p>This page has not been saved for offline play yet.</p>' +
+    '<p><a href="/games/" style="color:#2b2a5e">Back to the games</a></p>',
+    { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+  );
+}
