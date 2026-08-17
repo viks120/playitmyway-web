@@ -7,6 +7,22 @@
    No page-specific rules belong in this file.
    ========================================================================== */
 
+/* This site is light-only, on purpose, and says so out loud.
+
+   Without a declaration, a browser is free to invent its own dark version:
+   Chrome on Android algorithmically inverts sites that have no dark theme
+   when the reader turns on Auto Dark Theme. That inversion is not designed —
+   it would flip the age-band and word-class colours that carry meaning here
+   (a noun is blue, a verb is red) and repaint the tracing games' white paper.
+
+   "only" is the part that matters. Bare "light" says which schemes the page
+   supports; "only light" also withdraws permission for the browser to
+   override it. The matching <meta name="color-scheme"> on every page carries
+   the same signal earlier, before this stylesheet has been fetched. */
+:root {
+  color-scheme: only light;
+}
+
 @font-face {
   font-family: "Fredoka";
   src: url("fonts/fredoka-400.woff2") format("woff2");
