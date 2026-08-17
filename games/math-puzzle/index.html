@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <meta name="theme-color" content="#7c3aed" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -1384,6 +1384,20 @@
     </footer>
     <script src="../../components.js"></script>
     <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
       /* offline support; skipped over file:// where service workers do not run */
       if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
         addEventListener("load", function () {
@@ -1391,5 +1405,19 @@
         });
       }
     </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
   </body>
 </html>

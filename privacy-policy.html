@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, "
+      content="width=device-width, initial-scale=1.0, , viewport-fit=cover"
     />
     <meta name="theme-color" content="#2b2a5e" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -59,16 +59,23 @@
 
       .header {
         background-color: var(--color-deep);
-        padding: 1.2em 0;
+        /* fixed padding and a viewport-scalable minimum: the old em floor made
+           this bar 144px tall on a phone and 180px in landscape — permanently,
+           because it is sticky */
+        padding: 12px 16px;
         color: var(--color-deep-ink);
-        font-size: clamp(2em, 6vw, 2.5em);
+        font-size: clamp(1.25rem, 5vw, 2em);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         position: sticky;
         top: 0;
         z-index: 100;
         font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         text-align: center;
+      }
+
+      /* on a short screen a sticky title is a luxury; let it scroll away */
+      @media (max-height: 520px) {
+        .header { position: static; }
       }
 
       .container {
@@ -416,6 +423,20 @@
         new Date().getFullYear();
     </script>
     <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
       /* offline support; skipped over file:// where service workers do not run */
       if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
         addEventListener("load", function () {
@@ -423,5 +444,19 @@
         });
       }
     </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
   </body>
 </html>
