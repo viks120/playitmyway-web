@@ -457,7 +457,13 @@
         .header { margin-bottom: 5px; }
         .header h1 { font-size: 1.2em; }
         .stats { font-size: 0.8em; gap: 10px; margin-bottom: 5px; }
-        .game-area { height: calc(100vh - 130px); }
+        /* The chrome above the board (header, stats, mode buttons, target,
+           timer, feedback) is ~250px, not 130 — and the installed app adds a
+           nav bar. Subtracting too little pushed the bottom of the board and
+           its balloons below the fold while the clock ran. dvh, not vh, so
+           mobile browser chrome counts. */
+        .game-area { height: clamp(240px, calc(100vh - 300px), 460px); }
+        .game-area { height: clamp(240px, calc(100dvh - 300px), 460px); }
         .balloon { width: 50px; height: 65px; }
         .balloon-body { width: 50px; height: 60px; font-size: 1.2em; }
         .back-link { top: 5px; left: 5px; padding: 5px 8px; font-size: 0.75em; }

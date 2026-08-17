@@ -82,7 +82,10 @@
         table.games thead { display: none; }
         table.games tr { border-bottom: 2px solid #f0e6d8; padding: 6px 0; }
         table.games td { border: none; padding: 4px 14px; }
-        table.games td.g { font-size: 1.1rem; padding-top: 12px; }
+        /* nowrap + the table's overflow:hidden silently clipped the longest
+           game names ("Trace Letters & Numbers") on a 320px screen */
+        table.games { overflow: visible; }
+        table.games td.g { font-size: 1.1rem; padding-top: 12px; white-space: normal; }
       }
     </style>
   </head>

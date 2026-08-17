@@ -38,6 +38,8 @@
     <link rel="stylesheet" href="../../tokens.css" />
     <link rel="stylesheet" href="../../components.css" />
     <style>
+      /* width:100% must include padding, or the card overflows the phone */
+      *, *::before, *::after { box-sizing: border-box; }
       body {
         font-family: var(--font-display);
         background: var(--color-bg);
