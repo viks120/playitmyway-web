@@ -86,6 +86,84 @@
   text-decoration: underline;
 }
 
+/* ==========================================================================
+   App shell — the bottom bar, shown ONLY when running as an installed app.
+
+   In a browser tab this would be clutter: the browser already gives you back
+   and an address bar. But an installed app on iOS has NO back button at all —
+   only an edge-swipe most people never discover — so a child who opens a game
+   is stranded. That makes this a navigation fix, not decoration.
+
+   Selectors are `html body` / `html.pimw-installed` so they outrank the page's
+   own `body` rule, which is defined later in each page's inline <style>.
+   ========================================================================== */
+.pimw-appbar {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 900;              /* under game modals (1000+), over everything else */
+  background: #2b2a5e;
+  border-top: 1px solid rgba(201, 199, 245, 0.22);
+  padding-bottom: env(safe-area-inset-bottom);
+  justify-content: space-around;
+  align-items: stretch;
+}
+
+.pimw-appbar-btn {
+  flex: 1 1 0;
+  min-height: 56px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-family: inherit;
+  color: #c9c7f5;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 4px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 120ms ease, transform 120ms ease;
+}
+
+.pimw-appbar-btn:hover { color: #fff6ea; }
+.pimw-appbar-btn:active { transform: scale(0.92); color: #fff6ea; }
+
+.pimw-appbar-ic {
+  font-size: 21px;
+  line-height: 1;
+}
+
+.pimw-appbar-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Show the bar, and keep page content clear of it. */
+@media (display-mode: standalone) {
+  .pimw-appbar { display: flex; }
+  html body { padding-bottom: calc(62px + env(safe-area-inset-bottom)); }
+  html .pimw-sound-btn { bottom: calc(74px + env(safe-area-inset-bottom)); }
+  html .site-footer { margin-bottom: 20px; }
+}
+
+/* Fallback for iOS versions that report standalone only via navigator.standalone,
+   and for any browser without display-mode support. Set by the inline script. */
+html.pimw-installed .pimw-appbar { display: flex; }
+html.pimw-installed body { padding-bottom: calc(62px + env(safe-area-inset-bottom)); }
+html.pimw-installed .pimw-sound-btn { bottom: calc(74px + env(safe-area-inset-bottom)); }
+html.pimw-installed .site-footer { margin-bottom: 20px; }
+
+@media print {
+  .pimw-appbar { display: none !important; }
+}
+
 /* Site-wide sound toggle (see components.js). Fixed bottom-right so it sits
    in the same place on every game regardless of that page's own layout —
    a classroom and a sensory-sensitive child both need it findable without
