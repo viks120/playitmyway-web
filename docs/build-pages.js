@@ -35,7 +35,7 @@ function head(opts) {
     <meta property="og:title" content="${esc(opts.title)}" />
     <meta property="og:description" content="${esc(opts.description)}" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="${opts.canonical}" />
+${opts.canonical ? `    <meta property="og:url" content="${opts.canonical}" />\n` : ''}
     <meta property="og:site_name" content="Play It My Way" />
     <meta property="og:locale" content="en_US" />
 
@@ -43,7 +43,7 @@ function head(opts) {
     <meta name="twitter:title" content="${esc(opts.title)}" />
     <meta name="twitter:description" content="${esc(opts.description)}" />
 
-    <link rel="canonical" href="${opts.canonical}" />
+${opts.canonical ? `    <link rel="canonical" href="${opts.canonical}" />\n` : ''}
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="${opts.up}tokens.css" />
@@ -276,7 +276,9 @@ function buildTeachers() {
     title: 'For Parents & Teachers — What Each Game Builds | Play It My Way',
     description: 'What every Play It My Way game actually practises, the age it suits, and how long it takes. Free, ad-free and storage-free games for home and the classroom.',
     keywords: 'educational games for teachers, free classroom games, what skills do kids games teach, ad free games for schools, safe games for kids',
-    canonical: 'https://playitmyway.com/for-teachers.html',
+    // no .html: the host 308s that spelling, and a canonical pointing at a
+    // redirect is a signal Google has to resolve rather than obey
+    canonical: 'https://playitmyway.com/for-teachers',
     css: TEACHER_CSS
   });
 
@@ -363,7 +365,9 @@ function build404() {
     title: 'Page Not Found | Play It My Way',
     description: 'That page does not exist. Browse all free educational games for kids instead.',
     keywords: 'play it my way, free educational games for kids',
-    canonical: 'https://playitmyway.com/404.html',
+    // deliberately no canonical: this page is noindex, and pairing noindex
+    // with a canonical asks the crawler to honour two contradictory rules
+    canonical: '',
     robots: 'noindex, follow',
     css: PAGE_CSS
   });
@@ -417,7 +421,15 @@ function buildServiceWorker() {
       if (entry.name.startsWith('.') || entry.name === 'docs' || entry.name === 'node_modules') continue;
       if (entry.isDirectory()) walk(path.join(dir, entry.name), rel);
       else if (!skip.has(rel) && /\.(html|css|js|woff2|svg|png)$/.test(entry.name)) {
-        urls.push('/' + rel.replace(/\\/g, '/').replace(/(^|\/)index\.html$/, '$1'));
+        urls.push(
+          '/' + rel.replace(/\\/g, '/')
+            .replace(/(^|\/)index\.html$/, '$1')
+            // The host serves /page for page.html and 308s the .html form.
+            // cache.add() rejects on a redirect, so precaching the .html
+            // spelling silently cached nothing at all — including the offline
+            // fallback page. Ask for the URL that actually answers 200.
+            .replace(/\.html$/, '')
+        );
       }
     }
   };
@@ -466,29 +478,66 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;   // never touch third parties
 
-  event.respondWith(
-    caches.match(req).then((hit) => {
-      const fresh = fetch(req)
-        .then((res) => {
-          if (res && res.status === 200 && res.type === 'basic') {
-            const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => null);
+  /* Pages are cached under the spelling the host serves (/for-teachers) but
+     linked as for-teachers.html, because the .html links are what let the site
+     open straight off a memory stick over file://. So either spelling can
+     arrive here; a miss checks the other one before giving up on the cache. */
+  const leaf = url.pathname.slice(url.pathname.lastIndexOf('/') + 1);
+  const alt = url.pathname.endsWith('.html')
+    ? url.pathname.slice(0, -5)
+    : leaf && leaf.indexOf('.') === -1 ? url.pathname + '.html' : null;
 
-      if (hit) return hit;
-      return fresh.then((res) => {
-        if (res) return res;
-        // offline and never cached: hand back a friendly page, not a browser error
-        if (req.mode === 'navigate') return caches.match('/404.html');
-        return new Response('', { status: 504, statusText: 'Offline' });
-      });
-    })
+  event.respondWith(
+    caches.match(req)
+      .then((hit) => hit || (alt ? caches.match(alt) : undefined))
+      .then((hit) => {
+        const fresh = fetch(req)
+          .then((res) => {
+            if (res && res.status === 200 && res.type === 'basic') {
+              const copy = res.clone();
+              caches.open(CACHE).then((c) => c.put(req, copy));
+            }
+            return res;
+          })
+          .catch(() => null);
+
+        if (hit) return hit;
+        return fresh.then((res) => {
+          if (res) return res;
+          // offline and never cached: hand back a friendly page, not a browser
+          // error. respondWith(undefined) throws, so this must always resolve
+          // to a real Response even if the fallback page is missing too.
+          if (req.mode === 'navigate') {
+            return caches.match('/404')
+              .then((r) => r || caches.match('/404.html'))
+              .then((r) => r || OFFLINE());
+          }
+          return new Response('', { status: 504, statusText: 'Offline' });
+        });
+      })
   );
 });
+
+function OFFLINE() {
+  return new Response(
+    '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>Offline</title><body style="font-family:system-ui;text-align:center;padding:3em 1.5em;color:#2b2a5e">' +
+    '<h1>No connection</h1><p>This page has not been saved for offline play yet.</p>' +
+    '<p><a href="/games/" style="color:#2b2a5e">Back to the games</a></p>',
+    { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+  );
+}
 `;
+  /* sw.js is built inside a template literal, so a stray backslash in the
+     worker's own source is eaten before it ever reaches the file — that once
+     turned a regex into a line comment and silently disabled the fetch
+     handler. Parse the result before writing it. */
+  try {
+    new Function(sw);
+  } catch (e) {
+    throw new Error('generated sw.js does not parse: ' + e.message);
+  }
+
   fs.writeFileSync(path.join(ROOT, 'sw.js'), sw);
   return urls.length;
 }
