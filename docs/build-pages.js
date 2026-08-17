@@ -22,6 +22,11 @@ function head(opts) {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- light-only, and "only" withdraws the browser's permission to invent a
+         dark version of its own (Chrome's Auto Dark Theme) -->
+    <meta name="color-scheme" content="only light" />
+    <!-- and the same to the Dark Reader extension, which darkens pages itself -->
+    <meta name="darkreader-lock" />
     <meta name="theme-color" content="#c2410c" />
 
     <link rel="icon" type="image/svg+xml" href="${opts.up}favicon.svg" />
