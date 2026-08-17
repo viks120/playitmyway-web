@@ -59,16 +59,23 @@
 
       .header {
         background-color: var(--color-deep);
-        padding: 1.2em 0;
+        /* fixed padding and a viewport-scalable minimum: the old em floor made
+           this bar 144px tall on a phone and 180px in landscape — permanently,
+           because it is sticky */
+        padding: 12px 16px;
         color: var(--color-deep-ink);
-        font-size: clamp(2em, 6vw, 2.5em);
+        font-size: clamp(1.25rem, 5vw, 2em);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         position: sticky;
         top: 0;
         z-index: 100;
         font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         text-align: center;
+      }
+
+      /* on a short screen a sticky title is a luxury; let it scroll away */
+      @media (max-height: 520px) {
+        .header { position: static; }
       }
 
       .container {
