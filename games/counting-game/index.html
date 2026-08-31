@@ -111,6 +111,10 @@
         margin-bottom: 30px;
       }
 
+      .game-mode h3 {
+        margin: 0 0 10px;
+      }
+
       .mode-buttons {
         display: flex;
         gap: 10px;
@@ -437,9 +441,11 @@
           margin: 0 5px;
         }
 
+        /* was a 4-tall stack (~214px); a 2x2 grid halves that with the
+           same button size and the same 44px touch target */
         .mode-buttons {
-          flex-direction: column;
-          align-items: center;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
           gap: 10px;
         }
 
@@ -463,8 +469,9 @@
           padding: 8px;
         }
 
+        /* content is always exactly 3 short numbers (see generateCountingQuestion
+           and friends) — let the base repeat(3, 1fr) stand instead of wrapping */
         .answer-options {
-          grid-template-columns: repeat(2, 1fr);
           gap: 10px;
         }
 
@@ -493,18 +500,31 @@
           padding-top: 50px; /* Less space on smaller screens */
         }
 
-        .answer-options {
-          grid-template-columns: 1fr;
-        }
+        /* was forced to 1 column here (3 stacked rows, ~200px); the three
+           options are always short numbers, so let them stay in one row */
 
-        .stats {
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-        }
+        /* was forced to 1 column (4 stacked chips, ~194px); the base
+           flex-wrap already packs them into 2 rows on their own */
 
         .question-area {
           min-height: 80px;
+        }
+
+        .header {
+          margin-bottom: 16px;
+        }
+
+        .game-mode {
+          margin-bottom: 18px;
+        }
+
+        .answer-options {
+          margin-bottom: 12px;
+        }
+
+        .hint,
+        .feedback {
+          margin: 12px 0;
         }
       }
 
