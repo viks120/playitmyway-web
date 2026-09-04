@@ -208,3 +208,51 @@ html.pimw-installed .site-footer { margin-bottom: 20px; }
 @media print {
   .pimw-sound-btn { display: none !important; }
 }
+
+/* Full-screen toggle (see components.js). Top-right so it never competes
+   with the sound button (bottom-right) or the back link (top-left), and
+   fixed so it's still reachable without scrolling back up mid-game. It
+   reclaims the browser's own chrome on top of whatever the page already
+   saves — a distinct win from the layout work, not a substitute for it. */
+.pimw-fs-btn {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 500;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 2px solid rgba(51, 48, 46, 0.15);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 4px 0 0 rgba(51, 48, 46, 0.18);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.pimw-fs-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 0 rgba(51, 48, 46, 0.18);
+}
+
+.pimw-fs-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 rgba(51, 48, 46, 0.18);
+}
+
+/* while actually in full screen: a filled, unmistakably "tap to leave" look */
+.pimw-fs-btn.is-on {
+  background: rgba(43, 42, 94, 0.94);
+  color: #fff6ea;
+  border-color: rgba(43, 42, 94, 0.55);
+}
+
+@media print {
+  .pimw-fs-btn { display: none !important; }
+}
