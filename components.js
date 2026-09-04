@@ -5,6 +5,8 @@
 
    Provides two floating toggles: the site-wide sound button (bottom-right)
    and the full-screen button (top-right, every game — sound or silent).
+   Full screen also hides the page furniture — title block, "how to play"
+   and the trust footer — so only the game itself is left on screen.
    Pages with audio keep their own audio code and simply bail out early
    while muted:
        function playSound(type) { if (window.pimwMuted) return; ... }
@@ -64,9 +66,13 @@
   }
 
   // ---- full-screen toggle: every page this script reaches ---------------
-  // Fullscreens the whole page (<html>), not just the game board, so the
-  // back link, sound button and footer keep working exactly as they do
-  // today — only the browser's own chrome (address bar, tabs) goes away.
+  // Fullscreens the whole page (<html>) rather than the game element alone.
+  // Counter-intuitive but necessary: in element fullscreen the browser paints
+  // ONLY that element's subtree, so fixed-position controls living on <body>
+  // — including this button — would vanish, stranding the player with no
+  // visible way out. Fullscreening <html> keeps every control reachable, and
+  // components.css then hides the non-game furniture via .pimw-fs, which gets
+  // the same "just the game" result without the trap.
   function fsEnabled() {
     var d = document;
     return !!(d.fullscreenEnabled || d.webkitFullscreenEnabled || d.mozFullScreenEnabled || d.msFullscreenEnabled);
@@ -109,6 +115,11 @@
 
     function sync() {
       var on = !!fsElement();
+      // drives the furniture-hiding rules in components.css. A class, not the
+      // :fullscreen pseudo-class: its prefixed forms can't share a selector
+      // list (one unknown selector voids the whole rule), and we already know
+      // the state here.
+      document.documentElement.classList.toggle("pimw-fs", on);
       btn.innerHTML = '<span aria-hidden="true">' + (on ? "✕" : "⛶") + "</span>";
       btn.setAttribute("aria-pressed", on ? "true" : "false");
       btn.setAttribute("aria-label", on ? "Exit full screen" : "Play in full screen");
