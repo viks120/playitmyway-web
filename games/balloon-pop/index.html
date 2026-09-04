@@ -702,6 +702,10 @@
             currentTarget++;
             if (currentTarget > maxTarget) {
               levelUp();
+            } else {
+              // put the next number up straight away rather than leaving the
+              // child hunting the board until the 3-second refill comes round
+              topUpBalloons();
             }
           }
 
@@ -768,17 +772,27 @@
       function topUpBalloons() {
         const existing = document.querySelectorAll('.balloon');
         const target = Math.min(6 + level, 12);
-        let need = target - existing.length;
-        if (need <= 0) return;
-
         const values = [];
         const have = [...existing].map(b => parseInt(b.dataset.value, 10));
+
+        // The number being asked for must ALWAYS be on the board. This used to
+        // sit behind an early `if (need <= 0) return`, which deadlocked the
+        // game: a wrong tap deliberately does not pop its balloon, so once the
+        // board was full and the wanted number was not on it, nothing could
+        // ever remove a balloon and nothing could ever add the missing one.
+        // The child tapped, lost 5 points a time, and waited out the clock.
+        // Levels spawn 1..count but count up to maxTarget, so the tail of every
+        // level — 9 and 10 at level 1 — only ever arrives through this path.
         if (mode !== 'free' && !have.includes(currentTarget)) {
           values.push({
             value: currentTarget,
             display: mode === 'letters' ? letters[currentTarget - 1] : currentTarget.toString()
           });
         }
+
+        // padding out to a full board is still capacity-bound; the target above
+        // is not, so a full board grows by exactly the one balloon it was missing
+        const need = target - existing.length;
         while (values.length < need) {
           if (mode === 'letters') {
             const rand = Math.floor(Math.random() * maxTarget) + 1;
@@ -884,9 +898,10 @@
 
         timerInterval = setInterval(updateTimer, 100);
         spawnInterval = setInterval(() => {
-          if (gameRunning && document.querySelectorAll('.balloon').length < 6) {
-            topUpBalloons();
-          }
+          // no longer gated on a nearly-empty board: topUpBalloons() limits its
+          // own padding, and the board sitting at 6 was exactly the state that
+          // stopped the missing target from ever being added
+          if (gameRunning) topUpBalloons();
         }, 3000);
       }
 
