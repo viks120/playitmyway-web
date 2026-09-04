@@ -256,3 +256,27 @@ html.pimw-installed .site-footer { margin-bottom: 20px; }
 @media print {
   .pimw-fs-btn { display: none !important; }
 }
+
+/* ---- what "full screen" actually means here -----------------------------
+   Entering full screen sets .pimw-fs on <html> (see components.js). The
+   browser chrome is already gone by then; these rules clear the SITE's own
+   furniture too, so what's left is the game and the controls needed to play
+   and to leave.
+
+   Hidden: the page title block, the "how to play" notes, and the trust
+   footer — all page scaffolding rather than part of playing.
+
+   Deliberately kept: the back link and the installed-app bar (navigation —
+   removing every exit but one button is how people get stuck), the sound
+   toggle, and this file's own full-screen button. Also untouched are the
+   in-game legends and helper chips (.legend, .helper), which explain what
+   the pieces on the board mean and are needed mid-play.
+
+   Selectors carry html.pimw-fs so they outrank each page's own inline rules,
+   which are defined later in the document than this stylesheet. */
+html.pimw-fs .site-footer,
+html.pimw-fs .header,
+html.pimw-fs .game-head,
+html.pimw-fs .how-to {
+  display: none;
+}
