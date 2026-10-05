@@ -431,6 +431,12 @@
     world.showFocus(null);
     if (!calm()) later(0.4, () => world.burst(above(player.root.position, 1.5), 'confetti'));
     tell(`You made it across! ${S.pond.title} cleared.`, 'good');
+    // a swap asked for mid-hop would otherwise wait for an idle that never comes
+    if (S.pendingSwap) {
+      const k = S.pendingSwap;
+      S.pendingSwap = null;
+      swap(k);
+    }
   }
 
   function showWon() {
