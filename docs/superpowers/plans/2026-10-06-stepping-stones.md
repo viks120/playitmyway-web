@@ -36,7 +36,7 @@
 | `games/stepping-stones/index.html` (new) | The page |
 | `docs/vendor/three-entry.js` (new) | The Three.js exports the bundle contains |
 | `docs/vendor/build-three.js` (new) | Rebuilds `three.min.js` |
-| `docs/tests/stepping-stones.test.js` (new) | Pond, bundle and critter tests (`node --test docs/tests/`) |
+| `docs/tests/stepping-stones.test.js` (new) | Pond, bundle and critter tests (`node --test docs/tests/*.test.js`) |
 | `docs/catalogue.js`, `index.html`, `sitemap.xml`, `manifest.json` (modify) | Site wiring |
 | `games/index.html`, `for-teachers.html`, `404.html`, `sw.js` (regenerate) | via `node docs/build-pages.js` |
 
@@ -61,7 +61,7 @@ The preview server runs with `ROOT` = the repo and `CONTENT` = `$SP/drafts` on p
 
 <!-- file: docs/tests/stepping-stones.test.js -->
 ```js
-/* Stepping Stones tests. Zero dependencies:   node --test docs/tests/
+/* Stepping Stones tests. Zero dependencies:   node --test docs/tests/*.test.js
  *
  * They load the shipped files from games/stepping-stones, never a copy, and
  * check every pond against an independent restatement of its rule written
@@ -238,7 +238,7 @@ test('hasRoute follows diagonals and stops at gaps', () => {
 
 - [ ] **Step 2: Run the tests to confirm they fail**
 
-Run: `node --test docs/tests/`
+Run: `node --test docs/tests/*.test.js`
 Expected: FAIL with `Cannot find module '…\games\stepping-stones\ponds.js'`
 
 - [ ] **Step 3: Write `ponds.js`**
@@ -583,7 +583,7 @@ Expected: FAIL with `Cannot find module '…\games\stepping-stones\ponds.js'`
 
 - [ ] **Step 4: Run the tests to confirm they pass**
 
-Run: `node --test docs/tests/`
+Run: `node --test docs/tests/*.test.js`
 Expected: PASS, 21 tests (1 list test, 16 pond tests, 4 others), 0 failures.
 
 - [ ] **Step 5: Commit**
@@ -643,7 +643,7 @@ test('every THREE name the game scripts use is in the trimmed bundle', () => {
 
 - [ ] **Step 2: Run the tests to confirm the new ones fail**
 
-Run: `node --test docs/tests/`
+Run: `node --test docs/tests/*.test.js`
 Expected: FAIL in the two new tests with `ENOENT: no such file or directory, open '…three.min.js'`
 
 - [ ] **Step 3: Write the export list and the build script**
@@ -745,7 +745,7 @@ Check: `head -c 700 games/stepping-stones/three.min.js` shows `/*!`, `three.js r
 
 - [ ] **Step 5: Run the tests to confirm they pass**
 
-Run: `node --test docs/tests/`
+Run: `node --test docs/tests/*.test.js`
 Expected: PASS, 23 tests. The coverage test passes trivially until game scripts exist; Tasks 3 to 5 re-run it.
 
 - [ ] **Step 6: Commit**
@@ -806,7 +806,7 @@ test('the four critters build, react and animate without a browser', () => {
 
 - [ ] **Step 2: Run the tests to confirm the new one fails**
 
-Run: `node --test docs/tests/`
+Run: `node --test docs/tests/*.test.js`
 Expected: FAIL with `ENOENT … toon.js`
 
 - [ ] **Step 3: Write `toon.js`**
@@ -1401,7 +1401,7 @@ Expected: FAIL with `ENOENT … toon.js`
 
 - [ ] **Step 6: Run the tests to confirm they pass**
 
-Run: `node --test docs/tests/`
+Run: `node --test docs/tests/*.test.js`
 Expected: PASS, 24 tests.
 
 - [ ] **Step 7: Look at the critters**
@@ -2047,7 +2047,7 @@ Expected: no console errors; the bunny on a first-row stone facing the camera; a
 
 - [ ] **Step 3: Run the tests**
 
-Run: `node --test docs/tests/`
+Run: `node --test docs/tests/*.test.js`
 Expected: PASS, 24 tests. The coverage test now checks `world.js` too.
 
 - [ ] **Step 4: Commit**
@@ -3528,7 +3528,7 @@ Expected: `E2E PASS (run)`. Then open each screenshot in `$SP/shots/run-*.png` a
 
 - [ ] **Step 5: Run the unit tests**
 
-Run: `node --test docs/tests/`
+Run: `node --test docs/tests/*.test.js`
 Expected: PASS, 24 tests, with the coverage test now including `game.js`.
 
 - [ ] **Step 6: Commit**
@@ -3586,7 +3586,7 @@ Expected output includes `games/index.html  — 30 games across 5 bands` and `sw
 Check: `grep -c "stepping-stones" sw.js` prints 8 (the page plus 7 scripts), and `grep -o "All Games — 30" games/index.html` matches.
 
 - [ ] **Step 5: Final verification**
-  1. `node --test docs/tests/` passes.
+  1. `node --test docs/tests/*.test.js` passes.
   2. `node $SP/tools/e2e.cjs http://127.0.0.1:47123/games/stepping-stones/ $SP/shots final` prints `E2E PASS (final)`.
   3. Run `node $SP/tools/shot.cjs file:///C:/Users/shrik/playitmyway-web/games/stepping-stones/index.html $SP/shots/file.png 2500 1100 860`. Expected: no page errors, and the picker renders over `file://`. The only failed request is the absolute `/manifest.json`, which every page has over `file://`.
   4. Take phone (390 × 844) and desktop (1280 × 900) screenshots of the picker and a pond with `shot.cjs` and inspect them.
