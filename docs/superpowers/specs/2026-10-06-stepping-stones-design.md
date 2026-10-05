@@ -44,8 +44,10 @@ and when opened straight from a file (`file://`, the memory-stick case).
   bank (goal). The rule is shown in a banner at the top.
 - **Moves:** from a stone, the critter may hop to any stone touching it,
   including diagonals and backwards. From the near bank it may hop to any stone
-  in the first row; from any stone in the last row, onto the far bank.
-- **Guidance:** reachable stones are marked with a pulsing ring.
+  in the first row, and from any first-row stone back onto the near bank. From
+  any stone in the last row it may hop onto the far bank.
+- **Guidance:** reachable stones are marked with a pulsing ring: a large one
+  on the far bank when it is in reach, a small one on the near bank.
 - **Right stone:** the critter lands with squash and stretch, a musical note
   rising one step per row plays, sparkles burst, the message strip gives the
   reason ("21 = 3 × 7"), and the friends on the far bank hop and cheer.
@@ -55,7 +57,11 @@ and when opened straight from a file (`file://`, the memory-stick case).
   last safe stone. The sunk stone stays gone for the rest of that pond. There
   are no lives and no game over.
 - **Never stranded:** only wrong stones sink and the critter only ever stands
-  on right stones, so the route back to the guaranteed path always remains.
+  on right stones, so the way it came is always still there. The first hop
+  is the exception, because the near bank is not a stone. A right stone in
+  the first row can be a dead end cut off from the route, so the critter may
+  always hop back onto the near bank and try another. The end-to-end player
+  found this: before the fix it could be stranded on such a stone.
 - **Far bank:** the critter and friends celebrate. Stars depend on splashes in
   that pond: none gives 3, one gives 2, two or more gives 1. Buttons: **Next
   pond**, **Same pond, new stones**, **All ponds**.

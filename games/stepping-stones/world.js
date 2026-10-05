@@ -259,18 +259,18 @@
         const pad = pickerPads[i];
         if (!rig || !pad) return;
         const b = btn.getBoundingClientRect();
-        const y = b.top + b.height * 0.7;
+        const y = b.top + b.height * 0.74;
         const mid = W.pick(b.left + b.width / 2, y, 0, rect);
         const left = W.pick(b.left + b.width * 0.1, y, 0, rect);
         const right = W.pick(b.right - b.width * 0.1, y, 0, rect);
         if (!mid || !left || !right) return;
-        const s = clamp(left.distanceTo(right) / 2.4, 0.4, 1.6);
+        const s = clamp(left.distanceTo(right) / 2.4, 0.4, 2.0);
         pad.position.set(mid.x, 0, mid.z);
-        pad.scale.setScalar(s * 0.85);
+        pad.scale.setScalar(s * 1.05);
         rig.root.position.x = mid.x;
         rig.root.position.z = mid.z;
-        rig.root.scale.setScalar(s * 0.8);
-        rig.baseY = 0.05 * s * 0.85;
+        rig.root.scale.setScalar(s * 1.15);
+        rig.baseY = 0.05 * s * 1.05;
       });
     };
 
@@ -391,7 +391,7 @@
       }
       const hHalf = Math.tan((vfov * Math.PI) / 360) * a;
       const ahead = clamp(5.4 - 2.0 * a, 2.0, 4.6);
-      const pitch = 0.66;
+      const pitch = 0.72;
       const halfWidth = 1.5 * DX + 0.56 + 0.2;
       const L = clamp(halfWidth / hHalf + ahead * Math.cos(pitch), 10, 13);
       const tz = camZ - ahead;
@@ -461,11 +461,13 @@
 
       const pulse = Math.sin(t * 5);
       M.ring.opacity = 0.55 + 0.35 * pulse;
+      // the far bank gets a big goal ring; the near bank (a way back) a small one
+      const RING_SIZE = { stone: 1, end: 1.3, start: 0.75 };
       ringNodes.forEach((n, i) => {
         const p = W.nodeTop(n);
         const onBank = n.type !== 'stone';
         rings[i].position.set(p.x, onBank ? BANK_TOP + 0.02 : 0.03, p.z);
-        rings[i].scale.setScalar((onBank ? 1.3 : 1) * (1 + 0.06 * pulse));
+        rings[i].scale.setScalar(RING_SIZE[n.type] * (1 + 0.06 * pulse));
       });
       if (focusNode) {
         const p = W.nodeTop(focusNode);
