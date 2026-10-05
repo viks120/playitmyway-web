@@ -199,3 +199,28 @@ test('every THREE name the game scripts use is in the trimmed bundle', () => {
   const missing = [...used].filter((name) => !exported.has(name)).sort();
   assert.deepEqual(missing, [], 'add these to docs/vendor/three-entry.js, then run node docs/vendor/build-three.js');
 });
+
+test('the four critters build, react and animate without a browser', () => {
+  const ctx = loadBundle();
+  for (const f of ['toon.js', 'critters.js']) {
+    vm.runInContext(fs.readFileSync(path.join(GAME, f), 'utf8'), ctx, { filename: f });
+  }
+  const { Critters } = ctx;
+  assert.deepEqual(Object.keys(Critters.KINDS), ['bunny', 'frog', 'dino', 'kitten']);
+  assert.deepEqual(Object.values(Critters.KINDS).map((k) => `${k.name} the ${k.kind}`),
+    ['Clover the Bunny', 'Pip the Frog', 'Plum the Baby Dino', 'Mango the Kitten']);
+  for (const kind of Object.keys(Critters.KINDS)) {
+    const rig = Critters.create(kind);
+    let meshes = 0;
+    rig.root.traverse((o) => { if (o.isMesh) meshes++; });
+    assert.ok(meshes > 20, `${kind} has only ${meshes} meshes`);
+    for (const name of ['earshake', 'puff', 'shake', 'bubble']) assert.ok(rig.react(name) > 0, name);
+    for (let t = 1; t < 3; t += 0.05) rig.update(t, 0.05);
+    assert.ok(Number.isFinite(rig.root.children[0].rotation.z));
+    rig.dispose();
+  }
+  const h = Critters.hopCurve(0.3, 0.6);
+  assert.equal(h.phase, 'air');
+  assert.ok(h.y > 0);
+  assert.equal(Critters.hopCurve(5, 0.6), null);
+});
