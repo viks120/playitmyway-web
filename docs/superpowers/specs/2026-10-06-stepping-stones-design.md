@@ -275,7 +275,7 @@ it grows to the viewport.
 ## Testing
 
 1. **Pond tests:** plain Node with the built-in `node:test`, no installs. Run
-   with `node --test docs/tests/`. For every pond type across at least 2,000
+   with `node --test docs/tests/*.test.js`. For every pond type across at least 2,000
    fixed seeds:
    - the grid is 8 × 4;
    - a route exists, checked by an independent search;
