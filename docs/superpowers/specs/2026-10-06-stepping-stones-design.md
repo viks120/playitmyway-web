@@ -116,7 +116,10 @@ Ponds are generated fresh every time from a seeded random number generator
 2. **Right stones** go on every route cell. Each other cell also becomes a right
    stone with probability 0.15, which makes branches and dead ends, as long
    as its row stays at 2 right stones or fewer. Every row has 1 or 2 right
-   stones.
+   stones. Ponds with a small decoy pool get extra right stones, enough that
+   the decoys can fill the rest without breaking the twice-per-pond limit.
+   Even to 20 and Odd to 20 have only ten decoys each, so they always get at
+   least 12 right stones.
 3. **Decoys** fill every other cell, near misses first.
 4. **Checks:** no label repeats within a row; no label appears more than twice
    in the pond; a breadth-first search over right stones (8-neighbour moves,
@@ -218,15 +221,19 @@ load in order with relative paths, so the page works over both `http(s)` and
 |---|---|---|---|
 | `index.html` | The page: head and meta, back link, title block, game stage with HUD markup, how-to-play, trust footer, app bar, script tags | the scripts below, `tokens.css`, `components.css`, `components.js` | n/a |
 | `three.min.js` | Three.js r186, trimmed, IIFE defining global `THREE`; full MIT licence text as the leading comment | nothing | `THREE.*` |
-| `critters.js` | The four critters, their rig and animations | `THREE` | `Critters.KINDS` (id → name, kind, emoji, voice pitch); `Critters.create(kind)` → rig with `root`, `turn`, `look`, `sy`, `earX`, `update(t, dt)`, `react(name)` |
-| `ponds.js` | Pond definitions, generator, route checker, explanations, hints. Pure logic: no `THREE`, no DOM | nothing | `Ponds.LIST`; `Ponds.generate(id, seed)` → grid of `{ label, ok, why }`; `Ponds.hasRoute(grid)`; `Ponds.rng(seed)`. Exported to `window.Ponds` in the browser and `module.exports` in Node |
-| `game.js` | Renderer, scene, camera, input, screens and flow, sound, HUD wiring | `THREE`, `Critters`, `Ponds`, DOM | none: no globals |
+| `toon.js` | The shared look: toon ramp, flat fills, coloured outlines, disposal | `THREE` | `Toon.toon`, `Toon.flat`, `Toon.addOutlines`, `Toon.dispose` |
+| `ponds.js` | Pond definitions, generator, route checker, explanations, hints. Pure logic: no `THREE`, no DOM | nothing | `Ponds.LIST`; `Ponds.generate(id, seed)` → grid of `{ label, ok, why }`; `Ponds.judge(id, label)`; `Ponds.hasRoute(grid)`; `Ponds.rng(seed)`. Exported to `window.Ponds` in the browser and `module.exports` in Node |
+| `critters.js` | The four critters, their rig, reactions and hop curve | `THREE`, `Toon` | `Critters.KINDS` (id → name, kind, emoji, voice pitch); `Critters.create(kind)` → rig with `root`, `turn`, `look`, `sy`, `earX`, `update(t, dt)`, `react(name)`, `dispose()`; `Critters.hopCurve` |
+| `sound.js` | Synthesised sounds, silent while the site toggle is off | Web Audio | `Sfx.play(name, arg)` |
+| `world.js` | Renderer, scene, picker pads, pond meshes, ripples, particles, both camera framings | `THREE`, `Toon` | `World.create(canvas)` → world object, or `null` without WebGL |
+| `game.js` | Screens and flow, movement rules, input, HUD wiring, choreography | all of the above, DOM | none: no globals |
 
 Also new:
 
 - `docs/vendor/three-entry.js` lists exactly which Three.js exports the bundle
-  contains, with the one-line `npx esbuild` command that rebuilds
-  `three.min.js` from the pinned `three@0.186.1`. `docs/` is skipped by the
+  contains. `docs/vendor/build-three.js` rebuilds `three.min.js` from the
+  pinned `three@0.186.1` and `esbuild@0.28.2` with one command,
+  `node docs/vendor/build-three.js`. `docs/` is skipped by the
   service-worker precache.
 - `docs/tests/stepping-stones.test.js` holds the pond tests (see Testing).
 
