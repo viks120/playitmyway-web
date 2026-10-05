@@ -103,6 +103,9 @@ module.exports = {
     { slug: 'one-line-draw', name: 'One Line Draw', emoji: '✏️', age: '7', mins: '15',
       skills: ['logic'],
       practises: 'Planning a route that covers every line without lifting your finger — 36 puzzles, each proven solvable.' },
+    { slug: 'stepping-stones', name: 'Stepping Stones', emoji: '🐸', age: '7', mins: '10',
+      skills: ['numbers', 'logic'],
+      practises: 'Odd and even, times tables 2–10 and number bonds to 10, 20 and 100, by hopping only on stones that fit the rule and planning a route across the pond. A wrong stone explains itself before you try again.' },
 
     // --- 14+ ---
     { slug: 'science-trivia', name: 'Science Trivia', emoji: '🔬', age: '14', mins: '10',

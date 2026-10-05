@@ -5,7 +5,7 @@
  * analytics. There is deliberately no push code here — push would require a
  * per-device subscription held by a third party, which this site does not do.
  */
-const CACHE = 'pimw-e343a6e1';
+const CACHE = 'pimw-188dd0b8';
 
 const PRECACHE = [
   "/",
@@ -41,6 +41,14 @@ const PRECACHE = [
   "/games/silly-story-builder/",
   "/games/sort-it-out/",
   "/games/sound-it-out/",
+  "/games/stepping-stones/",
+  "/games/stepping-stones/critters.js",
+  "/games/stepping-stones/game.js",
+  "/games/stepping-stones/ponds.js",
+  "/games/stepping-stones/sound.js",
+  "/games/stepping-stones/three.min.js",
+  "/games/stepping-stones/toon.js",
+  "/games/stepping-stones/world.js",
   "/games/sudoku/",
   "/games/tic-tac-toe/",
   "/games/trace-letters/",
