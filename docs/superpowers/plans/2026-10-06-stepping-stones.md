@@ -3598,3 +3598,15 @@ Check: `grep -c "stepping-stones" sw.js` prints 8 (the page plus 7 scripts), and
 git add docs/catalogue.js index.html sitemap.xml manifest.json games/index.html for-teachers.html 404.html sw.js
 git commit -m "feat: Stepping Stones joins the catalogue, homepage, sitemap and offline cache"
 ```
+
+---
+
+## What changed during execution (2026-10-06)
+
+The plan was followed task by task. These differences came out of running it, and the code and spec carry them:
+
+1. **Test command.** Node 25's `--test` wants file patterns, not a folder, so the command is `node --test docs/tests/*.test.js` everywhere.
+2. **Pond camera aims further ahead.** `ahead = clamp(5.4 - 2.0 * a, 2.0, 4.6)` (was `4.6 - 2.2a`, 1.0 to 4.0). The first framing left a third of the screen as empty grass.
+3. **Critters stand smaller in the pond, and the camera looks down more.** Critter scale is 0.72 (was 0.8) and the camera pitch is 0.72 rad (was 0.66), so a critter no longer hides the numbers on the row ahead. On the picker the critters are larger (scale `s * 1.15`, pad `s * 1.05`, anchored at 74% of the button).
+4. **A way back to the near bank.** The end-to-end player found a real soft-lock. A right first-row stone can be a dead end cut off from the route, and from the bank there was no way back. `options()` now offers the near bank from any first-row stone, with a small ring (0.75; the far bank's goal ring stays 1.3). The keyboard treats the bank as its own row and announces "The near bank, where you started", and a tap on the bank while on the first row hops back. The spec's "Never stranded" section now explains this.
+5. **End-to-end player fixes (scratchpad only).** When backing out of a dead end, the player looks up the stone's label from its scan, since its trail keeps only positions. It also checks the hop back to the bank explicitly. It passed five times in a row on fresh random ponds, then again in the final run.
