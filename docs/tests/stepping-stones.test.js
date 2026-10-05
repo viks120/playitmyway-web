@@ -171,3 +171,31 @@ test('hasRoute follows diagonals and stops at gaps', () => {
   assert.equal(Ponds.hasRoute(grid(['o...', '.o..', '....', '...o', '..o.', '.o..', 'o...', '.o..'])), false);
   assert.equal(Ponds.hasRoute(grid(['o..o', 'o..o', 'o..o', '....', 'oooo', 'oooo', 'oooo', 'oooo'])), false);
 });
+
+/* Load the trimmed Three.js bundle the way a browser would: as a classic
+ * script whose top-level `var THREE` lands on the global object. */
+function loadBundle() {
+  const ctx = vm.createContext({ console });
+  ctx.window = ctx;
+  vm.runInContext(fs.readFileSync(path.join(GAME, 'three.min.js'), 'utf8'), ctx, { filename: 'three.min.js' });
+  return ctx;
+}
+
+test('three.min.js carries the full MIT licence text', () => {
+  const head = fs.readFileSync(path.join(GAME, 'three.min.js'), 'utf8').slice(0, 2000);
+  assert.match(head, /The MIT License/);
+  assert.match(head, /Copyright © 2010-\d{4} three\.js authors/);
+  assert.match(head, /Permission is hereby granted, free of charge/);
+  assert.match(head, /THE SOFTWARE IS PROVIDED "AS IS"/);
+});
+
+test('every THREE name the game scripts use is in the trimmed bundle', () => {
+  const exported = new Set(Object.keys(loadBundle().THREE));
+  const used = new Set();
+  for (const f of fs.readdirSync(GAME)) {
+    if (!f.endsWith('.js') || f === 'three.min.js') continue;
+    for (const m of fs.readFileSync(path.join(GAME, f), 'utf8').matchAll(/\bTHREE\.([A-Za-z0-9_]+)/g)) used.add(m[1]);
+  }
+  const missing = [...used].filter((name) => !exported.has(name)).sort();
+  assert.deepEqual(missing, [], 'add these to docs/vendor/three-entry.js, then run node docs/vendor/build-three.js');
+});
