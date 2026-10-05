@@ -1875,7 +1875,7 @@ git commit -m "feat(stepping-stones): four toon critters with reactions, and syn
         camera.updateProjectionMatrix();
       }
       const hHalf = Math.tan((vfov * Math.PI) / 360) * a;
-      const ahead = clamp(4.6 - 2.2 * a, 1.0, 4.0);
+      const ahead = clamp(5.4 - 2.0 * a, 2.0, 4.6);
       const pitch = 0.66;
       const halfWidth = 1.5 * DX + 0.56 + 0.2;
       const L = clamp(halfWidth / hHalf + ahead * Math.cos(pitch), 10, 13);
