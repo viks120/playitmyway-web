@@ -72,7 +72,7 @@ test('the four critters build, react and animate without a browser', () => {
 });
 
 test('no page loads the kit from anywhere but games/shared/3d', () => {
-  for (const game of ['stepping-stones', 'number-line-hop', 'peekaboo-pond', 'pond-prix', 'rainbow-balloons', 'farm-friends']) {
+  for (const game of ['stepping-stones', 'number-line-hop', 'peekaboo-pond', 'pond-prix', 'rainbow-balloons', 'farm-friends', 'pebble-push']) {
     const page = path.join(GAMES, game, 'index.html');
     if (!fs.existsSync(page)) continue;
     const html = fs.readFileSync(page, 'utf8');
