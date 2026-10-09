@@ -29,6 +29,15 @@ The spec leaves these details open. They are settled here:
 - **The hidden critter ducks.** It shrinks to 45% as its flower closes, and grows back as the flower opens.
 - **The progress row fills on arriving home,** as the spec says. A goldfish splashes with the kit's `splash` sound. The ladybug flutters up on little wings.
 
+## Changes made while building
+
+Screenshots and checks led to these changes. The shipped files differ from the code blocks below in these places:
+- **Camera (`world.js` `W.frame`).** It backs off until the row fits across and everything from the bank critters' ears to the front swap lane fits top to bottom. The ears must be at least 12% below the top, and the lane's near edge (2.0, or 3.0 with four flowers) no lower than 90% down. Tall screens look down a little more (pitch 0.58 to 0.70) and get less side margin. The distance eases between rounds, so on wide screens 2, 3 or 4 flowers are framed alike.
+- **The goldfish (`game.js`)** leaps sideways towards the middle (±1.25 in x, +0.75 in z) and dives into open water. Leaping towards the camera read as a nose-dive.
+- **The found critter (`game.js`)** stands 0.15 higher in an open flower and looks up at the child rather than at the pointer.
+- **Surprises stay put (`game.js`).** A wrong flower keeps its surprise for the whole round (`S.tried`), so tapping it twice shows the same goldfish or ladybug.
+- **New scratchpad checks.** `pp-zoom.cjs` shoots exact moments under a frame-locked, freezable clock. `pp-tap.cjs` taps a bud top, the water beside a pad and open water, with mouse and with touch. `filecheck-pp.cjs` opens the page over `file://`.
+
 ## File structure
 
 | File | Responsibility |
