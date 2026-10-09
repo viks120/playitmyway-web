@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#0f766e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Peekaboo Pond – Free 3D Memory Game | Play It My Way</title>
+    <meta name="description" content="A cute critter hides in a lotus flower, the flowers slide around, and your child taps to find it. A gentle 3D memory game for ages 3+. No ads." />
+    <meta name="keywords" content="memory game for toddlers, peekaboo game, hide and seek game for kids, 3d game for preschoolers, free game ages 3+" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Peekaboo Pond – Free 3D Memory Game for Little Ones" />
+    <meta property="og:description" content="Watch where the critter hides, follow the flowers as they slide, then tap to find it. No reading, no failing. Ages 3+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/peekaboo-pond/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Peekaboo Pond – Free 3D Memory Game for Little Ones" />
+    <meta name="twitter:description" content="A critter hides, the flowers slide, your child finds it. A gentle 3D memory game for ages 3+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/peekaboo-pond/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <style>
+      :root {
+        --band: var(--color-teal);
+        --band-tint: var(--color-teal-tint);
+        --band-tint-deep: #99d5cb;
+        --band-deep: #134e4a;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body {
+        background: var(--color-bg);
+        /* an accidental pull-to-refresh would end the game */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font-display);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: inherit; }
+
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 9px 14px; border-radius: var(--radius-pill);
+        background: var(--band-tint);
+        align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0 0 4px; text-wrap: balance; }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .stage-card {
+        width: 100%; max-width: 960px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 8px;
+      }
+      .stage {
+        position: relative; width: 100%;
+        height: clamp(440px, 72vh, 640px);
+        border-radius: 18px; overflow: hidden;
+        background: #dff4ff; color: var(--deep);
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html.pimw-fs .stage { height: calc(100vh - 96px); height: calc(100dvh - 96px); }
+      .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .pond-input { position: absolute; inset: 0; touch-action: none; cursor: pointer; border-radius: 18px; }
+      .pond-input:focus { outline: none; }
+      .pond-input:focus-visible { box-shadow: inset 0 0 0 4px var(--color-focus); }
+
+      .start { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding: 18px; }
+      .start-card {
+        background: rgba(255, 255, 255, 0.94); border-radius: 26px; padding: 14px 26px 18px; text-align: center;
+        box-shadow: 0 6px 0 var(--band-tint-deep), var(--shadow-lift);
+      }
+      .start-card h2 { margin: 0; font-size: clamp(24px, 6vw, 32px); }
+      .start-card p { margin: 2px 0 12px; color: var(--ink-soft); font-weight: 600; }
+      .play-btn {
+        width: 96px; height: 96px; border-radius: 50%; border: 0; cursor: pointer;
+        background: var(--band); color: #fff; font-size: 44px; line-height: 1; padding-left: 8px;
+        box-shadow: 0 7px 0 var(--band-deep);
+      }
+      .play-btn:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--band-deep); }
+
+      .hud { position: absolute; inset: 0; pointer-events: none; }
+      .progress {
+        position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; padding: 6px 8px;
+        background: rgba(255, 255, 255, 0.92); border-radius: var(--radius-pill); box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .slot {
+        width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 20px;
+        background: var(--band-tint); box-shadow: inset 0 0 0 2px var(--band-tint-deep);
+      }
+      .slot.full { background: #fff; box-shadow: inset 0 0 0 2px var(--band); }
+      .bubble {
+        position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+        min-width: 86px; height: 86px; padding: 0 16px; border-radius: 44px; display: grid; place-items: center;
+        background: #fff; font-size: 42px; font-weight: 700; color: var(--band); box-shadow: 0 5px 0 var(--band-tint-deep);
+      }
+      /* right: 64px keeps the message clear of the site's floating sound button */
+      .tell {
+        position: absolute; left: 10px; right: 64px; bottom: 10px; margin: 0;
+        background: rgba(255, 255, 255, 0.95); border-radius: 18px; padding: 9px 14px;
+        text-align: center; font-size: 16px; font-weight: 600; line-height: 1.3;
+        box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .tell:empty { display: none; }
+
+      .nogl {
+        position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; padding: 24px; text-align: center; background: var(--color-bg);
+      }
+      .nogl-emoji { font-size: 56px; margin: 0; }
+      .nogl h2 { margin: 0; }
+      .nogl a {
+        display: inline-block; margin: 6px; padding: 10px 16px; border-radius: var(--radius-pill);
+        background: var(--band-tint); color: var(--band); font-weight: 600; text-decoration: none;
+      }
+
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px;
+        background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-rest);
+        line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      .visually-hidden {
+        position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+      }
+
+      @media (max-width: 420px) {
+        .slot { width: 26px; height: 26px; font-size: 16px; }
+        .bubble { top: 58px; min-width: 70px; height: 70px; font-size: 34px; }
+        .tell { font-size: 14.5px; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🌸 Peekaboo Pond</h1>
+      <p>Watch where the critter hides, then find it!</p>
+    </header>
+
+    <main class="stage-card">
+      <div class="stage" id="stage">
+        <canvas id="view" aria-hidden="true"></canvas>
+        <div class="pond-input" id="pondInput" tabindex="0" role="application" aria-busy="true"
+             aria-label="The pond. Left and right arrows choose a flower, Enter opens it." hidden></div>
+
+        <div class="hud" id="hud" hidden>
+          <div class="progress" id="progress" role="img" aria-label="0 of 5 friends found"></div>
+          <div class="bubble" id="bubble" aria-hidden="true" hidden></div>
+          <p class="tell" id="tell" aria-live="polite"></p>
+        </div>
+
+        <section class="start" id="startScreen" aria-labelledby="startTitle">
+          <div class="start-card">
+            <h2 id="startTitle">Peekaboo Pond</h2>
+            <p>Watch where the critter hides!</p>
+            <button type="button" class="play-btn" id="playBtn" aria-label="Play">▶</button>
+          </div>
+        </section>
+
+        <div class="nogl" id="noGl" hidden>
+          <p class="nogl-emoji" aria-hidden="true">🌸</p>
+          <h2>This game needs 3D graphics</h2>
+          <p>This browser or device has 3D graphics switched off. Try one of these instead:</p>
+          <p><a href="../memory-game/">🧠 Memory Match</a><a href="../counting-game/">🔢 Count With Me</a></p>
+        </div>
+      </div>
+      <p class="visually-hidden" id="srFocus" aria-live="polite"></p>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Press the big ▶ button.</li>
+        <li>Watch! A critter hops into a pink flower, and the flower closes.</li>
+        <li>The flowers slide around. Keep your eyes on the right one.</li>
+        <li>Tap the flower where the critter is hiding. Peekaboo!</li>
+      </ol>
+      <p>A wrong flower just holds a surprise, a goldfish or a ladybug, so there is no failing. The game starts with two flowers that stay still, and only adds flowers and moves as your child finds the critter first time. Five finds bring a little party. On a keyboard, the arrow keys choose a flower and Enter opens it. Nothing is saved.</p>
+      <h3>What it practises</h3>
+      <p>Following a moving object with the eyes, remembering where something is when it cannot be seen, and patience: the skills behind every good game of peekaboo, with Clover, Pip, Plum and Mango taking turns to hide.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/3d/three.min.js"></script>
+    <script src="../shared/3d/toon.js"></script>
+    <script src="../shared/3d/critters.js"></script>
+    <script src="../shared/3d/sound.js"></script>
+    <script src="rounds.js"></script>
+    <script src="world.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>
