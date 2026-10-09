@@ -1,7 +1,7 @@
-/* The parts of Three.js that Stepping Stones uses.
+/* The parts of Three.js that the site's 3D games use.
  *
  * docs/vendor/build-three.js bundles this list into
- * games/stepping-stones/three.min.js: one minified classic script that
+ * games/shared/3d/three.min.js: one minified classic script that
  * defines a global THREE. It is a classic script rather than an ES module
  * because Chrome refuses module scripts over file://, and the site must open
  * straight off a memory stick. Three.js is MIT licensed; the bundle starts

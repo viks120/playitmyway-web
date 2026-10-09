@@ -13,7 +13,7 @@ const zlib = require('zlib');
 
 const THREE_VERSION = '0.186.1';
 const ESBUILD_VERSION = '0.28.2';
-const OUT = path.join(__dirname, '..', '..', 'games', 'stepping-stones', 'three.min.js');
+const OUT = path.join(__dirname, '..', '..', 'games', 'shared', '3d', 'three.min.js');
 const WORK = path.join(os.tmpdir(), `pimw-three-${THREE_VERSION}-esbuild-${ESBUILD_VERSION}`);
 
 const installed = (pkg, version) => {
@@ -34,8 +34,8 @@ fs.copyFileSync(path.join(__dirname, 'three-entry.js'), path.join(WORK, 'entry.j
 const licence = fs.readFileSync(path.join(WORK, 'node_modules', 'three', 'LICENSE'), 'utf8').trim();
 const banner = [
   '/*!',
-  ` * three.js r${THREE_VERSION.split('.')[1]} (https://threejs.org), trimmed to the parts Stepping`,
-  ' * Stones uses; the list is docs/vendor/three-entry.js in this site\'s repository.',
+  ` * three.js r${THREE_VERSION.split('.')[1]} (https://threejs.org), trimmed to the parts the site's`,
+  ' * 3D games use; the list is docs/vendor/three-entry.js in this site\'s repository.',
   ' *',
   ...licence.split(/\r?\n/).map((line) => (' * ' + line).trimEnd()),
   ' */',
