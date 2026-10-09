@@ -124,6 +124,9 @@ module.exports = {
     { slug: 'stepping-stones', name: 'Stepping Stones', emoji: '🐸', age: '7', mins: '10',
       skills: ['numbers', 'logic'],
       practises: 'Odd and even, times tables 2–10 and number bonds to 10, 20 and 100, by hopping only on stones that fit the rule and planning a route across the pond. A wrong stone explains itself before you try again.' },
+    { slug: 'frozen-pond', name: 'Frozen Pond', emoji: '❄️', age: '7', mins: '10',
+      skills: ['logic'],
+      practises: 'Planning several moves ahead and working backwards from the goal: on ice you slide until a rock stops you, so the route to the fish has to be thought through. 18 levels, each with its fewest-slides target, all checked solvable by computer, with undo, restart and hints.' },
 
     // --- 14+ ---
     { slug: 'science-trivia', name: 'Science Trivia', emoji: '🔬', age: '14', mins: '10',
