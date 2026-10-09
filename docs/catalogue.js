@@ -14,7 +14,7 @@ module.exports = {
 
   bands: [
     { id: '2',  label: 'Ages 2+',  title: 'First Steps',     band: 'band-3',
-      outcome: 'The straight lines and curves that come before letters.' },
+      outcome: 'First lines and curves, and colours named out loud.' },
     { id: '3',  label: 'Ages 3+',  title: 'Little Learners', band: 'band-3',
       outcome: 'Counting, colours, memory and first pen strokes.' },
     { id: '5',  label: 'Ages 5+',  title: 'Fun & Games',     band: 'band-5',
@@ -30,6 +30,9 @@ module.exports = {
     { slug: 'first-strokes', name: 'First Strokes', emoji: '🖍️', age: '2', mins: '5',
       skills: ['writing'],
       practises: 'The straight lines, curves and zigzags that come before letters. Three help levels: full guide, faded guide, then no guide at all.' },
+    { slug: 'rainbow-balloons', name: 'Rainbow Balloons', emoji: '🌈', age: '2', mins: '5',
+      skills: ['world'],
+      practises: 'Hearing a colour’s name and finding it among big 3D balloons: red and blue first, then yellow, green, orange and purple as the child gets them right first time. A wrong balloon says its own colour, so every tap teaches.' },
     { slug: 'trace-shapes', name: 'Trace Shapes', emoji: '⭐', age: '3', mins: '5',
       skills: ['writing'],
       practises: 'Drawing circles, squares, triangles and stars in one controlled stroke, with the guide fading away as it gets easier.' },

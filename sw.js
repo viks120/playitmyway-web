@@ -5,7 +5,7 @@
  * analytics. There is deliberately no push code here — push would require a
  * per-device subscription held by a third party, which this site does not do.
  */
-const CACHE = 'pimw-bd80986d';
+const CACHE = 'pimw-83b50bf9';
 
 const PRECACHE = [
   "/",
@@ -47,6 +47,10 @@ const PRECACHE = [
   "/games/pond-prix/game.js",
   "/games/pond-prix/race.js",
   "/games/pond-prix/world.js",
+  "/games/rainbow-balloons/",
+  "/games/rainbow-balloons/balloons.js",
+  "/games/rainbow-balloons/game.js",
+  "/games/rainbow-balloons/world.js",
   "/games/rock-paper-scissors/",
   "/games/science-trivia/",
   "/games/sentence-builder/",
@@ -54,6 +58,7 @@ const PRECACHE = [
   "/games/shared/3d/sound.js",
   "/games/shared/3d/three.min.js",
   "/games/shared/3d/toon.js",
+  "/games/shared/voice.js",
   "/games/silly-story-builder/",
   "/games/sort-it-out/",
   "/games/sound-it-out/",
