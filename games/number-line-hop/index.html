@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#b45309" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Number Line Hop – Free 3D Adding Game | Play It My Way</title>
+    <meta name="description" content="Hop a cute critter along a 3D number line to add and take away within 10 and 20: count on, count back, cross ten. Ages 5+. No ads." />
+    <meta name="keywords" content="number line game for kids, adding and subtracting game, counting on game, 3d maths game for kids, free maths game ages 5+" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Number Line Hop – Free 3D Adding Game for Kids" />
+    <meta property="og:description" content="Hop along a 3D number line of lily pads to add and take away within 10 and 20. Five ponds for ages 5+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/number-line-hop/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Number Line Hop – Free 3D Adding Game for Kids" />
+    <meta name="twitter:description" content="Add and take away by hopping along a 3D number line of lily pads. Ages 5+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/number-line-hop/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <style>
+      :root {
+        --band: var(--color-amber);
+        --band-tint: var(--color-amber-tint);
+        --band-tint-deep: #d8c897;
+        --band-deep: #7c2d12;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body {
+        background: var(--color-bg);
+        /* an accidental pull-to-refresh would throw the pond away */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font-display);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: inherit; }
+
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 9px 14px; border-radius: var(--radius-pill);
+        background: var(--band-tint);
+        align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0 0 4px; text-wrap: balance; }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .stage-card {
+        width: 100%; max-width: 960px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 8px;
+      }
+      .stage {
+        position: relative; width: 100%;
+        height: clamp(460px, 76vh, 680px);
+        border-radius: 18px; overflow: hidden;
+        background: #dff4ff; color: var(--deep);
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html.pimw-fs .stage { height: calc(100vh - 96px); height: calc(100dvh - 96px); }
+      .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .line-input { position: absolute; inset: 0; touch-action: none; cursor: pointer; border-radius: 18px; }
+      .line-input:focus { outline: none; }
+      .line-input:focus-visible { box-shadow: inset 0 0 0 4px var(--color-focus); }
+
+      /* screens laid over the 3D view */
+      .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 12px; }
+      .screen-title {
+        margin: 0; font-size: clamp(21px, 5vw, 28px); font-weight: 700; text-align: center;
+        background: rgba(255, 255, 255, 0.92); padding: 6px 18px; border-radius: var(--radius-pill);
+        box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .pick-grid { flex: 1; width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+      .stage.tall .pick-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+      .pick-btn {
+        border: 3px solid transparent; border-radius: 22px; background: transparent; cursor: pointer;
+        display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+        padding: 0 4px 8px; color: var(--deep);
+      }
+      .pick-btn:hover { background: rgba(255, 255, 255, 0.16); }
+      .pick-btn[aria-pressed="true"] { border-color: var(--band); background: rgba(255, 255, 255, 0.26); }
+      .pick-name {
+        background: #fff; border-radius: var(--radius-pill); padding: 4px 14px;
+        font-size: 18px; font-weight: 700; box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .pick-kind {
+        font-size: 13px; font-weight: 600; margin-top: 4px;
+        background: rgba(255, 255, 255, 0.86); border-radius: var(--radius-pill); padding: 1px 10px;
+      }
+      .go-btn, .hop-btn, .next-btn {
+        border: 0; border-radius: var(--radius-pill); background: var(--band); color: #fff;
+        font-size: 18px; font-weight: 600; padding: 12px 26px; min-height: 48px; cursor: pointer;
+        box-shadow: 0 5px 0 var(--band-deep);
+      }
+      .go-btn:active, .hop-btn:active, .next-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--band-deep); }
+      .go-btn:disabled { background: #d9a877; box-shadow: 0 5px 0 #b98a5c; cursor: default; transform: none; }
+      .hop-btn { font-size: 24px; font-weight: 700; padding: 13px 40px; }
+
+      .screen.menu { background: var(--color-bg); overflow-y: auto; align-items: stretch; padding: 16px; gap: 4px; }
+      .menu-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+      .menu-head h2 { margin: 0; font-size: 26px; }
+      .chip-btn {
+        border: 0; border-radius: var(--radius-pill); background: var(--band-tint); color: var(--band);
+        font-weight: 600; font-size: 16px; padding: 10px 16px; min-height: 44px; cursor: pointer;
+        box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .pond-family h3 { margin: 14px 0 8px; font-size: 18px; color: var(--ink-soft); }
+      .pond-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+      .pond-btn {
+        position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+        text-align: left; border: 0; border-radius: 16px; background: #fff; padding: 12px 14px; min-height: 64px;
+        box-shadow: 0 4px 0 var(--candy-card); cursor: pointer; color: var(--ink); font-size: 17px; font-weight: 600;
+      }
+      .pond-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--candy-card); }
+      .pond-stars { color: #d97706; font-size: 15px; letter-spacing: 2px; }
+      .pond-badge {
+        position: absolute; top: -9px; right: 8px; background: var(--deep); color: #fff;
+        font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: var(--radius-pill);
+      }
+
+      /* the problem card and the action bar while playing */
+      .hud { position: absolute; inset: 0; pointer-events: none; }
+      .card {
+        position: absolute; top: 10px; left: 10px; right: 10px; pointer-events: auto;
+        background: #fff; border-radius: 18px; padding: 6px 8px 2px; text-align: center;
+        box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .card-row { display: flex; align-items: center; gap: 6px; }
+      .card-mid { flex: 1; min-width: 0; }
+      .chip { margin: 0; font-size: 13px; font-weight: 600; color: var(--band); }
+      .sum { margin: 0; font-size: 30px; font-weight: 700; line-height: 1.15; letter-spacing: 1px; }
+      .tell { margin: 2px 0 0; font-size: 15px; font-weight: 600; color: var(--ink-soft); line-height: 1.3; min-height: 1.3em; }
+      .tell.good { color: #15803d; }
+      .tell.oops { color: #b4361f; }
+      .strip { display: block; width: 100%; height: 50px; }
+      .strip text { font-family: inherit; }
+      .strip.pickable { cursor: pointer; }
+      .hud-btn {
+        flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0;
+        background: var(--band-tint); font-size: 22px; line-height: 1; cursor: pointer;
+        display: grid; place-items: center; box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .hud-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .who-pop {
+        pointer-events: auto; position: absolute; top: 70px; left: 10px; display: flex; gap: 6px; z-index: 2;
+        background: #fff; padding: 8px; border-radius: 18px; box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+      }
+      .who-opt {
+        width: 64px; border: 3px solid transparent; border-radius: 14px; background: var(--band-tint);
+        cursor: pointer; display: flex; flex-direction: column; align-items: center;
+        padding: 6px 2px 4px; font-size: 26px; color: var(--deep);
+      }
+      .who-opt[aria-pressed="true"] { border-color: var(--band); }
+      .who-name { font-size: 12px; font-weight: 600; }
+      /* right: 64px keeps the buttons clear of the site's floating sound button */
+      .actions {
+        position: absolute; left: 10px; right: 64px; bottom: 12px; pointer-events: auto;
+        display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap;
+      }
+      .num-btn {
+        width: 50px; height: 50px; border: 0; border-radius: 16px; background: #fff; color: var(--deep);
+        font-size: 22px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .num-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .num-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+      .float {
+        position: absolute; transform: translate(-50%, -50%); pointer-events: none;
+        font-size: 18px; font-weight: 700; color: var(--deep); background: rgba(255, 255, 255, 0.94);
+        border-radius: var(--radius-pill); padding: 1px 10px; box-shadow: 0 2px 0 var(--band-tint-deep);
+      }
+
+      .won { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(255, 255, 255, 0.35); }
+      .won-card {
+        background: #fff; border-radius: 24px; padding: 18px 22px 20px; text-align: center;
+        box-shadow: 0 8px 0 var(--band-tint-deep), var(--shadow-lift); width: 100%; max-width: 340px;
+      }
+      .won-card h2 { margin: 0; font-size: 26px; }
+      .won-stars { font-size: 38px; letter-spacing: 6px; color: #f59e0b; margin: 6px 0 2px; }
+      .won-sub { margin: 0 0 14px; color: var(--ink-soft); font-weight: 600; }
+      .won-btns { display: flex; flex-direction: column; gap: 10px; }
+      .soft-btn {
+        border: 0; border-radius: var(--radius-pill); background: var(--band-tint); color: var(--band);
+        font-size: 16px; font-weight: 600; padding: 11px 18px; min-height: 46px; cursor: pointer;
+        box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .soft-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+
+      .nogl {
+        position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; padding: 24px; text-align: center; background: var(--color-bg);
+      }
+      .nogl-emoji { font-size: 56px; margin: 0; }
+      .nogl h2 { margin: 0; }
+      .nogl a {
+        display: inline-block; margin: 6px; padding: 10px 16px; border-radius: var(--radius-pill);
+        background: var(--band-tint); color: var(--band); font-weight: 600; text-decoration: none;
+      }
+
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px;
+        background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-rest);
+        line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+      .visually-hidden {
+        position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+      }
+
+      @media (max-width: 420px) {
+        .sum { font-size: 26px; }
+        .tell { font-size: 14px; }
+        .num-btn { width: 44px; height: 44px; font-size: 20px; }
+        .pick-name { font-size: 16px; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🐾 Number Line Hop</h1>
+      <p>Hop along the number line to add and take away.</p>
+    </header>
+
+    <main class="stage-card">
+      <div class="stage" id="stage">
+        <canvas id="view" aria-hidden="true"></canvas>
+        <div class="line-input" id="lineInput" tabindex="0" role="application"
+             aria-label="The number line. Left and right arrows choose a pad, Enter guesses." hidden></div>
+
+        <section class="screen pick" id="screenPick" aria-labelledby="pickTitle">
+          <h2 class="screen-title" id="pickTitle">Who's hopping today?</h2>
+          <div class="pick-grid" id="pickGrid" role="group" aria-label="Critters"></div>
+          <button type="button" class="go-btn" id="pickGo" disabled>Pick a critter</button>
+        </section>
+
+        <section class="screen menu" id="screenMenu" aria-labelledby="menuTitle" hidden>
+          <div class="menu-head">
+            <h2 id="menuTitle">Pick a pond</h2>
+            <button type="button" class="chip-btn" id="changeCritter">Change critter</button>
+          </div>
+          <div id="menuGroups"></div>
+        </section>
+
+        <div class="hud" id="hud" hidden>
+          <div class="card">
+            <div class="card-row">
+              <button type="button" class="hud-btn" id="whoBtn" aria-haspopup="true" aria-expanded="false"
+                      aria-controls="whoPop" aria-label="Switch critter"></button>
+              <div class="card-mid">
+                <p class="chip" id="chip"></p>
+                <p class="sum" id="sum"></p>
+              </div>
+              <button type="button" class="hud-btn" id="menuBtn" aria-label="All ponds"><span aria-hidden="true">🗺️</span></button>
+            </div>
+            <p class="tell" id="tell" aria-live="polite"></p>
+            <svg class="strip" id="strip" role="img" viewBox="0 0 340 50"></svg>
+          </div>
+          <div class="who-pop" id="whoPop" role="group" aria-label="Switch critter" hidden></div>
+          <div class="actions" id="actions"></div>
+        </div>
+        <div class="float" id="float" aria-hidden="true" hidden></div>
+
+        <div class="won" id="won" hidden>
+          <div class="won-card" role="dialog" aria-modal="true" aria-labelledby="wonTitle">
+            <h2 id="wonTitle">Pond done!</h2>
+            <p class="won-stars" id="wonStars" role="img"></p>
+            <p class="won-sub" id="wonSub"></p>
+            <div class="won-btns">
+              <button type="button" class="go-btn" id="wonNext">Next pond →</button>
+              <button type="button" class="soft-btn" id="wonAgain">Same pond again</button>
+              <button type="button" class="soft-btn" id="wonAll">All ponds</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="nogl" id="noGl" hidden>
+          <p class="nogl-emoji" aria-hidden="true">🐾</p>
+          <h2>This game needs 3D graphics</h2>
+          <p>This browser or device has 3D graphics switched off. Try one of these instead:</p>
+          <p><a href="../balloon-pop/">🎈 Balloon Pop</a><a href="../sort-it-out/">🧺 Sort It Out</a></p>
+        </div>
+      </div>
+      <p class="visually-hidden" id="srFocus" aria-live="polite"></p>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Pick your critter: Clover the Bunny, Pip the Frog, Plum the Baby Dino or Mango the Kitten.</li>
+        <li>Pick a pond: adding or taking away, within 10 or within 20, or a mix of both.</li>
+        <li><strong>Hop and count:</strong> press <strong>Hop!</strong> once for every hop and watch the answer appear as you count on, or back.</li>
+        <li><strong>Where will you land?</strong> Tap the pad you think your critter will land on, then watch it hop to check.</li>
+        <li><strong>How far to your friend?</strong> A friend waits on a pad. Pick how many hops it takes to reach them.</li>
+      </ol>
+      <p>On a keyboard: <kbd>Enter</kbd> hops, <kbd>←</kbd> <kbd>→</kbd> and <kbd>Enter</kbd> choose a pad, and the number keys pick how many hops. Tap the face button to switch critters at any time. Nothing is saved, so stars reset when you leave.</p>
+      <h3>What it practises</h3>
+      <p>Adding and taking away within 10 and 20 on a number line: counting on, counting back and crossing ten, the step many children find hardest. Every hop draws a +1 or −1 arc, just like a number line drawn in class, so the sum and the picture match.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/3d/three.min.js"></script>
+    <script src="../shared/3d/toon.js"></script>
+    <script src="../shared/3d/critters.js"></script>
+    <script src="../shared/3d/sound.js"></script>
+    <script src="lines.js"></script>
+    <script src="world.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>

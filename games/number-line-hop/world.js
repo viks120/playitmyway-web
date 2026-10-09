@@ -377,7 +377,8 @@
       const L = clamp(want / hHalf, 6, 22);
       const pitch = 0.6;
       camera.position.set(camX, 0.35 + L * Math.sin(pitch), L * Math.cos(pitch));
-      camera.lookAt(camX, 0.35, -0.6);
+      // aimed a little behind the line, so the line sits low and the bank shows below the problem card
+      camera.lookAt(camX, 0.35, -1.8);
       camera.updateMatrixWorld();
     };
 
