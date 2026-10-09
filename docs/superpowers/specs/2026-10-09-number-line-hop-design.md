@@ -158,7 +158,7 @@ The minus sign is `−` (U+2212). A single hop is "1 hop" or "1 more hop", never
   it happens, and every result. The stage-2 ring position goes in its own
   polite region.
 - **The rest matches Stepping Stones:** reduced motion means no spins or
-  confetti; without WebGL a friendly message links to other 5+ games;
+  confetti; without WebGL a friendly message links to two other 5+ games (Balloon Pop, Sort It Out);
   rendering pauses while the tab is hidden; the pixel ratio is capped at 2.
 
 ## Architecture
@@ -175,7 +175,7 @@ and `sound.js`, moved unchanged from `games/stepping-stones/`.
 | File | Purpose | Interface |
 |---|---|---|
 | `index.html` | The page: head, back link, title, stage with HUD markup, how to play, footer, scripts | n/a |
-| `lines.js` | Ponds, problem generator, hop choices, every message. Pure: no `THREE`, no DOM | `Lines.LIST`, `Lines.FAMILY`, `Lines.generate(id, seed)` → `{id, title, max, problems[9]}` with each problem `{op, start, jump, end, crosses, stage}`; `Lines.choices(id, problem)`; `Lines.say.*` message builders; `Lines.rng`. `window.Lines` in the browser, `module.exports` in Node |
+| `lines.js` | Ponds, problem generator, hop choices, every message. Pure: no `THREE`, no DOM | `Lines.LIST`, `Lines.GROUPS`, `Lines.generate(id, seed)` → `{id, title, max, problems[9]}` with each problem `{op, start, jump, end, crosses, stage}`; `Lines.choices(id, problem)`; `Lines.say.*` message builders; `Lines.rng`. `window.Lines` in the browser, `module.exports` in Node |
 | `world.js` | Renderer, scene, picker pads, the line of pads, arcs, ring, camera, effects | `World.create(canvas)` → world object or `null` |
 | `game.js` | Screens, stages, HUD, flat number line, input, choreography | none |
 
