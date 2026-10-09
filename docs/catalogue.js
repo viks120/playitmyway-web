@@ -77,6 +77,9 @@ module.exports = {
     { slug: 'rock-paper-scissors', name: 'Rock Paper Scissors', emoji: '✊', age: '5', mins: '3',
       skills: ['logic'],
       practises: 'Spotting a pattern in an opponent’s choices — a first taste of prediction.' },
+    { slug: 'number-line-hop', name: 'Number Line Hop', emoji: '🐾', age: '5', mins: '10',
+      skills: ['numbers'],
+      practises: 'Adding and taking away within 10 and 20 by hopping along a number line: counting on, counting back and crossing ten, then guessing where a hop will land and how far away a friend is.' },
 
     // --- 7+ ---
     { slug: 'silly-story-builder', name: 'Silly Story Builder', emoji: '📖', age: '7', mins: '10',
