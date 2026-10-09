@@ -71,13 +71,23 @@ test('the four critters build, react and animate without a browser', () => {
   assert.equal(Critters.hopCurve(5, 0.6), null);
 });
 
+/* Every page that mentions a kit file is a 3D game; it must load three.min.js
+ * and take each kit file it uses from games/shared/3d (the mascots are optional). */
 test('no page loads the kit from anywhere but games/shared/3d', () => {
-  for (const game of ['stepping-stones', 'number-line-hop', 'peekaboo-pond', 'pond-prix', 'rainbow-balloons', 'farm-friends', 'pebble-push', 'frozen-pond']) {
+  const found = [];
+  for (const game of fs.readdirSync(GAMES)) {
     const page = path.join(GAMES, game, 'index.html');
     if (!fs.existsSync(page)) continue;
     const html = fs.readFileSync(page, 'utf8');
-    for (const f of ['three.min.js', 'toon.js', 'critters.js', 'sound.js']) {
+    const used = ['three.min.js', 'toon.js', 'critters.js', 'sound.js'].filter((f) => html.includes(f));
+    if (!used.length) continue;
+    found.push(game);
+    assert.ok(used.includes('three.min.js'), `${game} uses the kit, so it must load three.min.js`);
+    for (const f of used) {
       assert.ok(html.includes(`<script src="../shared/3d/${f}"></script>`), `${game} must load ../shared/3d/${f}`);
     }
+  }
+  for (const game of ['stepping-stones', 'number-line-hop', 'peekaboo-pond', 'pond-prix', 'rainbow-balloons', 'farm-friends', 'pebble-push', 'frozen-pond']) {
+    assert.ok(found.includes(game), `${game} should load the kit`);
   }
 });

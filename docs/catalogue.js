@@ -22,7 +22,7 @@ module.exports = {
     { id: '7',  label: 'Ages 7+',  title: 'Brain Boosters',  band: 'band-7',
       outcome: 'Time, grammar, coding, maps and logic.' },
     { id: '14', label: 'Ages 14+', title: 'Challenge Zone',  band: 'band-14',
-      outcome: 'Real puzzles — sudoku, minesweeper, words and numbers.' }
+      outcome: 'Real puzzles — sudoku, circuits, molecules, forces and 3D shapes.' }
   ],
 
   games: [
