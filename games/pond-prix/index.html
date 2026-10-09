@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#b45309" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Pond Prix – Free 3D Kart Racing Maths Game | Play It My Way</title>
+    <meta name="description" content="Race Clover, Pip, Plum or Mango round the pond in a cute 3D kart race. Drive through the right answer gate for a boost: counting, adding, taking away and times tables. Ages 5+. No ads." />
+    <meta name="keywords" content="racing game for kids, kart racing maths game, adding game, times tables game, 3d game for kids, free maths game ages 5+" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Pond Prix – Free 3D Kart Racing Maths Game" />
+    <meta property="og:description" content="Three laps round the pond against three cute critters. Steer through the right answer gate for a boost. Counting, adding and times tables. Ages 5+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/pond-prix/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Pond Prix – Free 3D Kart Racing Maths Game" />
+    <meta name="twitter:description" content="A cute 3D kart race where the right answer gives you a boost. Ages 5+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/pond-prix/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <style>
+      :root {
+        --band: var(--color-amber);
+        --band-tint: var(--color-amber-tint);
+        --band-tint-deep: #d8c897;
+        --band-deep: #7c2d12;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body {
+        background: var(--color-bg);
+        /* an accidental pull-to-refresh would end the race */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font-display);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: inherit; }
+
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 9px 14px; border-radius: var(--radius-pill);
+        background: var(--band-tint);
+        align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0 0 4px; text-wrap: balance; }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .stage-card {
+        width: 100%; max-width: 960px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 8px;
+      }
+      .stage {
+        position: relative; width: 100%;
+        height: clamp(460px, 76vh, 680px);
+        border-radius: 18px; overflow: hidden;
+        background: #cdeeff; color: var(--deep);
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html.pimw-fs .stage { height: calc(100vh - 96px); height: calc(100dvh - 96px); }
+      .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .track-input { position: absolute; inset: 0; touch-action: none; cursor: pointer; border-radius: 18px; }
+      .track-input:focus { outline: none; }
+      .track-input:focus-visible { box-shadow: inset 0 0 0 4px var(--color-focus); }
+
+      /* pick a racer and a race */
+      .menu {
+        position: absolute; left: 10px; right: 10px; top: 10px;
+        background: rgba(255, 255, 255, 0.93); border-radius: 22px; padding: 10px 12px 12px;
+        box-shadow: 0 5px 0 var(--band-tint-deep), var(--shadow-lift);
+      }
+      .menu h2 { margin: 0 0 6px; font-size: 18px; text-align: center; }
+      .menu h2 + .row { margin-bottom: 10px; }
+      .row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+      .racer {
+        min-width: 76px; border: 3px solid transparent; border-radius: 16px; background: var(--band-tint);
+        display: flex; flex-direction: column; align-items: center; padding: 4px 8px 6px; cursor: pointer; color: var(--deep);
+        box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .racer[aria-pressed="true"] { border-color: var(--band); background: #fff; }
+      .racer-emoji { font-size: 30px; line-height: 1.15; }
+      .racer-name { font-size: 14px; font-weight: 700; }
+      .cup {
+        flex: 1 1 140px; max-width: 176px; border: 0; border-radius: 16px; background: var(--band); color: #fff;
+        display: flex; flex-direction: column; align-items: center; padding: 8px 8px 9px; cursor: pointer; min-height: 64px;
+        box-shadow: 0 5px 0 var(--band-deep);
+      }
+      .cup:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--band-deep); }
+      .cup-emoji { font-size: 22px; line-height: 1.1; }
+      .cup-title { font-size: 16px; font-weight: 700; }
+      .cup-blurb { font-size: 12.5px; font-weight: 600; opacity: 0.92; }
+
+      /* while racing */
+      .hud { position: absolute; inset: 0; pointer-events: none; }
+      .status {
+        position: absolute; top: 10px; left: 10px; display: flex; align-items: center; gap: 8px;
+        background: rgba(255, 255, 255, 0.93); border-radius: var(--radius-pill); padding: 4px 12px 4px 6px;
+        box-shadow: 0 4px 0 var(--band-tint-deep); font-weight: 700; font-size: 15px;
+      }
+      .place {
+        background: var(--band); color: #fff; border-radius: var(--radius-pill); padding: 2px 10px; font-size: 20px;
+      }
+      .question {
+        position: absolute; top: 58px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 24px);
+        background: #fff; border-radius: 22px; padding: 6px 20px; text-align: center;
+        box-shadow: 0 5px 0 var(--band-tint-deep);
+      }
+      .q-board { display: block; font-size: 34px; font-weight: 700; letter-spacing: 1px; white-space: nowrap; }
+      .q-board.fish { font-size: 25px; letter-spacing: 0; white-space: normal; max-width: 280px; }
+      /* right: 64px keeps the bottom row clear of the site's floating sound button */
+      .bottom {
+        position: absolute; left: 10px; right: 64px; bottom: 10px;
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+      }
+      .tell {
+        margin: 0; background: rgba(255, 255, 255, 0.94); border-radius: var(--radius-pill); padding: 4px 14px;
+        font-size: 15px; font-weight: 600; text-align: center; box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .tell:empty { display: none; }
+      .chips { display: flex; gap: 14px; pointer-events: auto; }
+      .chip {
+        width: 76px; height: 58px; border-radius: 16px; border: 3px solid transparent; background: rgba(255, 255, 255, 0.9);
+        font-size: 26px; font-weight: 700; color: var(--deep); cursor: pointer; box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .chip.here { border-color: var(--band); background: #fff; }
+      .chip:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .count {
+        position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); pointer-events: none;
+        font-size: 96px; font-weight: 700; color: #fff; -webkit-text-stroke: 3px var(--band-deep);
+        text-shadow: 0 6px 0 var(--band-deep);
+      }
+
+      /* the finish */
+      .done { position: absolute; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: 12px 16px; }
+      .done-card {
+        background: #fff; border-radius: 24px; padding: 16px 22px 18px; text-align: center; width: 100%; max-width: 340px;
+        box-shadow: 0 8px 0 var(--band-tint-deep), var(--shadow-lift);
+      }
+      .done-card h2 { margin: 0; font-size: 28px; }
+      .done-score { margin: 4px 0 8px; color: var(--ink-soft); font-weight: 600; }
+      .done-order { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 4px; font-weight: 600; }
+      .done-order li { background: var(--band-tint); border-radius: 12px; padding: 4px 10px; }
+      .done-order li.me { background: var(--band); color: #fff; }
+      .done-btns { display: flex; flex-direction: column; gap: 8px; }
+      .go-btn, .soft-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 17px; font-weight: 600; padding: 11px 20px; min-height: 46px; cursor: pointer;
+      }
+      .go-btn { background: var(--band); color: #fff; box-shadow: 0 5px 0 var(--band-deep); }
+      .go-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--band-deep); }
+      .soft-btn { background: var(--band-tint); color: var(--band); box-shadow: 0 4px 0 var(--band-tint-deep); }
+      .soft-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+
+      .nogl {
+        position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; padding: 24px; text-align: center; background: var(--color-bg);
+      }
+      .nogl-emoji { font-size: 56px; margin: 0; }
+      .nogl h2 { margin: 0; }
+      .nogl a {
+        display: inline-block; margin: 6px; padding: 10px 16px; border-radius: var(--radius-pill);
+        background: var(--band-tint); color: var(--band); font-weight: 600; text-decoration: none;
+      }
+
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px;
+        background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-rest);
+        line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+      .visually-hidden {
+        position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+      }
+
+      @media (max-width: 420px) {
+        .racer { min-width: 70px; padding: 3px 4px 5px; }
+        .racer-emoji { font-size: 26px; }
+        .cup { flex-basis: 100px; padding: 6px 6px 7px; min-height: 56px; }
+        .cup-title { font-size: 14.5px; }
+        .q-board { font-size: 29px; }
+        .chip { width: 64px; height: 54px; font-size: 23px; }
+        .chips { gap: 10px; }
+        .tell { font-size: 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🏎️ Pond Prix</h1>
+      <p>Race round the pond. The right answer gives you a boost!</p>
+    </header>
+
+    <main class="stage-card">
+      <div class="stage" id="stage">
+        <canvas id="view" aria-hidden="true"></canvas>
+        <div class="track-input" id="track" tabindex="0" role="application"
+             aria-label="The race. Left and right arrows change lane." hidden></div>
+
+        <section class="menu" id="menu" aria-label="Start a race">
+          <h2>Pick your racer</h2>
+          <div class="row" id="pickRow" role="group" aria-label="Racers"></div>
+          <h2>Pick a race</h2>
+          <div class="row" id="cupRow" role="group" aria-label="Races"></div>
+        </section>
+
+        <div class="hud" id="hud" hidden>
+          <div class="status"><span class="place" id="place">1st</span><span id="lap">Lap 1/3</span><span id="score"></span></div>
+          <div class="question" id="question" aria-live="polite" hidden>
+            <span class="q-board" id="qBoard" aria-hidden="true"></span>
+            <span class="visually-hidden" id="qSay"></span>
+          </div>
+          <div class="bottom">
+            <p class="tell" id="tell" aria-live="polite"></p>
+            <div class="chips" role="group" aria-label="Lanes">
+              <button type="button" class="chip" data-lane="0"></button>
+              <button type="button" class="chip" data-lane="1"></button>
+              <button type="button" class="chip" data-lane="2"></button>
+            </div>
+          </div>
+        </div>
+        <div class="count" id="count" aria-hidden="true" hidden></div>
+
+        <section class="done" id="done" hidden>
+          <div class="done-card" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+            <h2 id="doneTitle"></h2>
+            <p class="done-score" id="doneScore"></p>
+            <ol class="done-order" id="doneOrder"></ol>
+            <div class="done-btns">
+              <button type="button" class="go-btn" id="again">Race again</button>
+              <button type="button" class="soft-btn" id="nextRace">Next race</button>
+              <button type="button" class="soft-btn" id="toMenu">Change racer</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="nogl" id="noGl" hidden>
+          <p class="nogl-emoji" aria-hidden="true">🏎️</p>
+          <h2>This game needs 3D graphics</h2>
+          <p>This browser or device has 3D graphics switched off. Try one of these instead:</p>
+          <p><a href="../balloon-pop/">🎈 Balloon Pop</a><a href="../sort-it-out/">🧺 Sort It Out</a></p>
+        </div>
+      </div>
+      <p class="visually-hidden" id="srFocus" aria-live="polite"></p>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Pick your racer: Clover the Bunny, Pip the Frog, Plum the Baby Dino or Mango the Kitten.</li>
+        <li>Pick a race: a warm-up with no sums, counting fish, adding, adding and taking away to 20, or times tables.</li>
+        <li>3, 2, 1, Go! Your kart drives by itself. You only change lanes.</li>
+        <li>When a question pops up, steer into the lane with the right answer. Through the right arch: a boost! The wrong one: a splash of mud.</li>
+        <li>Three laps, nine questions. Orange arrow pads give you a little boost; brown mud slows you down.</li>
+      </ol>
+      <p>To change lane: tap the left or right side of the race, tap an answer at the bottom, or press <kbd>←</kbd> and <kbd>→</kbd>. <kbd>Space</kbd> honks. The other racers make mistakes too, so every race is close. Nothing is saved.</p>
+      <h3>What it practises</h3>
+      <p>Quick recall of number facts while something exciting is happening: counting to 10, adding to 10, adding and taking away to 20, and the 2, 3, 4, 5 and 10 times tables. Every answer is shown right after each gate, so a splash still teaches the sum.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/3d/three.min.js"></script>
+    <script src="../shared/3d/toon.js"></script>
+    <script src="../shared/3d/critters.js"></script>
+    <script src="../shared/3d/sound.js"></script>
+    <script src="race.js"></script>
+    <script src="world.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>
