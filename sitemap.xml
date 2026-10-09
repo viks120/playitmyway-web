@@ -46,6 +46,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://playitmyway.com/games/peekaboo-pond/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://playitmyway.com/games/first-strokes/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
