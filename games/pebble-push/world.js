@@ -324,7 +324,7 @@
         const p = W.cellPos(arrowAt.cell);
         const d = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] }[arrowAt.dir];
         const bob = 0.12 * Math.sin(t * 6);
-        arrow.position.set(p.x + d[0] * (0.55 + bob), 1.25, p.z + d[1] * (0.55 + bob));
+        arrow.position.set(p.x + d[0] * (0.8 + bob), 0.95, p.z + d[1] * (0.8 + bob));
         arrow.rotation.y = Math.atan2(d[0], d[1]);
       }
       for (let i = bits.length - 1; i >= 0; i--) {
