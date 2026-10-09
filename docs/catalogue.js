@@ -54,6 +54,9 @@ module.exports = {
     { slug: 'drawing-pad', name: 'Drawing Pad', emoji: '🖍️', age: '3', mins: 'open',
       skills: ['creative'],
       practises: 'Free drawing. No goals, no score — a blank page, colours, and a download button.' },
+    { slug: 'peekaboo-pond', name: 'Peekaboo Pond', emoji: '🌸', age: '3', mins: '5',
+      skills: ['logic'],
+      practises: 'Watching and remembering: following a hidden friend as the flowers slide around, then finding it. It gets trickier only as the child gets it right, and a wrong flower just holds a surprise.' },
 
     // --- 5+ ---
     { slug: 'sound-it-out', name: 'Sound It Out', emoji: '🗣️', age: '5', mins: '10',
