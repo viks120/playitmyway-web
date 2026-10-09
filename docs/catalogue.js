@@ -92,6 +92,9 @@ module.exports = {
     { slug: 'pond-prix', name: 'Pond Prix', emoji: '🏎️', age: '5', mins: '5',
       skills: ['numbers', 'speed'],
       practises: 'Quick recall of number facts while racing: counting to 10, adding to 10, adding and taking away to 20, and the 2, 3, 4, 5 and 10 times tables, picked out at answer gates. Every answer is shown after the gate, so a splash of mud still teaches the sum.' },
+    { slug: 'pebble-push', name: 'Pebble Push', emoji: '🪨', age: '5', mins: '10',
+      skills: ['logic'],
+      practises: 'Planning ahead: pebbles can only be pushed, never pulled, so a careless push can wedge one in a corner. 18 levels from one pebble to three, every one checked solvable by computer, with undo, restart and a hint that knows the way.' },
 
     // --- 7+ ---
     { slug: 'silly-story-builder', name: 'Silly Story Builder', emoji: '📖', age: '7', mins: '10',
