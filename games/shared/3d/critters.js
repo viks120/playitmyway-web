@@ -181,7 +181,7 @@
     const eyes = [-1, 1].map((sx) => addEye(head, 0.14, A, B, C, sx * 0.4, 0.06));
     for (const sx of [-1, 1]) head.add(stick(blush(0.08), A, B, C, sx * 0.78, -0.18));
     for (const [y, z, r] of [[0.5, 0.14, 0.1], [0.55, -0.08, 0.13], [0.43, -0.3, 0.12], [0.2, -0.5, 0.1]]) head.add(ball(plate, r, 0, y, z, 0.62, 1, 0.9));
-    return { head, eyes, tail, bubble, hop: 0.6 };
+    return { head, eyes, tail, wag: { axis: 'y', amp: 0.28, speed: 3.2 }, bubble, hop: 0.6 };
   }
 
   function buildKitten(g) {
@@ -228,7 +228,7 @@
     const eyes = [-1, 1].map((sx) => addEye(head, 0.15, A, B, C, sx * 0.4, -0.06));
     for (const sx of [-1, 1]) head.add(stick(blush(0.085), A, B, C, sx * 0.66, -0.28));
     for (const yw of [-0.17, 0, 0.17]) head.add(stick(ball(stripe, 0.07, 0, 0, 0, 0.5, 1.5, 0.35), A, B, C, yw, 0.62));
-    return { head, eyes, ears, tail, hop: 0.55 };
+    return { head, eyes, ears, tail, wag: { axis: 'z', amp: 0.18, speed: 1.6 }, hop: 0.55 };
   }
 
   const KINDS = {
@@ -244,12 +244,19 @@
   function create(kind) {
     const spec = KINDS[kind];
     if (!spec) throw new Error('Unknown critter: ' + kind);
+    return rig(kind, spec.build);
+  }
+
+  /* A rig around any build(group) function that returns { head, eyes } and
+   * optionally ears, nose, tail with wag { axis, amp, speed }, bubble and hop:
+   * the critters use it, and other games build their own animals with it. */
+  function rig(kind, build) {
     const root = new THREE.Group();
     const turn = new THREE.Group();
     const squash = new THREE.Group();
     root.add(turn);
     turn.add(squash);
-    const parts = spec.build(squash);
+    const parts = build(squash);
     Toon.addOutlines(squash);
     const rest = (parts.ears || []).map((e) => ({ x: e.rotation.x, z: e.rotation.z }));
     const seed = Math.random() * 10;
@@ -309,10 +316,7 @@
           e.rotation.x = rest[i].x + rig.earX + 0.04 * Math.sin(t * 2.1 + i);
           e.rotation.z = rest[i].z + 0.03 * Math.sin(t * 1.7 + i * 2) + dry;
         });
-        if (parts.tail) {
-          if (kind === 'dino') parts.tail.rotation.y = 0.28 * Math.sin(t * 3.2);
-          if (kind === 'kitten') parts.tail.rotation.z = 0.18 * Math.sin(t * 1.6);
-        }
+        if (parts.tail && parts.wag) parts.tail.rotation[parts.wag.axis] = parts.wag.amp * Math.sin(t * parts.wag.speed);
         if (parts.nose) {
           const twitch = (t + seed) % 2.2 < 0.35 ? Math.abs(Math.sin(t * 28)) : 0;
           parts.nose.scale.y = parts.noseY * (1 - 0.25 * twitch);
@@ -364,5 +368,8 @@
   const KINDS_PUBLIC = {};
   for (const [id, k] of Object.entries(KINDS)) KINDS_PUBLIC[id] = { name: k.name, kind: k.kind, emoji: k.emoji, voice: k.voice };
 
-  window.Critters = { KINDS: KINDS_PUBLIC, create, hopCurve };
+  // the building blocks, for games that make their own animals in the same style
+  const parts = { SPHERE, WHITE, INK_MAT, BLUSH, BLUSH_SOLID, ball, stick, eye, smile, wMouth, blush, addEye };
+
+  window.Critters = { KINDS: KINDS_PUBLIC, create, rig, parts, hopCurve };
 })();
