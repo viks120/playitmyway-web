@@ -83,6 +83,9 @@ module.exports = {
     { slug: 'number-line-hop', name: 'Number Line Hop', emoji: '🐾', age: '5', mins: '10',
       skills: ['numbers'],
       practises: 'Adding and taking away within 10 and 20 by hopping along a number line: counting on, counting back and crossing ten, then guessing where a hop will land and how far away a friend is.' },
+    { slug: 'pond-prix', name: 'Pond Prix', emoji: '🏎️', age: '5', mins: '5',
+      skills: ['numbers', 'speed'],
+      practises: 'Quick recall of number facts while racing: counting to 10, adding to 10, adding and taking away to 20, and the 2, 3, 4, 5 and 10 times tables, picked out at answer gates. Every answer is shown after the gate, so a splash of mud still teaches the sum.' },
 
     // --- 7+ ---
     { slug: 'silly-story-builder', name: 'Silly Story Builder', emoji: '📖', age: '7', mins: '10',
