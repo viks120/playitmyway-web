@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#15803d" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Laser Mirrors – Free 3D Light Reflection Puzzle for Teens | Play It My Way</title>
+    <meta name="description" content="Turn the mirrors so the laser beams light every crystal at once. Angle in equals angle out! 24 levels for ages 14+ with beam splitters, double crystals and red, blue and purple light. Undo and hints. No ads." />
+    <meta name="keywords" content="laser mirror puzzle, light reflection game, law of reflection, physics puzzle for teens, logic puzzle ages 14+, free 3d puzzle game" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Laser Mirrors – Free 3D Light Reflection Puzzle for Teens" />
+    <meta property="og:description" content="Steer laser beams with mirrors and splitters until every crystal glows. 24 levels, each checked solvable by computer, with undo and hints. Ages 14+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/laser-mirrors/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Laser Mirrors – Free 3D Light Reflection Puzzle for Teens" />
+    <meta name="twitter:description" content="Turn the mirrors so the laser beams light every crystal: a 3D reflection puzzle for ages 14+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/laser-mirrors/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <style>
+      :root {
+        --band: var(--color-green);
+        --band-tint: var(--color-green-tint);
+        --band-tint-deep: #a7e3b9;
+        --band-deep: #14532d;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+        --lab: #141834;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body {
+        background: var(--color-bg);
+        /* an accidental pull-to-refresh would lose the puzzle */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font-display);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: inherit; }
+
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 9px 14px; border-radius: var(--radius-pill);
+        background: var(--band-tint);
+        align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0 0 4px; text-wrap: balance; }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .stage-card {
+        width: 100%; max-width: 960px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 8px;
+      }
+      .stage {
+        position: relative; width: 100%;
+        height: clamp(460px, 76vh, 680px);
+        border-radius: 18px; overflow: hidden;
+        background: var(--lab); color: var(--deep);
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html.pimw-fs .stage { height: calc(100vh - 96px); height: calc(100dvh - 96px); }
+      .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .board-input { position: absolute; inset: 0; touch-action: none; cursor: grab; border-radius: 18px; }
+      .board-input:focus { outline: none; }
+      .board-input:focus-visible { box-shadow: inset 0 0 0 4px #7dd3fc; }
+
+      /* pick a level */
+      .menu { position: absolute; inset: 0; overflow-y: auto; background: rgba(247, 250, 255, 0.95); padding: 14px 16px 18px; }
+      .menu h2 { margin: 2px 0 4px; font-size: 21px; text-align: center; }
+      .menu-intro { margin: 0 auto 6px; max-width: 520px; text-align: center; color: var(--ink-soft); font-weight: 600; }
+      .level-group h3 { margin: 12px 0 6px; font-size: 16px; color: var(--ink-soft); text-align: center; }
+      .level-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; max-width: 520px; margin: 0 auto; }
+      .level-btn {
+        position: relative; height: 54px; border: 0; border-radius: 16px; background: #fff; color: var(--deep);
+        font-size: 22px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 0 var(--candy-card);
+      }
+      .level-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--candy-card); }
+      .level-btn.ok { background: var(--band-tint); }
+      .tick {
+        position: absolute; top: -6px; right: -4px; background: var(--band); color: #fff; border-radius: 50%;
+        width: 22px; height: 22px; font-size: 13px; display: grid; place-items: center;
+      }
+
+      /* while playing */
+      .hud { position: absolute; inset: 0; pointer-events: none; }
+      .tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; pointer-events: auto; }
+      .tool {
+        width: 46px; height: 46px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.94); cursor: pointer;
+        font-size: 21px; line-height: 1; box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .tool:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .info {
+        position: absolute; top: 64px; left: 10px; background: rgba(255, 255, 255, 0.94); border-radius: var(--radius-pill);
+        padding: 5px 14px; font-weight: 700; font-size: 15px; box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .info .sep { color: var(--ink-soft); margin: 0 5px; }
+      /* right: 64px keeps the message clear of the site's floating sound button */
+      .tell {
+        position: absolute; left: 10px; right: 64px; bottom: 10px; margin: 0;
+        background: rgba(255, 255, 255, 0.95); border-radius: 18px; padding: 8px 14px;
+        text-align: center; font-size: 15px; font-weight: 600; line-height: 1.3;
+        box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .tell:empty { display: none; }
+
+      .done { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(20, 24, 52, 0.35); }
+      .done-card {
+        background: #fff; border-radius: 24px; padding: 16px 22px 18px; text-align: center; width: 100%; max-width: 340px;
+        box-shadow: 0 8px 0 var(--band-tint-deep), var(--shadow-lift);
+      }
+      .done-card h2 { margin: 0; font-size: 27px; }
+      .done-sub { margin: 4px 0 14px; color: var(--ink-soft); font-weight: 600; }
+      .done-btns { display: flex; flex-direction: column; gap: 8px; }
+      .go-btn, .soft-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 17px; font-weight: 600; padding: 11px 20px; min-height: 46px; cursor: pointer;
+      }
+      .go-btn { background: var(--band); color: #fff; box-shadow: 0 5px 0 var(--band-deep); }
+      .go-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--band-deep); }
+      .soft-btn { background: var(--band-tint); color: var(--band); box-shadow: 0 4px 0 var(--band-tint-deep); }
+      .soft-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+
+      .nogl {
+        position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; padding: 24px; text-align: center; background: var(--color-bg);
+      }
+      .nogl-emoji { font-size: 56px; margin: 0; }
+      .nogl h2 { margin: 0; }
+      .nogl a {
+        display: inline-block; margin: 6px; padding: 10px 16px; border-radius: var(--radius-pill);
+        background: var(--band-tint); color: var(--band); font-weight: 600; text-decoration: none;
+      }
+
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px;
+        background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-rest);
+        line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol { margin: 0; padding-left: 22px; }
+      .how-to li + li { margin-top: 4px; }
+      .how-to p { margin: 10px 0 0; }
+      .reflect { margin: 8px 0 0; display: flex; flex-direction: column; align-items: center; }
+      .reflect svg { width: 100%; max-width: 460px; height: auto; display: block; }
+      .reflect figcaption { color: var(--ink-soft); font-size: 15px; text-align: center; margin-top: 2px; }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+      .visually-hidden {
+        position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+      }
+
+      @media (max-width: 420px) {
+        .level-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .tool { width: 42px; height: 42px; font-size: 19px; }
+        .tell { font-size: 14px; }
+        .info { font-size: 14px; padding: 5px 12px; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🔦 Laser Mirrors</h1>
+      <p>Turn the mirrors so every crystal lights up at once.</p>
+    </header>
+
+    <main class="stage-card">
+      <div class="stage" id="stage">
+        <canvas id="view" aria-hidden="true"></canvas>
+        <div class="board-input" id="board" tabindex="0" role="application"
+             aria-label="The lab bench. Left and right arrows pick a turnable piece, up and down change row, Enter turns it, Z undoes, R resets, H gives a hint." hidden></div>
+
+        <div class="hud" id="hud" hidden>
+          <div class="tools">
+            <button type="button" class="tool" id="menuBtn" aria-label="All levels"><span aria-hidden="true">☰</span></button>
+            <button type="button" class="tool" id="undoBtn" aria-label="Undo"><span aria-hidden="true">↩️</span></button>
+            <button type="button" class="tool" id="resetBtn" aria-label="Reset"><span aria-hidden="true">🔄</span></button>
+            <button type="button" class="tool" id="hintBtn" aria-label="Hint"><span aria-hidden="true">💡</span></button>
+          </div>
+          <div class="info"><span id="levelName">Level 1</span><span class="sep">·</span><span id="litCount">0/1</span> lit<span class="sep">·</span><span id="moves">0</span> <span id="movesWord">turns</span></div>
+          <p class="tell" id="tell" aria-live="polite"></p>
+        </div>
+
+        <section class="menu" id="menu" aria-labelledby="menuTitle">
+          <h2 id="menuTitle">Pick a level</h2>
+          <p class="menu-intro">Turn the mirrors so the laser beams light every crystal at the same time.</p>
+          <div id="levelGroups"></div>
+        </section>
+
+        <section class="done" id="done" hidden>
+          <div class="done-card" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+            <h2 id="doneTitle"></h2>
+            <p class="done-sub" id="doneSub"></p>
+            <div class="done-btns">
+              <button type="button" class="go-btn" id="nextLevel">Next level →</button>
+              <button type="button" class="soft-btn" id="again">Play it again</button>
+              <button type="button" class="soft-btn" id="allLevels">All levels</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="nogl" id="noGl" hidden>
+          <p class="nogl-emoji" aria-hidden="true">🔦</p>
+          <h2>This game needs 3D graphics</h2>
+          <p>This browser or device has 3D graphics switched off. Try one of these instead:</p>
+          <p><a href="../sudoku/">9️⃣ Sudoku</a><a href="../minesweeper/">💣 Minesweeper</a></p>
+        </div>
+      </div>
+      <p class="visually-hidden" id="srFocus" aria-live="polite"></p>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Lasers fire beams of light along the bench. Light every crystal at the same time to solve the level.</li>
+        <li>Tap a mirror on a <strong>yellow turntable</strong> to turn it: it flips between / and \. Grey pieces bolted to the bench never move.</li>
+        <li>Blocks and the lasers themselves stop a beam, and a crystal soaks up the light that lights it. Beams pass straight through each other.</li>
+        <li><strong>Splitters</strong> (striped see-through glass) let a beam through <em>and</em> reflect it, so one beam becomes two. A <strong>double crystal</strong>, with a ring of two beads, needs beams from two different sides.</li>
+        <li>In the last group the lasers are red and blue. A red crystal needs red light only, and a blue crystal blue only. Red and blue light together make purple, which is just what a purple crystal needs.</li>
+      </ol>
+
+      <h3>Angle in = angle out</h3>
+      <figure class="reflect">
+        <svg viewBox="0 0 460 170" role="img" aria-labelledby="reflectTitle reflectDesc">
+          <title id="reflectTitle">The law of reflection</title>
+          <desc id="reflectDesc">Left: a beam hits a flat mirror and leaves at the same angle to the dashed normal line as it arrived. Right: seen from above, a beam heading right turns up at a / mirror and down at a \ mirror.</desc>
+          <defs>
+            <marker id="tip" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#d97706" />
+            </marker>
+          </defs>
+          <!-- a beam bouncing off a flat mirror -->
+          <line x1="28" y1="132" x2="192" y2="132" stroke="#64748b" stroke-width="6" stroke-linecap="round" />
+          <g stroke="#94a3b8" stroke-width="2">
+            <line x1="44" y1="138" x2="36" y2="148" /><line x1="68" y1="138" x2="60" y2="148" /><line x1="92" y1="138" x2="84" y2="148" />
+            <line x1="116" y1="138" x2="108" y2="148" /><line x1="140" y1="138" x2="132" y2="148" /><line x1="164" y1="138" x2="156" y2="148" />
+            <line x1="188" y1="138" x2="180" y2="148" />
+          </g>
+          <line x1="110" y1="34" x2="110" y2="128" stroke="#64748b" stroke-width="2" stroke-dasharray="5 5" />
+          <text x="110" y="24" text-anchor="middle" font-size="13" fill="#5f5751">normal</text>
+          <line x1="46" y1="68" x2="106" y2="128" stroke="#f59e0b" stroke-width="5" stroke-linecap="round" marker-end="url(#tip)" />
+          <line x1="114" y1="128" x2="170" y2="72" stroke="#f59e0b" stroke-width="5" stroke-linecap="round" marker-end="url(#tip)" />
+          <path d="M110 96 A32 32 0 0 0 87.4 105.4" fill="none" stroke="#15803d" stroke-width="3" />
+          <path d="M110 96 A32 32 0 0 1 132.6 105.4" fill="none" stroke="#15803d" stroke-width="3" />
+          <text x="80" y="92" text-anchor="end" font-size="14" font-weight="700" fill="#15803d">in</text>
+          <text x="140" y="92" font-size="14" font-weight="700" fill="#15803d">out</text>
+          <text x="110" y="166" text-anchor="middle" font-size="13" fill="#5f5751">angle in = angle out</text>
+          <!-- from above: / turns a rightward beam up, \ turns it down -->
+          <g transform="translate(250 34)">
+            <rect x="0" y="0" width="84" height="84" rx="12" fill="#2d3367" />
+            <line x1="20" y1="64" x2="64" y2="20" stroke="#d3e5ff" stroke-width="7" stroke-linecap="round" />
+            <line x1="-14" y1="42" x2="40" y2="42" stroke="#f59e0b" stroke-width="5" stroke-linecap="round" />
+            <line x1="42" y1="42" x2="42" y2="-8" stroke="#f59e0b" stroke-width="5" stroke-linecap="round" marker-end="url(#tip)" />
+            <text x="42" y="112" text-anchor="middle" font-size="14" fill="#5f5751">/ turns it up</text>
+          </g>
+          <g transform="translate(360 34)">
+            <rect x="0" y="0" width="84" height="84" rx="12" fill="#2d3367" />
+            <line x1="20" y1="20" x2="64" y2="64" stroke="#d3e5ff" stroke-width="7" stroke-linecap="round" />
+            <line x1="-14" y1="42" x2="40" y2="42" stroke="#f59e0b" stroke-width="5" stroke-linecap="round" />
+            <line x1="42" y1="42" x2="42" y2="92" stroke="#f59e0b" stroke-width="5" stroke-linecap="round" marker-end="url(#tip)" />
+            <text x="42" y="112" text-anchor="middle" font-size="14" fill="#5f5751">\ turns it down</text>
+          </g>
+        </svg>
+        <figcaption>Light leaves a mirror at the same angle it arrives, measured from the normal.</figcaption>
+      </figure>
+      <p>When light bounces off a mirror, it leaves at the same angle it arrived at, measured from the <em>normal</em>: a line at right angles to the mirror. That's the law of reflection. On this bench every mirror sits at 45° to the beams, so each one turns the light through exactly 90°. Which way it turns depends on which diagonal the mirror is on, so plan the whole route from laser to crystal before you start turning.</p>
+      <p>Tap a turnable piece, or press <kbd>←</kbd> <kbd>→</kbd> to step through them and <kbd>↑</kbd> <kbd>↓</kbd> to change row, then <kbd>Enter</kbd> or <kbd>Space</kbd> to turn it. <kbd>Z</kbd> undoes, <kbd>R</kbd> resets and <kbd>H</kbd> or 💡 names a piece to turn. Drag the bench to look round it. Squares are named like a spreadsheet (A1 is the far left corner), so messages and hints can say exactly where a piece is. Every level has been checked by computer: each one can be solved, and only one setting of the pieces that matter works. Nothing is saved: ticks for solved levels last only this visit.</p>
+      <h3>What it practises</h3>
+      <p>The law of reflection, and the spatial reasoning to follow a beam through several bounces in your head. Later levels need real deduction: working backwards from each crystal, sharing a mirror between two beams, and mixing coloured light (red and blue make purple).</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/3d/three.min.js"></script>
+    <script src="../shared/3d/toon.js"></script>
+    <script src="../shared/3d/critters.js"></script>
+    <script src="../shared/3d/sound.js"></script>
+    <script src="optics.js"></script>
+    <script src="world.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>
