@@ -482,6 +482,7 @@
         if (o.isMesh && !o.userData.outline && !shared.has(o.geometry)) o.geometry.dispose();
       });
       course.clear();
+      bits.splice(0).forEach((p) => scene.remove(p.m));            // no confetti left over from the last level
       blockLabels.forEach((L) => L.set(''));
       lv.blocks.forEach((b, i) => {
         const wide = b.x1 - b.x0;
@@ -629,12 +630,7 @@
         if (r.onTarget) landLabel.set(`${f2(h.x)} m · hit!`, '#15803d', '#ffffff');
         else landLabel.set(`${f2(h.x)} m · ${gapText}`, '#fff1d6', '#7c2d12');
       }
-      if (h.t >= r.apex.t - 1e-9) {
-        apexLabel.mesh.position.set(r.apex.x, r.apex.y + 0.6, 0);
-        apexLabel.set(`H = ${f2(r.flat.H)} m`);
-      } else {
-        apexLabel.set('');
-      }
+      apexLabel.set('');
       // the gap to the target's centre, drawn on the surface both share
       const sameSurface = t.on < 0 ? h.kind === 'ground' : h.kind === 'top' && h.block === t.on;
       if (!r.onTarget && sameSurface && Math.abs(r.miss) > 0.05) {
@@ -644,6 +640,15 @@
         gapStrip.visible = true;
       } else {
         gapStrip.visible = false;
+      }
+    };
+    // the top of the arc, labelled once the whole shot is in view (if the ball got that far)
+    W.showApex = (r) => {
+      if (r.hit.t >= r.apex.t - 1e-9) {
+        apexLabel.mesh.position.set(r.apex.x, r.apex.y + 0.6, 0);
+        apexLabel.set(`H = ${f2(r.flat.H)} m`);
+      } else {
+        apexLabel.set('');
       }
     };
     W.clearShot = () => {
@@ -680,8 +685,8 @@
       const r = safeRect();
       const a = (camera.aspect * (r.r - r.l)) / (r.t - r.b);       // the shape of the free area
       const tall = clamp((1.5 - a) / 0.8, 0, 1);
-      const yaw = lerp(-0.3, -0.95, tall);
-      const pitch = lerp(0.14, 0.36, tall);
+      const yaw = lerp(-0.3, -1.1, tall);
+      const pitch = lerp(0.14, 0.42, tall);
       return new THREE.Vector3(Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch));
     }
     function safeRect() {
@@ -894,8 +899,9 @@
       cam.pos.lerp(cam.want.pos, k);
       cam.look.lerp(cam.want.look, k);
       placeCamera();
-      scene.fog.near = cam.want.dist * 1.6 + 60;
-      scene.fog.far = cam.want.dist * 4 + 500;
+      // haze in the distance, so the trees and hills sit back behind the ball
+      scene.fog.near = cam.want.dist * 0.9 + 30;
+      scene.fog.far = cam.want.dist * 3.2 + 280;
 
       // the ball and dots keep a size you can see, however far away the camera is
       const perPx = mpp();

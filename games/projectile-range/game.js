@@ -214,6 +214,9 @@
     field.hidden = false;
     $('last').hidden = true;
     $('timerChip').hidden = true;
+    fireBtn.disabled = false;
+    fireBtn.textContent = '🎯 Launch';
+    fireBtn.removeAttribute('aria-label');
     setControls(true);
     drawControls();
     world.aim(S.angle, S.speed);
@@ -287,30 +290,35 @@
   angleIn.addEventListener('input', () => setAngle(+angleIn.value, 'slider'));
   speedIn.addEventListener('input', () => setSpeed(+speedIn.value, 'slider'));
 
-  // − and + step by the fine amount, and keep stepping, faster, while held
+  /* − and + step by the fine amount, and keep stepping, faster, while held.
+   * The repeat runs on the game clock, from the frame loop, so a slow frame
+   * can never squeeze in extra steps before the finger's lift is seen. */
+  const held = { fn: null, since: 0, next: 0 };
   function stepper(btn, fn) {
-    let timer = 0;
-    const stopIt = () => {
-      clearTimeout(timer);
-      timer = 0;
-    };
+    let byPointer = false;
     btn.addEventListener('pointerdown', (e) => {
       if (btn.disabled || e.button > 0) return;
       e.preventDefault();
+      byPointer = true;
       fn();
-      let wait = 400;
-      const again = () => {
-        fn();
-        wait = Math.max(45, wait * 0.8);
-        timer = setTimeout(again, wait);
-      };
-      stopIt();
-      timer = setTimeout(again, wait);
+      Object.assign(held, { fn, since: S.clock, next: S.clock + 0.45 });
     });
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => btn.addEventListener(ev, stopIt));
-    btn.addEventListener('click', (e) => {
-      if (e.detail === 0) fn();                            // Enter or Space on the focused button
+    const release = () => {
+      if (held.fn === fn) held.fn = null;
+    };
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => btn.addEventListener(ev, release));
+    btn.addEventListener('click', () => {
+      if (byPointer) byPointer = false;                    // the press already stepped
+      else fn();                                           // Enter or Space on the focused button
     });
+  }
+  function holdTick() {
+    if (!held.fn) return;
+    if (S.screen !== 'aim') held.fn = null;
+    else if (S.clock >= held.next) {
+      held.fn();
+      held.next = S.clock + Math.max(0.035, 0.11 - (S.clock - held.since) * 0.03);
+    }
   }
   stepper($('angleDown'), () => setAngle(S.angle - Flight.ANGLE.step));
   stepper($('angleUp'), () => setAngle(S.angle + Flight.ANGLE.step));
@@ -351,7 +359,8 @@
       if (el.offsetParent) top = Math.max(top, el.getBoundingClientRect().bottom - r.top);
     });
     const bottom = r.bottom - consoleEl.getBoundingClientRect().top;
-    world.setInsets({ top: top + 8, right: 10, bottom: bottom + 8, left: 10 }, snap);
+    // the tape's labels are centred on the ground, so leave room for their lower half too
+    world.setInsets({ top: top + 8, right: 10, bottom: bottom + 22, left: 10 }, snap);
   }
 
   /* ---------------------------------------------------------- shooting */
@@ -458,6 +467,7 @@
       if (S.shot === r && S.screen !== 'flight' && S.screen !== 'menu') {
         world.rate(calm() ? 9 : 2);
         world.view('review', r);
+        world.showApex(r);
       }
     });
     fireBtn.textContent = '🎯 Launch';
@@ -488,6 +498,7 @@
     let sub = say.done(lv, S.prog.shots);
     if (lv.two) sub += ` ${deg(S.prog.low)} + ${deg(S.prog.high)} = ${deg(S.prog.low + S.prog.high)}.`;
     $('doneSub').textContent = sub;
+    tell(sub);
     $('doneTip').textContent = lv.tip;
     $('nextLevel').hidden = S.index >= LEVELS.length - 1;
     $('again').textContent = 'Play it again';
@@ -499,7 +510,8 @@
     S.screen = 'done';
     S.card = 'out';
     $('doneTitle').textContent = 'Out of shots';
-    $('doneSub').textContent = say.outOfShots(lv, S.prog.best);
+    $('doneSub').textContent = say.closest(S.prog.best);
+    tell(say.outOfShots(lv, S.prog.best));
     const hs = Flight.hints(lv, S.prog);
     $('doneTip').textContent = `Hint: ${hs[hs.length - 2]}`;
     $('nextLevel').hidden = true;
@@ -523,8 +535,12 @@
   function resetView() {
     if (S.screen === 'menu' || S.screen === 'flight') return;
     world.rate(calm() ? 9 : 3);
-    if (S.shot) world.view('review', S.shot);
-    else world.view('overview');
+    if (S.shot) {
+      world.view('review', S.shot);
+      world.showApex(S.shot);
+    } else {
+      world.view('overview');
+    }
     srFocus.textContent = say.view();
   }
   function togglePredict() {
@@ -661,6 +677,7 @@
   const look = new THREE.Vector3();
   function tick(t, dt) {
     runTimers();
+    holdTick();
     if (S.screen === 'flight') flightTick();
     if (!rig) return;
     const hop = hopCurve(t - S.hopAt, S.cheer ? 0.7 : 0.45);
