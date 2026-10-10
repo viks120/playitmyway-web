@@ -143,6 +143,12 @@ module.exports = {
       practises: 'Constraint reasoning and elimination. Every puzzle has exactly one solution, so correct logic is never punished.' },
     { slug: 'word-guess', name: 'Word Guess', emoji: '🔠', age: '14', mins: '5',
       skills: ['reading', 'logic'],
-      practises: 'Vocabulary and deduction — narrowing 14,000 possible words down with each guess.' }
+      practises: 'Vocabulary and deduction — narrowing 14,000 possible words down with each guess.' },
+    { slug: 'twist-cube', name: 'Twist Cube', emoji: '🧊', age: '14', mins: '10',
+      skills: ['logic'],
+      practises: 'Reading a notation (U, D, L, R, F, B, and ′ for anticlockwise) and working backwards: a scramble of up to 10 twists is undone by reversing the order and flipping each twist. It also builds 3D spatial reasoning, keeping track of the faces as the whole cube turns.' },
+    { slug: 'log-jam', name: 'Log Jam', emoji: '🪵', age: '14', mins: '15',
+      skills: ['logic'],
+      practises: 'Planning several moves ahead and reasoning backwards from the goal: which log has to move before that one can? 36 levels from warm-up to expert, each with its fewest-moves target proved by computer, with undo, restart and hints from a real solver.' }
   ]
 };
