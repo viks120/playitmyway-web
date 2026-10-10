@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#15803d" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Plans &amp; Elevations – Free 3D GCSE Maths Puzzle | Play It My Way</title>
+    <meta name="description" content="Read the plan, front elevation and side elevation, then build the 3D shape from cubes. 24 levels from warm-ups to fewest-cubes puzzles, plus a quick which-view quiz. GCSE maths practice for ages 14+. No ads." />
+    <meta name="keywords" content="plans and elevations, GCSE maths 3D shapes, front elevation side elevation plan, isometric cubes puzzle, 3d maths game for teens, free maths game ages 14+" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Plans &amp; Elevations – Free 3D GCSE Maths Puzzle" />
+    <meta property="og:description" content="Build the hidden shape from its plan, front and side elevations. Live ticks for each view, hints, and fewest-cubes challenges. Ages 14+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/plans-and-elevations/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Plans &amp; Elevations – Free 3D GCSE Maths Puzzle" />
+    <meta name="twitter:description" content="Build the 3D shape that matches a plan, a front elevation and a side elevation. GCSE maths practice for ages 14+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/plans-and-elevations/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <style>
+      :root {
+        --band: var(--color-green);
+        --band-tint: var(--color-green-tint);
+        --band-tint-deep: #a7e3b9;
+        --band-deep: #14532d;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+        --good: #15803d;
+        --bad: #b91c1c;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body {
+        background: var(--color-bg);
+        /* an accidental pull-to-refresh would lose the build */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font-display);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: inherit; }
+
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 9px 14px; border-radius: var(--radius-pill);
+        background: var(--band-tint);
+        align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0 0 4px; text-wrap: balance; }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .stage-card {
+        width: 100%; max-width: 960px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 8px;
+      }
+      .stage {
+        position: relative; width: 100%;
+        height: clamp(460px, 76vh, 680px);
+        border-radius: 18px; overflow: hidden;
+        background: #e8f2ec; color: var(--deep);
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html.pimw-fs .stage { height: calc(100vh - 96px); height: calc(100dvh - 96px); }
+      .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .board-input { position: absolute; inset: 0; touch-action: none; cursor: pointer; border-radius: 18px; }
+      .board-input:focus { outline: none; }
+      .board-input:focus-visible { box-shadow: inset 0 0 0 4px var(--color-focus); }
+      .board-input.grab { cursor: grabbing; }
+
+      /* the level menu */
+      .menu { position: absolute; inset: 0; overflow-y: auto; background: rgba(249, 252, 250, 0.95); padding: 14px 16px 22px; }
+      .menu h2 { margin: 2px 0 6px; font-size: 20px; text-align: center; }
+      .menu-intro { max-width: 560px; margin: 0 auto 6px; text-align: center; color: var(--ink-soft); font-size: 15px; line-height: 1.45; }
+      .level-group h3 { margin: 12px 0 6px; font-size: 16px; color: var(--ink-soft); text-align: center; }
+      .level-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; max-width: 540px; margin: 0 auto; }
+      .level-btn {
+        position: relative; height: 56px; border: 0; border-radius: 16px; background: #fff; color: var(--deep);
+        font-size: 22px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 0 var(--candy-card);
+      }
+      .level-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--candy-card); }
+      .level-btn.ok { background: var(--band-tint); }
+      .tick {
+        position: absolute; top: -6px; right: -4px; background: var(--band); color: #fff; border-radius: 50%;
+        width: 22px; height: 22px; font-size: 13px; display: grid; place-items: center;
+      }
+      .stars { position: absolute; left: 0; right: 0; bottom: 2px; font-size: 11px; line-height: 1; color: #d97706; letter-spacing: 1px; }
+      .quiz-box { max-width: 540px; margin: 18px auto 0; padding: 12px 14px 14px; text-align: center; background: #fff; border-radius: 18px; box-shadow: 0 4px 0 var(--candy-card); }
+      .quiz-box p { margin: 0 0 10px; color: var(--ink-soft); font-size: 15px; }
+
+      /* while playing */
+      .hud { position: absolute; inset: 0; pointer-events: none; }
+      .tools { position: absolute; top: 10px; left: 10px; right: 64px; display: flex; gap: 6px; align-items: center; pointer-events: none; }
+      .tools > * { pointer-events: auto; }
+      .tool {
+        flex: none; width: 46px; height: 46px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.94); cursor: pointer;
+        font-size: 20px; line-height: 1; color: var(--deep); box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .tool:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .tool[aria-pressed="true"] { background: var(--band); color: #fff; box-shadow: 0 3px 0 var(--band-deep); }
+      .info {
+        flex: none; background: rgba(255, 255, 255, 0.94); border-radius: var(--radius-pill); white-space: nowrap;
+        padding: 6px 14px; font-weight: 700; font-size: 15px; box-shadow: 0 3px 0 var(--band-tint-deep); pointer-events: none;
+      }
+      .info .sep { color: var(--ink-soft); margin: 0 4px; }
+
+      /* the three target drawings (and, in the quiz, the three choices) */
+      .cards { position: absolute; display: flex; gap: 8px; pointer-events: none; }
+      .card {
+        flex: 1 1 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; margin: 0;
+        background: rgba(255, 255, 255, 0.95); border-radius: 14px; padding: 5px 8px 6px;
+        border: 2px solid transparent; box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .card.ok { border-color: var(--good); }
+      .card-head { display: flex; align-items: center; justify-content: space-between; gap: 4px; font-weight: 700; font-size: 14px; line-height: 1.2; }
+      .badge {
+        flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+        font-size: 13px; font-weight: 700; color: #fff; background: #9ca3af;
+      }
+      .card.ok .badge { background: var(--good); }
+      .card-pic { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; padding-top: 3px; }
+      .card-pic svg { width: 100%; height: 100%; display: block; }
+      .choice { cursor: pointer; pointer-events: auto; font: inherit; color: var(--deep); text-align: left; }
+      .choice:active { transform: translateY(2px); }
+      .choice.right { border-color: var(--good); background: #ecfdf3; }
+      .choice.wrong { border-color: var(--bad); background: #fef2f2; }
+      .choice .badge { background: var(--deep); }
+      .choice.right .badge { background: var(--good); }
+      .choice.wrong .badge { background: var(--bad); }
+      svg .sq { fill: #ffffff; stroke: #c4d3c9; stroke-width: 0.6; }
+      svg .sq.on { fill: #5a8a6c; stroke: #2f5a43; }
+      svg .sq.miss { fill: #fde68a; stroke: #d97706; stroke-width: 0.8; stroke-dasharray: 2 1.2; }
+      svg .sq.extra { fill: #fff1f1; stroke: #e2b4b4; }
+      svg .cross { stroke: #dc2626; stroke-width: 1.5; stroke-linecap: round; fill: none; }
+      svg .rim { fill: none; stroke: #2f5a43; stroke-width: 0.9; }
+      svg .lab { font-family: var(--font-display); font-size: 6.4px; font-weight: 600; fill: #5f5751; text-anchor: middle; }
+
+      /* build tools and turning */
+      .ctrls { position: absolute; display: flex; gap: 6px; align-items: center; pointer-events: auto; }
+      .seg { flex: none; display: flex; background: rgba(255, 255, 255, 0.94); border-radius: var(--radius-pill); padding: 3px; box-shadow: 0 3px 0 var(--band-tint-deep); }
+      .seg button {
+        border: 0; background: transparent; border-radius: var(--radius-pill); height: 40px; padding: 0 13px;
+        font-size: 15px; font-weight: 700; color: var(--deep); cursor: pointer; white-space: nowrap;
+      }
+      .seg button[aria-pressed="true"] { background: var(--band); color: #fff; }
+      .next-btn { pointer-events: auto; }
+
+      /* right: 64px keeps the message clear of the site's floating sound button */
+      .tell {
+        position: absolute; left: 10px; right: 64px; bottom: 10px; margin: 0;
+        background: rgba(255, 255, 255, 0.95); border-radius: 18px; padding: 8px 14px;
+        text-align: center; font-size: 15px; font-weight: 600; line-height: 1.3;
+        box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .tell:empty { display: none; }
+
+      /* wide screens: the drawings stand in a column on the right */
+      .cards { top: 10px; right: 10px; bottom: 112px; width: clamp(150px, 23%, 210px); flex-direction: column; }
+      .ctrls { left: 10px; bottom: 60px; }
+
+      .done { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(255, 255, 255, 0.35); overflow-y: auto; }
+      .done-card {
+        background: #fff; border-radius: 24px; padding: 16px 22px 18px; text-align: center; width: 100%; max-width: 360px; margin: auto;
+        box-shadow: 0 8px 0 var(--band-tint-deep), var(--shadow-lift);
+      }
+      .done-card h2 { margin: 0; font-size: 26px; }
+      .done-sub { margin: 4px 0 8px; color: var(--ink-soft); font-weight: 600; }
+      .done-stars { margin: 0 0 8px; display: flex; flex-direction: column; gap: 4px; }
+      .star-row { display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; font-size: 15px; }
+      .star-row .st { font-size: 20px; color: #d1d5db; }
+      .star-row.got .st { color: #f59e0b; }
+      .done-fact { margin: 0 0 12px; font-size: 14px; color: var(--ink-soft); line-height: 1.4; }
+      .done-btns { display: flex; flex-direction: column; gap: 8px; }
+      .go-btn, .soft-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 17px; font-weight: 600; padding: 11px 20px; min-height: 46px; cursor: pointer;
+      }
+      .go-btn { background: var(--band); color: #fff; box-shadow: 0 5px 0 var(--band-deep); }
+      .go-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--band-deep); }
+      .soft-btn { background: var(--band-tint); color: var(--band); box-shadow: 0 4px 0 var(--band-tint-deep); }
+      .soft-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+
+      .nogl {
+        position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; padding: 24px; text-align: center; background: var(--color-bg);
+      }
+      .nogl-emoji { font-size: 56px; margin: 0; }
+      .nogl h2 { margin: 0; }
+      .nogl a {
+        display: inline-block; margin: 6px; padding: 10px 16px; border-radius: var(--radius-pill);
+        background: var(--band-tint); color: var(--band); font-weight: 600; text-decoration: none;
+      }
+
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px;
+        background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-rest);
+        line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol, .how-to ul { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+      .visually-hidden {
+        position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+      }
+
+      /* tall screens (phones held upright): the drawings become a row along the top,
+         the controls a row along the bottom, and the message sits just above them */
+      @media (max-aspect-ratio: 1/1) {
+        .cards { top: 62px; left: 10px; right: 10px; bottom: auto; width: auto; height: auto; flex-direction: row; gap: 6px; }
+        .card { padding: 4px 6px 5px; }
+        .card-pic svg { height: auto; max-height: 160px; }
+        .card-head .el { display: none; }
+        .ctrls { left: 10px; bottom: 10px; }
+        .tell { bottom: 62px; right: 10px; }
+      }
+      @media (max-width: 420px) {
+        .level-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .tool { width: 42px; height: 42px; font-size: 18px; }
+        .tools { gap: 5px; right: 10px; }
+        .info { font-size: 13px; padding: 5px 10px; }
+        .card-head { font-size: 13px; }
+        .badge { width: 20px; height: 20px; font-size: 12px; }
+        .seg button { padding: 0 10px; font-size: 14px; }
+        .ctrls { gap: 5px; }
+        .tell { font-size: 14px; padding: 7px 10px; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🧱 Plans &amp; Elevations</h1>
+      <p>Read the three views. Build the hidden shape.</p>
+    </header>
+
+    <main class="stage-card">
+      <div class="stage" id="stage">
+        <canvas id="view" aria-hidden="true"></canvas>
+        <div class="board-input" id="board" tabindex="0" role="application"
+             aria-label="The baseplate. Arrow keys move the cursor, plus or Enter adds a cube, minus or Delete removes one, Q and E turn the view, T tilts it, C compares, Z undoes, H gives a hint." hidden></div>
+
+        <div class="hud" id="hud" hidden>
+          <div class="tools">
+            <button type="button" class="tool" id="menuBtn" aria-label="All levels"><span aria-hidden="true">☰</span></button>
+            <button type="button" class="tool" id="undoBtn" aria-label="Undo"><span aria-hidden="true">↩️</span></button>
+            <button type="button" class="tool" id="clearBtn" aria-label="Clear the baseplate"><span aria-hidden="true">🗑️</span></button>
+            <button type="button" class="tool" id="hintBtn" aria-label="Hint"><span aria-hidden="true">💡</span></button>
+            <div class="info" id="info"><span id="levelName">Level 1</span><span class="sep" aria-hidden="true">·</span><span id="cubeCount">0 cubes</span></div>
+          </div>
+
+          <div class="cards" id="cards">
+            <figure class="card" id="card-plan" role="img"><div class="card-head" aria-hidden="true"><span>Plan</span><span class="badge">✗</span></div><div class="card-pic"></div></figure>
+            <figure class="card" id="card-front" role="img"><div class="card-head" aria-hidden="true"><span>Front<span class="el"> elevation</span></span><span class="badge">✗</span></div><div class="card-pic"></div></figure>
+            <figure class="card" id="card-side" role="img"><div class="card-head" aria-hidden="true"><span>Side<span class="el"> elevation</span></span><span class="badge">✗</span></div><div class="card-pic"></div></figure>
+          </div>
+          <div class="cards" id="choices" role="group" aria-label="Pick a drawing" hidden></div>
+
+          <div class="ctrls" id="ctrls">
+            <div class="seg" id="toolSeg" role="group" aria-label="Tool">
+              <button type="button" id="addBtn" aria-pressed="true"><span aria-hidden="true">＋ </span>Add</button>
+              <button type="button" id="eraseBtn" aria-pressed="false"><span aria-hidden="true">－ </span>Erase</button>
+            </div>
+            <button type="button" class="tool" id="turnLeft" aria-label="Turn the view left"><span aria-hidden="true">↺</span></button>
+            <button type="button" class="tool" id="turnRight" aria-label="Turn the view right"><span aria-hidden="true">↻</span></button>
+            <button type="button" class="tool" id="compareBtn" aria-pressed="false" aria-label="Compare my build with the drawings"><span aria-hidden="true">👁️</span></button>
+            <button type="button" class="go-btn next-btn" id="nextQ" hidden>Next →</button>
+          </div>
+          <p class="tell" id="tell" aria-live="polite"></p>
+        </div>
+
+        <section class="menu" id="menu" aria-labelledby="menuTitle">
+          <h2 id="menuTitle">Pick a level</h2>
+          <p class="menu-intro">Each level gives you three drawings of a hidden shape made of cubes: the plan (from above), the front elevation and the side elevation. Build any shape that matches all three.</p>
+          <div id="levelGroups"></div>
+          <div class="quiz-box">
+            <h2>Quick quiz</h2>
+            <p>A 3D model and three drawings: which one is the front elevation, the side elevation or the plan? 8 questions.</p>
+            <button type="button" class="go-btn" id="quizBtn">Which view is it?</button>
+          </div>
+        </section>
+
+        <section class="done" id="done" hidden>
+          <div class="done-card" role="dialog" aria-modal="true" aria-labelledby="doneTitle" aria-describedby="doneSub">
+            <h2 id="doneTitle"></h2>
+            <p class="done-sub" id="doneSub"></p>
+            <div class="done-stars" id="doneStars"></div>
+            <p class="done-fact" id="doneFact"></p>
+            <div class="done-btns">
+              <button type="button" class="go-btn" id="nextLevel">Next level →</button>
+              <button type="button" class="soft-btn" id="keepBuilding">Keep building for the stars</button>
+              <button type="button" class="soft-btn" id="again">Play it again</button>
+              <button type="button" class="soft-btn" id="allLevels">All levels</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="nogl" id="noGl" hidden>
+          <p class="nogl-emoji" aria-hidden="true">🧱</p>
+          <h2>This game needs 3D graphics</h2>
+          <p>This browser or device has 3D graphics switched off. Try one of these instead:</p>
+          <p><a href="../sudoku/">9️⃣ Sudoku</a><a href="../minesweeper/">💣 Minesweeper</a></p>
+        </div>
+      </div>
+      <p class="visually-hidden" id="srFocus" aria-live="polite"></p>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Each level gives you three drawings of a hidden shape made of cubes: the <strong>plan</strong> (looking down from above), the <strong>front elevation</strong> (looking from the front) and the <strong>side elevation</strong> (looking from the right-hand side).</li>
+        <li>Build a shape on the baseplate that has exactly those three views. Tap a square to place a cube, tap the top of a cube to stack on it, or tap the side of a cube to build next to it.</li>
+        <li>A tick on a drawing means your build matches that view. Match all three to solve the level.</li>
+        <li>Different shapes can share the same three views, because a cube can hide behind taller ones. Any shape that matches counts. Some levels give stars for using the fewest or the most cubes possible, and the last six must be solved with the fewest.</li>
+      </ol>
+      <p>Drag to turn the model, or use ↺ and ↻. To take a cube away, switch to <strong>－ Erase</strong>, right-click or long-press. 👁️ <strong>Compare</strong> shades the squares your build is missing in amber and crosses out the extra ones. 💡 gives a hint; tap it again for a more exact one. On a keyboard, the arrow keys move a cursor over the baseplate, <kbd>+</kbd> or <kbd>Enter</kbd> adds a cube, <kbd>−</kbd> or <kbd>Delete</kbd> removes one, <kbd>Q</kbd> and <kbd>E</kbd> turn the view, <kbd>T</kbd> tilts it, <kbd>C</kbd> compares, <kbd>Z</kbd> undoes and <kbd>H</kbd> gives a hint. Nothing is saved: ticks and stars last only this visit.</p>
+      <h3>Reading the drawings</h3>
+      <ul>
+        <li>The plan has the front edge at the bottom. Columns are lettered A, B, C from the left and rows numbered 1, 2, 3 from the front, just like the labels on the baseplate.</li>
+        <li>The front elevation shows the tallest stack in each column. The side elevation shows the tallest stack in each row, seen from the right, so its left edge is the front of the shape.</li>
+        <li>For the most cubes, make every covered square as tall as both elevations allow. For the fewest, let one tall stack count for its column and its row at the same time.</li>
+      </ul>
+      <p>The quick quiz shows a 3D model and three drawings: pick the plan, the front elevation or the side elevation, and the wrong ones explain themselves (a view from the back, a flipped plan…).</p>
+      <h3>What it practises</h3>
+      <p>Plans and elevations from GCSE maths: turning a 3D shape into its 2D views and back again, and reasoning about the fewest and the most cubes a set of views allows.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/3d/three.min.js"></script>
+    <script src="../shared/3d/toon.js"></script>
+    <script src="../shared/3d/critters.js"></script>
+    <script src="../shared/3d/sound.js"></script>
+    <script src="views.js"></script>
+    <script src="drawings.js"></script>
+    <script src="world.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>
