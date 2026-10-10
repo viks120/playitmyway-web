@@ -177,11 +177,18 @@
     refit();
     world.snapCamera();
     focusBoard();
-    // a moment to see it solved, then the scramble plays out a twist at a time
+    // a moment to see it solved, then the scramble plays out a twist at a time.
+    // With reduced motion each twist is quick but held, so it can still be
+    // followed, and free play skips the flurry and just shows the scramble.
     const k = S.moves.length;
-    const dur = calm() ? 0.14 : lv.free ? 0.075 : k <= 3 ? 0.5 : k <= 6 ? 0.38 : 0.3;
-    const hold = calm() ? 0.06 : lv.free ? 0 : 0.2;
-    later(calm() ? 0.3 : 0.7, () => {
+    const still = calm();
+    const dur = still ? 0.16 : lv.free ? 0.075 : k <= 3 ? 0.5 : k <= 6 ? 0.38 : 0.3;
+    const hold = lv.free ? 0 : still ? 0.3 : 0.2;
+    later(still ? 0.4 : 0.7, () => {
+      if (still && lv.free) {
+        world.settle(S.start);
+        return;
+      }
       let s = S.state;
       for (const m of S.moves) {
         s = C.twist(s, m);
@@ -360,12 +367,14 @@
     Sfx.play('win');
     const line = say.solved(lv, S.count);
     tell(line);
+    // the scramble, shown afterwards in the letters of the player's own view, as they typed them
+    const seen = S.moves.map((m) => C.toView(S.view, m));
     later(1.3, () => {
       $('doneTitle').textContent = !lv.free && S.count <= lv.par ? 'Solved at par!' : 'Solved!';
       $('doneSub').textContent = line;
       $('doneHelp').textContent = say.help(S.hints, S.peeked);
-      $('doneScramble').textContent = say.scramble(S.moves);
-      $('doneWay').textContent = say.way(S.moves);
+      $('doneScramble').textContent = say.scramble(seen);
+      $('doneWay').textContent = say.way(seen);
       $('nextLevel').hidden = S.index >= C.LEVELS.length - 1;
       $('again').textContent = lv.free ? 'New scramble' : 'Play it again';
       done.hidden = false;

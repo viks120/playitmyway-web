@@ -161,6 +161,7 @@
       }
       .mv.did { background: var(--band); color: #fff; }
       .path { color: var(--ink-soft); font-weight: 600; }
+      .path:empty { display: none; }
 
       /* the twist buttons: a column pair down the right-hand side */
       .pad {
@@ -257,7 +258,8 @@
         .tool { width: 42px; height: 42px; font-size: 19px; }
         .tools { gap: 5px; }
         .info { top: 60px; font-size: 14px; }
-        .scramble { top: 98px; }
+        .scramble { top: 98px; font-size: 13px; line-height: 1.4; padding: 6px 10px; }
+        .mv { min-width: 22px; padding: 0 3px; border-radius: 6px; }
         .tell { font-size: 14px; }
         .primer { font-size: 14px; }
       }
@@ -288,9 +290,9 @@
           </div>
           <div class="info" id="info"><span id="levelName">3×3×3</span><span class="sep">·</span><span id="moves">0</span> <span id="movesWord">twists</span><span id="parText"><span class="sep">·</span>par <span id="par">1</span></span></div>
           <section class="scramble" id="scramble" aria-label="The scramble" hidden>
+            <p class="path" id="pathStatus"></p>
             <p><b>Scramble</b> <span id="scrambleMoves"></span></p>
             <p><b>Undo it</b> <span id="undoMoves"></span></p>
-            <p class="path" id="pathStatus"></p>
           </section>
           <div class="pad" id="pad" role="group" aria-label="Twist a face">
             <button type="button" class="tw" data-move="U" aria-label="U: top face clockwise"><span class="dot" aria-hidden="true" hidden></span>U</button>
