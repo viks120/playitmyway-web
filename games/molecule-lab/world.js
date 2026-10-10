@@ -308,8 +308,9 @@
     };
 
     // the open-slot studs spread out like electron pairs: away from the
-    // bonds and from each other, and a little towards the viewer so they
-    // are not hidden behind their atom
+    // bonds and from each other, and drawn towards the atom's outline as
+    // you see it (a little in front), so none hides behind its atom or
+    // sits on its letter
     function spreadStuds(v, p, toCam) {
       if (!v.slots.length) return;
       const bondDirs = [];
@@ -330,7 +331,7 @@
           s.dir = [d[0] / l, d[1] / l, d[2] / l];
         }
       }
-      for (let it = 0; it < 3; it++) {
+      for (let it = 0; it < 4; it++) {
         for (const s of v.slots) {
           const f = [0, 0, 0];
           const push = (o, k) => {
@@ -343,10 +344,11 @@
           };
           for (const b of bondDirs) push(b, 1.3);
           for (const o of v.slots) if (o !== s) push(o.dir, 1);
-          f[0] += toCam.x * 0.45;
-          f[1] += toCam.y * 0.45;
-          f[2] += toCam.z * 0.45;
-          const n = [s.dir[0] + f[0] * 0.04, s.dir[1] + f[1] * 0.04, s.dir[2] + f[2] * 0.04];
+          const lean = 1.6 * (0.25 - (s.dir[0] * toCam.x + s.dir[1] * toCam.y + s.dir[2] * toCam.z));
+          f[0] += toCam.x * lean;
+          f[1] += toCam.y * lean;
+          f[2] += toCam.z * lean;
+          const n = [s.dir[0] + f[0] * 0.05, s.dir[1] + f[1] * 0.05, s.dir[2] + f[2] * 0.05];
           const l = Math.hypot(n[0], n[1], n[2]) || 1;
           s.dir = [n[0] / l, n[1] / l, n[2] / l];
         }
@@ -417,7 +419,7 @@
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       if (!w || !h) return;
-      const k = snap ? 1 : 1 - Math.exp(-4 * dt);
+      const k = snap || calm ? 1 : 1 - Math.exp(-4 * dt);       // reduced motion: no gliding
       const { c, r } = measure();
       target.lerp(c, k);
       radius += (r - radius) * k;
@@ -565,8 +567,7 @@
         const label = new THREE.Mesh(G.plane, lab.mat);
         label.renderOrder = 4;
         shapeFx.add(label);
-        shape.label = label;
-        shape.labelAt = c.clone().add(mid.multiplyScalar(r + 0.55));
+        Object.assign(shape, { label, c, mid, r, labelAt: c.clone().addScaledVector(mid, r + 0.55) });
       }
       for (const lp of info.lone || []) {
         const c = V3(pos.get(lp.id));
@@ -638,8 +639,8 @@
         if (side.lengthSq() < 1e-6) side.set(1, 0, 0);
         side.normalize();
         const n = b.sticks.length;
-        const radiusStick = n === 1 ? 0.085 : 0.062;
-        const gap = n === 2 ? 0.13 : 0.15;
+        const radiusStick = [0, 0.085, 0.058, 0.05][n];
+        const gap = n === 2 ? 0.2 : 0.17;
         b.sticks.forEach((pair, i) => {
           const off = side.clone().multiplyScalar((i - (n - 1) / 2) * gap);
           pair.forEach((m, h) => {
@@ -678,10 +679,11 @@
         dragTip.scale.setScalar(0.12);
       }
       if (shape && shape.label) {
-        // about 30 px tall on screen, whatever the zoom
+        // about 30 px tall on screen, whatever the zoom, and just clear of its arc
         const s = (30 * shape.labelAt.distanceTo(camera.position)) / focal;
         shape.label.scale.set(s * (256 / 96), s, 1);
         shape.label.quaternion.copy(camera.quaternion);
+        shape.labelAt.copy(shape.c).addScaledVector(shape.mid, shape.r + 0.7 * s + 0.12);
         shape.label.position.copy(shape.labelAt);
       }
       for (let i = bits.length - 1; i >= 0; i--) {

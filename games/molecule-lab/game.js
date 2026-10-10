@@ -126,7 +126,7 @@
       b.classList.toggle('ok', ok);
     });
   }
-  const groupOf = (i) => Chem.GROUPS.find((g) => i >= g.from && i < g.to).title;
+  const groupOf = (i) => Chem.GROUPS.find((g) => i >= g.from && i < g.to).short;
 
   function showMenu() {
     S.screen = 'menu';
