@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#15803d" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Molecule Lab – Build Molecules in 3D, Free Chemistry Game | Play It My Way</title>
+    <meta name="description" content="Build covalent molecules atom by atom in 3D: water, ammonia, methane, ethanol and more. Give every atom the right number of bonds, then watch it relax into its real shape with its bond angle. 20 chemistry tasks for ages 14+. No ads." />
+    <meta name="keywords" content="molecule builder, covalent bonding game, GCSE chemistry game, 3d molecule shapes, VSEPR bond angles, isomers, free chemistry game ages 14+" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Molecule Lab – Build Molecules in 3D, Free Chemistry Game" />
+    <meta property="og:description" content="Join atoms with single, double and triple bonds, then see each molecule take its real 3D shape. Isomers, bond angles and hints included. Ages 14+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/molecule-lab/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Molecule Lab – Build Molecules in 3D, Free Chemistry Game" />
+    <meta name="twitter:description" content="Build covalent molecules in 3D and see their real shapes and bond angles: a chemistry game for ages 14+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/molecule-lab/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <style>
+      :root {
+        --band: var(--color-green);
+        --band-tint: var(--color-green-tint);
+        --band-tint-deep: #a7e3b9;
+        --band-deep: #14532d;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body {
+        background: var(--color-bg);
+        /* an accidental pull-to-refresh would lose the molecule */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font-display);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: inherit; }
+      sub { font-size: 0.68em; line-height: 0; vertical-align: -0.22em; }
+
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 9px 14px; border-radius: var(--radius-pill);
+        background: var(--band-tint);
+        align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0 0 4px; text-wrap: balance; }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .stage-card {
+        width: 100%; max-width: 960px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 8px;
+      }
+      .stage {
+        position: relative; width: 100%;
+        height: clamp(460px, 76vh, 680px);
+        border-radius: 18px; overflow: hidden;
+        background: #e8f5ee; color: var(--deep);
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html.pimw-fs .stage { height: calc(100vh - 96px); height: calc(100dvh - 96px); }
+      .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .board-input { position: absolute; inset: 0; touch-action: none; cursor: grab; border-radius: 18px; }
+      .board-input:active { cursor: grabbing; }
+      .board-input:focus { outline: none; }
+      .board-input:focus-visible { box-shadow: inset 0 0 0 4px var(--color-focus); }
+
+      /* pick a molecule */
+      .menu { position: absolute; inset: 0; overflow-y: auto; background: rgba(246, 251, 248, 0.92); padding: 14px 16px 18px; }
+      .menu h2 { margin: 2px 0 6px; font-size: 21px; text-align: center; }
+      .menu-lead { margin: 0 auto 6px; max-width: 560px; text-align: center; color: var(--ink-soft); font-size: 15px; line-height: 1.4; }
+      .menu-lead b { color: var(--ink); white-space: nowrap; }
+      .task-group h3 { margin: 12px 0 6px; font-size: 16px; color: var(--ink-soft); text-align: center; }
+      .task-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; max-width: 640px; margin: 0 auto; }
+      .task-btn {
+        position: relative; min-height: 64px; border: 0; border-radius: 16px; background: #fff; color: var(--deep);
+        cursor: pointer; box-shadow: 0 4px 0 var(--candy-card); padding: 6px 4px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+      }
+      .task-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--candy-card); }
+      .task-btn.ok { background: var(--band-tint); }
+      .task-f { font-size: 20px; font-weight: 700; line-height: 1.15; }
+      .task-n { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); line-height: 1.15; }
+      .tick {
+        position: absolute; top: -6px; right: -4px; background: var(--band); color: #fff; border-radius: 50%;
+        width: 22px; height: 22px; font-size: 13px; display: grid; place-items: center;
+      }
+      .free-row { display: flex; justify-content: center; margin: 16px 0 4px; }
+
+      /* while building */
+      .hud { position: absolute; inset: 0; pointer-events: none; }
+      /* right: 64px keeps the top bar clear of the site's floating full-screen button */
+      .topbar { position: absolute; top: 10px; left: 10px; right: 64px; display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+      .tools { display: flex; gap: 6px; pointer-events: auto; }
+      .tool {
+        width: 46px; height: 46px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.94); cursor: pointer;
+        font-size: 21px; line-height: 1; box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .tool:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .task-card {
+        flex: 1 1 250px; min-width: 0; max-width: 440px;
+        background: rgba(255, 255, 255, 0.94); border-radius: 16px; padding: 5px 14px 7px;
+        box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .task-card p { margin: 0; }
+      .task-step { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+      .task-goal { font-size: 19px; font-weight: 700; line-height: 1.25; }
+      .task-built { font-size: 14px; font-weight: 600; color: var(--ink-soft); margin-top: 1px !important; }
+      .tally.ok { color: var(--band); }
+      .tally.over { color: #b91c1c; }
+
+      .palette {
+        position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(var(--tell-h, 0px) + 10px);
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 12px; pointer-events: auto;
+        width: max-content; max-width: calc(100% - 20px);
+      }
+      .atoms, .acts { display: flex; gap: 7px; }
+      .atom-btn {
+        position: relative; width: 52px; height: 52px; border-radius: 50%; cursor: pointer;
+        font-size: 21px; font-weight: 700; line-height: 1; padding: 0;
+        border: 3px solid var(--line); background: var(--fill); color: var(--ink-on);
+        box-shadow: 0 4px 0 rgba(43, 42, 94, 0.22);
+      }
+      .atom-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(43, 42, 94, 0.22); }
+      .atom-btn .slots {
+        position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%);
+        display: flex; gap: 2px; padding: 2px 4px; border-radius: 999px; background: #fff;
+        box-shadow: 0 1px 2px rgba(43, 42, 94, 0.25);
+      }
+      .atom-btn .slots i { width: 6px; height: 6px; border-radius: 50%; background: #f5b70f; display: block; }
+      .atom-btn[data-el="H"] { --fill: #f5f7fa; --line: #93a0b2; --ink-on: #33302e; }
+      .atom-btn[data-el="C"] { --fill: #424956; --line: #262a33; --ink-on: #ffffff; }
+      .atom-btn[data-el="N"] { --fill: #3d72e3; --line: #2549a6; --ink-on: #ffffff; }
+      .atom-btn[data-el="O"] { --fill: #e2483d; --line: #a52a20; --ink-on: #ffffff; }
+      .atom-btn[data-el="Cl"] { --fill: #37b65d; --line: #20793c; --ink-on: #ffffff; font-size: 19px; }
+      .act-btn {
+        height: 52px; border-radius: var(--radius-pill); border: 0; cursor: pointer; padding: 0 16px;
+        background: rgba(255, 255, 255, 0.96); color: var(--deep); font-size: 17px; font-weight: 700;
+        display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .act-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .act-btn .ic { font-size: 19px; }
+      .hud.is-done .palette, .hud.is-done .task-card { display: none; }
+
+      /* right: 64px keeps the message clear of the site's floating sound button */
+      .tell {
+        position: absolute; left: 10px; right: 64px; bottom: 10px; margin: 0;
+        background: rgba(255, 255, 255, 0.95); border-radius: 18px; padding: 8px 14px;
+        text-align: center; font-size: 15px; font-weight: 600; line-height: 1.3;
+        box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .tell:empty { display: none; }
+
+      /* finished: a card above the message, or beside the molecule on a wide screen */
+      .done { position: absolute; inset: 0; pointer-events: none; }
+      .done-card {
+        position: absolute; left: 10px; right: 10px; bottom: calc(var(--tell-h, 0px) + 10px);
+        max-height: calc(100% - var(--tell-h, 0px) - 170px); pointer-events: auto;
+        display: flex; flex-direction: column;
+        background: #fff; border-radius: 22px; padding: 10px 14px 12px;
+        box-shadow: 0 6px 0 var(--band-tint-deep), var(--shadow-lift);
+      }
+      .done-card h2 { margin: 0 0 4px; font-size: 21px; line-height: 1.2; flex: none; }
+      .done-card h2 span { color: var(--band); }
+      .done-info { flex: 1 1 auto; min-height: 0; max-height: 170px; overflow-y: auto; }
+      .done-card p { margin: 0 0 6px; font-size: 14.5px; line-height: 1.4; }
+      .done-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+      .done-facts p:only-child { grid-column: 1 / -1; }
+      .done-k { display: block; font-size: 12px; font-weight: 700; color: var(--band); text-transform: uppercase; letter-spacing: 0.04em; }
+      .done-row { font-weight: 600; }
+      .done-note { display: none; font-size: 12.5px !important; color: var(--ink-soft); }
+      .done-btns { flex: none; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 8px; margin-top: 6px; }
+      .done-btns .long { display: none; }
+      .go-btn, .soft-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 16px; font-weight: 600; padding: 10px 14px; min-height: 46px; cursor: pointer;
+      }
+      .go-btn { background: var(--band); color: #fff; box-shadow: 0 5px 0 var(--band-deep); }
+      .go-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--band-deep); }
+      .soft-btn { background: var(--band-tint); color: var(--band-deep); box-shadow: 0 4px 0 var(--band-tint-deep); }
+      .soft-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .free-row .go-btn { font-size: 17px; padding: 11px 24px; }
+
+      .nogl {
+        position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; padding: 24px; text-align: center; background: var(--color-bg);
+      }
+      .nogl-emoji { font-size: 56px; margin: 0; }
+      .nogl h2 { margin: 0; }
+      .nogl a {
+        display: inline-block; margin: 6px; padding: 10px 16px; border-radius: var(--radius-pill);
+        background: var(--band-tint); color: var(--band); font-weight: 600; text-decoration: none;
+      }
+
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px;
+        background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-rest);
+        line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      .keys { margin: 6px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; }
+      .keys dt { font-weight: 600; }
+      .keys dd { margin: 0; }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+      .visually-hidden {
+        position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+      }
+
+      @media (min-width: 760px) {
+        .done-card {
+          left: auto; right: 10px; top: 66px; bottom: auto; width: 340px;
+          max-height: calc(100% - 76px - var(--tell-h, 0px)); padding: 12px 16px 14px;
+        }
+        .done-card h2 { font-size: 22px; }
+        .done-card p { font-size: 15px; }
+        .done-info { max-height: none; }
+        .done-facts { grid-template-columns: 1fr; }
+        .done-note { display: block; }
+        .done-btns { grid-template-columns: 1fr; margin-top: 8px; }
+        .done-btns .long { display: inline; }
+        .done-btns .short { display: none; }
+      }
+      @media (max-width: 560px) {
+        .task-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .tool { width: 42px; height: 42px; font-size: 19px; }
+        .atom-btn { width: 48px; height: 48px; font-size: 19px; }
+        .act-btn { height: 46px; font-size: 16px; padding: 0 14px; }
+        .task-goal { font-size: 17px; }
+        .tell { font-size: 14px; padding: 7px 12px; }
+        .done-card h2 { font-size: 20px; }
+        .done-card p { font-size: 14px; }
+        .keys { grid-template-columns: 1fr; }
+        .keys dd { margin-bottom: 6px; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>⚗️ Molecule Lab</h1>
+      <p>Join atoms into molecules, then see their real 3D shapes.</p>
+    </header>
+
+    <main class="stage-card">
+      <div class="stage" id="stage">
+        <canvas id="view" aria-hidden="true"></canvas>
+        <div class="board-input" id="board" tabindex="0" role="application" aria-roledescription="molecule builder"
+             aria-label="Molecule builder" aria-describedby="keysHelp" hidden></div>
+
+        <div class="hud" id="hud" hidden>
+          <div class="topbar" id="topbar">
+            <div class="tools">
+              <button type="button" class="tool" id="menuBtn" aria-label="All molecules (M)" title="All molecules (M)"><span aria-hidden="true">☰</span></button>
+              <button type="button" class="tool" id="undoBtn" aria-label="Undo (Z)" title="Undo (Z)"><span aria-hidden="true">↩️</span></button>
+              <button type="button" class="tool" id="clearBtn" aria-label="Clear (X)" title="Clear (X)"><span aria-hidden="true">🗑️</span></button>
+              <button type="button" class="tool" id="hintBtn" aria-label="Hint (question mark)" title="Hint (?)"><span aria-hidden="true">💡</span></button>
+            </div>
+            <div class="task-card" id="taskCard">
+              <p class="task-step" id="taskStep"></p>
+              <p class="task-goal" id="taskGoal"></p>
+              <p class="task-built" id="built"></p>
+            </div>
+          </div>
+          <div class="palette" id="palette" role="group" aria-label="Atoms and bonds">
+            <div class="atoms">
+              <button type="button" class="atom-btn" data-el="H" aria-label="Add hydrogen: 1 bond (H)" title="Hydrogen: 1 bond (H)"><span aria-hidden="true">H</span><span class="slots" aria-hidden="true"><i></i></span></button>
+              <button type="button" class="atom-btn" data-el="C" aria-label="Add carbon: 4 bonds (C)" title="Carbon: 4 bonds (C)"><span aria-hidden="true">C</span><span class="slots" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
+              <button type="button" class="atom-btn" data-el="N" aria-label="Add nitrogen: 3 bonds (N)" title="Nitrogen: 3 bonds (N)"><span aria-hidden="true">N</span><span class="slots" aria-hidden="true"><i></i><i></i><i></i></span></button>
+              <button type="button" class="atom-btn" data-el="O" aria-label="Add oxygen: 2 bonds (O)" title="Oxygen: 2 bonds (O)"><span aria-hidden="true">O</span><span class="slots" aria-hidden="true"><i></i><i></i></span></button>
+              <button type="button" class="atom-btn" data-el="Cl" aria-label="Add chlorine: 1 bond (L)" title="Chlorine: 1 bond (L)"><span aria-hidden="true">Cl</span><span class="slots" aria-hidden="true"><i></i></span></button>
+            </div>
+            <div class="acts">
+              <button type="button" class="act-btn" id="bondBtn" aria-label="Bond: make, raise or remove the bond between the last two atoms picked (B)" title="Bond (B)"><span class="ic" aria-hidden="true">⇄</span>Bond</button>
+              <button type="button" class="act-btn" id="delBtn" aria-label="Delete the selected atom (Delete)" title="Delete (Del)"><span class="ic" aria-hidden="true">✕</span>Delete</button>
+            </div>
+          </div>
+          <p class="tell" id="tell" aria-live="polite"></p>
+        </div>
+
+        <section class="menu" id="menu" aria-labelledby="menuTitle">
+          <h2 id="menuTitle">Pick a molecule to build</h2>
+          <p class="menu-lead">Atoms bond by sharing pairs of electrons. Give every atom exactly the bonds it needs: <b>H 1</b>, <b>Cl 1</b>, <b>O 2</b>, <b>N 3</b>, <b>C 4</b>.</p>
+          <div id="taskGroups"></div>
+          <div class="free-row"><button type="button" class="go-btn" id="freeBtn"><span aria-hidden="true">🧪</span> Free build</button></div>
+        </section>
+
+        <section class="done" id="done" hidden>
+          <div class="done-card" id="doneCard" role="dialog" aria-labelledby="doneTitle" aria-describedby="doneInfo">
+            <h2 id="doneTitle"></h2>
+            <div class="done-info" id="doneInfo">
+              <div class="done-facts">
+                <p class="done-row"><span class="done-k">Shape</span><span id="doneShape"></span></p>
+                <p class="done-row" id="doneAngleRow"><span class="done-k">Bond angle (ideal)</span><span id="doneAngle"></span></p>
+              </div>
+              <p><span class="done-k">Did you know?</span><span id="doneFact"></span></p>
+              <p class="done-note">Ideal angles come from electron-pair repulsion (VSEPR); real molecules differ by a few degrees.</p>
+            </div>
+            <div class="done-btns">
+              <button type="button" class="go-btn" id="nextBtn" aria-label="Next molecule"><span class="long">Next molecule →</span><span class="short" aria-hidden="true">Next →</span></button>
+              <button type="button" class="soft-btn" id="againBtn" aria-label="Build it again"><span class="long">Build it again</span><span class="short" aria-hidden="true">Again</span></button>
+              <button type="button" class="soft-btn" id="allBtn" aria-label="All molecules"><span class="long">All molecules</span><span class="short" aria-hidden="true">All</span></button>
+            </div>
+          </div>
+        </section>
+
+        <div class="nogl" id="noGl" hidden>
+          <p class="nogl-emoji" aria-hidden="true">⚗️</p>
+          <h2>This game needs 3D graphics</h2>
+          <p>This browser or device has 3D graphics switched off. Try one of these instead:</p>
+          <p><a href="../science-trivia/">🔬 Science Trivia</a><a href="../sudoku/">9️⃣ Sudoku</a></p>
+        </div>
+      </div>
+      <p class="visually-hidden" id="keysHelp">Keys: H, C, N, O and L (or 1 to 5) add hydrogen, carbon, nitrogen, oxygen or chlorine, bonded to the selected atom. Tab and the arrow keys pick an atom; Space jumps to an atom with an open slot. B makes, raises or removes the bond between the last two atoms picked. Delete removes the selected atom. Z undoes, X clears, question mark gives a hint, M opens the list of molecules. Shift with the arrow keys turns the view. Escape then Tab moves on to the buttons.</p>
+    </main>
+
+    <section class="how-to">
+      <h2>🧪 How to play</h2>
+      <ol>
+        <li>Pick a molecule. The task gives its name and formula: NH₃ means one nitrogen and three hydrogens.</li>
+        <li>Add atoms from the palette. A new atom bonds to the selected atom (the one with the orange ring).</li>
+        <li>Every atom needs a set number of bonds: hydrogen 1, chlorine 1, oxygen 2, nitrogen 3, carbon 4. Yellow studs show the bonding slots still open, and an atom settles when it is full.</li>
+        <li>Some atoms share two or three pairs of electrons. Pick the two atoms one after the other and press Bond: single, then double, then triple, then none. You can also drag from one atom to the other, or tap a bond.</li>
+        <li>When your molecule matches, it relaxes into its real 3D shape and shows its shape, a bond angle and a fact. The last group is isomers: the same atoms joined in a different order make a different molecule.</li>
+      </ol>
+      <p>Drag on empty space to turn the molecule; pinch or scroll to zoom. 💡 Hint always suggests the next step, ↩️ Undo takes one back and 🗑️ Clear starts again. Try 🧪 Free build to make anything: the lab names more than 50 molecules. Nothing is saved: ticks for finished molecules last only this visit.</p>
+      <h3>Keys</h3>
+      <dl class="keys">
+        <dt><kbd>H</kbd> <kbd>C</kbd> <kbd>N</kbd> <kbd>O</kbd> <kbd>L</kbd> or <kbd>1</kbd>–<kbd>5</kbd></dt><dd>add hydrogen, carbon, nitrogen, oxygen or chlorine (L), bonded to the selected atom</dd>
+        <dt><kbd>Tab</kbd> or arrow keys</dt><dd>pick an atom (<kbd>Space</kbd>: the next one with an open slot)</dd>
+        <dt><kbd>B</kbd></dt><dd>bond the last two atoms picked: single → double → triple → none</dd>
+        <dt><kbd>Delete</kbd></dt><dd>remove the selected atom (with its hydrogens)</dd>
+        <dt><kbd>Z</kbd> · <kbd>X</kbd> · <kbd>?</kbd></dt><dd>undo · clear · hint</dd>
+        <dt><kbd>Shift</kbd> + arrows · <kbd>+</kbd> <kbd>−</kbd></dt><dd>turn the view · zoom</dd>
+        <dt><kbd>M</kbd> · <kbd>Esc</kbd></dt><dd>list of molecules · let go of the selection (then <kbd>Tab</kbd> moves on to the buttons)</dd>
+      </dl>
+      <h3>What it practises</h3>
+      <p>Covalent bonding as taught at GCSE: how many bonds each atom makes, single, double and triple bonds, turning a formula into a structure, and isomers (ethanol and methoxymethane are both C₂H₆O). The finished shapes add the shapes of molecules and their bond angles from electron-pair repulsion (VSEPR). Angles shown are the ideal ones from that model; real molecules differ by a few degrees.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/3d/three.min.js"></script>
+    <script src="../shared/3d/toon.js"></script>
+    <script src="../shared/3d/critters.js"></script>
+    <script src="../shared/3d/sound.js"></script>
+    <script src="chem.js"></script>
+    <script src="world.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>
