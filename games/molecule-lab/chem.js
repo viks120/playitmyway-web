@@ -485,7 +485,7 @@
     { name: 'methoxymethane', formula: 'CH3OCH3', smiles: 'COC', angle: [1, 'C', 'C'],
       tip: 'The same atoms as ethanol, C₂H₆O, but the oxygen sits between the two carbons.',
       how: 'the oxygen sits between the two carbons, and each carbon has three hydrogens',
-      fact: 'Methoxymethane and ethanol are isomers: both C₂H₆O. With no O–H group its molecules cannot hydrogen bond to each other, so it boils at −24 °C, while ethanol boils at 78 °C. (The model gives about 104.5° at the oxygen; the bulky CH₃ groups open the real angle to about 112°.)' },
+      fact: 'Methoxymethane and ethanol are isomers: both C₂H₆O. With no O–H group its molecules cannot hydrogen bond to each other, so it boils at −24 °C, while ethanol boils at 78 °C. The real C–O–C angle is about 112°: the bulky CH₃ groups push it open.' },
     { name: 'propane', formula: 'C3H8', smiles: 'CCC', angle: [1, 'C', 'C'],
       tip: 'A chain of three carbons.',
       how: 'three carbons make a chain, C–C–C, and every other bond goes to a hydrogen',
@@ -497,11 +497,11 @@
   ].map((t) => Object.assign({}, t, { mol: parse(t.smiles) }));
 
   const GROUPS = [
-    { title: 'Single bonds', from: 0, to: 5 },
-    { title: 'Double and triple bonds', from: 5, to: 9 },
-    { title: 'Carbon chains', from: 9, to: 13 },
-    { title: 'Oxygen joins in', from: 13, to: 17 },
-    { title: 'Isomers: same atoms, new shape', from: 17, to: 20 },
+    { title: 'Single bonds', short: 'Single bonds', from: 0, to: 5 },
+    { title: 'Double and triple bonds', short: 'Double and triple bonds', from: 5, to: 9 },
+    { title: 'Carbon chains', short: 'Carbon chains', from: 9, to: 13 },
+    { title: 'Oxygen joins in', short: 'Oxygen joins in', from: 13, to: 17 },
+    { title: 'Isomers: same atoms, new shape', short: 'Isomers', from: 17, to: 20 },
   ];
 
   /* Molecules the lab can name: every task, and more for the free build. */
@@ -1160,7 +1160,7 @@
     named: (entry, shape, head) => `That’s ${entry.name}, ${sub(entry.formula)}! ${shape}${head ? `, ${head.label} about ${deg(head.angle)}` : ''}. ${entry.fact}`,
     namedRing: (entry) => `That’s ${entry.name}, ${sub(entry.formula)}! ${entry.fact}`,
     unknown: (f) => `Every atom is full: ${sub(f)}. It is not one of the molecules I can name.`,
-    isomer: (task, rec) => `Every atom is full, but this is ${rec ? rec.name : 'a different molecule'}: an isomer of ${task.name}, same atoms, different arrangement. In ${task.name}, ${task.how}.`,
+    isomer: (task, rec) => `This is ${rec ? rec.name : 'a different molecule'}, an isomer: the same atoms, joined differently. In ${task.name}, ${task.how}.`,
     other: (task, rec, f) => (rec
       ? `That’s ${rec.name}, ${sub(rec.formula)}. The task is ${task.name}, ${sub(task.formula)}.`
       : `Every atom is full, but you have ${sub(f)}. The task is ${task.name}, ${sub(task.formula)}.`),

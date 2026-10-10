@@ -500,7 +500,7 @@ test('every message, word for word', () => {
   assert.equal(C.say.bondUp('C', 'O', 2), 'C=O: now a double bond, two shared pairs.');
   assert.equal(C.say.bondUp('N', 'N', 3), 'N≡N: now a triple bond, three shared pairs.');
   assert.equal(C.say.isomer(C.TASKS[17], C.recognise(C.TASKS[14].mol)),
-    'Every atom is full, but this is ethanol: an isomer of methoxymethane, same atoms, different arrangement. In methoxymethane, the oxygen sits between the two carbons, and each carbon has three hydrogens.');
+    'This is ethanol, an isomer: the same atoms, joined differently. In methoxymethane, the oxygen sits between the two carbons, and each carbon has three hydrogens.');
   assert.equal(C.say.other(C.TASKS[14], C.recognise(C.TASKS[13].mol), 'CH4O'), 'That’s methanol, CH₃OH. The task is ethanol, C₂H₅OH.');
   assert.equal(C.say.unknown('C4H10O'), 'Every atom is full: C₄H₁₀O. It is not one of the molecules I can name.');
 });

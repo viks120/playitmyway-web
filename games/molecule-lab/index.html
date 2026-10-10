@@ -178,7 +178,7 @@
       }
       .act-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
       .act-btn .ic { font-size: 19px; }
-      .hud.is-done .palette, .hud.is-done .task-card { display: none; }
+      .hud.is-done .palette, .hud.is-done .task-card, .hud.is-done .tool:not(#menuBtn) { display: none; }
 
       /* right: 64px keeps the message clear of the site's floating sound button */
       .tell {
@@ -352,7 +352,7 @@
           <p><a href="../science-trivia/">🔬 Science Trivia</a><a href="../sudoku/">9️⃣ Sudoku</a></p>
         </div>
       </div>
-      <p class="visually-hidden" id="keysHelp">Keys: H, C, N, O and L (or 1 to 5) add hydrogen, carbon, nitrogen, oxygen or chlorine, bonded to the selected atom. Tab and the arrow keys pick an atom; Space jumps to an atom with an open slot. B makes, raises or removes the bond between the last two atoms picked. Delete removes the selected atom. Z undoes, X clears, question mark gives a hint, M opens the list of molecules. Shift with the arrow keys turns the view. Escape then Tab moves on to the buttons.</p>
+      <p class="visually-hidden" id="keysHelp">Keys: H, C, N, O and L (or 1 to 5) add hydrogen, carbon, nitrogen, oxygen or chlorine, bonded to the selected atom. Tab and the arrow keys pick an atom; Space jumps to an atom with an open slot. B makes, raises or removes the bond between the last two atoms picked. Delete removes the selected atom. Z undoes, X clears, question mark or Shift H gives a hint, M opens the list of molecules. Shift with the arrow keys turns the view. Escape then Tab moves on to the buttons.</p>
     </main>
 
     <section class="how-to">
@@ -371,7 +371,7 @@
         <dt><kbd>Tab</kbd> or arrow keys</dt><dd>pick an atom (<kbd>Space</kbd>: the next one with an open slot)</dd>
         <dt><kbd>B</kbd></dt><dd>bond the last two atoms picked: single → double → triple → none</dd>
         <dt><kbd>Delete</kbd></dt><dd>remove the selected atom (with its hydrogens)</dd>
-        <dt><kbd>Z</kbd> · <kbd>X</kbd> · <kbd>?</kbd></dt><dd>undo · clear · hint</dd>
+        <dt><kbd>Z</kbd> · <kbd>X</kbd> · <kbd>?</kbd> or <kbd>Shift</kbd>+<kbd>H</kbd></dt><dd>undo · clear · hint (plain <kbd>H</kbd> adds a hydrogen)</dd>
         <dt><kbd>Shift</kbd> + arrows · <kbd>+</kbd> <kbd>−</kbd></dt><dd>turn the view · zoom</dd>
         <dt><kbd>M</kbd> · <kbd>Esc</kbd></dt><dd>list of molecules · let go of the selection (then <kbd>Tab</kbd> moves on to the buttons)</dd>
       </dl>
