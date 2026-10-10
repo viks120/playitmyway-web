@@ -438,7 +438,8 @@
         : `You predicted ${f1(guess)} m: ${p.pct}% out.`;
     },
     done: (level, shots) => `Level ${level.n} done in ${shots} ${shots === 1 ? 'shot' : 'shots'}!`,
-    outOfShots: (level, best) => `Out of shots.${best != null ? ` Your closest was ${f1(Math.abs(best))} m ${best < 0 ? 'short' : 'long'}.` : ''} Try again: your settings are kept.`,
+    closest: (best) => `${best != null ? `Your closest was ${f1(Math.abs(best))} m ${best < 0 ? 'short' : 'long'}. ` : ''}Try again: your settings are kept.`,
+    outOfShots: (level, best) => `Out of shots. ${say.closest(best)}`,
     fixed: (what) => `The ${what} is fixed in this level.`,
     shots: (n, limit) => (limit ? `${limit - n} of ${limit} shots left` : `${n} ${n === 1 ? 'shot' : 'shots'}`),
     view: () => 'View reset.',

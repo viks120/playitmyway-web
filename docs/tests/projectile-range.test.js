@@ -315,6 +315,7 @@ test('every message, word for word', () => {
   assert.equal(F.say.done(l1, 1), 'Level 1 done in 1 shot!');
   assert.equal(F.say.done(l1, 4), 'Level 1 done in 4 shots!');
   assert.equal(F.say.outOfShots(F.LEVELS[21], -2.345), 'Out of shots. Your closest was 2.3 m short. Try again: your settings are kept.');
+  assert.equal(F.say.closest(4.06), 'Your closest was 4.1 m long. Try again: your settings are kept.');
   assert.equal(F.say.shots(2, null), '2 shots');
   assert.equal(F.say.shots(1, null), '1 shot');
   assert.equal(F.say.shots(0, 3), '3 of 3 shots left');
