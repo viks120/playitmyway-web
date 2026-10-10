@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#15803d" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Logic Gates – Free 3D Boolean Logic Puzzle for Teens | Play It My Way</title>
+    <meta name="description" content="Build circuits on a 3D board: pick AND, OR, NOT, XOR, NAND or NOR for each slot until every row of the truth table matches. 24 levels up to adders and a multiplexer, for ages 14+. No ads." />
+    <meta name="keywords" content="logic gates game, truth table practice, boolean logic puzzle, GCSE computer science logic gates, half adder full adder game, NAND gate puzzle" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Logic Gates – Free 3D Boolean Logic Puzzle for Teens" />
+    <meta property="og:description" content="Choose a gate for every slot until the truth table matches. From AND and OR to De Morgan, NAND-only circuits and adders. 24 levels, each checked solvable by computer. Ages 14+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/logic-gates/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Logic Gates – Free 3D Boolean Logic Puzzle for Teens" />
+    <meta name="twitter:description" content="Build circuits gate by gate until every row of the truth table matches: a 3D logic puzzle for ages 14+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/logic-gates/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <style>
+      :root {
+        --band: var(--color-green);
+        --band-tint: var(--color-green-tint);
+        --band-tint-deep: #a7e3b9;
+        --band-deep: #14532d;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+        --ok: #15803d;
+        --bad: #dc2626;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body {
+        background: var(--color-bg);
+        /* an accidental pull-to-refresh would lose the circuit */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font-display);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: inherit; }
+
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 9px 14px; border-radius: var(--radius-pill);
+        background: var(--band-tint);
+        align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0 0 4px; text-wrap: balance; }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .stage-card {
+        width: 100%; max-width: 1040px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 8px;
+      }
+      .stage {
+        position: relative; width: 100%;
+        height: clamp(460px, 76vh, 680px);
+        border-radius: 18px; overflow: hidden;
+        background: #e3f1e7; color: var(--deep);
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html.pimw-fs .stage { height: calc(100vh - 96px); height: calc(100dvh - 96px); }
+
+      /* while playing: the board, and the truth table beside it (below it on narrow screens) */
+      .play {
+        position: absolute; inset: 0 0 62px 0;
+        display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto;
+      }
+      .stage.wide .play { grid-template-columns: minmax(0, 1fr) 330px; grid-template-rows: minmax(0, 1fr); bottom: 58px; }
+      .board-wrap { position: relative; min-height: 0; min-width: 0; }
+      .board-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .board-input { position: absolute; inset: 0; touch-action: manipulation; cursor: pointer; border-radius: 18px; }
+      .board-input:focus { outline: none; }
+      .board-input:focus-visible { box-shadow: inset 0 0 0 4px var(--color-focus); }
+
+      .tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; }
+      .tool {
+        width: 46px; height: 46px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.95); cursor: pointer;
+        font-size: 20px; line-height: 1; box-shadow: 0 3px 0 var(--band-tint-deep); color: var(--deep);
+      }
+      .tool:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .tool[aria-pressed="true"] { background: #ffe14a; }
+
+      /* the gates in the box for this level */
+      .palette {
+        position: absolute; left: 6px; right: 6px; bottom: 8px;
+        display: flex; justify-content: center; gap: 6px; pointer-events: none;
+      }
+      .gate-btn {
+        position: relative; pointer-events: auto; width: 64px; height: 56px; padding: 3px 2px 2px; border: 3px solid transparent;
+        border-radius: 14px; background: rgba(255, 255, 255, 0.96); cursor: pointer; color: var(--deep);
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+        box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .gate-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .gate-btn canvas { width: 46px; height: 24px; display: block; }
+      .gate-btn .gname { font-size: 13px; font-weight: 700; line-height: 1.1; }
+      .gate-btn .gkey {
+        position: absolute; top: -7px; right: -6px; min-width: 18px; height: 18px; border-radius: 9px; padding: 0 4px;
+        background: var(--deep); color: #fff; font: 600 11px/18px var(--font-display); text-align: center;
+      }
+      .gate-btn[aria-pressed="true"] { border-color: var(--color-focus); background: #fff; }
+      .gate-btn[aria-disabled="true"] { opacity: 0.45; }
+      @media (hover: none) { .gate-btn .gkey { display: none; } }
+
+      /* the truth table */
+      .side {
+        margin: 8px 8px 0 8px; min-height: 0; max-height: 46vh;
+        background: rgba(255, 255, 255, 0.97); border-radius: 16px; box-shadow: 0 3px 0 var(--band-tint-deep);
+        display: flex; flex-direction: column; overflow: hidden;
+      }
+      .stage.wide .side { margin: 8px 8px 0 0; max-height: none; }
+      .side-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px 4px 12px; }
+      .side-head h2 { margin: 0; font-size: 17px; line-height: 1.2; flex: 1; min-width: 0; }
+      .side-head h2 .lvl { color: var(--band); }
+      .score {
+        flex: none; font-weight: 700; font-size: 14px; padding: 3px 10px; border-radius: var(--radius-pill);
+        background: var(--band-tint); color: var(--band-deep); white-space: nowrap;
+      }
+      .score.all { background: var(--band); color: #fff; }
+      .table-toggle {
+        flex: none; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--band-tint); color: var(--band-deep);
+        font-size: 16px; cursor: pointer; display: none;
+      }
+      .stage:not(.wide) .table-toggle { display: inline-block; }
+      .table-body { min-height: 0; display: flex; flex-direction: column; }
+      .goal { margin: 0 12px 6px; font-size: 14.5px; line-height: 1.35; color: var(--ink); }
+      .tt-wrap { overflow: auto; min-height: 0; padding: 0 8px 8px; }
+      .tt { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 15px; text-align: center; }
+      .tt th { font-weight: 700; font-size: 13px; color: var(--ink-soft); padding: 2px 3px; position: sticky; top: 0; background: #fff; }
+      .tt th.grp { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid #e5e7eb; }
+      .tt th.in, .tt td.in { color: var(--deep); }
+      .tt td { padding: 3px 3px; border-top: 1px solid #f1f5f9; font-weight: 600; }
+      .tt td.v0 { color: #94a3b8; }
+      .tt td.v1 { color: var(--deep); font-weight: 700; }
+      .tt td.want { background: #f6faf7; }
+      .tt td.got.good { color: var(--ok); }
+      .tt td.got.bad { color: var(--bad); background: #fef2f2; }
+      .tt td.got.none { color: #94a3b8; }
+      .tt td.first-out { border-left: 2px solid #e5e7eb; }
+      .tt td.note { color: var(--ink-soft); font-weight: 500; font-size: 13px; white-space: nowrap; }
+      .tt .mark { width: 30px; }
+      .tt .mark span[aria-hidden] {
+        display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: 13px; color: #fff; background: #cbd5e1;
+      }
+      .tt tr.ok .mark span[aria-hidden] { background: var(--ok); }
+      .tt tr.bad .mark span[aria-hidden] { background: var(--bad); }
+      .tt tbody tr { cursor: pointer; }
+      .tt tbody tr.cur td { background: #dbeafe; }
+      .tt tbody tr.cur td:first-child { box-shadow: inset 4px 0 0 var(--color-focus); }
+
+      /* right: 64px keeps the message clear of the site's floating sound button */
+      .tell {
+        position: absolute; left: 10px; right: 64px; bottom: 8px; margin: 0;
+        background: rgba(255, 255, 255, 0.96); border-radius: 16px; padding: 7px 12px;
+        text-align: center; font-size: 15px; font-weight: 600; line-height: 1.3;
+        box-shadow: 0 4px 0 var(--band-tint-deep); min-height: 44px; display: flex; align-items: center; justify-content: center;
+      }
+      .tell:empty { display: none; }
+
+      /* the level list */
+      .menu { position: absolute; inset: 0; overflow-y: auto; background: rgba(246, 252, 248, 0.95); padding: 14px 16px 18px; }
+      .menu h2 { margin: 2px 0 6px; font-size: 21px; text-align: center; }
+      .menu-intro { margin: 0 auto 6px; max-width: 520px; text-align: center; color: var(--ink-soft); font-size: 15px; line-height: 1.4; }
+      .menu-tools { display: flex; justify-content: center; margin: 4px 0 2px; }
+      .level-group h3 { margin: 12px 0 6px; font-size: 16px; color: var(--ink-soft); text-align: center; }
+      .level-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; max-width: 520px; margin: 0 auto; }
+      .level-btn {
+        position: relative; height: 56px; border: 0; border-radius: 16px; background: #fff; color: var(--deep);
+        font-size: 22px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 0 var(--candy-card);
+      }
+      .level-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--candy-card); }
+      .level-btn.ok { background: var(--band-tint); }
+      .tick {
+        position: absolute; top: -6px; right: -4px; background: var(--band); color: #fff; border-radius: 50%;
+        width: 22px; height: 22px; font-size: 13px; display: grid; place-items: center;
+      }
+
+      .done, .guide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 14px; background: rgba(255, 255, 255, 0.35); }
+      .done-card {
+        background: #fff; border-radius: 24px; padding: 16px 22px 18px; text-align: center; width: 100%; max-width: 380px;
+        box-shadow: 0 8px 0 var(--band-tint-deep), var(--shadow-lift); max-height: 100%; overflow-y: auto;
+      }
+      .done-card h2 { margin: 0; font-size: 26px; }
+      .done-sub { margin: 6px 0 14px; color: var(--ink); font-weight: 500; line-height: 1.45; }
+      .done-btns { display: flex; flex-direction: column; gap: 8px; }
+      .go-btn, .soft-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 17px; font-weight: 600; padding: 11px 20px; min-height: 46px; cursor: pointer;
+      }
+      .go-btn { background: var(--band); color: #fff; box-shadow: 0 5px 0 var(--band-deep); }
+      .go-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--band-deep); }
+      .soft-btn { background: var(--band-tint); color: var(--band-deep); box-shadow: 0 4px 0 var(--band-tint-deep); }
+      .soft-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+
+      /* the gate guide */
+      .guide-card {
+        position: relative; background: #fff; border-radius: 22px; width: 100%; max-width: 640px; max-height: 100%;
+        display: flex; flex-direction: column; box-shadow: 0 8px 0 var(--band-tint-deep), var(--shadow-lift);
+      }
+      .guide-head { display: flex; align-items: center; gap: 10px; padding: 12px 12px 6px 18px; }
+      .guide-head h2 { margin: 0; font-size: 22px; flex: 1; }
+      .guide-close { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--band-tint); color: var(--band-deep); font-size: 20px; cursor: pointer; }
+      .guide-body { overflow-y: auto; padding: 0 16px 16px; }
+      .guide-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+      .gate-card { border-radius: 16px; padding: 10px 12px; background: #f8fafc; border: 2px solid #e2e8f0; }
+      .gate-card-top { display: flex; align-items: center; gap: 10px; }
+      .gate-card canvas { width: 84px; height: 42px; flex: none; }
+      .gate-card h3 { margin: 0; font-size: 19px; }
+      .gate-card .expr { margin: 0; color: var(--ink-soft); font-size: 14px; }
+      .gate-card p.rule { margin: 6px 0; font-size: 14.5px; line-height: 1.35; }
+      .mini { border-collapse: collapse; font-size: 13.5px; text-align: center; }
+      .mini th, .mini td { padding: 1px 8px; border-bottom: 1px solid #e2e8f0; }
+      .mini th { color: var(--ink-soft); font-weight: 700; }
+      .mini td.y { font-weight: 700; color: var(--band-deep); }
+      .guide-note { margin: 12px 2px 0; font-size: 14.5px; line-height: 1.45; }
+
+      .nogl {
+        position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; padding: 24px; text-align: center; background: var(--color-bg);
+      }
+      .nogl-emoji { font-size: 56px; margin: 0; }
+      .nogl h2 { margin: 0; }
+      .nogl a {
+        display: inline-block; margin: 6px; padding: 10px 16px; border-radius: var(--radius-pill);
+        background: var(--band-tint); color: var(--band); font-weight: 600; text-decoration: none;
+      }
+
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px;
+        background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-rest);
+        line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol, .how-to ul { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+      .visually-hidden {
+        position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+      }
+
+      /* narrow screens: smaller buttons, and a compact table under the board */
+      .stage:not(.wide) .play { bottom: 72px; }
+      .stage:not(.wide) .side.closed .table-body { display: none; }
+      .stage:not(.wide) .tt { font-size: 14px; }
+      .stage:not(.wide) .tt td { padding: 2px 2px; }
+      .stage:not(.wide) .goal { font-size: 13.5px; margin-bottom: 4px; }
+      @media (max-width: 520px) {
+        .tool { width: 41px; height: 41px; font-size: 18px; }
+        .tools { gap: 5px; top: 8px; left: 8px; }
+        .gate-btn { width: 50px; height: 50px; border-radius: 12px; }
+        .gate-btn canvas { width: 40px; height: 20px; }
+        .gate-btn .gname { font-size: 12px; }
+        .palette { gap: 4px; bottom: 6px; }
+        .level-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .tell { font-size: 14px; }
+        .side-head h2 { font-size: 15.5px; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>💡 Logic Gates</h1>
+      <p>Choose a gate for every slot until the whole truth table ticks.</p>
+    </header>
+
+    <main class="stage-card">
+      <div class="stage" id="stage">
+        <div class="play" id="play">
+          <div class="board-wrap" id="boardWrap">
+            <canvas id="view" aria-hidden="true"></canvas>
+            <div class="board-input" id="board" tabindex="0" role="application"
+                 aria-label="The circuit board. Tab or the arrow keys move between switches and slots. Enter flips a switch or changes a gate; 1 to 6 put a gate in a slot; T tests every row; Z undoes; H gives a hint; I opens the gate guide." hidden></div>
+            <div class="tools" id="tools" hidden>
+              <button type="button" class="tool" id="menuBtn" aria-label="All levels"><span aria-hidden="true">☰</span></button>
+              <button type="button" class="tool" id="undoBtn" aria-label="Undo"><span aria-hidden="true">↩️</span></button>
+              <button type="button" class="tool" id="clearBtn" aria-label="Clear all gates"><span aria-hidden="true">🗑️</span></button>
+              <button type="button" class="tool" id="hintBtn" aria-label="Hint"><span aria-hidden="true">💡</span></button>
+              <button type="button" class="tool" id="testBtn" aria-label="Test every row" aria-pressed="false"><span aria-hidden="true">▶️</span></button>
+              <button type="button" class="tool" id="guideBtn" aria-label="Gate guide"><span aria-hidden="true">📘</span></button>
+            </div>
+            <div class="palette" id="palette" role="group" aria-label="Gates for the selected slot" hidden></div>
+          </div>
+          <section class="side" id="side" aria-labelledby="levelTitle" hidden>
+            <div class="side-head">
+              <h2 id="levelTitle"></h2>
+              <span class="score" id="score"></span>
+              <button type="button" class="table-toggle" id="tableToggle" aria-expanded="true" aria-controls="tableBody" aria-label="Hide the truth table"><span aria-hidden="true">▾</span></button>
+            </div>
+            <div class="table-body" id="tableBody">
+              <p class="goal" id="goal"></p>
+              <div class="tt-wrap" id="ttWrap"><table class="tt" id="tt"></table></div>
+            </div>
+          </section>
+        </div>
+        <p class="tell" id="tell" aria-live="polite"></p>
+
+        <section class="menu" id="menu" aria-labelledby="menuTitle">
+          <h2 id="menuTitle">Pick a level</h2>
+          <p class="menu-intro">Each board has switches on the left, lamps on the right and empty slots between. Pick a gate for every slot so the lamps match the truth table.</p>
+          <div class="menu-tools"><button type="button" class="soft-btn" id="menuGuide">📘 Gate guide</button></div>
+          <div id="levelGroups"></div>
+        </section>
+
+        <section class="guide" id="guide" hidden>
+          <div class="guide-card" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+            <div class="guide-head">
+              <h2 id="guideTitle">📘 Gate guide</h2>
+              <button type="button" class="guide-close" id="guideClose" aria-label="Close the gate guide"><span aria-hidden="true">✕</span></button>
+            </div>
+            <div class="guide-body" tabindex="0" aria-label="The six gates">
+              <div class="guide-list" id="guideList"></div>
+              <p class="guide-note"><strong>One wire into a two-input gate?</strong> Then both of its inputs get that same signal. AND and OR pass it straight through, NAND and NOR flip it like NOT, and XOR always gives 0, because its two inputs can never differ.</p>
+              <p class="guide-note"><strong>Reading a truth table:</strong> each row is one way the switches can be set. Two switches give 4 rows, three give 8 and four give 16: the number doubles with every switch.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="done" id="done" hidden>
+          <div class="done-card" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+            <h2 id="doneTitle"></h2>
+            <p class="done-sub" id="doneSub"></p>
+            <div class="done-btns">
+              <button type="button" class="go-btn" id="nextLevel">Next level →</button>
+              <button type="button" class="soft-btn" id="stay">Keep testing this one</button>
+              <button type="button" class="soft-btn" id="allLevels">All levels</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="nogl" id="noGl" hidden>
+          <p class="nogl-emoji" aria-hidden="true">💡</p>
+          <h2>This game needs 3D graphics</h2>
+          <p>This browser or device has 3D graphics switched off. Try one of these instead:</p>
+          <p><a href="../sudoku/">9️⃣ Sudoku</a><a href="../minesweeper/">💣 Minesweeper</a></p>
+        </div>
+      </div>
+      <p class="visually-hidden" id="srFocus" aria-live="polite"></p>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Pick a level. The truth table beside the board (under it on a phone) is your goal: for every way the switches can be set, the <strong>Target</strong> column says what each lamp must show.</li>
+        <li>Tap an empty slot (the dashed box with a ?) and choose a gate from the buttons under the board. Tap the slot again to step through the gates.</li>
+        <li>As you build, every row of the table gets a ✓ or a ✗, worked out from your circuit. Fill every slot so all the rows tick.</li>
+        <li>Flip the switches to watch it work: wires carrying a 1 glow and current flows along them, and the tick or cross by each lamp shows whether that row is right. <strong>▶️ Test</strong> steps through every row for you.</li>
+      </ol>
+      <h3>Keys</h3>
+      <ul>
+        <li><kbd>Tab</kbd> or the arrow keys move between switches and slots; <kbd>Enter</kbd> or <kbd>Space</kbd> flips a switch or changes a slot's gate.</li>
+        <li><kbd>1</kbd> AND, <kbd>2</kbd> OR, <kbd>3</kbd> NOT, <kbd>4</kbd> XOR, <kbd>5</kbd> NAND, <kbd>6</kbd> NOR put that gate in the selected slot; <kbd>Delete</kbd> empties it.</li>
+        <li><kbd>A</kbd>, <kbd>B</kbd>, <kbd>C</kbd>… flip that switch. <kbd>T</kbd> tests every row, <kbd>Z</kbd> undoes, <kbd>R</kbd> clears the board, <kbd>H</kbd> gives a hint (press it twice for a suggested gate) and <kbd>I</kbd> opens the gate guide.</li>
+      </ul>
+      <p>NOT has only one input, so it only fits a slot with one wire going in. Put a two-input gate in a one-wire slot and both of its inputs get the same signal: AND and OR pass it through, NAND and NOR flip it, and XOR always gives 0. Every level has been checked by computer, so every one can be solved. Nothing is saved: ticks for solved levels last only this visit.</p>
+      <h3>What it practises</h3>
+      <p>Boolean logic from GCSE Computer Science and beyond: the six gates and their truth tables, combining gates, De Morgan's laws, building any gate from NAND, and real circuits such as half and full adders, a multiplexer, a parity check and a comparator.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/3d/three.min.js"></script>
+    <script src="../shared/3d/toon.js"></script>
+    <script src="../shared/3d/critters.js"></script>
+    <script src="../shared/3d/sound.js"></script>
+    <script src="gates.js"></script>
+    <script src="symbols.js"></script>
+    <script src="world.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>
