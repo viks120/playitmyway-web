@@ -472,7 +472,7 @@
     const BARKS = ['#91603a', '#a06a3e', '#86593a', '#a87244', '#7d5234', '#9a6a45'];
 
     function makeLog(len, rnd) {
-      const L = len - 0.12;
+      const L = len - 0.18;                // a clear gap between logs end to end
       const r = R * (0.93 + rnd() * 0.08);
       const group = new THREE.Group();
       const lie = new THREE.Group();
@@ -615,6 +615,7 @@
     /* A new board for state s. The seed keeps each level's logs looking the
      * same every time. */
     W.build = (s, seed) => {
+      clearEffects();
       pieces.forEach((pc) => {
         board.remove(pc.group);
         Toon.dispose(pc.group, KEEP);
@@ -793,13 +794,23 @@
         bits.push({ m, v: new THREE.Vector3(rand(-0.5, 0.5) * b.speed, b.up * rand(0.6, 1.3), rand(-0.5, 0.5) * b.speed), life: b.life, max: b.life, size: b.size });
       }
     };
-    W.ripple = (pos) => {
+    W.ripple = (pos, size, life) => {
       const m = new THREE.Mesh(G.ripple, Toon.flat('#ffffff', 0.85));
       m.rotation.x = -Math.PI / 2;
       m.position.set(pos.x, WATER_Y + 0.01, pos.z);
       scene.add(m);
-      rings.push({ m, life: 1.1, max: 1.1 });
+      rings.push({ m, life: life || 1.1, max: life || 1.1, size: size || 1 });
     };
+    // effects from the last level do not carry over into the next
+    function clearEffects() {
+      bits.forEach((b) => scene.remove(b.m));
+      bits.length = 0;
+      rings.forEach((r) => {
+        scene.remove(r.m);
+        r.m.material.dispose();
+      });
+      rings.length = 0;
+    }
 
     /* The boat sails out of the gap and away down the river. Returns the
      * time until it splashes into open water. */
@@ -838,10 +849,10 @@
         W.ripple(at);
         if (splashCb) splashCb(at);
       }
-      // little wake ripples behind it
-      if (!calm && sail.splashed && Math.floor(k * 4) !== sail.wake && s < 26) {
-        sail.wake = Math.floor(k * 4);
-        W.ripple(new THREE.Vector3(p.x - tan.x * 0.9, 0, p.z - tan.z * 0.9));
+      // a few small wake ripples behind it
+      if (!calm && sail.splashed && Math.floor(k * 2.5) !== sail.wake && s < 16) {
+        sail.wake = Math.floor(k * 2.5);
+        W.ripple(new THREE.Vector3(p.x - tan.x * 0.9, 0, p.z - tan.z * 0.9), 0.42, 0.8);
       }
       pc.group.visible = s < riverLen - 1;
     }
@@ -972,7 +983,7 @@
           continue;
         }
         const k = 1 - r.life / r.max;
-        r.m.scale.setScalar(0.25 + k * 0.9);
+        r.m.scale.setScalar((0.25 + k * 0.9) * r.size);
         r.m.material.opacity = 0.85 * (1 - k);
       }
     };
