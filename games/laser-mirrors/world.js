@@ -90,8 +90,10 @@
       steel: Toon.toon('#3b4166', '#22264a'),
       glass: Toon.toon('#d3e5ff', '#55638f'),
       sheen: Toon.flat('#ffffff', 0.85),
-      split: Toon.flat('#7be0ff', 0.32),
-      stripe: Toon.flat('#e9fbff', 0.7),
+      mirrorTop: Toon.toon('#eef4ff', '#6f7fae'),
+      split: Toon.flat('#5ee0ff', 0.26),
+      slat: Toon.toon('#e3f3ff', '#6f8fb0'),
+      splitTop: Toon.toon('#5ee0ff', '#0e7490'),
       block: Toon.toon('#5a6386', '#30354f'),
       blockTop: Toon.toon('#6c7598'),
       body: Toon.toon('#e6e8f2', '#7d84a6'),
@@ -101,8 +103,8 @@
       warn: Toon.flat('#ff8a3d'),
       cursor: Toon.flat('#5cf08e'),
       cursorGlow: Toon.flat('#5cf08e', 0.25),
-      hint: Toon.toon('#fbbf24', '#a16207'),
-      hintRing: Toon.flat('#fbbf24', 0.8),
+      hint: Toon.toon('#ffffff', '#2b2a5e'),
+      hintRing: Toon.flat('#ffffff', 0.8),
       spark: Toon.flat('#ffffff'),
       confetti: ['#ff8fb0', '#ffcf4a', '#86e0a8', '#9ec9ff', '#c4b5fd'].map((c) => Toon.flat(c)),
     };
@@ -131,7 +133,8 @@
       glassPane: new THREE.BoxGeometry(0.84, 0.46, 0.04),
       post: new THREE.BoxGeometry(0.06, 0.52, 0.09),
       rail: new THREE.BoxGeometry(0.92, 0.05, 0.1),
-      stripe: new THREE.BoxGeometry(0.8, 0.018, 0.05),
+      slat: new THREE.BoxGeometry(0.8, 0.07, 0.05),
+      dash: new THREE.BoxGeometry(0.16, 0.06, 0.12),
       sheen: new THREE.BoxGeometry(0.05, 0.4, 0.068),
       block: new THREE.BoxGeometry(0.84, 0.6, 0.84),
       blockTop: new THREE.BoxGeometry(0.64, 0.05, 0.64),
@@ -141,11 +144,11 @@
       stand: new THREE.CylinderGeometry(0.2, 0.27, 0.14, 6),
       gemTop: new THREE.ConeGeometry(0.21, 0.32, 6),
       gemBottom: new THREE.ConeGeometry(0.21, 0.2, 6),
-      ring: new THREE.TorusGeometry(0.31, 0.022, 6, 36),
+      ring: new THREE.TorusGeometry(0.44, 0.026, 6, 40),
       cursor: new THREE.RingGeometry(0.6, 0.7, 4, 1, Math.PI / 4),
       cursorGlow: new THREE.RingGeometry(0.52, 0.82, 4, 1, Math.PI / 4),
-      hintHead: new THREE.ConeGeometry(0.17, 0.28, 16),
-      hintTail: new THREE.CylinderGeometry(0.06, 0.06, 0.26, 10),
+      hintHead: new THREE.ConeGeometry(0.24, 0.36, 18),
+      hintTail: new THREE.CylinderGeometry(0.085, 0.085, 0.34, 12),
       hintRing: new THREE.RingGeometry(0.47, 0.55, 40),
       pad: new THREE.RingGeometry(0.33, 0.43, 6, 1, Math.PI / 6),
     };
@@ -246,37 +249,38 @@
         const panel = new THREE.Mesh(G.panel, M.glass);
         panel.position.y = mid;
         spin.add(panel);
-        for (const side of [-1, 1]) {
-          for (const dx of [-0.2, -0.08]) {
-            const sh = new THREE.Mesh(G.sheen, M.sheen);
-            sh.position.set(dx, mid, 0);
-            sh.rotation.z = -0.55;
-            sh.scale.z = side;
-            spin.add(sh);
-          }
+        // two diagonal glints: a little thicker than the panel, so they show on both faces
+        for (const dx of [-0.2, -0.08]) {
+          const sh = new THREE.Mesh(G.sheen, M.sheen);
+          sh.position.set(dx, mid, 0);
+          sh.rotation.z = -0.55;
+          spin.add(sh);
         }
+        // a solid silver top edge: seen from above, a mirror is an unbroken line
+        const top = new THREE.Mesh(G.rail, M.mirrorTop);
+        top.position.y = mid + 0.26;
+        spin.add(top);
       } else {
+        // half-silvered: silver slats with clear glass between, and a dashed
+        // cyan top edge, so from any angle it is plainly not a mirror
         const pane = new THREE.Mesh(G.glassPane, M.split);
         pane.position.y = mid;
         spin.add(pane);
-        for (const dy of [-0.15, -0.05, 0.05, 0.15]) {
-          const st = new THREE.Mesh(G.stripe, M.stripe);
-          st.position.y = mid + dy;
-          spin.add(st);
+        for (const dy of [-0.14, 0, 0.14]) {
+          const sl = new THREE.Mesh(G.slat, M.slat);
+          sl.position.y = mid + dy;
+          spin.add(sl);
+        }
+        for (const dx of [-0.36, -0.12, 0.12, 0.36]) {
+          const d = new THREE.Mesh(G.dash, M.splitTop);
+          d.position.set(dx, mid + 0.26, 0);
+          spin.add(d);
         }
       }
       for (const sx of [-1, 1]) {
         const post = new THREE.Mesh(G.post, frame);
         post.position.set(sx * 0.45, mid, 0);
         spin.add(post);
-      }
-      const rail = new THREE.Mesh(G.rail, frame);
-      rail.position.y = mid + 0.26;
-      spin.add(rail);
-      if (p.kind === 'splitter') {
-        const low = new THREE.Mesh(G.rail, frame);
-        low.position.y = mid - 0.26;
-        spin.add(low);
       }
       g.add(spin);
       const angle = p.slant ? -Math.PI / 4 : Math.PI / 4;
@@ -362,13 +366,13 @@
       if (p.need === 'two' || p.need === 'purple') {
         const ring = new THREE.Mesh(G.ring, M.ring);
         ring.rotation.x = Math.PI / 2;
-        ring.position.y = 0.17;
+        ring.position.y = BEAM_Y + 0.02;
         g.add(ring);
         const cols = p.need === 'two' ? [LIGHT[1].glow, LIGHT[1].glow] : [LIGHT[2].glow, LIGHT[4].glow];
         cols.forEach((c, i) => {
           const bead = new THREE.Mesh(G.ball, Toon.toon('#555c86'));
-          bead.scale.setScalar(0.065);
-          bead.position.set(i ? 0.31 : -0.31, 0.17, 0);
+          bead.scale.setScalar(0.085);
+          bead.position.set(i ? 0.44 : -0.44, BEAM_Y + 0.02, 0);
           g.add(bead);
           beads.push({ mesh: bead, on: new THREE.Color(c), off: new THREE.Color('#2a2f55'), level: 0, want: 0 });
         });
@@ -376,8 +380,8 @@
       const warnMat = Toon.flat('#ff8a3d', 0);
       const warn = new THREE.Mesh(G.ring, warnMat);
       warn.rotation.x = Math.PI / 2;
-      warn.position.y = 0.17;
-      warn.scale.setScalar(1.25);
+      warn.position.y = BEAM_Y + 0.02;
+      warn.scale.setScalar(p.need === 'two' || p.need === 'purple' ? 1.18 : 1);
       g.add(warn);
       g.position.copy(posOf(p.x, p.y));
       Toon.addOutlines(g);
@@ -562,15 +566,24 @@
       if (cursor.visible) cursor.position.copy(turnables[i].group.position);
     };
 
+    /* The hint: a ring round the piece and a fat arrow on its far side,
+     * tilted to point down the screen at it (seen from above, an upright
+     * arrow would only show as a dot). */
     const hint = new THREE.Group();
     const hintArrow = new THREE.Group();
     const head = new THREE.Mesh(G.hintHead, M.hint);
-    head.rotation.x = Math.PI;              // pointing down at the piece
-    head.position.y = 0;
+    head.rotation.x = Math.PI / 2;          // tip along +z, towards the piece
     const tail = new THREE.Mesh(G.hintTail, M.hint);
-    tail.position.y = 0.24;
+    tail.rotation.x = Math.PI / 2;
+    tail.position.z = -0.3;
     hintArrow.add(head, tail);
     Toon.addOutlines(hintArrow);
+    const HINT_TILT = 0.5;
+    hintArrow.rotation.x = HINT_TILT;
+    const hintDir = new THREE.Vector3(0, -Math.sin(HINT_TILT), Math.cos(HINT_TILT));
+    // the tip (0.18 ahead of the head's middle) rests just above and behind the piece
+    const hintBase = new THREE.Vector3(0, 0.85, -0.38).addScaledVector(hintDir, -0.18);
+    hintArrow.position.copy(hintBase);
     const hintRing = new THREE.Mesh(G.hintRing, M.hintRing);
     hintRing.rotation.x = -Math.PI / 2;
     hintRing.position.y = 0.11;
@@ -803,7 +816,7 @@
         cursor.scale.set(s, 1, s);
       }
       if (hint.visible) {
-        hintArrow.position.y = 1.05 + (calm ? 0 : 0.12 * Math.sin(t * 5));
+        hintArrow.position.copy(hintBase).addScaledVector(hintDir, calm ? 0 : -0.08 - 0.08 * Math.sin(t * 5));
         hintRing.material.opacity = calm ? 0.8 : 0.55 + 0.35 * Math.sin(t * 5);
       }
       const shimmer = calm ? 0 : 0.06 * Math.sin(t * 7);
