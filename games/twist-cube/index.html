@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#15803d" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Twist Cube – Free 3D Twisting Cube Puzzle for Teens | Play It My Way</title>
+    <meta name="description" content="Watch a colourful 3D cube get scrambled, then undo the twists in as few moves as it took. Learn the face letters U, D, L, R, F and B on 2×2×2 and 3×3×3 cubes, then try a full scramble. 18 challenges for ages 14+, with hints and undo. No ads." />
+    <meta name="keywords" content="twisting cube puzzle, 3d cube puzzle online, cube notation for beginners, puzzle game for teens, free logic puzzle ages 14+" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Twist Cube – Free 3D Twisting Cube Puzzle for Teens" />
+    <meta property="og:description" content="Undo the twists on a 2×2×2 and a 3×3×3 cube, learn the face letters, then take on a full scramble. Every par is checked by computer to be the fewest twists possible. Ages 14+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/twist-cube/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Twist Cube – Free 3D Twisting Cube Puzzle for Teens" />
+    <meta name="twitter:description" content="Undo the twists on a colourful 3D cube and learn the face letters: a thinking puzzle for ages 14+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/twist-cube/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <style>
+      :root {
+        --band: var(--color-green);
+        --band-tint: var(--color-green-tint);
+        --band-tint-deep: #a7e3b9;
+        --band-deep: #14532d;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body {
+        background: var(--color-bg);
+        /* an accidental pull-to-refresh would lose the puzzle */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font-display);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: inherit; }
+
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 9px 14px; border-radius: var(--radius-pill);
+        background: var(--band-tint);
+        align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0 0 4px; text-wrap: balance; }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .stage-card {
+        width: 100%; max-width: 960px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 8px;
+      }
+      .stage {
+        position: relative; width: 100%;
+        height: clamp(460px, 76vh, 680px);
+        border-radius: 18px; overflow: hidden;
+        background: #e3f2e9; color: var(--deep);
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html.pimw-fs .stage { height: calc(100vh - 96px); height: calc(100dvh - 96px); }
+      .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .board-input { position: absolute; inset: 0; touch-action: none; cursor: grab; border-radius: 18px; }
+      .board-input:active { cursor: grabbing; }
+      .board-input:focus { outline: none; }
+      .board-input:focus-visible { box-shadow: inset 0 0 0 4px var(--color-focus); }
+
+      /* pick a challenge */
+      .menu { position: absolute; inset: 0; overflow-y: auto; background: rgba(246, 252, 248, 0.93); padding: 14px 16px 18px; }
+      .menu h2 { margin: 2px 0 8px; font-size: 21px; text-align: center; }
+      .primer {
+        max-width: 560px; margin: 0 auto 6px; padding: 8px 14px; border-radius: 16px;
+        background: #fff; box-shadow: 0 3px 0 var(--band-tint-deep); font-size: 15px; line-height: 1.45; text-align: center;
+      }
+      .primer b { color: var(--band-deep); }
+      .level-group h3 { margin: 12px 0 6px; font-size: 16px; color: var(--ink-soft); text-align: center; }
+      .level-row { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; max-width: 600px; margin: 0 auto; }
+      .level-row.wide { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 320px; }
+      .level-btn {
+        position: relative; height: 58px; border: 0; border-radius: 16px; background: #fff; color: var(--deep);
+        cursor: pointer; box-shadow: 0 4px 0 var(--candy-card);
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 2px;
+      }
+      .level-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--candy-card); }
+      .level-btn.ok { background: var(--band-tint); }
+      .lv-big { font-size: 22px; font-weight: 700; line-height: 1.1; }
+      .lv-small { font-size: 11px; font-weight: 600; color: var(--ink-soft); line-height: 1.1; }
+      .tick {
+        position: absolute; top: -6px; right: -4px; background: var(--band); color: #fff; border-radius: 50%;
+        width: 22px; height: 22px; font-size: 13px; display: grid; place-items: center;
+      }
+      .options { display: flex; justify-content: center; margin-top: 14px; }
+      .option {
+        border: 0; border-radius: var(--radius-pill); padding: 9px 16px; min-height: 44px; font-size: 15px; font-weight: 600;
+        background: #fff; color: var(--deep); cursor: pointer; box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .option[aria-pressed="true"] { background: var(--band-tint); color: var(--band-deep); }
+
+      /* while playing */
+      .hud { position: absolute; inset: 0; pointer-events: none; }
+      .tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; pointer-events: auto; }
+      .tool {
+        width: 46px; height: 46px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.94); cursor: pointer;
+        font-size: 21px; line-height: 1; box-shadow: 0 3px 0 var(--band-tint-deep); padding: 0;
+      }
+      .tool:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .tool[aria-pressed="true"] { background: var(--band-tint); box-shadow: inset 0 0 0 3px var(--band); }
+      .info {
+        position: absolute; top: 64px; left: 10px; background: rgba(255, 255, 255, 0.94); border-radius: var(--radius-pill);
+        padding: 5px 14px; font-weight: 700; font-size: 15px; box-shadow: 0 3px 0 var(--band-tint-deep); white-space: nowrap;
+      }
+      .info .sep { color: var(--ink-soft); margin: 0 5px; }
+      .scramble {
+        position: absolute; top: 104px; left: 10px; width: min(400px, calc(100% - 160px));
+        max-height: 34%; overflow-y: auto; pointer-events: auto;
+        background: rgba(255, 255, 255, 0.95); border-radius: 16px; padding: 7px 12px 8px;
+        box-shadow: 0 3px 0 var(--band-tint-deep); font-size: 14px; line-height: 1.5;
+      }
+      .scramble p { margin: 2px 0; }
+      .scramble b { color: var(--band-deep); margin-right: 4px; }
+      .mv {
+        display: inline-block; min-width: 26px; text-align: center; padding: 0 5px; border-radius: 8px;
+        background: var(--band-tint); font-weight: 700; color: var(--deep); margin: 1px 0;
+      }
+      .mv.did { background: var(--band); color: #fff; }
+      .path { color: var(--ink-soft); font-weight: 600; }
+
+      /* the twist buttons: a column pair down the right-hand side */
+      .pad {
+        position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+        display: grid; grid-template-columns: repeat(2, 56px); grid-auto-rows: 46px; gap: 7px; pointer-events: auto;
+      }
+      .tw {
+        position: relative; border: 0; border-radius: 14px; background: rgba(255, 255, 255, 0.95); cursor: pointer;
+        font-size: 21px; font-weight: 700; color: var(--deep); box-shadow: 0 3px 0 var(--band-tint-deep); padding: 0;
+      }
+      .tw.prime { background: rgba(220, 252, 231, 0.96); }
+      .tw:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .tw .dot {
+        position: absolute; top: 5px; right: 6px; width: 9px; height: 9px; border-radius: 50%;
+        box-shadow: 0 0 0 1.5px rgba(35, 40, 56, 0.55);
+      }
+      /* right: 64px keeps the message clear of the site's floating sound button */
+      .tell {
+        position: absolute; left: 10px; right: 64px; bottom: 10px; margin: 0;
+        background: rgba(255, 255, 255, 0.95); border-radius: 18px; padding: 8px 14px;
+        text-align: center; font-size: 15px; font-weight: 600; line-height: 1.3;
+        box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .tell:empty { display: none; }
+
+      .done { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(255, 255, 255, 0.3); }
+      .done-card {
+        background: #fff; border-radius: 24px; padding: 16px 22px 18px; text-align: center; width: 100%; max-width: 360px;
+        box-shadow: 0 8px 0 var(--band-tint-deep), var(--shadow-lift); max-height: 100%; overflow-y: auto;
+      }
+      .done-card h2 { margin: 0; font-size: 27px; }
+      .done-sub { margin: 4px 0 2px; color: var(--ink); font-weight: 600; }
+      .done-help { margin: 0 0 8px; color: var(--ink-soft); font-weight: 600; font-size: 15px; }
+      .done-moves { margin: 0 0 12px; padding: 6px 10px; border-radius: 12px; background: var(--band-tint); font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+      .done-moves span { display: block; }
+      .done-btns { display: flex; flex-direction: column; gap: 8px; }
+      .go-btn, .soft-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 17px; font-weight: 600; padding: 11px 20px; min-height: 46px; cursor: pointer;
+      }
+      .go-btn { background: var(--band); color: #fff; box-shadow: 0 5px 0 var(--band-deep); }
+      .go-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--band-deep); }
+      .soft-btn { background: var(--band-tint); color: var(--band); box-shadow: 0 4px 0 var(--band-tint-deep); }
+      .soft-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+
+      .nogl {
+        position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; padding: 24px; text-align: center; background: var(--color-bg);
+      }
+      .nogl-emoji { font-size: 56px; margin: 0; }
+      .nogl h2 { margin: 0; }
+      .nogl a {
+        display: inline-block; margin: 6px; padding: 10px 16px; border-radius: var(--radius-pill);
+        background: var(--band-tint); color: var(--band); font-weight: 600; text-decoration: none;
+      }
+
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px;
+        background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-rest);
+        line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 16px 0 4px; font-size: 18px; }
+      .how-to ol, .how-to ul { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      .letters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 12px; margin: 6px 0 0; padding: 0; list-style: none; }
+      .letters li { display: flex; align-items: center; gap: 8px; }
+      .letters b {
+        display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; flex: none;
+        background: var(--band-tint); color: var(--band-deep); font-size: 18px;
+      }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+      .visually-hidden {
+        position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+      }
+
+      /* phones held upright: the twist buttons become two compact rows under the cube,
+         kept clear of the floating sound button at the bottom right */
+      @media (max-aspect-ratio: 1/1) {
+        .pad {
+          top: auto; transform: none; bottom: 10px; left: 10px; right: 64px;
+          grid-template-columns: none; grid-template-rows: repeat(2, 44px); grid-auto-rows: auto;
+          grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 5px;
+        }
+        .tw { font-size: 19px; }
+        .tell { bottom: 112px; right: 10px; }
+        .scramble { width: auto; right: 10px; max-height: 26%; }
+      }
+      @media (max-width: 560px) {
+        .level-row { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 330px; }
+        .letters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 420px) {
+        .tool { width: 42px; height: 42px; font-size: 19px; }
+        .tools { gap: 5px; }
+        .info { top: 60px; font-size: 14px; }
+        .scramble { top: 98px; }
+        .tell { font-size: 14px; }
+        .primer { font-size: 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🧊 Twist Cube</h1>
+      <p>Watch the twists, then undo them.</p>
+    </header>
+
+    <main class="stage-card">
+      <div class="stage" id="stage">
+        <canvas id="view" aria-hidden="true"></canvas>
+        <div class="board-input" id="board" tabindex="0" role="application"
+             aria-label="The cube. Letters U, D, L, R, F and B twist a face, with Shift for anticlockwise. Arrow keys turn the whole cube. Z or Backspace undoes, 0 resets, H gives a hint, S shows the scramble, V goes back to the starting view." hidden></div>
+
+        <div class="hud" id="hud" hidden>
+          <div class="tools" id="tools">
+            <button type="button" class="tool" id="menuBtn" aria-label="All levels"><span aria-hidden="true">☰</span></button>
+            <button type="button" class="tool" id="undoBtn" aria-label="Undo"><span aria-hidden="true">↩️</span></button>
+            <button type="button" class="tool" id="resetBtn" aria-label="Reset to the scramble"><span aria-hidden="true">🔄</span></button>
+            <button type="button" class="tool" id="hintBtn" aria-label="Hint"><span aria-hidden="true">💡</span></button>
+            <button type="button" class="tool" id="scrambleBtn" aria-label="Show the scramble" aria-pressed="false"><span aria-hidden="true">📜</span></button>
+            <button type="button" class="tool" id="homeBtn" aria-label="Back to the starting view"><span aria-hidden="true">🧭</span></button>
+          </div>
+          <div class="info" id="info"><span id="levelName">3×3×3</span><span class="sep">·</span><span id="moves">0</span> <span id="movesWord">twists</span><span id="parText"><span class="sep">·</span>par <span id="par">1</span></span></div>
+          <section class="scramble" id="scramble" aria-label="The scramble" hidden>
+            <p><b>Scramble</b> <span id="scrambleMoves"></span></p>
+            <p><b>Undo it</b> <span id="undoMoves"></span></p>
+            <p class="path" id="pathStatus"></p>
+          </section>
+          <div class="pad" id="pad" role="group" aria-label="Twist a face">
+            <button type="button" class="tw" data-move="U" aria-label="U: top face clockwise"><span class="dot" aria-hidden="true" hidden></span>U</button>
+            <button type="button" class="tw prime" data-move="U'" aria-label="U prime: top face anticlockwise"><span class="dot" aria-hidden="true" hidden></span>U′</button>
+            <button type="button" class="tw" data-move="D" aria-label="D: bottom face clockwise"><span class="dot" aria-hidden="true" hidden></span>D</button>
+            <button type="button" class="tw prime" data-move="D'" aria-label="D prime: bottom face anticlockwise"><span class="dot" aria-hidden="true" hidden></span>D′</button>
+            <button type="button" class="tw" data-move="L" aria-label="L: left face clockwise"><span class="dot" aria-hidden="true" hidden></span>L</button>
+            <button type="button" class="tw prime" data-move="L'" aria-label="L prime: left face anticlockwise"><span class="dot" aria-hidden="true" hidden></span>L′</button>
+            <button type="button" class="tw" data-move="R" aria-label="R: right face clockwise"><span class="dot" aria-hidden="true" hidden></span>R</button>
+            <button type="button" class="tw prime" data-move="R'" aria-label="R prime: right face anticlockwise"><span class="dot" aria-hidden="true" hidden></span>R′</button>
+            <button type="button" class="tw" data-move="F" aria-label="F: front face clockwise"><span class="dot" aria-hidden="true" hidden></span>F</button>
+            <button type="button" class="tw prime" data-move="F'" aria-label="F prime: front face anticlockwise"><span class="dot" aria-hidden="true" hidden></span>F′</button>
+            <button type="button" class="tw" data-move="B" aria-label="B: back face clockwise"><span class="dot" aria-hidden="true" hidden></span>B</button>
+            <button type="button" class="tw prime" data-move="B'" aria-label="B prime: back face anticlockwise"><span class="dot" aria-hidden="true" hidden></span>B′</button>
+          </div>
+          <p class="tell" id="tell" aria-live="polite"></p>
+        </div>
+
+        <section class="menu" id="menu" aria-labelledby="menuTitle">
+          <h2 id="menuTitle">Pick a challenge</h2>
+          <p class="primer"><b>U D L R F B</b> name the face to twist: up, down, left, right, front, back. A letter on its own turns that face clockwise, as you look straight at it. With a ′ (say "prime") it turns anticlockwise.</p>
+          <div id="levelGroups"></div>
+          <div class="options">
+            <button type="button" class="option" id="shapesBtn" aria-pressed="false">Shapes on stickers: off</button>
+          </div>
+        </section>
+
+        <section class="done" id="done" hidden>
+          <div class="done-card" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+            <h2 id="doneTitle"></h2>
+            <p class="done-sub" id="doneSub"></p>
+            <p class="done-help" id="doneHelp"></p>
+            <p class="done-moves"><span id="doneScramble"></span><span id="doneWay"></span></p>
+            <div class="done-btns">
+              <button type="button" class="go-btn" id="nextLevel">Next level →</button>
+              <button type="button" class="soft-btn" id="again">Play it again</button>
+              <button type="button" class="soft-btn" id="allLevels">All levels</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="nogl" id="noGl" hidden>
+          <p class="nogl-emoji" aria-hidden="true">🧊</p>
+          <h2>This game needs 3D graphics</h2>
+          <p>This browser or device has 3D graphics switched off. Try one of these instead:</p>
+          <p><a href="../sudoku/">9️⃣ Sudoku</a><a href="../2048-slider/">🧩 2048 Slider</a></p>
+        </div>
+      </div>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Pick a challenge. In <strong>Undo the twists</strong>, watch a solved cube get scrambled by a few twists: 1 at first, up to 10.</li>
+        <li>Undo them. The fewest twists that can do it is the scramble's own length, called <strong>par</strong>. Every par has been checked by computer: there is no shorter way.</li>
+        <li>Twist with the letter buttons or keys. To see the hidden sides, drag the cube round or use the arrow keys.</li>
+        <li>Then try a <strong>full scramble</strong> of each size, solved any way you like.</li>
+      </ol>
+
+      <h3>The face letters</h3>
+      <ul class="letters">
+        <li><b>U</b> up, the top face</li>
+        <li><b>D</b> down, the bottom</li>
+        <li><b>F</b> front, towards you</li>
+        <li><b>B</b> back, away from you</li>
+        <li><b>L</b> left</li>
+        <li><b>R</b> right</li>
+      </ul>
+      <p><strong>R</strong> means a quarter turn of the right face <em>clockwise</em>, as if you were looking straight at that face. <strong>R′</strong> (say "R prime") turns it anticlockwise, so R′ undoes R. Two of the same in a row, R R, is a half turn; you'll often see it written R2.</p>
+      <p>The letters go with your view. Turn the whole cube and the letters stay put: F is always the face towards you, whatever colour it is now.</p>
+      <p><strong>The undo rule:</strong> to undo a run of twists, do them backwards and flip each one. R U F′ is undone by F U′ R′. It's like getting dressed: socks then shoes comes undone as shoes off, then socks.</p>
+
+      <h3>Keys and help</h3>
+      <p><kbd>U</kbd> <kbd>D</kbd> <kbd>L</kbd> <kbd>R</kbd> <kbd>F</kbd> <kbd>B</kbd> twist a face; hold <kbd>Shift</kbd> for anticlockwise. The arrow keys turn the whole cube. <kbd>Z</kbd> or <kbd>Backspace</kbd> undoes a twist, <kbd>0</kbd> resets to the scramble, <kbd>H</kbd> or 💡 gives a hint, <kbd>S</kbd> or 📜 shows the scramble, and <kbd>V</kbd> or 🧭 goes back to the starting view. The hint knows the scramble, so it names the next twist back; if you've wandered off that path, it tells you how many twists to undo. "Shapes on stickers" in the level menu adds a shape to each colour, for anyone who finds some colours hard to tell apart. Nothing is saved: ticks for solved levels last only this visit.</p>
+      <p>Solving a full scramble from scratch takes a method. Most people learn one layer at a time: a cross on one face, its corners, then the middle layer, then the last layer. Take your time: there's no clock.</p>
+
+      <h3>What it practises</h3>
+      <p>Reading and using a notation, and working backwards: undoing steps means reversing their order and flipping each one, the same idea as inverse operations in maths. It also builds 3D spatial reasoning, keeping track of the faces as the cube turns.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/3d/three.min.js"></script>
+    <script src="../shared/3d/toon.js"></script>
+    <script src="../shared/3d/critters.js"></script>
+    <script src="../shared/3d/sound.js"></script>
+    <script src="cube.js"></script>
+    <script src="world.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>
