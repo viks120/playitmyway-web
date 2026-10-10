@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#15803d" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Projectile Range – Free 3D Projectile Motion Physics Game | Play It My Way</title>
+    <meta name="description" content="Set the launch angle and speed, fire, and land on the target. Real projectile motion with the GCSE and A-level formulas worked out after every shot, on Earth, the Moon, Mars and a heavy planet. 24 levels for ages 14+. No ads." />
+    <meta name="keywords" content="projectile motion game, physics game for teens, range equation, suvat practice, launch angle and speed, gcse physics game, a level physics game, free physics simulation" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Projectile Range – Free 3D Projectile Motion Physics Game" />
+    <meta property="og:description" content="Choose the angle and speed, launch, and see the time of flight, maximum height and range worked out with the real formulas. Walls, platforms, two-angle shots and other planets. Ages 14+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/projectile-range/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Projectile Range – Free 3D Projectile Motion Physics Game" />
+    <meta name="twitter:description" content="Hit the target with real projectile motion: angle, speed, gravity and the formulas behind every shot. Ages 14+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/projectile-range/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <style>
+      :root {
+        --band: var(--color-green);
+        --band-tint: var(--color-green-tint);
+        --band-tint-deep: #a7e3b9;
+        --band-deep: #14532d;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body {
+        background: var(--color-bg);
+        /* an accidental pull-to-refresh would lose the level */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font-display);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button, input, output { font-family: inherit; }
+
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 9px 14px; border-radius: var(--radius-pill);
+        background: var(--band-tint);
+        align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0 0 4px; text-wrap: balance; }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .stage-card {
+        width: 100%; max-width: 960px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 8px;
+      }
+      .stage {
+        position: relative; width: 100%;
+        height: clamp(460px, 76vh, 680px);
+        border-radius: 18px; overflow: hidden;
+        background: #cfeaff; color: var(--deep);
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html.pimw-fs .stage { height: calc(100vh - 96px); height: calc(100dvh - 96px); }
+      .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .range-input { position: absolute; inset: 0; touch-action: none; cursor: grab; border-radius: 18px; }
+      .range-input:active { cursor: grabbing; }
+      .range-input:focus { outline: none; }
+      .range-input:focus-visible { box-shadow: inset 0 0 0 4px var(--color-focus); }
+
+      /* pick a loader and a level */
+      .menu { position: absolute; inset: 0; overflow-y: auto; background: rgba(247, 253, 249, 0.95); padding: 14px 16px 18px; }
+      .menu h2 { margin: 2px 0 8px; font-size: 20px; text-align: center; }
+      .menu-lead { margin: -4px auto 10px; max-width: 560px; text-align: center; color: var(--ink-soft); font-weight: 600; font-size: 15px; }
+      .row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 8px; }
+      .racer {
+        min-width: 70px; border: 3px solid transparent; border-radius: 16px; background: var(--band-tint);
+        display: flex; flex-direction: column; align-items: center; padding: 3px 8px 5px; cursor: pointer; color: var(--deep);
+        box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .racer[aria-pressed="true"] { border-color: var(--band); background: #fff; }
+      .racer-emoji { font-size: 24px; line-height: 1.15; }
+      .racer-name { font-size: 13px; font-weight: 700; }
+      .level-group { max-width: 560px; margin: 0 auto; }
+      .level-group h3 { margin: 12px 0 0; font-size: 16px; text-align: center; }
+      .level-group p { margin: 0 0 6px; font-size: 13.5px; color: var(--ink-soft); text-align: center; font-weight: 600; }
+      .level-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+      .level-btn {
+        position: relative; height: 52px; border: 0; border-radius: 16px; background: #fff; color: var(--deep);
+        font-size: 21px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 0 var(--candy-card);
+      }
+      .level-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--candy-card); }
+      .level-btn.ok { background: var(--band-tint); }
+      .level-btn .world { font-size: 14px; margin-left: 4px; }
+      .tick, .bonus {
+        position: absolute; top: -6px; border-radius: 50%; width: 22px; height: 22px; font-size: 12px;
+        display: grid; place-items: center;
+      }
+      .tick { right: -4px; background: var(--band); color: #fff; }
+      .bonus { left: -4px; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }
+
+      /* while playing */
+      .hud { position: absolute; inset: 0; pointer-events: none; }
+      .tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; pointer-events: auto; }
+      .tool {
+        width: 46px; height: 46px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.94); cursor: pointer;
+        font-size: 21px; line-height: 1; box-shadow: 0 3px 0 var(--band-tint-deep); color: var(--deep);
+      }
+      .tool:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .tool[aria-pressed="true"] { background: var(--band); box-shadow: 0 3px 0 var(--band-deep); }
+      .info {
+        position: absolute; top: 10px; left: 222px; right: 70px; display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start;
+      }
+      .chip {
+        background: rgba(255, 255, 255, 0.94); border-radius: var(--radius-pill); padding: 4px 12px; font-weight: 700; font-size: 14.5px;
+        box-shadow: 0 3px 0 var(--band-tint-deep); line-height: 1.35; white-space: nowrap;
+      }
+      .chip .sep { color: var(--ink-soft); margin: 0 3px; }
+      .chip.timer { font-variant-numeric: tabular-nums; }
+      .chip.pair .got { color: var(--band); }
+
+      .console {
+        position: absolute; left: 10px; right: 10px; bottom: 66px;
+        background: rgba(255, 255, 255, 0.95); border-radius: 18px; padding: 8px 12px 10px;
+        box-shadow: 0 4px 0 var(--band-tint-deep); pointer-events: auto;
+        display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 4px 16px; align-items: center;
+      }
+      .last {
+        grid-column: 1 / -1; margin: 0 0 2px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+        font-size: 14px; font-weight: 600; color: var(--ink-soft); font-variant-numeric: tabular-nums;
+      }
+      .last b { color: var(--deep); }
+      .mini-btn {
+        border: 0; border-radius: var(--radius-pill); background: var(--band-tint); color: var(--band-deep); font-weight: 700;
+        font-size: 13.5px; padding: 4px 12px; min-height: 32px; cursor: pointer; box-shadow: 0 2px 0 var(--band-tint-deep);
+      }
+      .mini-btn:active { transform: translateY(2px); box-shadow: none; }
+      .ctl { display: grid; grid-template-columns: auto 36px minmax(60px, 1fr) 36px 78px; gap: 6px; align-items: center; min-width: 0; }
+      .ctl-name { font-weight: 700; font-size: 15px; white-space: nowrap; }
+      .ctl-name .sym { color: var(--ink-soft); font-weight: 600; }
+      .ctl-val { font-weight: 700; font-size: 17px; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .ctl.fixed .ctl-val::after { content: " 🔒"; font-size: 12px; }
+      .step {
+        width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--band-tint); color: var(--band-deep);
+        font-size: 22px; font-weight: 700; line-height: 1; cursor: pointer; box-shadow: 0 2px 0 var(--band-tint-deep);
+        touch-action: manipulation;
+      }
+      .step:active { transform: translateY(2px); box-shadow: none; }
+      .step:disabled, .fire:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+      input[type="range"] {
+        -webkit-appearance: none; appearance: none; width: 100%; height: 36px; margin: 0; background: transparent; cursor: pointer;
+        touch-action: manipulation;
+      }
+      input[type="range"]::-webkit-slider-runnable-track { height: 8px; border-radius: 99px; background: var(--band-tint-deep); }
+      input[type="range"]::-moz-range-track { height: 8px; border-radius: 99px; background: var(--band-tint-deep); }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none; appearance: none; width: 26px; height: 26px; margin-top: -9px; border-radius: 50%;
+        background: var(--band); border: 3px solid #fff; box-shadow: 0 2px 0 var(--band-deep);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 22px; height: 22px; border-radius: 50%; background: var(--band); border: 3px solid #fff; box-shadow: 0 2px 0 var(--band-deep);
+      }
+      input[type="range"]:disabled { cursor: not-allowed; opacity: 0.5; }
+      input[type="range"]:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 1px; border-radius: 99px; }
+      .fire-row { display: flex; align-items: center; gap: 8px; grid-row: span 2; justify-content: flex-end; }
+      .guess { display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 14px; }
+      .guess input {
+        width: 74px; height: 40px; border: 2px solid var(--band-tint-deep); border-radius: 12px; padding: 4px 6px;
+        font-size: 16px; font-weight: 700; color: var(--deep); text-align: right; background: #fff;
+      }
+      .go-btn, .soft-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 17px; font-weight: 600; padding: 11px 20px; min-height: 46px; cursor: pointer;
+      }
+      .go-btn { background: var(--band); color: #fff; box-shadow: 0 5px 0 var(--band-deep); }
+      .go-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--band-deep); }
+      .soft-btn { background: var(--band-tint); color: var(--band-deep); box-shadow: 0 4px 0 var(--band-tint-deep); }
+      .soft-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .fire { font-size: 18px; font-weight: 700; min-width: 128px; min-height: 52px; }
+      /* right: 64px keeps the message clear of the site's floating sound button */
+      .tell {
+        position: absolute; left: 10px; right: 64px; bottom: 10px; margin: 0; min-height: 46px;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(255, 255, 255, 0.95); border-radius: 18px; padding: 6px 14px;
+        text-align: center; font-size: 15px; font-weight: 600; line-height: 1.3;
+        box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .tell:empty { visibility: hidden; }
+
+      .card-layer { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 14px; background: rgba(255, 255, 255, 0.28); }
+      .done-card, .work-card {
+        background: #fff; border-radius: 24px; padding: 16px 22px 18px; text-align: center; width: 100%; max-width: 380px;
+        box-shadow: 0 8px 0 var(--band-tint-deep), var(--shadow-lift); max-height: 100%; overflow-y: auto;
+      }
+      .done-card h2 { margin: 0; font-size: 26px; }
+      .done-sub { margin: 4px 0 6px; color: var(--ink-soft); font-weight: 600; }
+      .done-tip { margin: 0 0 14px; font-size: 15px; line-height: 1.4; background: var(--band-tint); border-radius: 14px; padding: 8px 12px; }
+      .done-btns { display: flex; flex-direction: column; gap: 8px; }
+      .work-card { max-width: 600px; text-align: left; padding: 14px 18px 16px; }
+      .work-card h2 { margin: 0 0 8px; font-size: 20px; text-align: center; }
+      .work-list { margin: 0 0 12px; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 15px; line-height: 1.4; }
+      .work-list dt { font-weight: 700; white-space: nowrap; }
+      .work-list dd { margin: 0; font-variant-numeric: tabular-nums; }
+      .work-note { margin: 0 0 12px; font-size: 13.5px; color: var(--ink-soft); }
+      .work-card .go-btn { display: block; margin: 0 auto; }
+
+      .nogl {
+        position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; padding: 24px; text-align: center; background: var(--color-bg);
+      }
+      .nogl-emoji { font-size: 56px; margin: 0; }
+      .nogl h2 { margin: 0; }
+      .nogl a {
+        display: inline-block; margin: 6px; padding: 10px 16px; border-radius: var(--radius-pill);
+        background: var(--band-tint); color: var(--band); font-weight: 600; text-decoration: none;
+      }
+
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px;
+        background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-rest);
+        line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol, .how-to ul { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      .how-to .formulas { list-style: none; padding: 0; }
+      .how-to .formulas li { margin: 2px 0; }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+      .visually-hidden {
+        position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+      }
+
+      /* narrower stages: the info chips go under the tools, the controls stack */
+      @media (max-width: 760px) {
+        .info { top: 62px; left: 10px; right: 10px; }
+        .console { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
+        .ctl { grid-column: 1 / -1; grid-template-columns: 62px 36px minmax(40px, 1fr) 36px 76px; }
+        .ctl-name { font-size: 14px; white-space: normal; line-height: 1.1; }
+        .fire-row { grid-column: 1 / -1; grid-row: auto; }
+        .fire-row .fire { flex: 1; }
+        .last { font-size: 13px; flex-wrap: nowrap; justify-content: space-between; }
+        .last .wide { display: none; }
+        .mini-btn { padding: 4px 10px; }
+        .tell { font-size: 14px; min-height: 58px; padding: 5px 12px; }
+        .chip { font-size: 13.5px; padding: 3px 10px; }
+      }
+      @media (max-width: 420px) {
+        .tool { width: 42px; height: 42px; font-size: 19px; }
+        .info { top: 58px; }
+        .console { padding: 6px 8px 8px; }
+        .ctl { grid-template-columns: 54px 34px minmax(40px, 1fr) 34px 68px; gap: 4px; }
+        .step { width: 34px; height: 34px; }
+        .ctl-val { font-size: 15.5px; }
+        .fire { min-height: 46px; }
+        .work-list { grid-template-columns: 1fr; gap: 0 0; }
+        .work-list dd { margin-bottom: 6px; }
+        .level-btn { font-size: 19px; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>🎯 Projectile Range</h1>
+      <p>Choose the angle and the speed. Land on the target.</p>
+    </header>
+
+    <main class="stage-card">
+      <div class="stage" id="stage">
+        <canvas id="view" aria-hidden="true"></canvas>
+        <div class="range-input" id="field" tabindex="0" role="application"
+             aria-label="The range. Left and right arrows change the angle, up and down the speed, Shift for fine steps. Enter launches. H gives a hint, R resets the view, W shows the working." hidden></div>
+
+        <div class="hud" id="hud" hidden>
+          <div class="tools">
+            <button type="button" class="tool" id="menuBtn" aria-label="All levels"><span aria-hidden="true">☰</span></button>
+            <button type="button" class="tool" id="hintBtn" aria-label="Hint"><span aria-hidden="true">💡</span></button>
+            <button type="button" class="tool" id="viewBtn" aria-label="Reset the view"><span aria-hidden="true">🎥</span></button>
+            <button type="button" class="tool" id="predictBtn" aria-pressed="false" aria-label="Predict the landing distance before each shot"><span aria-hidden="true">🔮</span></button>
+          </div>
+          <div class="info">
+            <span class="chip" id="levelChip">Level 1</span>
+            <span class="chip" id="worldChip"></span>
+            <span class="chip timer" id="timerChip" hidden></span>
+            <span class="chip pair" id="pairChip" hidden></span>
+          </div>
+
+          <div class="console" id="console">
+            <p class="last" id="last" hidden><span id="lastText"></span><button type="button" class="mini-btn" id="workBtn" aria-label="Show the working"><span aria-hidden="true">📐</span><span class="wide" aria-hidden="true"> Working</span></button></p>
+            <div class="ctl" id="angleCtl">
+              <label class="ctl-name" for="angle">Angle <span class="sym">θ</span></label>
+              <button type="button" class="step" id="angleDown" aria-label="Angle down 0.5 degrees">−</button>
+              <input type="range" id="angle" min="10" max="80" step="0.5" value="45" />
+              <button type="button" class="step" id="angleUp" aria-label="Angle up 0.5 degrees">+</button>
+              <output class="ctl-val" id="angleVal" for="angle">45.0°</output>
+            </div>
+            <div class="ctl" id="speedCtl">
+              <label class="ctl-name" for="speed">Speed <span class="sym">v</span></label>
+              <button type="button" class="step" id="speedDown" aria-label="Speed down 0.1 metres per second">−</button>
+              <input type="range" id="speed" min="5" max="30" step="0.1" value="15" />
+              <button type="button" class="step" id="speedUp" aria-label="Speed up 0.1 metres per second">+</button>
+              <output class="ctl-val" id="speedVal" for="speed">15.0 m/s</output>
+            </div>
+            <div class="fire-row">
+              <div class="guess" id="guessBox" hidden>
+                <label for="guess">Predict</label>
+                <input type="number" id="guess" inputmode="decimal" min="0" max="999" step="0.1" autocomplete="off" />
+                <span aria-hidden="true">m</span>
+              </div>
+              <button type="button" class="go-btn fire" id="fireBtn">🎯 Launch</button>
+            </div>
+          </div>
+          <p class="tell" id="tell" aria-live="polite"></p>
+        </div>
+
+        <section class="menu" id="menu" aria-labelledby="menuTitle">
+          <h2 id="menuTitle">Projectile Range</h2>
+          <p class="menu-lead">No air resistance, real gravity. Set the angle and speed, then see the physics worked out after every shot.</p>
+          <div class="row" id="pickRow" role="group" aria-label="Who loads the launcher"></div>
+          <div id="levelGroups"></div>
+        </section>
+
+        <section class="card-layer" id="working" hidden>
+          <div class="work-card" role="dialog" aria-modal="true" aria-labelledby="workTitle">
+            <h2 id="workTitle">The working</h2>
+            <dl class="work-list" id="workList"></dl>
+            <p class="work-note">No air resistance: across, the speed never changes; up, gravity takes g m/s off every second.</p>
+            <button type="button" class="go-btn" id="workClose">Close</button>
+          </div>
+        </section>
+
+        <section class="card-layer" id="done" hidden>
+          <div class="done-card" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+            <h2 id="doneTitle"></h2>
+            <p class="done-sub" id="doneSub"></p>
+            <p class="done-tip" id="doneTip"></p>
+            <div class="done-btns">
+              <button type="button" class="go-btn" id="nextLevel">Next level →</button>
+              <button type="button" class="soft-btn" id="again">Play it again</button>
+              <button type="button" class="soft-btn" id="allLevels">All levels</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="nogl" id="noGl" hidden>
+          <p class="nogl-emoji" aria-hidden="true">🎯</p>
+          <h2>This game needs 3D graphics</h2>
+          <p>This browser or device has 3D graphics switched off. Try one of these instead:</p>
+          <p><a href="../science-trivia/">🔬 Science Trivia</a><a href="../sudoku/">9️⃣ Sudoku</a></p>
+        </div>
+      </div>
+      <p class="visually-hidden" id="srFocus" aria-live="polite"></p>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Pick a level. Each one tells you what is fixed and what you choose: the angle, the speed, or both.</li>
+        <li>Set the launch angle θ and the launch speed v with the sliders, the − and + buttons or the keys.</li>
+        <li>Launch. The ball flies on its true path and drops a dot every tenth of a second or so, so you can see how it moves.</li>
+        <li>Read the result: how long it flew, how high it went, where it landed and how far it was from the target. Tap 📐 Working to see the formulas with your numbers in them.</li>
+        <li>Adjust and try again. Later levels add walls to clear, raised platforms, two-angle puzzles, the Moon, Mars and a heavy planet, and finally just three shots at narrow targets.</li>
+      </ol>
+      <p>Keys: <kbd>←</kbd> <kbd>→</kbd> change the angle by 1° and <kbd>↑</kbd> <kbd>↓</kbd> the speed by 1 m/s; hold <kbd>Shift</kbd> for 0.5° and 0.1 m/s steps. <kbd>Enter</kbd> or <kbd>Space</kbd> launches (and skips to the landing during a flight). <kbd>H</kbd> or 💡 gives a hint, <kbd>R</kbd> or 🎥 resets the view, <kbd>W</kbd> shows the working and <kbd>P</kbd> or 🔮 turns on predictions: type where you think the ball will land, and get a bonus tick if you are within 5%. Drag the scene to look around.</p>
+      <h3>The physics</h3>
+      <p>The ball starts at ground level with speed v at angle θ. With no air resistance the sideways speed v cos θ never changes, while gravity g takes g m/s off the upward speed v sin θ every second. On flat ground that gives:</p>
+      <ul class="formulas">
+        <li>Time of flight: T = 2v sin θ / g</li>
+        <li>Maximum height: H = v² sin² θ / 2g</li>
+        <li>Range: R = v² sin 2θ / g, longest at 45°, and the same for θ and 90° − θ</li>
+        <li>Height at any distance: y = x tan θ − g x² / (2v² cos² θ), for walls and platforms</li>
+      </ul>
+      <p>Gravity is 9.8 m/s² on Earth, 1.6 on the Moon, 3.7 on Mars and 24.8 on the heavy planet. The steps are 0.5° and 0.1 m/s, and every level has been checked by computer to have settings on those steps that hit. Nothing is saved: ticks for finished levels last only this visit.</p>
+      <h3>What it practises</h3>
+      <p>Projectile motion as taught at GCSE and A level: splitting a velocity into horizontal and vertical parts, the equations of motion under constant gravity, the range equation and why 45° goes furthest, complementary angles, and how the path changes with gravity. Predicting first, then checking against a measured result, is the habit of a scientist.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/3d/three.min.js"></script>
+    <script src="../shared/3d/toon.js"></script>
+    <script src="../shared/3d/critters.js"></script>
+    <script src="../shared/3d/sound.js"></script>
+    <script src="flight.js"></script>
+    <script src="world.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>
