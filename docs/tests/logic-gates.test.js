@@ -322,7 +322,10 @@ test('every message, word for word', () => {
   assert.equal(G.say.testRow(lv, [1, 1], [null], null), 'A=1 B=1: Q=? ?');
   assert.equal(G.say.tested(G.score(lv, ['OR', 'NOT']), lv), '2 of 4 rows match. The first wrong row is A=0 B=1.');
   assert.equal(G.say.tested(G.score(lv, ['AND', 'NOT']), lv), 'All 4 rows match!');
-  assert.equal(G.say.hintWrong(2), 'Slot 2 holds the wrong gate. Press H again for a suggestion.');
+  assert.equal(G.say.hintWrong(2), 'Slot 2 holds the wrong gate. Ask for a hint again to see what to try.');
+  assert.equal(G.say.hintEmpty(3), 'Slot 3 still needs a gate. Ask for a hint again to see what to try.');
+  assert.equal(G.say.slotPick(2, 'XOR'), 'Slot 2 (XOR) selected. Pick a gate below, or tap it again to change it.');
+  assert.equal(G.say.slotPick(1, null), 'Slot 1 selected. Pick a gate below, or tap it again to change it.');
   assert.equal(G.say.hintTry(1, 'XOR'), 'Try XOR in slot 1.');
   assert.equal(G.say.solved(3), 'Level 3 solved! Every row of the truth table matches.');
   assert.equal(G.say.slotFocus(lv, 1, null), 'Slot 2: one wire in, from slot 1. Empty.');

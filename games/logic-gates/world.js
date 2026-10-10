@@ -137,7 +137,7 @@
       cyl: new THREE.CylinderGeometry(1, 1, 1, 20),
       ball: new THREE.SphereGeometry(1, 28, 18),
       bit: new THREE.SphereGeometry(1, 8, 6),
-      arch: new THREE.TorusGeometry(0.13, WIRE_W / 2, 8, 18, Math.PI),
+      arch: new THREE.TorusGeometry(0.15, WIRE_W / 2, 8, 18, Math.PI),
       ring: new THREE.TorusGeometry(0.09, 0.022, 8, 24),
     };
     const KEEP = new Set(Object.values(G).concat(Object.values(M).flat()));
@@ -532,7 +532,7 @@
             .sort((u, v) => Math.hypot(u[0] - a[0], u[1] - a[1]) - Math.hypot(v[0] - a[0], v[1] - a[1]));
           let from = a;
           const dir = [Math.sign(p[0] - a[0]), Math.sign(p[1] - a[1])];
-          const R = 0.13;
+          const R = 0.15;
           cuts.forEach((c) => {
             const s0 = [c[0] - dir[0] * R, c[1] - dir[1] * R];
             const s1 = [c[0] + dir[0] * R, c[1] + dir[1] * R];

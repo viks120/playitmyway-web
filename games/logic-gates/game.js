@@ -71,6 +71,7 @@
     testing: null,
     timers: [],
     tabDir: 0,
+    tapped: -1,              // the slot a tap last selected: tapping it again changes its gate
     back: null,              // where focus goes when the gate guide closes
   };
 
@@ -170,6 +171,9 @@
     S.solvedNow = false;
     S.hintKey = '';
     S.hintStep = 0;
+    S.cursor = null;
+    S.slot = 0;                          // the last level may have had more slots than this one
+    S.tapped = -1;
     world.build(S.level, layoutOf(i));
     S.screen = 'play';
     menu.hidden = true;
@@ -739,10 +743,12 @@
     const it = world.pick(e.clientX, e.clientY);
     if (!it) return;
     if (it.kind === 'in') {
+      S.tapped = -1;
       flip(it.i);
-    } else if (same(it, S.cursor)) {
+    } else if (S.tapped === it.i && same(it, S.cursor)) {
       cycleSlot(it.i);
     } else {
+      S.tapped = it.i;
       moveCursor(it, false);
       tell(say.slotPick(it.i + 1, S.gates[it.i]));
     }

@@ -693,7 +693,7 @@
     lamp: (name, got, want) => (got == null ? `${name} has no signal yet.` : `${name} is ${got}${got === want ? ', as it should be.' : `, but should be ${want}.`}`),
     flip: (name, v) => `${name} is ${v ? 'on (1)' : 'off (0)'}.`,
     setTo: (level, bits) => `Switches set to ${bitsText(level, bits)}.`,
-    slotPick: (slot, id) => `Slot ${slot} selected${id ? `, holding ${id}` : ''}. Pick a gate below, or tap the slot again to change it.`,
+    slotPick: (slot, id) => `Slot ${slot}${id ? ` (${id})` : ''} selected. Pick a gate below, or tap it again to change it.`,
     testing: () => 'Testing every row of the truth table…',
     testRow: (level, bits, got, ok) => `${bitsText(level, bits)}: ${level.outputs.map((o, k) => `${o.name}=${got[k] == null ? '?' : got[k]}`).join(' ')} ${ok === true ? '✓' : ok === false ? '✗' : '?'}`,
     tested: (s, level) => {
@@ -703,8 +703,8 @@
       return `${s.match} of ${s.total} rows match. Some lamps have no signal yet: fill every slot.`;
     },
     testStopped: () => 'Testing stopped.',
-    hintWrong: (slot) => `Slot ${slot} holds the wrong gate. Press H again for a suggestion.`,
-    hintEmpty: (slot) => `Slot ${slot} still needs a gate. Press H again for a suggestion.`,
+    hintWrong: (slot) => `Slot ${slot} holds the wrong gate. Ask for a hint again to see what to try.`,
+    hintEmpty: (slot) => `Slot ${slot} still needs a gate. Ask for a hint again to see what to try.`,
     hintTry: (slot, id) => `Try ${id} in slot ${slot}.`,
     hintSolved: () => 'Every row already matches!',
     solved: (n) => `Level ${n} solved! Every row of the truth table matches.`,
