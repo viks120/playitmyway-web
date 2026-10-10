@@ -455,6 +455,7 @@
   boardEl.addEventListener('pointerdown', (e) => {
     if (S.screen !== 'play' || S.drag) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    boardEl.focus({ preventScroll: true });              // so the keys work straight after
     const i = world.pieceAt(e.clientX, e.clientY);
     const grab = world.dragPoint(e.clientX, e.clientY);
     if (i < 0 || !grab) {
