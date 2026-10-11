@@ -158,6 +158,9 @@ module.exports = {
       practises: 'Covalent bonding as taught at GCSE: how many bonds each atom makes (H 1, Cl 1, O 2, N 3, C 4), single, double and triple bonds, and turning a formula into a structure, with isomers told apart (ethanol and methoxymethane are both C₂H₆O). Each finished molecule relaxes into its VSEPR shape and names its bond angle, so shapes of molecules come for free.' },
     { slug: 'projectile-range', name: 'Projectile Range', emoji: '🎯', age: '14', mins: '15',
       skills: ['world', 'numbers'],
-      practises: 'Projectile motion as taught at GCSE and A level: choosing a launch angle and speed, then checking the measured time of flight, highest point and range against R = v² sin 2θ / g and the other formulas worked out with your own numbers. Walls, raised platforms, complementary angles, the Moon, Mars and a heavy planet, and a three-shot round with narrow targets; predict the range first for a bonus within 5%.' }
+      practises: 'Projectile motion as taught at GCSE and A level: choosing a launch angle and speed, then checking the measured time of flight, highest point and range against R = v² sin 2θ / g and the other formulas worked out with your own numbers. Walls, raised platforms, complementary angles, the Moon, Mars and a heavy planet, and a three-shot round with narrow targets; predict the range first for a bonus within 5%.' },
+    { slug: 'logic-gates', name: 'Logic Gates', emoji: '💡', age: '14', mins: '15',
+      skills: ['logic', 'world'],
+      practises: 'Boolean logic for GCSE Computer Science: reading truth tables, what AND, OR, NOT, XOR, NAND and NOR do, De Morgan’s laws, building any gate from NAND, and real circuits such as half and full adders, a multiplexer and a comparator. Every level is checked solvable by computer, with undo, solver hints and a gate guide.' }
   ]
 };
