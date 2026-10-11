@@ -185,13 +185,14 @@ function violations(name, svg, f, game) {
  * let through, so a loosened rule fails here before any icon is judged. */
 test('the style checker catches what it must', () => {
   const f = FOLDERS[0];
-  const wrap = (inner, comment) =>
+  /* `inner` goes inside the standard wrapper; `after` goes after it */
+  const wrap = (inner, comment, after) =>
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">${comment || '<!-- Probe: a test icon -->'}\n` +
-    `<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">${inner}</g>\n</svg>\n`;
+    `<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">${inner}</g>${after || ''}\n</svg>\n`;
   const box = '<rect x="4" y="4" width="40" height="40" fill="#ffffff"/>';
-  assert.deepEqual(violations('ok.svg', wrap(box + '<g><g/><path d="M4 4h40" stroke="#ef4444" stroke-width="3"/></g>'), f, null), []);
+  assert.deepEqual(violations('ok.svg', wrap(box + '<g><g/><path d="M4 4h40" stroke="#ef4444" stroke-width="3"/></g>', null, '<circle cx="24" cy="24" r="4" fill="#ff6b57"/>'), f, null), []);
   const cases = [
-    ['<rect x="4" y="4" width="40" height="40"/>', 'names no fill'],
+    ['', 'names no fill', '<rect x="4" y="4" width="40" height="40"/>'],
     [box.replace('/>', ' stroke-width="2"/>'), 'ink outline of width 2'],
     [box.replace('/>', ' stroke="#ef4444"/>'), 'outlined in #ef4444'],
     [box.replace('/>', ' stroke="#33302E" stroke-width="4"/>'), 'ink outline of width 4'],
@@ -209,8 +210,8 @@ test('the style checker catches what it must', () => {
     [box + '</g>', 'stray </g>'],
     ['<path d="M4 4h40"/>', 'ink outline'],
   ];
-  for (const [inner, fragment] of cases) {
-    const found = violations('probe.svg', wrap(inner), f, null);
+  for (const [inner, fragment, after] of cases) {
+    const found = violations('probe.svg', wrap(inner, null, after), f, null);
     assert.ok(found.some((m) => m.includes(fragment)), `expected a violation mentioning ${JSON.stringify(fragment)}, got ${JSON.stringify(found)}`);
   }
   const two = violations('c.svg', wrap(box, '<!-- a: b --><!-- c: d -->'), f, null);
