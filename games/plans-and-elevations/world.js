@@ -76,6 +76,7 @@
       cursor: Toon.flat('#2563eb'),
       glow: Toon.flat('#f59e0b', 0.5),
       glowStack: Toon.flat('#fbbf24', 0.32),
+      glowDoom: Toon.flat('#ef4444', 0.4),
       white: Toon.flat('#ffffff'),
       spark: Toon.flat('#ffcf4a'),
       confetti: ['#ff8fb0', '#ffcf4a', '#86e0a8', '#9ec9ff', '#c4b5fd'].map((c) => Toon.flat(c)),
@@ -285,6 +286,10 @@
       cam.snap = true;
     };
 
+    /* A cube is two things: the mesh you see (which drops in and shrinks
+     * away) and an invisible box where the cube really is, which is what
+     * clicks are tested against, so a quick second tap is never fooled by a
+     * cube still falling into place. */
     function makeCube(x, z, y) {
       const mesh = new THREE.Mesh(G.cube, M.layers[y % M.layers.length]);
       const hull = new THREE.Mesh(G.cube, M.hulls[y % M.hulls.length]);
@@ -292,10 +297,16 @@
       hull.raycast = () => {};
       mesh.add(hull);
       mesh.position.copy(W.squarePos(x, z, y + 0.5));
-      mesh.userData = { x, z, y };
+      mesh.raycast = () => {};
       blocks.add(mesh);
-      pickable.push(mesh);
-      return mesh;
+      const box = new THREE.Mesh(G.cube, M.white);
+      box.visible = false;
+      box.position.copy(mesh.position);
+      box.userData = { x, z, y };
+      blocks.add(box);
+      box.updateMatrixWorld();             // ready for a click before the next frame is drawn
+      pickable.push(box);
+      return { mesh, box, x, z, y, born: -9 };
     }
 
     /* Show the build h (heights per square). With animate, new cubes drop
@@ -307,7 +318,8 @@
         const z = Math.floor(i / lv.w);
         while (col.length > h[i]) {
           const c = col.pop();
-          pickable.splice(pickable.indexOf(c.mesh), 1);
+          pickable.splice(pickable.indexOf(c.box), 1);
+          blocks.remove(c.box);
           if (animate) {
             c.dieAt = t;
             dying.push(c);
@@ -317,11 +329,12 @@
           }
         }
         while (col.length < h[i]) {
-          const y = col.length;
-          const mesh = makeCube(x, z, y);
-          const c = { mesh, y, born: animate ? t : -9 };
+          const c = makeCube(x, z, col.length);
           col.push(c);
-          if (animate) mesh.position.y += 0.9;
+          if (animate) {
+            c.born = t;
+            c.mesh.position.y += 0.9;
+          }
         }
       }
     };
@@ -345,8 +358,9 @@
         ghost.position.copy(W.squarePos(p.x, p.z, p.y + 0.5));
       }
     };
-    /* Hint glows: amber squares, and for a square with a target height a
-     * glass column that tall. */
+    /* Hint glows: amber squares on the baseplate. A square with a target
+     * height { to, from } also shows the change: amber glass where cubes
+     * should be added, red glass over the cubes that should go. */
     W.glow = (squares, t) => {
       glows.clear();
       glowAt = t || 0;
@@ -355,12 +369,13 @@
         const tile = new THREE.Mesh(G.tile, M.glow);
         tile.position.copy(W.squarePos(s.x, s.z, 0.01));
         glows.add(tile);
-        if (s.to) {
-          const col = new THREE.Mesh(G.cube, M.glowStack);
-          col.scale.set(1.08, s.to, 1.08);
-          col.position.copy(W.squarePos(s.x, s.z, s.to / 2));
-          glows.add(col);
-        }
+        if (s.to == null || s.from == null || s.to === s.from) return;
+        const lo = Math.min(s.to, s.from);
+        const hi = Math.max(s.to, s.from);
+        const col = new THREE.Mesh(G.cube, s.to > s.from ? M.glowStack : M.glowDoom);
+        col.scale.set(1.08, hi - lo + 0.04, 1.08);
+        col.position.copy(W.squarePos(s.x, s.z, (lo + hi) / 2));
+        glows.add(col);
       });
     };
 
@@ -547,8 +562,6 @@
         });
       }
     };
-    W.top = () => (lv ? lv.top : 3);
-
     W.update = (t, dt) => {
       // new cubes drop into place with a little bounce
       for (const col of cubes) {
@@ -556,7 +569,7 @@
           if (c.born < 0) continue;
           const k = clamp((t - c.born) / 0.22, 0, 1);
           const e = 1 - Math.pow(1 - k, 3);
-          const rest = W.squarePos(c.mesh.userData.x, c.mesh.userData.z, c.y + 0.5);
+          const rest = c.box.position;
           c.mesh.position.y = rest.y + 0.9 * (1 - e);
           const squash = k >= 1 ? 1 : 1 - 0.12 * Math.sin(Math.PI * k);
           c.mesh.scale.set(1 / Math.sqrt(squash), squash, 1 / Math.sqrt(squash));
@@ -581,6 +594,7 @@
         const a = 0.35 + 0.25 * (0.5 + 0.5 * Math.sin((t - glowAt) * 5));
         M.glow.opacity = a + 0.15;
         M.glowStack.opacity = a * 0.7;
+        M.glowDoom.opacity = a * 0.8;
       }
       if (cursor.visible) cursor.scale.setScalar(1 + 0.03 * Math.sin(t * 6));
       for (let i = bits.length - 1; i >= 0; i--) {

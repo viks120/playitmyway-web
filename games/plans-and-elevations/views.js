@@ -401,7 +401,7 @@
     }
     const x = pick % w;
     const z = Math.floor(pick / w);
-    return { kind: 'square', text: say.hintSquare(square(x, z, d), goal[pick]), squares: [{ x, z, to: goal[pick] }] };
+    return { kind: 'square', text: say.hintSquare(square(x, z, d), goal[pick]), squares: [{ x, z, to: goal[pick], from: h[pick] }] };
   }
 
   /* -------------------------------------------------------------- quiz
