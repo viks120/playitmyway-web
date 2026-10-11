@@ -161,6 +161,12 @@ module.exports = {
       practises: 'Projectile motion as taught at GCSE and A level: choosing a launch angle and speed, then checking the measured time of flight, highest point and range against R = v² sin 2θ / g and the other formulas worked out with your own numbers. Walls, raised platforms, complementary angles, the Moon, Mars and a heavy planet, and a three-shot round with narrow targets; predict the range first for a bonus within 5%.' },
     { slug: 'logic-gates', name: 'Logic Gates', emoji: '💡', age: '14', mins: '15',
       skills: ['logic', 'world'],
-      practises: 'Boolean logic for GCSE Computer Science: reading truth tables, what AND, OR, NOT, XOR, NAND and NOR do, De Morgan’s laws, building any gate from NAND, and real circuits such as half and full adders, a multiplexer and a comparator. Every level is checked solvable by computer, with undo, solver hints and a gate guide.' }
+      practises: 'Boolean logic for GCSE Computer Science: reading truth tables, what AND, OR, NOT, XOR, NAND and NOR do, De Morgan’s laws, building any gate from NAND, and real circuits such as half and full adders, a multiplexer and a comparator. Every level is checked solvable by computer, with undo, solver hints and a gate guide.' },
+    { slug: 'plans-and-elevations', name: 'Plans & Elevations', emoji: '🧱', age: '14', mins: '15',
+      skills: ['numbers', 'logic'],
+      practises: 'The GCSE skill of plans and elevations: reading a plan, a front elevation and a side elevation and building a cube shape that matches all three, with a live tick for each view. Later levels ask for the fewest cubes a set of views allows, and a quick quiz asks which drawing is which view.' },
+    { slug: 'net-folding', name: 'Net Folding', emoji: '📦', age: '14', mins: '10',
+      skills: ['logic', 'numbers'],
+      practises: 'Nets of 3D shapes: which of the 35 six-square shapes fold into a cube (11 do), which faces end up opposite, the dice rule that opposite faces add up to 7, and nets of pyramids, prisms, tetrahedra and cuboids. Every chosen net folds up in 3D, so a wrong answer shows its doubled-up faces or open side instead of just a cross.' }
   ]
 };
