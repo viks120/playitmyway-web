@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Rainbow Balloons: three coloured balloons -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M14 26l6 16M34 24l-6 18M24 32l1 10" fill="none" stroke-width="2"/><ellipse cx="14" cy="16" rx="8" ry="10" fill="#ef4444"/><ellipse cx="34" cy="14" rx="8" ry="10" fill="#60a5fa"/><ellipse cx="24" cy="22" rx="8" ry="10" fill="#fbbf24"/></g><ellipse cx="21" cy="17" rx="1.8" ry="3" fill="#ffffff" opacity=".7"/>
+</svg>
