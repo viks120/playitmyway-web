@@ -68,6 +68,7 @@
     compare: false,
     cursor: { x: 0, z: 0 },
     cursorOn: false,
+    quietCursor: false,      // a square hint is showing: no ghost cube at the cursor for now
     hintStep: 0,
     hintFor: '',
     won: false,              // this attempt at the level has been solved
@@ -293,6 +294,7 @@
     drawCount();
     fitExtent();
     world.glow(null);
+    S.quietCursor = false;
     showCursor();
     const n = Views.count(S.h);
     if (!m.all) {
@@ -422,7 +424,9 @@
     if (r.kind === 'view' && !S.compare) setCompare(true, true);
     world.glow(r.squares.length ? r.squares : null, time());
     if (r.kind === 'square') {
+      // the cursor jumps to the square; its ghost cube waits, so it cannot contradict the glow
       S.cursor = { x: r.squares[0].x, z: r.squares[0].z };
+      S.quietCursor = true;
       showCursor();
     }
     tell(r.text);
@@ -436,6 +440,7 @@
   }
   function setTool(tool) {
     S.tool = tool;
+    S.quietCursor = false;
     $('addBtn').setAttribute('aria-pressed', String(tool === 'add'));
     $('eraseBtn').setAttribute('aria-pressed', String(tool === 'erase'));
     tell(say.tool(tool === 'erase'));
@@ -464,7 +469,7 @@
       return;
     }
     world.cursor(S.cursorOn ? S.cursor : null);
-    if (S.cursorOn && !hovering) world.preview(previewAt(S.cursor.x, S.cursor.z, S.tool === 'erase'));
+    if (S.cursorOn && !hovering && !S.quietCursor) world.preview(previewAt(S.cursor.x, S.cursor.z, S.tool === 'erase'));
     else if (!hovering) world.preview(null);
   }
   // the ghost cube (or eraser box) for square x, z, if that action is possible
@@ -483,6 +488,7 @@
   // arrows move the cursor as the screen shows it: up is away from you, whichever way you look
   function moveCursor(dir) {
     const lv = S.lv;
+    S.quietCursor = false;
     if (!S.cursorOn) {
       S.cursorOn = true;
       showCursor();
@@ -739,6 +745,15 @@
   $('turnLeft').addEventListener('click', backToBoard(() => turn(-1)));
   $('turnRight').addEventListener('click', backToBoard(() => turn(1)));
   $('nextQ').addEventListener('click', nextQuestion);
+  // the done card is a modal dialog: Tab goes round its own buttons
+  done.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const items = [...done.querySelectorAll('button')].filter((b) => !b.hidden);
+    if (!items.length) return;
+    e.preventDefault();
+    const i = items.indexOf(document.activeElement);
+    items[e.shiftKey ? (i <= 0 ? items.length - 1 : i - 1) : (i + 1) % items.length].focus();
+  });
 
   /* -------------------------------------------------------------- keys */
   document.addEventListener('keydown', (e) => {
@@ -806,9 +821,12 @@
     }
   });
 
+  // a resize clears the canvas, so draw again at once rather than show a blank frame
   function fit() {
     world.resize();
     fitFrame();
+    world.frame(0, false);
+    world.render();
   }
   if (window.ResizeObserver) new ResizeObserver(fit).observe(stage);
   else window.addEventListener('resize', fit);
