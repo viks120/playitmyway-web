@@ -266,7 +266,7 @@ test('the four critters and the mark exist', () => {
 - [ ] **Step 2: Run it and watch it fail for the right reason**
 
 Run: `node --test docs/tests/icons.test.js`
-Expected: FAIL, 5 of 6 tests. The three "obeys the style rules" tests fail with `icons/games has no files yet` (and the same for the other folders); the coverage test reports all 45 slugs missing; the critters-and-mark test fails. Only "no two files draw the same picture" passes, vacuously.
+Expected: FAIL, 5 of 7 tests. The three "obeys the style rules" tests fail with `icons/games has no files yet` (and the same for the other folders) and the coverage test reports all 45 slugs missing; the critters-and-mark test fails too. "the style checker catches what it must" passes (it probes the checker with in-memory files) and "no two files draw the same picture" passes, vacuously.
 
 - [ ] **Step 3: Commit**
 
