@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#15803d" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Net Folding – Free 3D Nets of Shapes Game | Play It My Way</title>
+    <meta name="description" content="Which net folds into a cube? Pick a net and watch it fold up in 3D, hinge by hinge. Cube nets, opposite faces, dice, pyramids, prisms and cuboids, for ages 14+. No ads." />
+    <meta name="keywords" content="nets of 3d shapes, cube nets game, which net makes a cube, gcse geometry nets, spatial reasoning game, free maths game ages 14+" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Net Folding – Free 3D Nets of Shapes Game" />
+    <meta property="og:description" content="Pick the net that makes the shape, then watch it fold up in 3D to see why it works, or why it can't. Cubes, dice, pyramids, prisms and cuboids. Ages 14+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/net-folding/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Net Folding – Free 3D Nets of Shapes Game" />
+    <meta name="twitter:description" content="Which net folds into a cube? Watch every net fold up in 3D. Spatial reasoning for ages 14+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/net-folding/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <style>
+      :root {
+        --band: var(--color-green);
+        --band-tint: var(--color-green-tint);
+        --band-tint-deep: #a7e3b9;
+        --band-deep: #14532d;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body {
+        background: var(--color-bg);
+        /* an accidental pull-to-refresh would lose the round */
+        overscroll-behavior-y: contain;
+      }
+      body {
+        font-family: var(--font-display);
+        color: var(--ink);
+        margin: 0;
+        padding: 16px 12px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      button { font-family: inherit; }
+
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600;
+        font-size: 15px; padding: 9px 14px; border-radius: var(--radius-pill);
+        background: var(--band-tint);
+        align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center;
+        box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+
+      header.game-head { text-align: center; margin: 8px 0 14px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0 0 4px; text-wrap: balance; }
+      header.game-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+      .stage-card {
+        width: 100%; max-width: 960px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest);
+        padding: 8px;
+      }
+      .stage {
+        --tell-h: 64px;
+        position: relative; width: 100%;
+        height: clamp(460px, 76vh, 680px);
+        border-radius: 18px; overflow: hidden;
+        background: #eef8f1; color: var(--deep);
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html.pimw-fs .stage { height: calc(100vh - 96px); height: calc(100dvh - 96px); }
+
+      /* while playing: the question, the 3D view, the answers; the message strip sits below them */
+      .play { position: absolute; left: 0; right: 0; top: 0; bottom: var(--tell-h); display: flex; flex-direction: column; }
+      .topbar { flex: none; display: flex; align-items: center; gap: 10px; padding: 8px 10px 4px; }
+      .ask { flex: 1; min-width: 0; }
+      .prompt { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.25; color: var(--deep); text-wrap: balance; }
+      .info { margin: 2px 0 0; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+      .tool {
+        flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #fff; cursor: pointer;
+        font-size: 20px; line-height: 1; color: var(--deep); box-shadow: 0 3px 0 var(--band-tint-deep);
+      }
+      .tool:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .next-btn {
+        flex: none; border: 0; border-radius: var(--radius-pill); background: var(--band); color: #fff; cursor: pointer;
+        font-size: 16px; font-weight: 700; padding: 10px 18px; min-height: 44px; box-shadow: 0 4px 0 var(--band-deep);
+      }
+      .next-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-deep); }
+
+      .view { position: relative; flex: 1 1 auto; min-height: 140px; }
+      .view canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .board-input { position: absolute; inset: 0; touch-action: none; cursor: grab; }
+      .board-input:active { cursor: grabbing; }
+      .board-input:focus { outline: none; }
+      .board-input:focus-visible { box-shadow: inset 0 0 0 4px var(--color-focus); border-radius: 12px; }
+      .view-tools { position: absolute; top: 6px; right: 8px; display: flex; gap: 6px; }
+      .view-tools .tool { width: 38px; height: 38px; font-size: 18px; background: rgba(255, 255, 255, 0.92); }
+
+      .choices {
+        flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 4px 10px 8px;
+      }
+      .choices[data-n="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .choice {
+        position: relative; height: 148px; border: 0; border-radius: 16px; background: #fff; color: var(--deep); cursor: pointer;
+        padding: 20px 8px 8px; display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 0 var(--candy-card), inset 0 0 0 2px #e2eee6;
+      }
+      .choice:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--candy-card), inset 0 0 0 2px #e2eee6; }
+      .choice svg { width: 100%; height: 100%; display: block; overflow: visible; }
+      .choice svg .cut { stroke: var(--deep); stroke-width: 0.045; stroke-linecap: round; }
+      .choice svg .fold { stroke: var(--deep); stroke-width: 0.03; stroke-dasharray: 0.09 0.07; opacity: 0.75; }
+      .choice-letter { position: absolute; top: 5px; left: 11px; font-weight: 700; font-size: 16px; color: var(--ink-soft); }
+      .choice.shown { box-shadow: 0 4px 0 var(--candy-card), inset 0 0 0 3px #9ec9ff; }
+      .choice.right { background: #ecfbf1; box-shadow: 0 4px 0 var(--band-tint-deep), inset 0 0 0 3px var(--band); }
+      .choice.wrong { background: #fff1f1; box-shadow: 0 4px 0 #f3c4c4, inset 0 0 0 3px #e5484d; }
+      .verdict { position: absolute; top: 3px; right: 10px; font-size: 19px; font-weight: 700; }
+      .choice.right .verdict { color: var(--band); }
+      .choice.wrong .verdict { color: #c92a2a; }
+      .choice.chip { height: 58px; padding: 8px 12px; justify-content: flex-start; gap: 10px; }
+      .chip-swatch { width: 38px; height: 38px; flex: none; }
+      .chip-swatch svg { width: 100%; height: 100%; }
+      .chip-name { font-size: 18px; font-weight: 700; }
+
+      /* right: 64px keeps the message clear of the site's floating sound button */
+      .tell {
+        position: absolute; left: 10px; right: 64px; bottom: 10px; margin: 0;
+        background: rgba(255, 255, 255, 0.95); border-radius: 18px; padding: 8px 14px;
+        text-align: center; font-size: 15px; font-weight: 600; line-height: 1.3;
+        box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .tell:empty { display: none; }
+      /* behind the menu, only the turning cube shows. No transition on the switch back: with
+         reduced motion the site gives every element a tiny transition, and a button that is
+         still hidden for that instant cannot take the focus. */
+      .topbar, .view-tools, .choices, .board-input { transition-property: none; }
+      .stage[data-screen="menu"] .topbar, .stage[data-screen="menu"] .view-tools,
+      .stage[data-screen="menu"] .choices, .stage[data-screen="menu"] .board-input { visibility: hidden; }
+
+      /* pick a challenge */
+      .menu { position: absolute; inset: 0; overflow-y: auto; background: rgba(240, 249, 243, 0.86); padding: 16px 16px 20px; }
+      .menu h2 { margin: 2px 0 4px; font-size: 22px; text-align: center; }
+      .menu-sub { margin: 0 0 12px; text-align: center; color: var(--ink-soft); font-weight: 600; }
+      .groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; max-width: 640px; margin: 0 auto; }
+      .group-btn {
+        position: relative; display: flex; align-items: center; gap: 12px; text-align: left; border: 0; cursor: pointer;
+        background: #fff; color: var(--deep); border-radius: 18px; padding: 12px 14px; min-height: 76px;
+        box-shadow: 0 4px 0 var(--candy-card), inset 0 0 0 2px #e2eee6;
+      }
+      .group-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--candy-card); }
+      .group-btn.ok { background: #ecfbf1; }
+      .g-emoji { font-size: 30px; line-height: 1; }
+      .g-text { display: flex; flex-direction: column; gap: 2px; }
+      .g-title { font-size: 18px; font-weight: 700; }
+      .g-blurb { font-size: 14px; color: var(--ink-soft); font-weight: 600; }
+      .tick {
+        display: none; position: absolute; top: -6px; right: -4px; background: var(--band); color: #fff; border-radius: 50%;
+        width: 24px; height: 24px; font-size: 14px; place-items: center;
+      }
+      .group-btn.ok .tick { display: grid; }
+
+      .done { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(255, 255, 255, 0.35); }
+      .done-card {
+        background: #fff; border-radius: 24px; padding: 16px 22px 18px; text-align: center; width: 100%; max-width: 360px;
+        box-shadow: 0 8px 0 var(--band-tint-deep), var(--shadow-lift);
+      }
+      .done-card h2 { margin: 0; font-size: 27px; }
+      .done-sub { margin: 4px 0 14px; color: var(--ink-soft); font-weight: 600; }
+      .done-btns { display: flex; flex-direction: column; gap: 8px; }
+      .go-btn, .soft-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 17px; font-weight: 600; padding: 11px 20px; min-height: 46px; cursor: pointer;
+      }
+      .go-btn { background: var(--band); color: #fff; box-shadow: 0 5px 0 var(--band-deep); }
+      .go-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--band-deep); }
+      .soft-btn { background: var(--band-tint); color: var(--band-deep); box-shadow: 0 4px 0 var(--band-tint-deep); }
+      .soft-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+
+      .nogl {
+        position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; padding: 24px; text-align: center; background: var(--color-bg);
+      }
+      .nogl-emoji { font-size: 56px; margin: 0; }
+      .nogl h2 { margin: 0; }
+      .nogl a {
+        display: inline-block; margin: 6px; padding: 10px 16px; border-radius: var(--radius-pill);
+        background: var(--band-tint); color: var(--band-deep); font-weight: 600; text-decoration: none;
+      }
+
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px;
+        background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-rest);
+        line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol, .how-to ul { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+
+      /* narrow screens: answers in a 2 by 2 grid under the 3D view */
+      @media (max-width: 600px) {
+        .choices, .choices[data-n="3"] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; padding: 4px 8px 6px; }
+        .choices[data-n="3"] .choice:last-child { grid-column: 1 / -1; justify-self: center; width: calc(50% - 4px); }
+        .choice { height: 104px; padding: 18px 6px 6px; }
+        .choice.chip { height: 50px; padding: 6px 10px; }
+        .chip-swatch { width: 32px; height: 32px; }
+        .chip-name { font-size: 16px; }
+        .prompt { font-size: 16px; }
+        .info { font-size: 12.5px; }
+        .groups { grid-template-columns: 1fr; }
+        .tell { font-size: 14px; padding: 7px 12px; }
+        .view-tools .tool { width: 34px; height: 34px; font-size: 16px; }
+        .next-btn { padding: 9px 14px; font-size: 15px; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1>📦 Net Folding</h1>
+      <p>Pick the net that makes the shape, then watch it fold.</p>
+    </header>
+
+    <main class="stage-card">
+      <div class="stage" id="stage">
+        <div class="play" id="play">
+          <div class="topbar">
+            <button type="button" class="tool" id="menuBtn" aria-label="All challenges"><span aria-hidden="true">☰</span></button>
+            <div class="ask">
+              <h2 class="prompt" id="prompt"></h2>
+              <p class="info" id="info"></p>
+            </div>
+            <button type="button" class="next-btn" id="nextBtn" hidden>Next →</button>
+          </div>
+          <div class="view" id="viewBox">
+            <canvas id="view" aria-hidden="true"></canvas>
+            <div class="board-input" id="board" tabindex="0" role="application" aria-busy="false"
+                 aria-label="The 3D view. Arrow keys or Tab move between the answers, Enter chooses, Space replays the fold, Q and E turn the shape, R and F tilt it, N goes to the next question."></div>
+            <div class="view-tools">
+              <button type="button" class="tool" id="leftBtn" aria-label="Turn left"><span aria-hidden="true">⟲</span></button>
+              <button type="button" class="tool" id="rightBtn" aria-label="Turn right"><span aria-hidden="true">⟳</span></button>
+              <button type="button" class="tool" id="replayBtn" aria-label="Replay the fold"><span aria-hidden="true">▶</span></button>
+            </div>
+          </div>
+          <div class="choices" id="choices" role="group" aria-label="Answers"></div>
+        </div>
+        <p class="tell" id="tell" aria-live="polite"></p>
+
+        <section class="menu" id="menu" aria-labelledby="menuTitle">
+          <h2 id="menuTitle">Choose a challenge</h2>
+          <p class="menu-sub">Eight questions a round. Every net you pick folds up in 3D.</p>
+          <div class="groups" id="groups"></div>
+        </section>
+
+        <section class="done" id="done" hidden>
+          <div class="done-card" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+            <h2 id="doneTitle"></h2>
+            <p class="done-sub" id="doneSub"></p>
+            <div class="done-btns">
+              <button type="button" class="go-btn" id="againBtn">Another round →</button>
+              <button type="button" class="soft-btn" id="allBtn">Choose a challenge</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="nogl" id="noGl" hidden>
+          <p class="nogl-emoji" aria-hidden="true">📦</p>
+          <h2>This game needs 3D graphics</h2>
+          <p>This browser or device has 3D graphics switched off. Try one of these instead:</p>
+          <p><a href="../sudoku/">9️⃣ Sudoku</a><a href="../minesweeper/">💣 Minesweeper</a></p>
+        </div>
+      </div>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Choose a challenge: cube nets, opposite faces, dice, other solids, or matching a coloured cube.</li>
+        <li>Read the question and look at the answers. Turn the 3D shape to see every side.</li>
+        <li>Pick an answer. The net folds up in 3D, one hinge at a time, so you can see why it works or why it can't: two faces landing in the same place, or a side left open.</li>
+        <li>After answering, pick any other net to watch it fold too. Eight questions make a round.</li>
+      </ol>
+      <p><strong>Keys:</strong> <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> or <kbd>Tab</kbd> move between the answers, <kbd>Enter</kbd> chooses (or press <kbd>1</kbd> to <kbd>4</kbd>), <kbd>Space</kbd> replays the fold, <kbd>Q</kbd> and <kbd>E</kbd> turn the shape, <kbd>R</kbd> and <kbd>F</kbd> tilt it, and <kbd>N</kbd> goes to the next question. With a mouse or a finger, drag the 3D view to turn it.</p>
+      <p>The first questions in each challenge are gentle, then the wrong answers get more tempting. Each colour has its own symbol too, so the colours never have to be told apart by sight alone. Nothing is saved: your score, streak and ticks last only this visit.</p>
+      <h3>What it practises</h3>
+      <p>Nets of 3D shapes, as met in secondary-school geometry: which of the 35 six-square shapes fold into a cube (11 do), which faces end up opposite, the rule that opposite faces of a die add up to 7, and nets of pyramids, prisms, tetrahedra and cuboids. Above all it builds spatial reasoning, the skill of turning and folding shapes in your head, by checking every guess against a real fold.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/3d/three.min.js"></script>
+    <script src="../shared/3d/toon.js"></script>
+    <script src="../shared/3d/critters.js"></script>
+    <script src="../shared/3d/sound.js"></script>
+    <script src="nets.js"></script>
+    <script src="world.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>
