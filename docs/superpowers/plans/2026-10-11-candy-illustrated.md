@@ -49,7 +49,7 @@
 - Create: `docs/tests/icons.test.js`
 
 **Interfaces:**
-- Produces: the test file later tasks append to. Helper names used later: `ROOT`, `C`, `read(...parts)`, `exists(...parts)`, `svgFiles(dir)`, `PICTO`.
+- Produces: the test file later tasks append to. Helper names used later: `ROOT`, `C`, `read(...parts)`, `exists(...parts)`, `allFiles(dir)`, `PICTO` (unused until Task 7 appends the page checks).
 
 - [ ] **Step 1: Write the test file with the file rules and the coverage check**
 
@@ -134,6 +134,7 @@ function violations(name, svg, f, game) {
     if (lower.includes(bad)) v.push(`must not contain ${bad}`);
   }
   if (/\son[a-z]+=/i.test(body)) v.push('must not contain event handler attributes');
+  if (/=(?!")|\s=/.test(body)) v.push('attribute values must be double-quoted, with no space around =');
   for (const m of body.matchAll(/\b(fill|stroke)="([^"]+)"/g)) {
     const c = m[2].toLowerCase();
     if (c !== 'none' && !f.palette.has(c)) v.push(`${m[1]} ${m[2]} is not in the palette`);
@@ -143,8 +144,12 @@ function violations(name, svg, f, game) {
     const { fill, stroke } = s.eff;
     if (fill === undefined) v.push(`${s.tag} names no fill, on itself or a <g> around it, so it would render black`);
     if (stroke === undefined || stroke === 'none') continue;
-    const w = Number(s.eff['stroke-width'] === undefined ? 1 : s.eff['stroke-width']);
     if (s.eff['stroke-linejoin'] !== 'round' || s.eff['stroke-linecap'] !== 'round') v.push(`${s.tag} is stroked without round joins and caps`);
+    const w = Number(s.eff['stroke-width'] === undefined ? 1 : s.eff['stroke-width']);
+    if (!Number.isFinite(w)) {
+      v.push(`${s.tag} has a stroke-width that is not a plain number`);
+      continue;
+    }
     const outlined = fill !== undefined && fill !== 'none';
     if (stroke === INK && outlined) {
       inkOutline = true;
