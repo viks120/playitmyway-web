@@ -16,12 +16,13 @@ One original SVG per game, 45 files, at `icons/games/<slug>.svg` where `<slug>` 
 Style rules, all checked by the test in `docs/tests/icons.test.js`:
 
 - `viewBox="0 0 48 48"`, no `width` or `height` attributes (the page sizes it).
-- Outlines in the ink colour `#33302e`, `stroke-width` 2.5, round joins and caps. Fills are flat: the site palette (`tokens.css` colours) plus this fixed set of extra fills, and nothing else: red `#ef4444`, yellow `#fbbf24`, green `#4ade80`, blue `#60a5fa`, pink `#ff8fab`, brown `#8b5e3c`, grey `#94a3b8`, white `#ffffff`.
+- Every filled shape that has an outline gets it in the ink colour `#33302e` at `stroke-width` 2.5. Drawn lines (unfilled strokes, in ink or a palette colour) are between 1.5 and 7 wide. Every stroke has round joins and caps. Every shape names a fill, itself or through a wrapping `<g>`, so nothing falls back to black; the standard wrapper is `<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">`.
+- Fills and strokes are flat and come only from the site palette (`tokens.css` colours) plus this fixed set of extra colours: red `#ef4444`, yellow `#fbbf24`, green `#4ade80`, blue `#60a5fa`, pink `#ff8fab`, brown `#8b5e3c`, grey `#94a3b8`, white `#ffffff`. Attributes are double-quoted; no `style` attributes.
 - No `<text>` elements. Digits and letters are drawn as shapes, so they render the same on every device and inside an `<img>`.
-- No gradients, filters, scripts, external references, `<image>` elements or embedded fonts.
-- No two files are byte-identical, and no two games get the same picture (Count With Me and Dot to Dot currently share 🔢).
+- No gradients, filters, scripts, event handlers, external references, `<image>`, `<title>`, `<desc>`, `<metadata>` or `<foreignObject>` elements, or embedded fonts.
+- No two files draw the same picture, compared with comments and whitespace removed (Count With Me and Dot to Dot currently share 🔢).
 - Each icon must read at 36px, the phone size. Fine detail that disappears at that size is left out.
-- Each file carries a one-line XML comment naming the game, and nothing else that a renderer would have to parse.
+- Each file carries exactly one XML comment, `<!-- Name: what it shows -->`, where Name is the game's catalogue name, and nothing else that a renderer would have to parse.
 
 The pictures are chosen to say what the game is, not to be clever: a brain for Memory Match, a paint palette for Color Matcher, stacked number blocks for Count With Me, a dashed shape with numbered dots for Dot to Dot, a crayon for Drawing Pad, a lotus on water for Peekaboo Pond, and so on through the catalogue. The 14+ games keep a grown-up tone: a laser and mirror, a twisting cube, a cube stack with its plan view, a floating log, a molecule, a cannonball arc, an AND gate, an unfolded net.
 

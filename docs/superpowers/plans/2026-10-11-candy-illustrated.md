@@ -15,7 +15,7 @@
 - Work on branch `candy-illustrated`. Never push `main`; pushing `main` deploys the site.
 - Zero third-party requests on any page. All artwork is original and lives in the repo.
 - Nothing is stored in the browser (no cookies, localStorage, etc.). Nothing in this plan touches storage.
-- Icon files: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">` root (games), `0 0 64 60` (critters), `0 0 64 64` (mark); no `width`/`height` on the root; no `<text>`, gradients, filters, scripts, `<image>`, `href=`, `url(`, `<style>`; strokes in ink `#33302e` at `stroke-width="2.5"` with round joins and caps; fills only from `tokens.css` hex colours plus `#ef4444 #fbbf24 #4ade80 #60a5fa #ff8fab #8b5e3c #94a3b8 #ffffff` (critters may also use any hex colour that appears in `games/shared/3d/critters.js`); one `<!-- Name: what it shows -->` comment per file; no two files identical.
+- Icon files: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">` root (games), `0 0 64 60` (critters), `0 0 64 64` (mark); no `width`/`height` on the root; no `<text>`, gradients, filters, scripts, `<image>`, `href=`, `url(`, `<style>`; every filled shape that has an outline gets it in ink `#33302e` at `stroke-width="2.5"`; drawn lines (unfilled strokes, ink or a palette colour) are 1.5 to 7 wide; every stroke has round joins and caps; every shape names a fill, itself or through a wrapping `<g>` (the standard wrapper is `<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">`); fills and strokes only from `tokens.css` hex colours plus `#ef4444 #fbbf24 #4ade80 #60a5fa #ff8fab #8b5e3c #94a3b8 #ffffff` (critters may also use any hex colour that appears in `games/shared/3d/critters.js`); exactly one comment per file, `<!-- Name: what it shows -->`, where Name is the catalogue name for a game icon; no two files draw the same picture; no `style=`, single-quoted attributes, event handlers, `<title>`, `<desc>`, `<metadata>` or `<foreignObject>`.
 - `games/index.html`, `for-teachers.html`, `404.html` and `sw.js` are GENERATED: edit `docs/catalogue.js` or `docs/build-pages.js` and run `node docs/build-pages.js`. Never hand-edit them.
 - Scripts that edit pages must target the FIRST `<h1` only; `drawing-pad` embeds a whole HTML document inside a template literal further down the file.
 - Do not run `chrome.exe --version` (it opens a window). Do not launch three or more headless Chromes at once.
@@ -68,10 +68,9 @@ const ROOT = path.join(__dirname, '..', '..');
 const C = require(path.join(ROOT, 'docs', 'catalogue.js'));
 const read = (...p) => fs.readFileSync(path.join(ROOT, ...p), 'utf8');
 const exists = (...p) => fs.existsSync(path.join(ROOT, ...p));
-const svgFiles = (dir) =>
-  exists(dir) ? fs.readdirSync(path.join(ROOT, dir)).filter((f) => f.endsWith('.svg')).sort() : [];
+const allFiles = (dir) => (exists(dir) ? fs.readdirSync(path.join(ROOT, dir)).sort() : []);
 /* an emoji or other pictograph, with the joiners and keycaps that ride on them */
-const PICTO = /[\p{Extended_Pictographic}\uFE0F\u20E3\u200D]/u;
+const PICTO = /[\p{Extended_Pictographic}️⃣‍]/u;
 
 const INK = '#33302e';
 const EXTRA = ['#ef4444', '#fbbf24', '#4ade80', '#60a5fa', '#ff8fab', '#8b5e3c', '#94a3b8', '#ffffff'];
@@ -85,49 +84,114 @@ const FOLDERS = [
   { dir: 'icons', box: '0 0 64 64', palette: PALETTE, needsInk: false, only: ['mark.svg'] },
 ];
 
-function checkSvg(name, svg, f) {
+/* Just enough SVG structure to know, for every shape, the fill, stroke,
+ * width, join and cap it ends up with after inheriting from its <g>
+ * ancestors. The files are our own and simple; this is not an XML parser. */
+const SHAPES = new Set(['path', 'circle', 'ellipse', 'rect', 'polygon', 'polyline', 'line']);
+const INHERITED = ['fill', 'stroke', 'stroke-width', 'stroke-linejoin', 'stroke-linecap'];
+
+function attrsOf(tag) {
+  const out = {};
+  for (const m of tag.matchAll(/\s([a-zA-Z:-]+)="([^"]*)"/g)) out[m[1]] = m[2];
+  return out;
+}
+
+function shapesOf(body) {
+  const shapes = [];
+  const stack = [];
+  for (const m of body.matchAll(/<\/?([a-zA-Z]+)\b[^>]*>/g)) {
+    const tag = m[0];
+    const name = m[1];
+    if (tag.startsWith('</')) {
+      if (name === 'g') stack.pop();
+      continue;
+    }
+    const own = attrsOf(tag);
+    const eff = Object.assign({}, ...stack);
+    for (const k of INHERITED) if (own[k] !== undefined) eff[k] = own[k];
+    if (name === 'g') {
+      if (!tag.endsWith('/>')) stack.push(Object.fromEntries(INHERITED.filter((k) => own[k] !== undefined).map((k) => [k, own[k]])));
+      continue;
+    }
+    if (SHAPES.has(name)) shapes.push({ tag, eff });
+  }
+  return shapes;
+}
+
+/* Every rule a file breaks, so one run reports everything. `game` is the
+ * catalogue entry for a game icon, or null. */
+function violations(name, svg, f, game) {
+  const v = [];
   const root = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f.box}">`;
-  assert.ok(svg.startsWith(root), `${name}: must start with ${root}`);
-  assert.match(svg, /<!-- [^\n]+ -->/, `${name}: needs a one-line comment naming the game`);
-  for (const bad of ['<text', 'gradient', '<filter', '<script', '<image', 'href=', 'url(', '<style', '@font-face']) {
-    assert.ok(!svg.toLowerCase().includes(bad), `${name}: must not contain ${bad}`);
+  if (!svg.startsWith(root)) v.push(`must start with ${root} but starts with ${JSON.stringify(svg.slice(0, 60))}`);
+  const comments = svg.match(/<!--[\s\S]*?-->/g) || [];
+  if (comments.length !== 1) v.push(`needs exactly one comment, has ${comments.length}`);
+  else if (!/^<!-- [^:\n]+: [^\n]+ -->$/.test(comments[0])) v.push(`comment must read <!-- Name: what it shows -->, not ${comments[0]}`);
+  else if (game && !comments[0].startsWith(`<!-- ${game.name}: `)) v.push(`comment must start with the catalogue name ${JSON.stringify(game.name)}`);
+  const body = svg.replace(/<!--[\s\S]*?-->/g, '');
+  const lower = body.toLowerCase();
+  for (const bad of ['<text', 'gradient', '<filter', '<script', '<image', '<style', '<title', '<desc', '<metadata', '<foreignobject', 'href=', 'url(', 'style=', '@font-face', "='"]) {
+    if (lower.includes(bad)) v.push(`must not contain ${bad}`);
   }
-  for (const m of svg.matchAll(/\b(fill|stroke)="([^"]+)"/g)) {
-    const v = m[2].toLowerCase();
-    assert.ok(v === 'none' || f.palette.has(v), `${name}: ${m[1]} ${m[2]} is not in the palette`);
+  if (/\son[a-z]+=/i.test(body)) v.push('must not contain event handler attributes');
+  for (const m of body.matchAll(/\b(fill|stroke)="([^"]+)"/g)) {
+    const c = m[2].toLowerCase();
+    if (c !== 'none' && !f.palette.has(c)) v.push(`${m[1]} ${m[2]} is not in the palette`);
   }
-  if (f.needsInk) assert.ok(svg.includes(`stroke="${INK}"`), `${name}: needs an ink outline`);
-  for (const m of svg.matchAll(/stroke-width="([^"]+)"/g)) {
-    assert.ok(Number(m[1]) > 0 && Number(m[1]) <= 8, `${name}: stroke-width ${m[1]} out of range`);
+  let inkOutline = false;
+  for (const s of shapesOf(body)) {
+    const { fill, stroke } = s.eff;
+    if (fill === undefined) v.push(`${s.tag} names no fill, on itself or a <g> around it, so it would render black`);
+    if (stroke === undefined || stroke === 'none') continue;
+    const w = Number(s.eff['stroke-width'] === undefined ? 1 : s.eff['stroke-width']);
+    if (s.eff['stroke-linejoin'] !== 'round' || s.eff['stroke-linecap'] !== 'round') v.push(`${s.tag} is stroked without round joins and caps`);
+    const outlined = fill !== undefined && fill !== 'none';
+    if (stroke === INK && outlined) {
+      inkOutline = true;
+      if (w !== 2.5) v.push(`${s.tag} is an ink outline of width ${w}, not 2.5`);
+    } else if (w < 1.5 || w > 7) {
+      v.push(`${s.tag} is a line of width ${w}, outside 1.5 to 7`);
+    }
   }
+  if (f.needsInk && !inkOutline) v.push('needs at least one filled shape with an ink outline');
+  return v.map((msg) => `${name}: ${msg}`);
 }
 
 for (const f of FOLDERS) {
   test(`${f.dir}: every file obeys the style rules`, () => {
-    const files = (f.only || svgFiles(f.dir)).filter((n) => exists(f.dir, n));
-    assert.ok(files.length > 0, `${f.dir} has no SVG files yet`);
-    for (const n of files) checkSvg(`${f.dir}/${n}`, read(f.dir, n), f);
+    const files = (f.only || allFiles(f.dir)).filter((n) => exists(f.dir, n));
+    assert.ok(files.length > 0, `${f.dir} has no files yet`);
+    const found = [];
+    for (const n of files) {
+      const game = f.dir === 'icons/games' ? C.games.find((g) => g.slug + '.svg' === n) || null : null;
+      found.push(...violations(`${f.dir}/${n}`, read(f.dir, n), f, game));
+    }
+    assert.deepEqual(found, []);
   });
 }
 
-test('no two pictures are the same file', () => {
+test('no two files draw the same picture', () => {
+  const essence = (svg) => svg.replace(/<!--[\s\S]*?-->/g, '').replace(/\s+/g, ' ').trim();
   const seen = new Map();
   for (const f of FOLDERS) {
-    for (const n of (f.only || svgFiles(f.dir)).filter((x) => exists(f.dir, x))) {
-      const h = crypto.createHash('sha1').update(read(f.dir, n)).digest('hex');
-      assert.ok(!seen.has(h), `${f.dir}/${n} is identical to ${seen.get(h)}`);
+    for (const n of (f.only || allFiles(f.dir)).filter((x) => exists(f.dir, x))) {
+      const h = crypto.createHash('sha1').update(essence(read(f.dir, n))).digest('hex');
+      assert.ok(!seen.has(h), `${f.dir}/${n} draws the same picture as ${seen.get(h)}`);
       seen.set(h, `${f.dir}/${n}`);
     }
   }
 });
 
 test('every game in the catalogue has an icon, and no icon is an orphan', () => {
-  const slugs = C.games.map((g) => g.slug).sort();
-  assert.deepEqual(svgFiles('icons/games').map((n) => n.replace(/\.svg$/, '')), slugs);
+  const slugs = C.games.map((g) => g.slug);
+  const files = allFiles('icons/games');
+  const missing = slugs.filter((s) => !files.includes(s + '.svg'));
+  const orphans = files.filter((n) => !n.endsWith('.svg') || !slugs.includes(n.slice(0, -4)));
+  assert.deepEqual({ missing, orphans }, { missing: [], orphans: [] });
 });
 
 test('the four critters and the mark exist', () => {
-  assert.deepEqual(svgFiles('icons/critters'), ['clover.svg', 'mango.svg', 'pip.svg', 'plum.svg']);
+  assert.deepEqual(allFiles('icons/critters'), ['clover.svg', 'mango.svg', 'pip.svg', 'plum.svg']);
   assert.ok(exists('icons', 'mark.svg'));
 });
 ```
@@ -135,7 +199,7 @@ test('the four critters and the mark exist', () => {
 - [ ] **Step 2: Run it and watch it fail for the right reason**
 
 Run: `node --test docs/tests/icons.test.js`
-Expected: FAIL. The three "obeys the style rules" tests fail with `icons/games has no SVG files yet` (and the same for the other folders); the coverage test fails because `icons/games` is empty.
+Expected: FAIL, 5 of 6 tests. The three "obeys the style rules" tests fail with `icons/games has no files yet` (and the same for the other folders); the coverage test reports all 45 slugs missing; the critters-and-mark test fails. Only "no two files draw the same picture" passes, vacuously.
 
 - [ ] **Step 3: Commit**
 
@@ -153,98 +217,98 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 **Files:**
 - Create: `icons/games/first-strokes.svg`, `rainbow-balloons.svg`, `farm-friends.svg`, `trace-shapes.svg`, `trace-letters.svg`, `trace-name.svg`, `memory-game.svg`, `color-matcher.svg`, `counting-game.svg`, `dot-to-dot.svg`, `drawing-pad.svg`, `peekaboo-pond.svg`
 
-Every file is exactly the content shown, with a trailing newline. The `<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">` wrapper gives each shape its ink outline; shapes that should have no outline say `stroke="none"`.
+Every file is exactly the content shown, with a trailing newline. The `<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">` wrapper gives each shape its ink outline and a safe no-fill default; filled shapes name their own fill, shapes that should have no outline say `stroke="none"`, and coloured lines set their own `stroke` and `stroke-width` (1.5 to 7). The test reports every rule a file breaks, so fix the file, never the rule.
 
 - [ ] **Step 1: Write the twelve files**
 
 `icons/games/first-strokes.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- First Strokes: a crayon drawing a zigzag -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M5 36l7-12 7 12 7-12" fill="none" stroke-width="7"/><path d="M5 36l7-12 7 12 7-12" fill="none" stroke="#ff6b57" stroke-width="3.5"/><g transform="rotate(35 36 20)"><path d="M32 7l4-5 4 5z" fill="#fbbf24"/><rect x="32" y="7" width="8" height="24" rx="2" fill="#fbbf24"/><rect x="32" y="11" width="8" height="4" fill="#2b2a5e" stroke="none"/></g></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M5 36l7-12 7 12 7-12" fill="none" stroke-width="7"/><path d="M5 36l7-12 7 12 7-12" fill="none" stroke="#ff6b57" stroke-width="3.5"/><g transform="rotate(35 36 20)"><path d="M32 7l4-5 4 5z" fill="#fbbf24"/><rect x="32" y="7" width="8" height="24" rx="2" fill="#fbbf24"/><rect x="32" y="11" width="8" height="4" fill="#2b2a5e" stroke="none"/></g></g>
 </svg>
 ```
 
 `icons/games/rainbow-balloons.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Rainbow Balloons: three coloured balloons -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M14 26l6 16M34 24l-6 18M24 32l1 10" fill="none" stroke-width="2"/><ellipse cx="14" cy="16" rx="8" ry="10" fill="#ef4444"/><ellipse cx="34" cy="14" rx="8" ry="10" fill="#60a5fa"/><ellipse cx="24" cy="22" rx="8" ry="10" fill="#fbbf24"/></g><ellipse cx="21" cy="17" rx="1.8" ry="3" fill="#ffffff" opacity=".7"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M14 26l6 16M34 24l-6 18M24 32l1 10" fill="none" stroke-width="2"/><ellipse cx="14" cy="16" rx="8" ry="10" fill="#ef4444"/><ellipse cx="34" cy="14" rx="8" ry="10" fill="#60a5fa"/><ellipse cx="24" cy="22" rx="8" ry="10" fill="#fbbf24"/></g><ellipse cx="21" cy="17" rx="1.8" ry="3" fill="#ffffff" opacity=".7"/>
 </svg>
 ```
 
 `icons/games/farm-friends.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Farm Friends: a cow's face -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="10" cy="20" rx="5" ry="3" fill="#ff8fab"/><ellipse cx="38" cy="20" rx="5" ry="3" fill="#ff8fab"/><ellipse cx="24" cy="24" rx="14" ry="13" fill="#ffffff"/><path d="M14 16c-2-4 0-8 3-8M34 16c2-4 0-8-3-8" fill="none"/><ellipse cx="24" cy="31" rx="8" ry="5" fill="#ff8fab"/></g><circle cx="18" cy="21" r="2" fill="#33302e"/><circle cx="30" cy="21" r="2" fill="#33302e"/><circle cx="21" cy="31" r="1.3" fill="#33302e"/><circle cx="27" cy="31" r="1.3" fill="#33302e"/><path d="M16 14c3-2 6 0 5 3s-4 2-5-3z" fill="#33302e"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="10" cy="20" rx="5" ry="3" fill="#ff8fab"/><ellipse cx="38" cy="20" rx="5" ry="3" fill="#ff8fab"/><ellipse cx="24" cy="24" rx="14" ry="13" fill="#ffffff"/><path d="M14 16c-2-4 0-8 3-8M34 16c2-4 0-8-3-8" fill="none"/><ellipse cx="24" cy="31" rx="8" ry="5" fill="#ff8fab"/></g><circle cx="18" cy="21" r="2" fill="#33302e"/><circle cx="30" cy="21" r="2" fill="#33302e"/><circle cx="21" cy="31" r="1.3" fill="#33302e"/><circle cx="27" cy="31" r="1.3" fill="#33302e"/><path d="M16 14c3-2 6 0 5 3s-4 2-5-3z" fill="#33302e"/>
 </svg>
 ```
 
 `icons/games/trace-shapes.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Trace Shapes: a star to trace, with the start dot -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 5l5.5 12 13 1.5-9.5 9 2.5 13L24 34l-11.5 6.5 2.5-13-9.5-9 13-1.5z" fill="#fbbf24" stroke-dasharray="5 3"/><circle cx="24" cy="5" r="3.5" fill="#ff6b57" stroke-width="2"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 5l5.5 12 13 1.5-9.5 9 2.5 13L24 34l-11.5 6.5 2.5-13-9.5-9 13-1.5z" fill="#fbbf24" stroke-dasharray="5 3"/><circle cx="24" cy="5" r="3.5" fill="#ff6b57"/></g>
 </svg>
 ```
 
 `icons/games/trace-letters.svg`
 ```svg
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Trace Letters and Numbers: a capital A on its guide -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 40L24 8l14 32M15.5 28h17" fill="none" stroke="#c9c7f5" stroke-width="7"/><path d="M10 40L24 8l14 32M15.5 28h17" fill="none" stroke-dasharray="5 3"/><circle cx="10" cy="40" r="3.5" fill="#ff6b57" stroke-width="2"/></g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Trace Letters & Numbers: a capital A on its guide -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 40L24 8l14 32M15.5 28h17" fill="none" stroke="#c9c7f5" stroke-width="7"/><path d="M10 40L24 8l14 32M15.5 28h17" fill="none" stroke-dasharray="5 3"/><circle cx="10" cy="40" r="3.5" fill="#ff6b57"/></g>
 </svg>
 ```
 
 `icons/games/trace-name.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Trace Your Name: a name tag with a heart -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="11" width="40" height="26" rx="6" fill="#fff6ea"/><path d="M12 31h24" stroke-dasharray="4 3"/><path d="M24 26c-5-4-7-6-7-9a3.5 3.5 0 0 1 7-1 3.5 3.5 0 0 1 7 1c0 3-2 5-7 9z" fill="#ff6b57" stroke-width="2"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="11" width="40" height="26" rx="6" fill="#fff6ea"/><path d="M12 31h24" stroke-dasharray="4 3"/><path d="M24 26c-5-4-7-6-7-9a3.5 3.5 0 0 1 7-1 3.5 3.5 0 0 1 7 1c0 3-2 5-7 9z" fill="#ff6b57"/></g>
 </svg>
 ```
 
 `icons/games/memory-game.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Memory Match: a brain -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M22 10c-6 0-10 4-10 9 0 2-3 4-3 8s3 7 7 7c1 3 4 5 8 5V10z" fill="#ff8fab"/><path d="M26 10c6 0 10 4 10 9 0 2 3 4 3 8s-3 7-7 7c-1 3-4 5-8 5V10z" fill="#ff8fab"/><path d="M24 10v29M15 22c3 0 4 2 4 4M33 22c-3 0-4 2-4 4M18 31c2-1 3-3 3-5M30 31c-2-1-3-3-3-5" fill="none"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M22 10c-6 0-10 4-10 9 0 2-3 4-3 8s3 7 7 7c1 3 4 5 8 5V10z" fill="#ff8fab"/><path d="M26 10c6 0 10 4 10 9 0 2 3 4 3 8s-3 7-7 7c-1 3-4 5-8 5V10z" fill="#ff8fab"/><path d="M24 10v29M15 22c3 0 4 2 4 4M33 22c-3 0-4 2-4 4M18 31c2-1 3-3 3-5M30 31c-2-1-3-3-3-5" fill="none"/></g>
 </svg>
 ```
 
 `icons/games/color-matcher.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Color Matcher: a paint palette -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 8c-10 0-17 7-17 16s7 15 15 15c3 0 4-2 3-4s0-4 3-4h4c4 0 7-3 7-7 0-9-7-16-15-16z" fill="#fff6ea"/><circle cx="15" cy="22" r="3" fill="#ff6b57"/><circle cx="22" cy="15" r="3" fill="#fbbf24"/><circle cx="31" cy="16" r="3" fill="#4ade80"/><circle cx="35" cy="25" r="3" fill="#60a5fa"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 8c-10 0-17 7-17 16s7 15 15 15c3 0 4-2 3-4s0-4 3-4h4c4 0 7-3 7-7 0-9-7-16-15-16z" fill="#fff6ea"/><circle cx="15" cy="22" r="3" fill="#ff6b57"/><circle cx="22" cy="15" r="3" fill="#fbbf24"/><circle cx="31" cy="16" r="3" fill="#4ade80"/><circle cx="35" cy="25" r="3" fill="#60a5fa"/></g>
 </svg>
 ```
 
 `icons/games/counting-game.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Count With Me: three blocks with one, two and three dots -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="24" width="16" height="16" rx="3" fill="#60a5fa"/><rect x="26" y="24" width="16" height="16" rx="3" fill="#fbbf24"/><rect x="16" y="7" width="16" height="16" rx="3" fill="#ff6b57"/></g><g fill="#ffffff"><circle cx="14" cy="32" r="2.2"/><circle cx="31" cy="29" r="2.2"/><circle cx="37" cy="35" r="2.2"/><circle cx="20" cy="11" r="2.2"/><circle cx="24" cy="15" r="2.2"/><circle cx="28" cy="19" r="2.2"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="24" width="16" height="16" rx="3" fill="#60a5fa"/><rect x="26" y="24" width="16" height="16" rx="3" fill="#fbbf24"/><rect x="16" y="7" width="16" height="16" rx="3" fill="#ff6b57"/></g><g fill="#ffffff"><circle cx="14" cy="32" r="2.2"/><circle cx="31" cy="29" r="2.2"/><circle cx="37" cy="35" r="2.2"/><circle cx="20" cy="11" r="2.2"/><circle cx="24" cy="15" r="2.2"/><circle cx="28" cy="19" r="2.2"/></g>
 </svg>
 ```
 
 `icons/games/dot-to-dot.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Dot to Dot: four dots joined by a dashed line -->
-<path d="M24 7L40 24 24 41 8 24z" fill="none" stroke="#33302e" stroke-width="2" stroke-dasharray="4 3"/><g fill="#7c3aed" stroke="#33302e" stroke-width="2.5"><circle cx="24" cy="7" r="4"/><circle cx="40" cy="24" r="4"/><circle cx="24" cy="41" r="4"/><circle cx="8" cy="24" r="4"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 7L40 24 24 41 8 24z" stroke-width="2" stroke-dasharray="4 3"/><circle cx="24" cy="7" r="4" fill="#7c3aed"/><circle cx="40" cy="24" r="4" fill="#7c3aed"/><circle cx="24" cy="41" r="4" fill="#7c3aed"/><circle cx="8" cy="24" r="4" fill="#7c3aed"/></g>
 </svg>
 ```
 
 `icons/games/drawing-pad.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Drawing Pad: a sheet with a scribble and two paint dots -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="8" y="6" width="32" height="36" rx="4" fill="#ffffff"/><path d="M14 31c3-8 6-8 9 0s6 8 9 0" fill="none" stroke="#ff6b57" stroke-width="3.5"/><circle cx="18" cy="16" r="4" fill="#4ade80" stroke="none"/><circle cx="30" cy="16" r="4" fill="#60a5fa" stroke="none"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="8" y="6" width="32" height="36" rx="4" fill="#ffffff"/><path d="M14 31c3-8 6-8 9 0s6 8 9 0" fill="none" stroke="#ff6b57" stroke-width="3.5"/><circle cx="18" cy="16" r="4" fill="#4ade80" stroke="none"/><circle cx="30" cy="16" r="4" fill="#60a5fa" stroke="none"/></g>
 </svg>
 ```
 
 `icons/games/peekaboo-pond.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Peekaboo Pond: a lotus on the water -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="24" cy="38" rx="18" ry="6" fill="#60a5fa"/><path d="M24 36c-8-3-12-10-10-18 5 2 9 7 10 12z" fill="#ff8fab"/><path d="M24 36c8-3 12-10 10-18-5 2-9 7-10 12z" fill="#ff8fab"/><path d="M24 36c-5-7-5-18 0-26 5 8 5 19 0 26z" fill="#fff6ea"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="24" cy="38" rx="18" ry="6" fill="#60a5fa"/><path d="M24 36c-8-3-12-10-10-18 5 2 9 7 10 12z" fill="#ff8fab"/><path d="M24 36c8-3 12-10 10-18-5 2-9 7-10 12z" fill="#ff8fab"/><path d="M24 36c-5-7-5-18 0-26 5 8 5 19 0 26z" fill="#fff6ea"/></g>
 </svg>
 ```
 
 - [ ] **Step 2: Run the test**
 
 Run: `node --test docs/tests/icons.test.js`
-Expected: `icons/games: every file obeys the style rules` PASSES and `no two pictures are the same file` PASSES. The coverage test still FAILS (33 games have no icon yet) and the critters/mark tests still fail. If a style-rule assertion fails it names the file and the rule; fix the file, not the rule.
+Expected: `icons/games: every file obeys the style rules` PASSES and `no two files draw the same picture` PASSES. The coverage test still FAILS (33 games listed as missing) and the critters/mark tests still fail. If the style test fails it lists every file and rule broken; fix the files, not the rule.
 
 - [ ] **Step 3: Commit**
 
@@ -267,70 +331,70 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 `icons/games/sound-it-out.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Sound It Out: a speech bubble with sound bars -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 9h32v23H22l-8 8v-8H8z" fill="#7c3aed"/><path d="M17 17v7M24 14v13M31 17v7" stroke="#ffffff" stroke-width="3.5"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 9h32v23H22l-8 8v-8H8z" fill="#7c3aed"/><path d="M17 17v7M24 14v13M31 17v7" stroke="#ffffff" stroke-width="3.5"/></g>
 </svg>
 ```
 
 `icons/games/sort-it-out.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Sort It Out: a circle and a triangle dropping into two boxes -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="24" width="18" height="18" rx="3" fill="#60a5fa"/><rect x="26" y="24" width="18" height="18" rx="3" fill="#fbbf24"/><circle cx="13" cy="11" r="5" fill="#ef4444"/><path d="M35 5l6 11H29z" fill="#4ade80"/><path d="M13 18v4M35 18v4" stroke-dasharray="2 2"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="24" width="18" height="18" rx="3" fill="#60a5fa"/><rect x="26" y="24" width="18" height="18" rx="3" fill="#fbbf24"/><circle cx="13" cy="11" r="5" fill="#ef4444"/><path d="M35 5l6 11H29z" fill="#4ade80"/><path d="M13 18v4M35 18v4" stroke-dasharray="2 2"/></g>
 </svg>
 ```
 
 `icons/games/tic-tac-toe.svg`
 ```svg
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Tic Tac Toe: the grid with a winning line of crosses -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M18 8v32M30 8v32M8 18h32M8 30h32"/><path d="M10 10l6 6M16 10l-6 6M32 32l6 6M38 32l-6 6M21 21l6 6M27 21l-6 6" stroke="#ff6b57" stroke-width="3"/><circle cx="35" cy="13" r="3.5" fill="none" stroke="#2563eb" stroke-width="3"/><circle cx="13" cy="35" r="3.5" fill="none" stroke="#2563eb" stroke-width="3"/></g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Tic Tac Toe: the board with a winning line of crosses -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="5" y="5" width="38" height="38" rx="5" fill="#fff6ea"/><path d="M18 8v32M30 8v32M8 18h32M8 30h32"/><path d="M10 10l6 6M16 10l-6 6M32 32l6 6M38 32l-6 6M21 21l6 6M27 21l-6 6" stroke="#ff6b57" stroke-width="3"/><circle cx="35" cy="13" r="3.5" fill="none" stroke="#2563eb" stroke-width="3"/><circle cx="13" cy="35" r="3.5" fill="none" stroke="#2563eb" stroke-width="3"/></g>
 </svg>
 ```
 
 `icons/games/catch-falling-object.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Catch the Fruit: an apple -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 14c-3-3-8-3-11 0-5 5-4 16 2 23 3 3 6 3 9 1 3 2 6 2 9-1 6-7 7-18 2-23-3-3-8-3-11 0z" fill="#ef4444"/><path d="M24 14c0-4 2-7 5-8" fill="none"/><path d="M25 11c3-4 8-3 9-2-1 3-5 5-9 2z" fill="#4ade80"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 14c-3-3-8-3-11 0-5 5-4 16 2 23 3 3 6 3 9 1 3 2 6 2 9-1 6-7 7-18 2-23-3-3-8-3-11 0z" fill="#ef4444"/><path d="M24 14c0-4 2-7 5-8" fill="none"/><path d="M25 11c3-4 8-3 9-2-1 3-5 5-9 2z" fill="#4ade80"/></g>
 </svg>
 ```
 
 `icons/games/balloon-pop.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Balloon Pop: a balloon about to pop -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="22" cy="20" rx="12" ry="14" fill="#ff6b57"/><path d="M19 33h6l-3 4z" fill="#ff6b57"/><path d="M22 37c-3 3 3 6 0 9" fill="none" stroke-width="2"/><path d="M38 6l-3 5M44 12l-5 2M43 4l-5 4" stroke-width="2.5"/></g><ellipse cx="17" cy="14" rx="2.5" ry="4" fill="#ffffff" opacity=".7"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="22" cy="20" rx="12" ry="14" fill="#ff6b57"/><path d="M19 33h6l-3 4z" fill="#ff6b57"/><path d="M22 37c-3 3 3 6 0 9" fill="none" stroke-width="2"/><path d="M38 6l-3 5M44 12l-5 2M43 4l-5 4" stroke-width="2.5"/></g><ellipse cx="17" cy="14" rx="2.5" ry="4" fill="#ffffff" opacity=".7"/>
 </svg>
 ```
 
 `icons/games/whack-a-mole.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Whack-a-Mole: a mole popping out of its mound -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="24" cy="38" rx="18" ry="6" fill="#b45309"/><ellipse cx="24" cy="36" rx="12" ry="3.5" fill="#33302e" stroke="none"/><ellipse cx="24" cy="26" rx="9" ry="11" fill="#8b5e3c"/><ellipse cx="24" cy="29" rx="3" ry="2" fill="#ff8fab"/></g><circle cx="20.5" cy="24" r="1.8" fill="#33302e"/><circle cx="27.5" cy="24" r="1.8" fill="#33302e"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="24" cy="38" rx="18" ry="6" fill="#b45309"/><ellipse cx="24" cy="36" rx="12" ry="3.5" fill="#33302e" stroke="none"/><ellipse cx="24" cy="26" rx="9" ry="11" fill="#8b5e3c"/><ellipse cx="24" cy="29" rx="3" ry="2" fill="#ff8fab"/></g><circle cx="20.5" cy="24" r="1.8" fill="#33302e"/><circle cx="27.5" cy="24" r="1.8" fill="#33302e"/>
 </svg>
 ```
 
 `icons/games/rock-paper-scissors.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Rock Paper Scissors: a pair of scissors -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M16 21L40 7M16 27l24 14" stroke="#94a3b8" stroke-width="5"/><path d="M16 21L40 7M16 27l24 14" stroke-width="1.5"/><circle cx="11" cy="14" r="6" fill="#ff6b57"/><circle cx="11" cy="34" r="6" fill="#ff6b57"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M16 21L40 7M16 27l24 14" stroke="#94a3b8" stroke-width="5"/><path d="M16 21L40 7M16 27l24 14" stroke-width="1.5"/><circle cx="11" cy="14" r="6" fill="#ff6b57"/><circle cx="11" cy="34" r="6" fill="#ff6b57"/></g>
 </svg>
 ```
 
 `icons/games/number-line-hop.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Number Line Hop: two hops along a number line -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 34h40"/><path d="M10 30v8M20 30v8M30 30v8M40 30v8"/><path d="M10 28c3-10 7-10 10 0M20 28c3-10 7-10 10 0" fill="none" stroke="#15803d" stroke-width="3"/><circle cx="30" cy="24" r="4" fill="#4ade80"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 34h40"/><path d="M10 30v8M20 30v8M30 30v8M40 30v8"/><path d="M10 28c3-10 7-10 10 0M20 28c3-10 7-10 10 0" fill="none" stroke="#15803d" stroke-width="3"/><circle cx="30" cy="24" r="4" fill="#4ade80"/></g>
 </svg>
 ```
 
 `icons/games/pond-prix.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Pond Prix: a racing kart -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M16 21l4-8h10l4 8z" fill="#c9c7f5"/><rect x="5" y="21" width="38" height="12" rx="4" fill="#ff6b57"/><circle cx="14" cy="34" r="5" fill="#33302e"/><circle cx="34" cy="34" r="5" fill="#33302e"/></g><circle cx="14" cy="34" r="2" fill="#94a3b8"/><circle cx="34" cy="34" r="2" fill="#94a3b8"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M16 21l4-8h10l4 8z" fill="#c9c7f5"/><rect x="5" y="21" width="38" height="12" rx="4" fill="#ff6b57"/><circle cx="14" cy="34" r="5" fill="#33302e"/><circle cx="34" cy="34" r="5" fill="#33302e"/></g><circle cx="14" cy="34" r="2" fill="#94a3b8"/><circle cx="34" cy="34" r="2" fill="#94a3b8"/>
 </svg>
 ```
 
 `icons/games/pebble-push.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Pebble Push: a pebble pushed towards its target -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 10h12M18 6l4 4-4 4" fill="none" stroke="#ff6b57" stroke-width="3"/><circle cx="36" cy="32" r="8" fill="none" stroke-dasharray="3 3"/><ellipse cx="17" cy="32" rx="9" ry="7" fill="#94a3b8"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 10h12M18 6l4 4-4 4" fill="none" stroke="#ff6b57" stroke-width="3"/><circle cx="36" cy="32" r="8" fill="none" stroke-dasharray="3 3"/><ellipse cx="17" cy="32" rx="9" ry="7" fill="#94a3b8"/></g>
 </svg>
 ```
 
@@ -360,70 +424,70 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 `icons/games/silly-story-builder.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Silly Story Builder: an open book -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 12c-5-4-12-4-18-2v26c6-2 13-2 18 2z" fill="#fff6ea"/><path d="M24 12c5-4 12-4 18-2v26c-6-2-13-2-18 2z" fill="#ffffff"/><path d="M10 18h9M10 24h9M29 18h9M29 24h5" stroke="#c9c7f5"/><path d="M30 31l2 3 3-4" fill="none" stroke="#ff6b57" stroke-width="3"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 12c-5-4-12-4-18-2v26c6-2 13-2 18 2z" fill="#fff6ea"/><path d="M24 12c5-4 12-4 18-2v26c-6-2-13-2-18 2z" fill="#ffffff"/><path d="M10 18h9M10 24h9M29 18h9M29 24h5" stroke="#c9c7f5"/><path d="M30 31l2 3 3-4" fill="none" stroke="#ff6b57" stroke-width="3"/></g>
 </svg>
 ```
 
 `icons/games/clock-shop.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Clock Shop: a clock face -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><circle cx="24" cy="24" r="18" fill="#ffffff"/><circle cx="24" cy="24" r="14" fill="#dbeafe" stroke="none"/><path d="M24 9v3M24 36v3M9 24h3M36 24h3"/><path d="M24 14v10l7 5" fill="none" stroke-width="3"/><circle cx="24" cy="24" r="2.2" fill="#ff6b57"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><circle cx="24" cy="24" r="18" fill="#ffffff"/><circle cx="24" cy="24" r="14" fill="#dbeafe" stroke="none"/><path d="M24 9v3M24 36v3M9 24h3M36 24h3"/><path d="M24 14v10l7 5" fill="none" stroke-width="3"/><circle cx="24" cy="24" r="2.2" fill="#ff6b57"/></g>
 </svg>
 ```
 
 `icons/games/code-the-robot.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Code the Robot: a robot's head -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 14V9"/><circle cx="24" cy="6" r="3" fill="#ff6b57"/><rect x="10" y="14" width="28" height="24" rx="6" fill="#94a3b8"/><rect x="16" y="20" width="16" height="10" rx="2" fill="#dbeafe"/><path d="M6 22v8M42 22v8"/></g><circle cx="20" cy="25" r="2" fill="#33302e"/><circle cx="28" cy="25" r="2" fill="#33302e"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 14V9"/><circle cx="24" cy="6" r="3" fill="#ff6b57"/><rect x="10" y="14" width="28" height="24" rx="6" fill="#94a3b8"/><rect x="16" y="20" width="16" height="10" rx="2" fill="#dbeafe"/><path d="M6 22v8M42 22v8"/></g><circle cx="20" cy="25" r="2" fill="#33302e"/><circle cx="28" cy="25" r="2" fill="#33302e"/>
 </svg>
 ```
 
 `icons/games/word-scramble.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Word Scramble: three jumbled letter tiles -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><g transform="rotate(-12 9 24)"><rect x="2" y="17" width="14" height="14" rx="3" fill="#ede9fe"/><path d="M5.5 21h7M9 21v7"/></g><g transform="rotate(8 24 24)"><rect x="17" y="17" width="14" height="14" rx="3" fill="#ede9fe"/><path d="M20.5 28l3.5-8 3.5 8M22 25h4" fill="none"/></g><g transform="rotate(-6 39 24)"><rect x="32" y="17" width="14" height="14" rx="3" fill="#ede9fe"/><path d="M42 21a4.5 4.5 0 1 0 0 6" fill="none"/></g></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><g transform="rotate(-12 9 24)"><rect x="2" y="17" width="14" height="14" rx="3" fill="#ede9fe"/><path d="M5.5 21h7M9 21v7"/></g><g transform="rotate(8 24 24)"><rect x="17" y="17" width="14" height="14" rx="3" fill="#ede9fe"/><path d="M20.5 28l3.5-8 3.5 8M22 25h4" fill="none"/></g><g transform="rotate(-6 39 24)"><rect x="32" y="17" width="14" height="14" rx="3" fill="#ede9fe"/><path d="M42 21a4.5 4.5 0 1 0 0 6" fill="none"/></g></g>
 </svg>
 ```
 
 `icons/games/math-puzzle.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Math Puzzle: a plus sign and an equals sign -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><circle cx="18" cy="24" r="12" fill="#fef3c7"/><path d="M12 24h12M18 18v12" stroke="#b45309" stroke-width="4"/><path d="M34 19h10M34 29h10" stroke="#2563eb" stroke-width="4"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><circle cx="18" cy="24" r="12" fill="#fef3c7"/><path d="M12 24h12M18 18v12" stroke="#b45309" stroke-width="4"/><path d="M34 19h10M34 29h10" stroke="#2563eb" stroke-width="4"/></g>
 </svg>
 ```
 
 `icons/games/geography-explorer.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Geography Explorer: a globe on its stand -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M16 42h16M24 38v4"/><circle cx="24" cy="22" r="16" fill="#60a5fa"/><path d="M14 14c4-2 8 0 8 4s-5 4-5 8-5 1-6-2 0-8 3-10zM30 26c3-1 6 1 6 4s-4 4-6 2-2-5 0-6zM28 10c3 0 5 2 4 4s-5 0-4-4z" fill="#4ade80" stroke-width="2"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M16 42h16M24 38v4"/><circle cx="24" cy="22" r="16" fill="#60a5fa"/><path d="M14 14c4-2 8 0 8 4s-5 4-5 8-5 1-6-2 0-8 3-10zM30 26c3-1 6 1 6 4s-4 4-6 2-2-5 0-6zM28 10c3 0 5 2 4 4s-5 0-4-4z" fill="#4ade80"/></g>
 </svg>
 ```
 
 `icons/games/sentence-builder.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Sentence Builder: a noun, a verb and an adjective block in a row -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="18" width="12" height="12" rx="3" fill="#dbeafe"/><rect x="18" y="18" width="12" height="12" rx="3" fill="#fee2e2"/><rect x="32" y="18" width="12" height="12" rx="3" fill="#dcfce7"/><path d="M7 24h6" stroke="#1d4ed8" stroke-width="3"/><path d="M21 24h6" stroke="#b91c1c" stroke-width="3"/><path d="M35 24h6" stroke="#15803d" stroke-width="3"/></g><circle cx="41" cy="36" r="2.2" fill="#33302e"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="18" width="12" height="12" rx="3" fill="#dbeafe"/><rect x="18" y="18" width="12" height="12" rx="3" fill="#fee2e2"/><rect x="32" y="18" width="12" height="12" rx="3" fill="#dcfce7"/><path d="M7 24h6" stroke="#1d4ed8" stroke-width="3"/><path d="M21 24h6" stroke="#b91c1c" stroke-width="3"/><path d="M35 24h6" stroke="#15803d" stroke-width="3"/></g><circle cx="41" cy="36" r="2.2" fill="#33302e"/>
 </svg>
 ```
 
 `icons/games/one-line-draw.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- One Line Draw: the house you draw without lifting the pen -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 38V18l16-10 16 10v20H8l32-20M8 18l32 20" fill="none" stroke="#7c3aed" stroke-width="3"/><circle cx="8" cy="38" r="3.5" fill="#ff6b57"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 38V18l16-10 16 10v20H8l32-20M8 18l32 20" fill="none" stroke="#7c3aed" stroke-width="3"/><circle cx="8" cy="38" r="3.5" fill="#ff6b57"/></g>
 </svg>
 ```
 
 `icons/games/stepping-stones.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Stepping Stones: stones across the pond, a frog on the far one -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><circle cx="24" cy="24" r="21" fill="#60a5fa" stroke="none"/><ellipse cx="12" cy="34" rx="8" ry="5" fill="#94a3b8"/><ellipse cx="36" cy="34" rx="8" ry="5" fill="#94a3b8"/><ellipse cx="24" cy="19" rx="8" ry="5" fill="#94a3b8"/><circle cx="24" cy="13" r="5" fill="#4ade80"/></g><circle cx="22" cy="11.5" r="1.3" fill="#33302e"/><circle cx="26" cy="11.5" r="1.3" fill="#33302e"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><circle cx="24" cy="24" r="21" fill="#60a5fa" stroke="none"/><ellipse cx="12" cy="34" rx="8" ry="5" fill="#94a3b8"/><ellipse cx="36" cy="34" rx="8" ry="5" fill="#94a3b8"/><ellipse cx="24" cy="19" rx="8" ry="5" fill="#94a3b8"/><circle cx="24" cy="13" r="5" fill="#4ade80"/></g><circle cx="22" cy="11.5" r="1.3" fill="#33302e"/><circle cx="26" cy="11.5" r="1.3" fill="#33302e"/>
 </svg>
 ```
 
 `icons/games/frozen-pond.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Frozen Pond: a snowflake on the ice -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><circle cx="24" cy="24" r="20" fill="#dbeafe"/><path d="M24 8v32M10 16l28 16M10 32l28-16" stroke="#2563eb" stroke-width="3"/><path d="M24 12l-3 3M24 12l3 3M24 36l-3-3M24 36l3-3" stroke="#2563eb" stroke-width="2.5"/><circle cx="24" cy="24" r="4" fill="#ffffff" stroke="#2563eb"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><circle cx="24" cy="24" r="20" fill="#dbeafe"/><path d="M24 8v32M10 16l28 16M10 32l28-16" stroke="#2563eb" stroke-width="3"/><path d="M24 12l-3 3M24 12l3 3M24 36l-3-3M24 36l3-3" stroke="#2563eb" stroke-width="2.5"/><circle cx="24" cy="24" r="4" fill="#ffffff" stroke="#2563eb"/></g>
 </svg>
 ```
 
@@ -454,98 +518,98 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 `icons/games/science-trivia.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Science Trivia: a flask of green liquid -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M19 6h10v12l10 18a3 3 0 0 1-3 4H12a3 3 0 0 1-3-4l10-18z" fill="#ffffff"/><path d="M15.5 30h17l4.5 8H11z" fill="#4ade80" stroke="none"/><path d="M17 6h14"/></g><circle cx="20" cy="33" r="1.5" fill="#ffffff"/><circle cx="27" cy="35" r="1.2" fill="#ffffff"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M19 6h10v12l10 18a3 3 0 0 1-3 4H12a3 3 0 0 1-3-4l10-18z" fill="#ffffff"/><path d="M15.5 30h17l4.5 8H11z" fill="#4ade80" stroke="none"/><path d="M17 6h14"/></g><circle cx="20" cy="33" r="1.5" fill="#ffffff"/><circle cx="27" cy="35" r="1.2" fill="#ffffff"/>
 </svg>
 ```
 
 `icons/games/2048-slider.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- 2048 Slider: a board with a 2 tile and a 4 tile -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="6" width="36" height="36" rx="5" fill="#d9c8ae"/><rect x="9" y="9" width="14" height="14" rx="2" fill="#fef3c7"/><rect x="25" y="9" width="14" height="14" rx="2" fill="#fbbf24"/><rect x="9" y="25" width="14" height="14" rx="2" fill="#fff6ea" stroke="none"/><rect x="25" y="25" width="14" height="14" rx="2" fill="#fff6ea" stroke="none"/><path d="M13 14c0-3 6-3 6 0 0 2-6 4-6 6h6" fill="none" stroke-width="2.2"/><path d="M34 12v9M30 12l-1 6h6" fill="none" stroke-width="2.2"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="6" width="36" height="36" rx="5" fill="#d9c8ae"/><rect x="9" y="9" width="14" height="14" rx="2" fill="#fef3c7"/><rect x="25" y="9" width="14" height="14" rx="2" fill="#fbbf24"/><rect x="9" y="25" width="14" height="14" rx="2" fill="#fff6ea" stroke="none"/><rect x="25" y="25" width="14" height="14" rx="2" fill="#fff6ea" stroke="none"/><path d="M13 14c0-3 6-3 6 0 0 2-6 4-6 6h6" fill="none" stroke-width="2.2"/><path d="M34 12v9M30 12l-1 6h6" fill="none" stroke-width="2.2"/></g>
 </svg>
 ```
 
 `icons/games/minesweeper.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Minesweeper: a mine and a flag -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M20 12v6M20 38v6M4 28h6M30 28h6M9 17l4 4M27 35l4 4M9 39l4-4M27 21l4-4" stroke-width="3"/><circle cx="20" cy="28" r="10" fill="#33302e"/><path d="M38 6v18"/><path d="M38 6l8 4-8 4z" fill="#ff6b57"/></g><circle cx="17" cy="25" r="2" fill="#ffffff"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M20 12v6M20 38v6M4 28h6M30 28h6M9 17l4 4M27 35l4 4M9 39l4-4M27 21l4-4" stroke-width="3"/><circle cx="20" cy="28" r="10" fill="#33302e"/><path d="M38 6v18"/><path d="M38 6l8 4-8 4z" fill="#ff6b57"/></g><circle cx="17" cy="25" r="2" fill="#ffffff"/>
 </svg>
 ```
 
 `icons/games/sudoku.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Sudoku: a grid with a few cells filled -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="6" width="36" height="36" rx="3" fill="#ffffff"/><path d="M18 6v36M30 6v36M6 18h36M6 30h36" stroke-width="2"/></g><circle cx="12" cy="12" r="3" fill="#2563eb"/><circle cx="36" cy="24" r="3" fill="#2563eb"/><circle cx="24" cy="36" r="3" fill="#2563eb"/><circle cx="24" cy="12" r="3" fill="#ff6b57"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="6" width="36" height="36" rx="3" fill="#ffffff"/><path d="M18 6v36M30 6v36M6 18h36M6 30h36" stroke-width="2"/></g><circle cx="12" cy="12" r="3" fill="#2563eb"/><circle cx="36" cy="24" r="3" fill="#2563eb"/><circle cx="24" cy="36" r="3" fill="#2563eb"/><circle cx="24" cy="12" r="3" fill="#ff6b57"/>
 </svg>
 ```
 
 `icons/games/word-guess.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Word Guess: a row of guess tiles and a question mark -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="16" width="9" height="10" rx="2" fill="#94a3b8"/><rect x="15" y="16" width="9" height="10" rx="2" fill="#fbbf24"/><rect x="26" y="16" width="9" height="10" rx="2" fill="#4ade80"/><rect x="37" y="16" width="9" height="10" rx="2" fill="#4ade80"/><path d="M20 34c0-4 8-4 8 0 0 3-4 3-4 6" fill="none"/></g><circle cx="24" cy="43" r="1.8" fill="#33302e"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="16" width="9" height="10" rx="2" fill="#94a3b8"/><rect x="15" y="16" width="9" height="10" rx="2" fill="#fbbf24"/><rect x="26" y="16" width="9" height="10" rx="2" fill="#4ade80"/><rect x="37" y="16" width="9" height="10" rx="2" fill="#4ade80"/><path d="M20 34c0-4 8-4 8 0 0 3-4 3-4 6" fill="none"/></g><circle cx="24" cy="43" r="1.8" fill="#33302e"/>
 </svg>
 ```
 
 `icons/games/laser-mirrors.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Laser Mirrors: a beam bouncing off a mirror to its target -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 34h14V14" fill="none" stroke="#ef4444" stroke-width="3.5"/><path d="M18 40l12-12" stroke="#60a5fa" stroke-width="5"/><rect x="2" y="30" width="8" height="8" rx="2" fill="#ff6b57"/><circle cx="24" cy="10" r="4.5" fill="#fbbf24"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 34h14V14" fill="none" stroke="#ef4444" stroke-width="3.5"/><path d="M18 40l12-12" stroke="#60a5fa" stroke-width="5"/><rect x="2" y="30" width="8" height="8" rx="2" fill="#ff6b57"/><circle cx="24" cy="10" r="4.5" fill="#fbbf24"/></g>
 </svg>
 ```
 
 `icons/games/twist-cube.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Twist Cube: one face of a 2x2 cube and a twist arrow -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="8" width="28" height="28" rx="4" fill="#33302e"/><path d="M40 16a12 12 0 0 1 0 16M38 28l2 5 4-3" fill="none" stroke="#ff6b57" stroke-width="3"/></g><rect x="9" y="11" width="10" height="10" rx="2" fill="#ef4444"/><rect x="21" y="11" width="10" height="10" rx="2" fill="#fbbf24"/><rect x="9" y="23" width="10" height="10" rx="2" fill="#4ade80"/><rect x="21" y="23" width="10" height="10" rx="2" fill="#60a5fa"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="8" width="28" height="28" rx="4" fill="#33302e"/><path d="M40 16a12 12 0 0 1 0 16M38 28l2 5 4-3" fill="none" stroke="#ff6b57" stroke-width="3"/></g><rect x="9" y="11" width="10" height="10" rx="2" fill="#ef4444"/><rect x="21" y="11" width="10" height="10" rx="2" fill="#fbbf24"/><rect x="9" y="23" width="10" height="10" rx="2" fill="#4ade80"/><rect x="21" y="23" width="10" height="10" rx="2" fill="#60a5fa"/>
 </svg>
 ```
 
 `icons/games/log-jam.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Log Jam: logs in a frame, the coral one slides out -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="5" y="5" width="38" height="38" rx="4" fill="#dcfce7"/><rect x="9" y="10" width="18" height="6" rx="3" fill="#8b5e3c"/><rect x="29" y="10" width="6" height="18" rx="3" fill="#8b5e3c"/><rect x="9" y="21" width="12" height="6" rx="3" fill="#ff6b57"/><rect x="9" y="32" width="22" height="6" rx="3" fill="#8b5e3c"/><path d="M36 24h6M39 21l3 3-3 3" fill="none" stroke-width="2"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="5" y="5" width="38" height="38" rx="4" fill="#dcfce7"/><rect x="9" y="10" width="18" height="6" rx="3" fill="#8b5e3c"/><rect x="29" y="10" width="6" height="18" rx="3" fill="#8b5e3c"/><rect x="9" y="21" width="12" height="6" rx="3" fill="#ff6b57"/><rect x="9" y="32" width="22" height="6" rx="3" fill="#8b5e3c"/><path d="M36 24h6M39 21l3 3-3 3" fill="none" stroke-width="2"/></g>
 </svg>
 ```
 
 `icons/games/molecule-lab.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Molecule Lab: a water molecule -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 24L12 36M24 24l12 12"/><circle cx="24" cy="19" r="10" fill="#ef4444"/><circle cx="11" cy="36" r="6" fill="#ffffff"/><circle cx="37" cy="36" r="6" fill="#ffffff"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 24L12 36M24 24l12 12"/><circle cx="24" cy="19" r="10" fill="#ef4444"/><circle cx="11" cy="36" r="6" fill="#ffffff"/><circle cx="37" cy="36" r="6" fill="#ffffff"/></g>
 </svg>
 ```
 
 `icons/games/projectile-range.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Projectile Range: a ball on its arc towards the target -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 42h40"/><path d="M8 36c6-26 22-26 32-6" fill="none" stroke-dasharray="3 3"/><rect x="3" y="31" width="10" height="7" rx="2" fill="#94a3b8"/><circle cx="18" cy="17" r="4" fill="#33302e"/><circle cx="40" cy="35" r="5" fill="#ff6b57"/></g><circle cx="40" cy="35" r="2" fill="#ffffff"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 42h40"/><path d="M8 36c6-26 22-26 32-6" fill="none" stroke-dasharray="3 3"/><rect x="3" y="31" width="10" height="7" rx="2" fill="#94a3b8"/><circle cx="18" cy="17" r="4" fill="#33302e"/><circle cx="40" cy="35" r="5" fill="#ff6b57"/></g><circle cx="40" cy="35" r="2" fill="#ffffff"/>
 </svg>
 ```
 
 `icons/games/logic-gates.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Logic Gates: an AND gate with two inputs on and the output lit -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 18h10M4 30h10M40 24h5"/><path d="M14 10h12a14 14 0 0 1 0 28H14z" fill="#dbeafe"/><circle cx="43" cy="24" r="3" fill="#fbbf24"/></g><circle cx="7" cy="18" r="2.5" fill="#4ade80"/><circle cx="7" cy="30" r="2.5" fill="#4ade80"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 18h10M4 30h10M40 24h5"/><path d="M14 10h12a14 14 0 0 1 0 28H14z" fill="#dbeafe"/><circle cx="43" cy="24" r="3" fill="#fbbf24"/></g><circle cx="7" cy="18" r="2.5" fill="#4ade80"/><circle cx="7" cy="30" r="2.5" fill="#4ade80"/>
 </svg>
 ```
 
 `icons/games/plans-and-elevations.svg`
 ```svg
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Plans and Elevations: a cube and its plan view -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 4h10v10H4zM9 4v10M4 9h10" fill="#ffffff" stroke-width="2"/><path d="M12 20l14-7 14 7-14 7z" fill="#fff6ea"/><path d="M12 20v14l14 7V27z" fill="#c9c7f5"/><path d="M40 20v14l-14 7V27z" fill="#7c3aed"/></g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Plans & Elevations: a cube and its plan view -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 4h10v10H4zM9 4v10M4 9h10" fill="#ffffff"/><path d="M12 20l14-7 14 7-14 7z" fill="#fff6ea"/><path d="M12 20v14l14 7V27z" fill="#c9c7f5"/><path d="M40 20v14l-14 7V27z" fill="#7c3aed"/></g>
 </svg>
 ```
 
 `icons/games/net-folding.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Net Folding: the cross-shaped net of a cube -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M18 4h12v12h12v12H30v12H18V28H6V16h12z" fill="#dcfce7"/><path d="M18 16h12v12H18z" fill="#ff6b57"/><path d="M18 16V4M30 16V4M18 28v12M30 28v12M6 16h12M30 16h12M6 28h12M30 28h12" stroke-width="2"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M18 4h12v12h12v12H30v12H18V28H6V16h12z" fill="#dcfce7"/><path d="M18 16h12v12H18z" fill="#ff6b57"/><path d="M18 16V4M30 16V4M18 28v12M30 28v12M6 16h12M30 16h12M6 28h12M30 28h12" stroke-width="2"/></g>
 </svg>
 ```
 
 - [ ] **Step 2: Run the test; coverage must now pass**
 
 Run: `node --test docs/tests/icons.test.js`
-Expected: `icons/games: every file obeys the style rules`, `no two pictures are the same file` and `every game in the catalogue has an icon, and no icon is an orphan` all PASS. Only the critters/mark tests still fail.
+Expected: `icons/games: every file obeys the style rules`, `no two files draw the same picture` and `every game in the catalogue has an icon, and no icon is an orphan` all PASS. Only the critters/mark tests still fail.
 
 - [ ] **Step 3: Render a contact sheet and look at it once**
 
@@ -590,28 +654,28 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 `icons/critters/clover.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 60"><!-- Clover the Bunny: cream fur, one floppy ear -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M22 26c-4-10-4-20 0-24 4 4 6 14 6 22z" fill="#fff1e4"/><path d="M22 22c-2-7-2-14 0-16 2 2 3 9 3 14z" fill="#ffadc2" stroke="none"/><path d="M40 26c6-8 10-14 16-14-1 6-6 12-12 16z" fill="#fff1e4"/><path d="M42 24c4-5 7-9 11-10-1 4-5 8-9 11z" fill="#ffadc2" stroke="none"/><ellipse cx="32" cy="38" rx="20" ry="17" fill="#fff1e4"/><path d="M28 46q4 3 8 0" fill="none" stroke-width="2"/></g><circle cx="25" cy="36" r="3" fill="#33302e"/><circle cx="39" cy="36" r="3" fill="#33302e"/><circle cx="26" cy="35" r="1" fill="#ffffff"/><circle cx="40" cy="35" r="1" fill="#ffffff"/><ellipse cx="32" cy="42" rx="2.2" ry="1.6" fill="#ff94b0"/><circle cx="19" cy="42" r="3" fill="#ffadc2" opacity=".7"/><circle cx="45" cy="42" r="3" fill="#ffadc2" opacity=".7"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M22 26c-4-10-4-20 0-24 4 4 6 14 6 22z" fill="#fff1e4"/><path d="M22 22c-2-7-2-14 0-16 2 2 3 9 3 14z" fill="#ffadc2" stroke="none"/><path d="M40 26c6-8 10-14 16-14-1 6-6 12-12 16z" fill="#fff1e4"/><path d="M42 24c4-5 7-9 11-10-1 4-5 8-9 11z" fill="#ffadc2" stroke="none"/><ellipse cx="32" cy="38" rx="20" ry="17" fill="#fff1e4"/><path d="M28 46q4 3 8 0" fill="none" stroke-width="2"/></g><circle cx="25" cy="36" r="3" fill="#33302e"/><circle cx="39" cy="36" r="3" fill="#33302e"/><circle cx="26" cy="35" r="1" fill="#ffffff"/><circle cx="40" cy="35" r="1" fill="#ffffff"/><ellipse cx="32" cy="42" rx="2.2" ry="1.6" fill="#ff94b0"/><circle cx="19" cy="42" r="3" fill="#ffadc2" opacity=".7"/><circle cx="45" cy="42" r="3" fill="#ffadc2" opacity=".7"/>
 </svg>
 ```
 
 `icons/critters/pip.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 60"><!-- Pip the Frog: green, eyes on top -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="32" cy="40" rx="22" ry="16" fill="#97df86"/><circle cx="20" cy="24" r="8" fill="#97df86"/><circle cx="44" cy="24" r="8" fill="#97df86"/><path d="M22 44q10 6 20 0" fill="none" stroke-width="2.2"/></g><circle cx="20" cy="24" r="4" fill="#33302e"/><circle cx="44" cy="24" r="4" fill="#33302e"/><circle cx="21.5" cy="22.5" r="1.3" fill="#ffffff"/><circle cx="45.5" cy="22.5" r="1.3" fill="#ffffff"/><circle cx="14" cy="42" r="3" fill="#ffadc2" opacity=".6"/><circle cx="50" cy="42" r="3" fill="#ffadc2" opacity=".6"/><circle cx="26" cy="34" r="2" fill="#7cc86f"/><circle cx="40" cy="33" r="1.6" fill="#7cc86f"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="32" cy="40" rx="22" ry="16" fill="#97df86"/><circle cx="20" cy="24" r="8" fill="#97df86"/><circle cx="44" cy="24" r="8" fill="#97df86"/><path d="M22 44q10 6 20 0" fill="none" stroke-width="2.2"/></g><circle cx="20" cy="24" r="4" fill="#33302e"/><circle cx="44" cy="24" r="4" fill="#33302e"/><circle cx="21.5" cy="22.5" r="1.3" fill="#ffffff"/><circle cx="45.5" cy="22.5" r="1.3" fill="#ffffff"/><circle cx="14" cy="42" r="3" fill="#ffadc2" opacity=".6"/><circle cx="50" cy="42" r="3" fill="#ffadc2" opacity=".6"/><circle cx="26" cy="34" r="2" fill="#7cc86f"/><circle cx="40" cy="33" r="1.6" fill="#7cc86f"/>
 </svg>
 ```
 
 `icons/critters/plum.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 60"><!-- Plum the Baby Dino: lilac, peach spikes, cream tummy -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M20 20l4-9 4 9M28 16l4-9 4 9M36 20l4-9 4 9" fill="#ffb48f"/><ellipse cx="32" cy="38" rx="21" ry="17" fill="#c2b2fb"/><ellipse cx="32" cy="46" rx="11" ry="7" fill="#fff0d4" stroke="none"/><path d="M27 42q5 4 10 0" fill="none" stroke-width="2"/></g><circle cx="24" cy="35" r="3" fill="#33302e"/><circle cx="40" cy="35" r="3" fill="#33302e"/><circle cx="25" cy="34" r="1" fill="#ffffff"/><circle cx="41" cy="34" r="1" fill="#ffffff"/><circle cx="29" cy="39" r="1" fill="#8f7ad8"/><circle cx="35" cy="39" r="1" fill="#8f7ad8"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M20 20l4-9 4 9M28 16l4-9 4 9M36 20l4-9 4 9" fill="#ffb48f"/><ellipse cx="32" cy="38" rx="21" ry="17" fill="#c2b2fb"/><ellipse cx="32" cy="46" rx="11" ry="7" fill="#fff0d4" stroke="none"/><path d="M27 42q5 4 10 0" fill="none" stroke-width="2"/></g><circle cx="24" cy="35" r="3" fill="#33302e"/><circle cx="40" cy="35" r="3" fill="#33302e"/><circle cx="25" cy="34" r="1" fill="#ffffff"/><circle cx="41" cy="34" r="1" fill="#ffffff"/><circle cx="29" cy="39" r="1" fill="#8f7ad8"/><circle cx="35" cy="39" r="1" fill="#8f7ad8"/>
 </svg>
 ```
 
 `icons/critters/mango.svg`
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 60"><!-- Mango the Kitten: orange with stripes and whiskers -->
-<g stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M14 30L12 8l16 10z" fill="#ffcf9c"/><path d="M50 30L52 8 36 18z" fill="#ffcf9c"/><path d="M16 26l-1-12 9 6z" fill="#ffb3c6" stroke="none"/><path d="M48 26l1-12-9 6z" fill="#ffb3c6" stroke="none"/><ellipse cx="32" cy="38" rx="21" ry="16" fill="#ffcf9c"/><path d="M26 23l2 6M32 22v6M38 23l-2 6" stroke="#f4a35c" stroke-width="3"/><path d="M30 41h4l-2 2z" fill="#ff8fab" stroke-width="1.5"/><path d="M28 46q4 2 8 0M8 38l12 2M8 44l12-1M56 38l-12 2M56 44l-12-1" fill="none" stroke-width="2"/></g><circle cx="24" cy="36" r="3" fill="#33302e"/><circle cx="40" cy="36" r="3" fill="#33302e"/><circle cx="25" cy="35" r="1" fill="#ffffff"/><circle cx="41" cy="35" r="1" fill="#ffffff"/>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M14 30L12 8l16 10z" fill="#ffcf9c"/><path d="M50 30L52 8 36 18z" fill="#ffcf9c"/><path d="M16 26l-1-12 9 6z" fill="#ffb3c6" stroke="none"/><path d="M48 26l1-12-9 6z" fill="#ffb3c6" stroke="none"/><ellipse cx="32" cy="38" rx="21" ry="16" fill="#ffcf9c"/><path d="M26 23l2 6M32 22v6M38 23l-2 6" stroke="#f4a35c" stroke-width="3"/><path d="M30 41h4l-2 2z" fill="#ff8fab" stroke="none"/><path d="M28 46q4 2 8 0M8 38l12 2M8 44l12-1M56 38l-12 2M56 44l-12-1" fill="none" stroke-width="2"/></g><circle cx="24" cy="36" r="3" fill="#33302e"/><circle cx="40" cy="36" r="3" fill="#33302e"/><circle cx="25" cy="35" r="1" fill="#ffffff"/><circle cx="41" cy="35" r="1" fill="#ffffff"/>
 </svg>
 ```
 
