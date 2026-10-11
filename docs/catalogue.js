@@ -144,11 +144,20 @@ module.exports = {
     { slug: 'word-guess', name: 'Word Guess', emoji: '🔠', age: '14', mins: '5',
       skills: ['reading', 'logic'],
       practises: 'Vocabulary and deduction — narrowing 14,000 possible words down with each guess.' },
+    { slug: 'laser-mirrors', name: 'Laser Mirrors', emoji: '🔦', age: '14', mins: '15',
+      skills: ['logic', 'world'],
+      practises: 'The law of reflection (angle in = angle out) and the spatial reasoning to follow a beam through several bounces: turn mirrors and splitters so laser beams light every crystal at once, with double crystals and red, blue and purple light in the later groups. 24 levels, each checked by computer to have one answer, with undo, reset and solver hints.' },
     { slug: 'twist-cube', name: 'Twist Cube', emoji: '🧊', age: '14', mins: '10',
       skills: ['logic'],
       practises: 'Reading a notation (U, D, L, R, F, B, and ′ for anticlockwise) and working backwards: a scramble of up to 10 twists is undone by reversing the order and flipping each twist. It also builds 3D spatial reasoning, keeping track of the faces as the whole cube turns.' },
     { slug: 'log-jam', name: 'Log Jam', emoji: '🪵', age: '14', mins: '15',
       skills: ['logic'],
-      practises: 'Planning several moves ahead and reasoning backwards from the goal: which log has to move before that one can? 36 levels from warm-up to expert, each with its fewest-moves target proved by computer, with undo, restart and hints from a real solver.' }
+      practises: 'Planning several moves ahead and reasoning backwards from the goal: which log has to move before that one can? 36 levels from warm-up to expert, each with its fewest-moves target proved by computer, with undo, restart and hints from a real solver.' },
+    { slug: 'molecule-lab', name: 'Molecule Lab', emoji: '⚗️', age: '14', mins: '15',
+      skills: ['world', 'logic'],
+      practises: 'Covalent bonding as taught at GCSE: how many bonds each atom makes (H 1, Cl 1, O 2, N 3, C 4), single, double and triple bonds, and turning a formula into a structure, with isomers told apart (ethanol and methoxymethane are both C₂H₆O). Each finished molecule relaxes into its VSEPR shape and names its bond angle, so shapes of molecules come for free.' },
+    { slug: 'projectile-range', name: 'Projectile Range', emoji: '🎯', age: '14', mins: '15',
+      skills: ['world', 'numbers'],
+      practises: 'Projectile motion as taught at GCSE and A level: choosing a launch angle and speed, then checking the measured time of flight, highest point and range against R = v² sin 2θ / g and the other formulas worked out with your own numbers. Walls, raised platforms, complementary angles, the Moon, Mars and a heavy planet, and a three-shot round with narrow targets; predict the range first for a bonus within 5%.' }
   ]
 };
