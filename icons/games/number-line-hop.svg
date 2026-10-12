@@ -1,3 +1,3 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Number Line Hop: two hops along a number line -->
-<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 34h40"/><path d="M10 30v8M20 30v8M30 30v8M40 30v8"/><path d="M10 28c3-10 7-10 10 0M20 28c3-10 7-10 10 0" fill="none" stroke="#15803d" stroke-width="3"/><circle cx="30" cy="24" r="4" fill="#4ade80"/></g>
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 29h40"/><path d="M10 25v8M20 25v8M30 25v8M40 25v8"/><path d="M10 23c3-10 7-10 10 0M20 23c3-10 7-10 10 0" fill="none" stroke="#15803d" stroke-width="3"/><circle cx="30" cy="19" r="4" fill="#4ade80"/></g>
 </svg>
