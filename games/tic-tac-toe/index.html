@@ -133,7 +133,7 @@
       .cell {
         width: 90px;
         height: 90px;
-        background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+        background: white;
         border: 3px solid #333;
         border-radius: 15px;
         display: flex;
@@ -147,7 +147,7 @@
       }
 
       .cell:hover:not(.taken) {
-        background: linear-gradient(45deg, #e8e8e8, #d8d8d8);
+        background: var(--color-amber-tint);
         transform: scale(1.05);
       }
 
@@ -156,17 +156,15 @@
       }
 
       .cell.x {
-        color: #ff6b6b;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        color: var(--wc-verb);
       }
 
       .cell.o {
-        color: #4ecdc4;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        color: var(--wc-noun);
       }
 
       .cell.winning {
-        background: linear-gradient(45deg, #a8e6cf, #88d8c0);
+        background: var(--color-green-tint);
         animation: pulse 0.5s ease infinite alternate;
       }
 
