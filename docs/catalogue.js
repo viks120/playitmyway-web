@@ -143,7 +143,7 @@ module.exports = {
       practises: 'Constraint reasoning and elimination. Every puzzle has exactly one solution, so correct logic is never punished.' },
     { slug: 'word-guess', name: 'Word Guess', age: '14', mins: '5',
       skills: ['reading', 'logic'],
-      practises: 'Vocabulary and deduction — narrowing 14,000 possible words down with each guess.' },
+      practises: 'Vocabulary and deduction — narrowing thousands of five, six and seven-letter words down with each guess.' },
     { slug: 'laser-mirrors', name: 'Laser Mirrors', age: '14', mins: '15',
       skills: ['logic', 'world'],
       practises: 'The law of reflection (angle in = angle out) and the spatial reasoning to follow a beam through several bounces: turn mirrors and splitters so laser beams light every crystal at once, with double crystals and red, blue and purple light in the later groups. 24 levels, each checked by computer to have one answer, with undo, reset and solver hints.' },
