@@ -1570,3 +1570,88 @@ Re-render the contact sheet from Task 5 (same HTML and Chrome command, one Chrom
 git add icons/games
 git commit -m "style(icons): polish from the set review; the one-line house gains its ceiling edge, dashes survive 36px, five icons centred, bubble recoloured"
 ```
+
+---
+
+### Task 14: Critter and icon fixes from the artwork review
+
+**Files:**
+- Modify: `icons/critters/plum.svg`, `icons/critters/pip.svg`, `icons/critters/mango.svg`, `icons/games/first-strokes.svg`, `icons/games/projectile-range.svg`, `icons/games/sentence-builder.svg`, `icons/games/dot-to-dot.svg`
+
+The review of Tasks 6 and 13 found Plum's spikes drawn as three open shapes floating above the head with unstroked bases (the fill closed them implicitly and background showed underneath). Each spike is now a closed triangle whose base sits inside the head, and the head is drawn over it. The smaller items: Pip's cheeks were translucent pink over green (muddy) and overlapped the outline, and a spot nicked an eye; Mango's forehead stripes covered the head's top outline; First Strokes sat high and Projectile Range low; Sentence Builder's blue and green bars ran into their block walls; Dot to Dot's dashes had a 1-unit gap that reads solid at 36px. Each file below is the complete new content.
+
+- [ ] **Step 1: Write the seven files**
+
+`icons/critters/plum.svg`
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 60"><!-- Plum the Baby Dino: lilac, peach spikes, cream tummy -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M19 26L24 11l5 15zM27 24L32 7l5 17zM35 26L40 11l5 15z" fill="#ffb48f"/><ellipse cx="32" cy="38" rx="21" ry="17" fill="#c2b2fb"/><ellipse cx="32" cy="46" rx="11" ry="7" fill="#fff0d4" stroke="none"/><path d="M27 42q5 4 10 0" fill="none" stroke-width="2"/></g><circle cx="24" cy="35" r="3" fill="#33302e"/><circle cx="40" cy="35" r="3" fill="#33302e"/><circle cx="25" cy="34" r="1" fill="#ffffff"/><circle cx="41" cy="34" r="1" fill="#ffffff"/><circle cx="29" cy="39" r="1" fill="#8f7ad8"/><circle cx="35" cy="39" r="1" fill="#8f7ad8"/>
+</svg>
+```
+
+`icons/critters/pip.svg`
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 60"><!-- Pip the Frog: green, eyes on top -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="32" cy="40" rx="22" ry="16" fill="#97df86"/><circle cx="20" cy="24" r="8" fill="#97df86"/><circle cx="44" cy="24" r="8" fill="#97df86"/><path d="M22 44q10 6 20 0" fill="none" stroke-width="2.2"/></g><circle cx="20" cy="24" r="4" fill="#33302e"/><circle cx="44" cy="24" r="4" fill="#33302e"/><circle cx="21.5" cy="22.5" r="1.3" fill="#ffffff"/><circle cx="45.5" cy="22.5" r="1.3" fill="#ffffff"/><circle cx="15" cy="42" r="3" fill="#ffadc2"/><circle cx="49" cy="42" r="3" fill="#ffadc2"/><circle cx="26" cy="34" r="2" fill="#7cc86f"/><circle cx="41" cy="36" r="1.6" fill="#7cc86f"/>
+</svg>
+```
+
+`icons/critters/mango.svg`
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 60"><!-- Mango the Kitten: orange with stripes and whiskers -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M14 30L12 8l16 10z" fill="#ffcf9c"/><path d="M50 30L52 8 36 18z" fill="#ffcf9c"/><path d="M16 26l-1-12 9 6z" fill="#ffb3c6" stroke="none"/><path d="M48 26l1-12-9 6z" fill="#ffb3c6" stroke="none"/><ellipse cx="32" cy="38" rx="21" ry="16" fill="#ffcf9c"/><path d="M26 27l2 6M32 26v6M38 27l-2 6" stroke="#f4a35c" stroke-width="3"/><path d="M30 41h4l-2 2z" fill="#ff8fab" stroke="none"/><path d="M28 46q4 2 8 0M8 38l12 2M8 44l12-1M56 38l-12 2M56 44l-12-1" fill="none" stroke-width="2"/></g><circle cx="24" cy="36" r="3" fill="#33302e"/><circle cx="40" cy="36" r="3" fill="#33302e"/><circle cx="25" cy="35" r="1" fill="#ffffff"/><circle cx="41" cy="35" r="1" fill="#ffffff"/>
+</svg>
+```
+
+`icons/games/first-strokes.svg` (moved down 2 to centre)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- First Strokes: a crayon drawing a zigzag -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M5 38l7-12 7 12 7-12" fill="none" stroke-width="7"/><path d="M5 38l7-12 7 12 7-12" fill="none" stroke="#ff6b57" stroke-width="3.5"/><g transform="rotate(35 27 27)"><rect x="23" y="2" width="8" height="20" rx="2" fill="#fbbf24"/><path d="M23 22l4 5 4-5z" fill="#fbbf24"/><rect x="23" y="4" width="8" height="4" fill="#2b2a5e" stroke="none"/></g></g>
+</svg>
+```
+
+`icons/games/projectile-range.svg` (moved up 3 to centre)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Projectile Range: a ball on its arc towards the target -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 39h40"/><path d="M8 33c6-26 22-26 32-6" fill="none" stroke-dasharray="3 5"/><rect x="3" y="28" width="10" height="7" rx="2" fill="#94a3b8"/><circle cx="18" cy="14" r="4" fill="#33302e"/><circle cx="40" cy="32" r="5" fill="#ff6b57"/></g><circle cx="40" cy="32" r="2" fill="#ffffff"/>
+</svg>
+```
+
+`icons/games/sentence-builder.svg` (bars clear their block walls)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Sentence Builder: a noun, a verb and an adjective block in a row -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="15" width="12" height="12" rx="3" fill="#dbeafe"/><rect x="18" y="15" width="12" height="12" rx="3" fill="#fee2e2"/><rect x="32" y="15" width="12" height="12" rx="3" fill="#dcfce7"/><path d="M7 21h6" stroke="#1d4ed8" stroke-width="3"/><path d="M22.5 21h3" stroke="#b91c1c" stroke-width="3"/><path d="M35 21h6" stroke="#15803d" stroke-width="3"/></g><circle cx="41" cy="33" r="2.2" fill="#33302e"/>
+</svg>
+```
+
+`icons/games/dot-to-dot.svg` (dash gap widened)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Dot to Dot: four dots joined by a dashed line -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 7L40 24 24 41 8 24z" stroke-width="2" stroke-dasharray="4 5"/><circle cx="24" cy="7" r="4" fill="#7c3aed"/><circle cx="40" cy="24" r="4" fill="#7c3aed"/><circle cx="24" cy="41" r="4" fill="#7c3aed"/><circle cx="8" cy="24" r="4" fill="#7c3aed"/></g>
+</svg>
+```
+
+- [ ] **Step 2: Test and render the critters once**
+
+Run: `node --test docs/tests/icons.test.js`
+Expected: all 7 PASS.
+
+Write this to the scratchpad as `critters-sheet.html` and screenshot it with one headless Chrome at 700×260; Read the PNG and confirm Plum's spikes now grow out of the head with no gap, Pip's cheeks are solid pink inside the outline, and Mango's stripes sit inside the head.
+
+```html
+<!doctype html><meta charset="utf-8"><title>critters</title>
+<style>body{margin:16px;background:#2b2a5e;display:flex;gap:24px;align-items:flex-end}img{display:block}.m{background:#fff8ef;padding:8px;border-radius:12px}</style>
+<img src="file:///C:/Users/shrik/playitmyway-web/icons/critters/clover.svg" width="144" height="135">
+<img src="file:///C:/Users/shrik/playitmyway-web/icons/critters/pip.svg" width="144" height="135">
+<img src="file:///C:/Users/shrik/playitmyway-web/icons/critters/plum.svg" width="144" height="135">
+<img src="file:///C:/Users/shrik/playitmyway-web/icons/critters/mango.svg" width="144" height="135">
+<span class="m"><img src="file:///C:/Users/shrik/playitmyway-web/icons/mark.svg" width="64" height="64"></span>
+<span class="m"><img src="file:///C:/Users/shrik/playitmyway-web/icons/mark.svg" width="16" height="16"></span>
+```
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add icons/critters icons/games
+git commit -m "style(icons): Plum's spikes grow from the head; small fixes to Pip, Mango and four game icons"
+```
