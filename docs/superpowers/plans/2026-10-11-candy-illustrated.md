@@ -950,15 +950,19 @@ Change the section comment above `.hero` (line 35) from `/* --- Hero: flat deep 
 Replace the `.game-grid` rule (line 142) with:
 
 ```css
-/* auto-fit (not auto-fill) so a short row collapses its empty tracks and the
-   cards centre; the 190px cap stops a two-game band stretching to half-page slabs */
+/* Flex rows, not a grid: every row centres itself, so a band of two cards is
+   two card-sized cards in the middle, and a part-filled last row sits centred
+   under the full ones. Cards grow from 150px to a 190px cap, which still
+   gives six to a row at full width. */
 .game-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 190px));
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-4);
 }
 ```
+
+and add `flex: 1 1 150px;` and `max-width: 190px;` to the `.game-card` rule, right after its `flex-direction: column;` line. (A grid with a 190px track cap fitted only five tracks per row, so a six-game band wrapped to five plus one lone card at the left; that was the first version of this step.)
 
 After the `.game-icon` rule (line 178) add:
 
@@ -988,7 +992,22 @@ Inside the `@media (max-width: 560px)` block, after the `.hero` rule there, add:
   }
 ```
 
-Inside the `@media (max-width: 480px)` block, after the `.game-icon` rule there, add:
+Inside the `@media (max-width: 480px)` block, the existing `.game-grid` rule there must now also switch the display back to a grid, and the `.game-card` rule there lifts the cap, so the two phone columns fill their width:
+
+```css
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+
+  .game-card {
+    padding: var(--space-4) var(--space-2);
+    max-width: none;
+  }
+```
+
+and after the `.game-icon` rule there, add:
 
 ```css
   .game-icon img {
