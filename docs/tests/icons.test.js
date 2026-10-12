@@ -205,3 +205,37 @@ test('the four critters and the mark exist', () => {
   assert.deepEqual(allFiles('icons/critters'), ['clover.svg', 'mango.svg', 'pip.svg', 'plum.svg']);
   assert.ok(exists('icons', 'mark.svg'));
 });
+
+/* Pages that show game cards: no card may still hold an emoji, and every
+ * picture must point at a file that exists. `up` is the page's path back to
+ * the site root. */
+function checkCards(page, up) {
+  const html = read(...page.split('/'));
+  const cards = Array.from(html.matchAll(/<span class="game-icon" aria-hidden="true">([\s\S]*?)<\/span>/g));
+  assert.ok(cards.length > 0, `${page}: no game cards found`);
+  for (const [, inner] of cards) {
+    /* the prefix group is '' at the root and '../' one folder down */
+    const m = inner.trim().match(/^<img src="((?:\.\.\/)*)icons\/games\/([a-z0-9-]+)\.svg" alt="" width="44" height="44">$/);
+    assert.ok(m, `${page}: a card still holds ${JSON.stringify(inner.trim())}`);
+    assert.equal(m[1], up, `${page}: icon path prefix should be ${JSON.stringify(up)}`);
+    assert.ok(exists('icons', 'games', m[2] + '.svg'), `${page}: ${m[2]}.svg does not exist`);
+  }
+  return cards.length;
+}
+
+function checkHero(page, up) {
+  const html = read(...page.split('/'));
+  assert.ok(html.includes('<header class="hero has-critters">'), `${page}: hero needs has-critters`);
+  assert.ok(html.includes(`<img class="hero-mark" src="${up}icons/mark.svg" alt="" width="44" height="44">`), `${page}: hero mark missing`);
+  for (const c of ['clover', 'pip', 'plum', 'mango']) {
+    assert.ok(html.includes(`<img src="${up}icons/critters/${c}.svg" alt="" width="72" height="68">`), `${page}: ${c} missing from the hero`);
+  }
+  const h1 = html.match(/<h1>([\s\S]*?)<\/h1>/)[1];
+  assert.ok(!hasPicto(h1), `${page}: the title still holds an emoji`);
+}
+
+test('homepage: every card shows its icon, the hero has the mark and the critters', () => {
+  assert.equal(checkCards('index.html', ''), C.games.length);
+  checkHero('index.html', '');
+  assert.ok(read('index.html').includes('<meta name="theme-color" content="#2b2a5e" />'));
+});

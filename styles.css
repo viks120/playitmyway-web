@@ -32,14 +32,29 @@ body {
   font-weight: 600;
 }
 
-/* --- Hero: flat deep band, no gradient, no text shadows ------------------ */
+/* --- Hero: deep band with confetti dots, no text shadows ----------------- */
 
 .hero {
+  position: relative;
   text-align: center;
   color: var(--color-deep-ink);
-  background: var(--color-deep);
   padding: var(--space-7) var(--space-4) var(--space-6);
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  /* confetti: four dot layers on different tile sizes so they never line up
+     into a grid. Pure CSS, no asset, and it stays behind the text. */
+  background-color: var(--color-deep);
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(251, 191, 36, 0.5) 2px, transparent 3px),
+    radial-gradient(circle at 70% 60%, rgba(255, 107, 87, 0.5) 2.5px, transparent 3.5px),
+    radial-gradient(circle at 40% 85%, rgba(201, 199, 245, 0.55) 1.5px, transparent 2.5px),
+    radial-gradient(circle at 85% 15%, rgba(74, 222, 128, 0.45) 2px, transparent 3px);
+  background-size: 90px 70px, 120px 90px, 70px 110px, 150px 130px;
+}
+
+/* homepage and catalogue: room for the critters standing on the bottom edge */
+.hero.has-critters {
+  padding-bottom: 64px;
+  margin-bottom: 36px;
 }
 
 /* The vw term has to be able to win on a phone: with an em-based minimum
@@ -49,6 +64,37 @@ body {
   font-size: clamp(1.75rem, 7.5vw, 3.4em);
   font-weight: 700;
   line-height: 1.05;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+/* the brand mark, sized from the heading itself */
+.hero-mark {
+  width: 0.9em;
+  height: 0.9em;
+  flex: none;
+}
+
+.hero-critters {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -36px;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.hero-critters img {
+  display: block;
+  width: 72px;
+  height: 68px;
+  filter: drop-shadow(0 4px 0 rgba(43, 42, 94, 0.18));
 }
 
 .tagline {
@@ -139,9 +185,12 @@ body {
   color: var(--color-ink-soft);
 }
 
+/* auto-fit (not auto-fill) so a short row collapses its empty tracks and the
+   cards centre; the 190px cap stops a two-game band stretching to half-page slabs */
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 190px));
+  justify-content: center;
   gap: var(--space-4);
 }
 
@@ -185,6 +234,12 @@ body {
   background: var(--band-tint);
   font-size: 2.4em;
   line-height: 1;
+}
+
+.game-icon img {
+  display: block;
+  width: 44px;
+  height: 44px;
 }
 
 .game-card:hover .game-icon {
@@ -325,6 +380,20 @@ body {
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   }
 
+  .hero.has-critters {
+    padding-bottom: 52px;
+    margin-bottom: 28px;
+  }
+
+  .hero-critters {
+    bottom: -28px;
+  }
+
+  .hero-critters img {
+    width: 56px;
+    height: 53px;
+  }
+
   .tagline {
     margin-top: var(--space-1);
   }
@@ -388,5 +457,10 @@ body {
     width: 60px;
     height: 60px;
     font-size: 2em;
+  }
+
+  .game-icon img {
+    width: 36px;
+    height: 36px;
   }
 }
