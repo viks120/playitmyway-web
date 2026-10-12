@@ -35,6 +35,7 @@ test('three lengths, each with answers and a guess list of the right width', () 
     }
   }
   assert.equal(D.a5.length, 528, 'the original five-letter answers are kept as they were');
+  assert.deepEqual([D.g6.length / 6, D.g7.length / 7], [15232, 23109], 'the ENABLE six- and seven-letter lists, complete');
 });
 
 test('the page loads the lists from words.js and no longer embeds them', () => {
@@ -44,5 +45,6 @@ test('the page loads the lists from words.js and no longer embeds them', () => {
   assert.ok(!page.includes('var DATA = {'), 'the old inline DATA literal is still there');
   assert.ok(page.includes('var LENGTHS = [5, 6, 7];'), 'the page must draw from three lengths');
   assert.ok(page.includes('repeat(var(--cols, 5), 1fr)'), 'the row grid must follow --cols');
-  assert.ok(!/five-letter/i.test(page), 'the copy still promises five letters');
+  const copy = page.replace(/<meta name="keywords"[^>]*>/, '');
+  assert.ok(!/five-letter|\b5[- ]letter\b/i.test(copy), 'the copy still promises five letters');
 });
