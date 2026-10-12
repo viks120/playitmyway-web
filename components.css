@@ -86,6 +86,15 @@
   text-decoration: underline;
 }
 
+/* Game-page title icon: the game's own picture from icons/games/, sized from
+   the heading so it sits on the text's centre line at any heading size. */
+.title-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.12em;
+  margin-right: 0.15em;
+}
+
 /* ==========================================================================
    App shell — the bottom bar, shown ONLY when running as an installed app.
 

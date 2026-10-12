@@ -263,3 +263,14 @@ test('the service worker precaches every icon', () => {
   for (const c of ['clover', 'pip', 'plum', 'mango']) assert.ok(sw.includes(`"/icons/critters/${c}.svg"`));
   assert.ok(sw.includes('"/icons/mark.svg"'));
 });
+
+test('every game page shows its icon in the title instead of an emoji', () => {
+  for (const g of C.games) {
+    const html = read('games', g.slug, 'index.html');
+    const m = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/);
+    assert.ok(m, `${g.slug}: no <h1>`);
+    assert.ok(m[1].startsWith(`<img class="title-icon" src="../../icons/games/${g.slug}.svg" alt="" width="40" height="40"> `), `${g.slug}: title does not start with its icon`);
+    assert.ok(!hasPicto(m[1]), `${g.slug}: title still holds an emoji`);
+    assert.ok(!m[1].includes('<span aria-hidden="true">'), `${g.slug}: title still has an emoji span`);
+  }
+});
