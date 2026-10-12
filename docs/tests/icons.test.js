@@ -86,7 +86,7 @@ function violations(name, svg, f, game) {
   else if (game && !comments[0].startsWith(`<!-- ${game.name}: `)) v.push(`comment must start with the catalogue name ${JSON.stringify(game.name)}`);
   const body = svg.replace(/<!--[\s\S]*?-->/g, '');
   const lower = body.toLowerCase();
-  for (const bad of ['<text', 'gradient', '<filter', '<script', '<image', '<style', '<title', '<desc', '<metadata', '<foreignobject', 'href=', 'url(', 'style=', '@font-face']) {
+  for (const bad of ['<text', 'gradient', '<filter', '<script', '<image', '<style', '<title', '<desc', '<metadata', '<foreignobject', 'href=', 'url(', 'style=', '@font-face', 'opacity=']) {
     if (lower.includes(bad)) v.push(`must not contain ${bad}`);
   }
   if (/\son[a-z]+=/i.test(body)) v.push('must not contain event handler attributes');
@@ -146,6 +146,7 @@ test('the style checker catches what it must', () => {
     [box.replace('/>', ' stroke-linecap="butt"/>'), 'round joins and caps'],
     [box.replace('#ffffff', '#123456'), 'not in the palette'],
     [box.replace('/>', ' style="fill:#000"/>'), 'style='],
+    [box.replace('/>', ' opacity=".5"/>'), 'opacity='],
     [box.replace('x="4"', "x='4'"), 'double-quoted'],
     [box.replace('x="4"', 'x = "4"'), 'double-quoted'],
     [box.replace('/>', ' onclick="x()"/>'), 'event handler'],
@@ -227,11 +228,14 @@ function checkHero(page, up) {
   const html = read(...page.split('/'));
   assert.ok(html.includes('<header class="hero has-critters">'), `${page}: hero needs has-critters`);
   assert.ok(html.includes(`<img class="hero-mark" src="${up}icons/mark.svg" alt="" width="44" height="44">`), `${page}: hero mark missing`);
-  for (const c of ['clover', 'pip', 'plum', 'mango']) {
-    assert.ok(html.includes(`<img src="${up}icons/critters/${c}.svg" alt="" width="72" height="68">`), `${page}: ${c} missing from the hero`);
-  }
-  const h1 = html.match(/<h1>([\s\S]*?)<\/h1>/)[1];
-  assert.ok(!hasPicto(h1), `${page}: the title still holds an emoji`);
+  const list = html.match(/<ul class="hero-critters" aria-hidden="true">([\s\S]*?)<\/ul>/);
+  assert.ok(list, `${page}: hero-critters list missing`);
+  const expected = ['clover', 'pip', 'plum', 'mango']
+    .map((c) => `<li><img src="${up}icons/critters/${c}.svg" alt="" width="72" height="68"></li>`).join('');
+  assert.equal(list[1].replace(/\s+/g, ''), expected.replace(/\s+/g, ''), `${page}: the critters must be clover, pip, plum, mango in that order and nothing else`);
+  const h1 = html.match(/<h1>([\s\S]*?)<\/h1>/);
+  assert.ok(h1, `${page}: no <h1>`);
+  assert.ok(!hasPicto(h1[1]), `${page}: the title still holds an emoji`);
 }
 
 test('homepage: every card shows its icon, the hero has the mark and the critters', () => {
