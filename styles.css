@@ -185,11 +185,13 @@ body {
   color: var(--color-ink-soft);
 }
 
-/* auto-fit (not auto-fill) so a short row collapses its empty tracks and the
-   cards centre; the 190px cap stops a two-game band stretching to half-page slabs */
+/* Flex rows, not a grid: every row centres itself, so a band of two cards is
+   two card-sized cards in the middle, and a part-filled last row sits centred
+   under the full ones. Cards grow from 150px to a 190px cap, which still
+   gives six to a row at full width. */
 .game-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 190px));
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-4);
 }
@@ -197,6 +199,8 @@ body {
 .game-card {
   display: flex;
   flex-direction: column;
+  flex: 1 1 150px;
+  max-width: 190px;
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-5) var(--space-3);
@@ -445,12 +449,14 @@ body {
   }
 
   .game-grid {
+    display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-3);
   }
 
   .game-card {
     padding: var(--space-4) var(--space-2);
+    max-width: none;
   }
 
   .game-icon {
