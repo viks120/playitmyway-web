@@ -1454,3 +1454,119 @@ Read both and confirm: no emoji left in any card, critters on both heroes, the m
 - [ ] **Step 3: Report**
 
 Report to the user: the branch name, the commit list (`git log --oneline main..candy-illustrated`), the two final screenshots, and that `main` has not been touched. Pushing is the user's decision; the command that avoids the account-picker dialog is `git -c credential.https://github.com.username=viks120 push origin main` after a fast-forward merge.
+
+---
+
+### Task 13: Icon polish after the set review
+
+**Files:**
+- Modify: `icons/games/one-line-draw.svg`, `first-strokes.svg`, `trace-shapes.svg`, `trace-letters.svg`, `trace-name.svg`, `pebble-push.svg`, `projectile-range.svg`, `laser-mirrors.svg`, `word-guess.svg`, `whack-a-mole.svg`, `number-line-hop.svg`, `sentence-builder.svg`, `sound-it-out.svg`
+
+The review of the finished set found polish worth doing before the icons go on pages: the one-line house had no ceiling edge, so it could not be drawn in one stroke; dashed "trace me" cues with a 3-unit gap vanish under round caps at 36px; the crayon pointed away from its zigzag; five icons sat visibly off-centre in their discs; the purple speech bubble resembled a well-known streaming logo. Each file below is the complete new content.
+
+- [ ] **Step 1: Write the thirteen files**
+
+`icons/games/one-line-draw.svg` (adds the ceiling edge `M8 18h32`, leaving exactly two odd vertices so the figure is drawable from the start dot)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- One Line Draw: the house you draw without lifting the pen -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 38V18l16-10 16 10v20H8l32-20M8 18l32 20M8 18h32" fill="none" stroke="#7c3aed" stroke-width="3"/><circle cx="8" cy="38" r="3.5" fill="#ff6b57"/></g>
+</svg>
+```
+
+`icons/games/first-strokes.svg` (the crayon tip now meets the end of the zigzag, and nothing touches the box edge)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- First Strokes: a crayon drawing a zigzag -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M5 36l7-12 7 12 7-12" fill="none" stroke-width="7"/><path d="M5 36l7-12 7 12 7-12" fill="none" stroke="#ff6b57" stroke-width="3.5"/><g transform="rotate(35 27 25)"><rect x="23" y="0" width="8" height="20" rx="2" fill="#fbbf24"/><path d="M23 20l4 5 4-5z" fill="#fbbf24"/><rect x="23" y="2" width="8" height="4" fill="#2b2a5e" stroke="none"/></g></g>
+</svg>
+```
+
+`icons/games/trace-shapes.svg` (dash gap widened; moved down 3 so the start dot clears the top)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Trace Shapes: a star to trace, with the start dot -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 8l5.5 12 13 1.5-9.5 9 2.5 13L24 37l-11.5 6.5 2.5-13-9.5-9 13-1.5z" fill="#fbbf24" stroke-dasharray="4 6"/><circle cx="24" cy="8" r="3.5" fill="#ff6b57"/></g>
+</svg>
+```
+
+`icons/games/trace-letters.svg` (dash gap widened)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Trace Letters & Numbers: a capital A on its guide -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 40L24 8l14 32M15.5 28h17" fill="none" stroke="#c9c7f5" stroke-width="7"/><path d="M10 40L24 8l14 32M15.5 28h17" fill="none" stroke-dasharray="4 6"/><circle cx="10" cy="40" r="3.5" fill="#ff6b57"/></g>
+</svg>
+```
+
+`icons/games/trace-name.svg` (dash gap widened)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Trace Your Name: a name tag with a heart -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="11" width="40" height="26" rx="6" fill="#fff6ea"/><path d="M12 31h24" stroke-dasharray="3 5"/><path d="M24 26c-5-4-7-6-7-9a3.5 3.5 0 0 1 7-1 3.5 3.5 0 0 1 7 1c0 3-2 5-7 9z" fill="#ff6b57"/></g>
+</svg>
+```
+
+`icons/games/pebble-push.svg` (dash gap widened)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Pebble Push: a pebble pushed towards its target -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 10h12M18 6l4 4-4 4" fill="none" stroke="#ff6b57" stroke-width="3"/><circle cx="36" cy="32" r="8" fill="none" stroke-dasharray="3 5"/><ellipse cx="17" cy="32" rx="9" ry="7" fill="#94a3b8"/></g>
+</svg>
+```
+
+`icons/games/projectile-range.svg` (dash gap widened)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Projectile Range: a ball on its arc towards the target -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 42h40"/><path d="M8 36c6-26 22-26 32-6" fill="none" stroke-dasharray="3 5"/><rect x="3" y="31" width="10" height="7" rx="2" fill="#94a3b8"/><circle cx="18" cy="17" r="4" fill="#33302e"/><circle cx="40" cy="35" r="5" fill="#ff6b57"/></g><circle cx="40" cy="35" r="2" fill="#ffffff"/>
+</svg>
+```
+
+`icons/games/laser-mirrors.svg` (moved right 7 to centre)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Laser Mirrors: a beam bouncing off a mirror to its target -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M17 34h14V14" fill="none" stroke="#ef4444" stroke-width="3.5"/><path d="M25 40l12-12" stroke="#60a5fa" stroke-width="5"/><rect x="9" y="30" width="8" height="8" rx="2" fill="#ff6b57"/><circle cx="31" cy="10" r="4.5" fill="#fbbf24"/></g>
+</svg>
+```
+
+`icons/games/word-guess.svg` (moved up 6 to centre)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Word Guess: a row of guess tiles and a question mark -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="10" width="9" height="10" rx="2" fill="#94a3b8"/><rect x="15" y="10" width="9" height="10" rx="2" fill="#fbbf24"/><rect x="26" y="10" width="9" height="10" rx="2" fill="#4ade80"/><rect x="37" y="10" width="9" height="10" rx="2" fill="#4ade80"/><path d="M20 28c0-4 8-4 8 0 0 3-4 3-4 6" fill="none"/></g><circle cx="24" cy="37" r="1.8" fill="#33302e"/>
+</svg>
+```
+
+`icons/games/whack-a-mole.svg` (moved up 5 to centre)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Whack-a-Mole: a mole popping out of its mound -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="24" cy="33" rx="18" ry="6" fill="#b45309"/><ellipse cx="24" cy="31" rx="12" ry="3.5" fill="#33302e" stroke="none"/><ellipse cx="24" cy="21" rx="9" ry="11" fill="#8b5e3c"/><ellipse cx="24" cy="24" rx="3" ry="2" fill="#ff8fab"/></g><circle cx="20.5" cy="19" r="1.8" fill="#33302e"/><circle cx="27.5" cy="19" r="1.8" fill="#33302e"/>
+</svg>
+```
+
+`icons/games/number-line-hop.svg` (moved up 5 to centre)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Number Line Hop: two hops along a number line -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 29h40"/><path d="M10 25v8M20 25v8M30 25v8M40 25v8"/><path d="M10 23c3-10 7-10 10 0M20 23c3-10 7-10 10 0" fill="none" stroke="#15803d" stroke-width="3"/><circle cx="30" cy="19" r="4" fill="#4ade80"/></g>
+</svg>
+```
+
+`icons/games/sentence-builder.svg` (moved up 3; the word bars now differ in length, as words do)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Sentence Builder: a noun, a verb and an adjective block in a row -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="15" width="12" height="12" rx="3" fill="#dbeafe"/><rect x="18" y="15" width="12" height="12" rx="3" fill="#fee2e2"/><rect x="32" y="15" width="12" height="12" rx="3" fill="#dcfce7"/><path d="M6.5 21h7" stroke="#1d4ed8" stroke-width="3"/><path d="M22 21h4" stroke="#b91c1c" stroke-width="3"/><path d="M34 21h8" stroke="#15803d" stroke-width="3"/></g><circle cx="41" cy="33" r="2.2" fill="#33302e"/>
+</svg>
+```
+
+`icons/games/sound-it-out.svg` (yellow bubble with ink bars and a centred tail, so it resembles no brand)
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Sound It Out: a speech bubble with sound bars -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 9h32v23H26l-6 7v-7H8z" fill="#fbbf24"/><path d="M17 17v7M24 14v13M31 17v7" stroke-width="3.5"/></g>
+</svg>
+```
+
+- [ ] **Step 2: Test, re-render the contact sheet, look once**
+
+Run: `node --test docs/tests/icons.test.js`
+Expected: all 7 PASS.
+
+Re-render the contact sheet from Task 5 (same HTML and Chrome command, one Chrome only) to `contact.png` in the scratchpad and Read it: the thirteen changed icons sit centred, the dashes show at 36px, the crayon touches its zigzag, the bubble is yellow.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add icons/games
+git commit -m "style(icons): polish from the set review; the one-line house gains its ceiling edge, dashes survive 36px, five icons centred, bubble recoloured"
+```
