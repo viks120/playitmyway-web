@@ -89,9 +89,9 @@
 /* Game-page title icon: the game's own picture from icons/games/, sized from
    the heading so it sits on the text's centre line at any heading size. */
 .title-icon {
-  width: 1em;
-  height: 1em;
-  vertical-align: -0.12em;
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: -0.2em;
   margin-right: 0.15em;
 }
 
