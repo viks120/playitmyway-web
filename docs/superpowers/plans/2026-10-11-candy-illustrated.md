@@ -576,6 +576,8 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 ### Task 5: Icons for the 14+ games (13 files) and the contact sheet
 
+> Executed 2026-10-12. The contact-sheet check redrew two of the files below: `sudoku.svg` (the dotted grid read as Tic Tac Toe at 36px; now a numbered grid with digits drawn as paths) and `net-folding.svg` (the plus of five squares was not a cube net; now the six-square cross). The shipped files are the record; this section keeps the first versions.
+
 **Files:**
 - Create: `icons/games/science-trivia.svg`, `2048-slider.svg`, `minesweeper.svg`, `sudoku.svg`, `word-guess.svg`, `laser-mirrors.svg`, `twist-cube.svg`, `log-jam.svg`, `molecule-lab.svg`, `projectile-range.svg`, `logic-gates.svg`, `plans-and-elevations.svg`, `net-folding.svg`
 - Scratchpad only (not committed): `contact-sheet.html`
@@ -1368,6 +1370,8 @@ Run: `node --test docs/tests/icons.test.js`
 Expected: FAILS with `memory-game still has a gradient`.
 
 - [ ] **Step 2: Memory Match**
+
+> Executed 2026-10-12. The final review added one more change here: the card template's `❓` emoji became a plain `?`, so the back shows a white question mark on the teal (the spec's "ink question mark"), not an OS-drawn glyph.
 
 In `games/memory-game/index.html`:
 
