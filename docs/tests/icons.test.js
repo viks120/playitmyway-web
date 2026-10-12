@@ -274,3 +274,20 @@ test('every game page shows its icon in the title instead of an emoji', () => {
     assert.ok(!m[1].includes('<span aria-hidden="true">'), `${g.slug}: title still has an emoji span`);
   }
 });
+
+/* The August restyle left fifteen gradients behind. The old-palette ones
+ * (coral-to-teal and friends) are gone; the ones that ARE the game (a sky,
+ * the ground, a colour channel) stay and say so in a comment on the line above. */
+test('legacy gradients: only game-content ones remain, each with a kept comment', () => {
+  for (const slug of ['memory-game', 'word-scramble', 'geography-explorer', 'tic-tac-toe']) {
+    assert.ok(!read('games', slug, 'index.html').includes('linear-gradient'), `${slug} still has a gradient`);
+  }
+  for (const slug of ['balloon-pop', 'catch-falling-object', 'whack-a-mole', 'color-matcher']) {
+    const lines = read('games', slug, 'index.html').split('\n');
+    lines.forEach((line, i) => {
+      if (line.includes('linear-gradient')) {
+        assert.ok(/\/\* kept: /.test(lines[i - 1]), `${slug} line ${i + 1}: gradient without a "kept:" comment above it`);
+      }
+    });
+  }
+});
