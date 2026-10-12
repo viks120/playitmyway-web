@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><!-- Sort It Out: a circle and a triangle dropping into two boxes -->
+<g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="24" width="18" height="18" rx="3" fill="#60a5fa"/><rect x="26" y="24" width="18" height="18" rx="3" fill="#fbbf24"/><circle cx="13" cy="11" r="5" fill="#ef4444"/><path d="M35 5l6 11H29z" fill="#4ade80"/><path d="M13 18v4M35 18v4" stroke-dasharray="2 2"/></g>
+</svg>
