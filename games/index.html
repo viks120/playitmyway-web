@@ -8,7 +8,7 @@
     <meta name="color-scheme" content="only light" />
     <!-- and the same to the Dark Reader extension, which darkens pages itself -->
     <meta name="darkreader-lock" />
-    <meta name="theme-color" content="#c2410c" />
+    <meta name="theme-color" content="#2b2a5e" />
 
     <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
 
@@ -372,7 +372,7 @@
     <style>
       .page-intro {
         max-width: 760px;
-        margin: 0 auto 8px;
+        margin: 12px auto 8px;
         padding: 0 20px;
         text-align: center;
         color: var(--color-ink-soft);
@@ -388,14 +388,20 @@
     </style>
   </head>
   <body>
-    <header class="hero">
-      <h1>🎮 All Games</h1>
+    <header class="hero has-critters">
+      <h1><img class="hero-mark" src="../icons/mark.svg" alt="" width="44" height="44">All Games</h1>
       <p class="tagline">45 games. Every one worth playing.</p>
       <ul class="trust-badges">
         <li>No ads. Ever.</li>
         <li>No tracking. Ever.</li>
         <li>Nothing stored. Ever.</li>
         <li>Free. Actually free.</li>
+      </ul>
+      <ul class="hero-critters" aria-hidden="true">
+        <li><img src="../icons/critters/clover.svg" alt="" width="72" height="68"></li>
+        <li><img src="../icons/critters/pip.svg" alt="" width="72" height="68"></li>
+        <li><img src="../icons/critters/plum.svg" alt="" width="72" height="68"></li>
+        <li><img src="../icons/critters/mango.svg" alt="" width="72" height="68"></li>
       </ul>
     </header>
 
@@ -412,19 +418,19 @@
         <p class="age-outcome">First lines and curves, and colours and animals named out loud.</p>
         <div class="game-grid">
           <a class="game-card" href="first-strokes/">
-            <span class="game-icon" aria-hidden="true">🖍️</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/first-strokes.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">First Strokes</span>
             <span class="game-card-age">2+</span>
             <span class="game-card-mins">~5 min</span>
           </a>
           <a class="game-card" href="rainbow-balloons/">
-            <span class="game-icon" aria-hidden="true">🌈</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/rainbow-balloons.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Rainbow Balloons</span>
             <span class="game-card-age">2+</span>
             <span class="game-card-mins">~5 min</span>
           </a>
           <a class="game-card" href="farm-friends/">
-            <span class="game-icon" aria-hidden="true">🐮</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/farm-friends.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Farm Friends</span>
             <span class="game-card-age">2+</span>
             <span class="game-card-mins">~5 min</span>
@@ -437,55 +443,55 @@
         <p class="age-outcome">Counting, colours, memory and first pen strokes.</p>
         <div class="game-grid">
           <a class="game-card" href="trace-shapes/">
-            <span class="game-icon" aria-hidden="true">⭐</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/trace-shapes.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Trace Shapes</span>
             <span class="game-card-age">3+</span>
             <span class="game-card-mins">~5 min</span>
           </a>
           <a class="game-card" href="trace-letters/">
-            <span class="game-icon" aria-hidden="true">🔤</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/trace-letters.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Trace Letters &amp; Numbers</span>
             <span class="game-card-age">3+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="trace-name/">
-            <span class="game-icon" aria-hidden="true">💖</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/trace-name.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Trace Your Name</span>
             <span class="game-card-age">3+</span>
             <span class="game-card-mins">~5 min</span>
           </a>
           <a class="game-card" href="memory-game/">
-            <span class="game-icon" aria-hidden="true">🧠</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/memory-game.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Memory Match</span>
             <span class="game-card-age">3+</span>
             <span class="game-card-mins">~5 min</span>
           </a>
           <a class="game-card" href="color-matcher/">
-            <span class="game-icon" aria-hidden="true">🎨</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/color-matcher.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Color Matcher</span>
             <span class="game-card-age">3+</span>
             <span class="game-card-mins">~5 min</span>
           </a>
           <a class="game-card" href="counting-game/">
-            <span class="game-icon" aria-hidden="true">🔢</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/counting-game.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Count With Me</span>
             <span class="game-card-age">3+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="dot-to-dot/">
-            <span class="game-icon" aria-hidden="true">🔢</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/dot-to-dot.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Dot to Dot</span>
             <span class="game-card-age">3+</span>
             <span class="game-card-mins">~5 min</span>
           </a>
           <a class="game-card" href="drawing-pad/">
-            <span class="game-icon" aria-hidden="true">🖍️</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/drawing-pad.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Drawing Pad</span>
             <span class="game-card-age">3+</span>
             <span class="game-card-mins">open-ended</span>
           </a>
           <a class="game-card" href="peekaboo-pond/">
-            <span class="game-icon" aria-hidden="true">🌸</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/peekaboo-pond.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Peekaboo Pond</span>
             <span class="game-card-age">3+</span>
             <span class="game-card-mins">~5 min</span>
@@ -498,61 +504,61 @@
         <p class="age-outcome">Phonics, sorting, quick reactions and fair play.</p>
         <div class="game-grid">
           <a class="game-card" href="sound-it-out/">
-            <span class="game-icon" aria-hidden="true">🗣️</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/sound-it-out.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Sound It Out</span>
             <span class="game-card-age">5+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="sort-it-out/">
-            <span class="game-icon" aria-hidden="true">🧺</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/sort-it-out.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Sort It Out</span>
             <span class="game-card-age">5+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="tic-tac-toe/">
-            <span class="game-icon" aria-hidden="true">⭕</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/tic-tac-toe.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Tic Tac Toe</span>
             <span class="game-card-age">5+</span>
             <span class="game-card-mins">~3 min</span>
           </a>
           <a class="game-card" href="catch-falling-object/">
-            <span class="game-icon" aria-hidden="true">🍎</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/catch-falling-object.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Catch the Fruit</span>
             <span class="game-card-age">5+</span>
             <span class="game-card-mins">~3 min</span>
           </a>
           <a class="game-card" href="balloon-pop/">
-            <span class="game-icon" aria-hidden="true">🎈</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/balloon-pop.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Balloon Pop</span>
             <span class="game-card-age">5+</span>
             <span class="game-card-mins">~3 min</span>
           </a>
           <a class="game-card" href="whack-a-mole/">
-            <span class="game-icon" aria-hidden="true">🔨</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/whack-a-mole.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Whack-a-Mole</span>
             <span class="game-card-age">5+</span>
             <span class="game-card-mins">~3 min</span>
           </a>
           <a class="game-card" href="rock-paper-scissors/">
-            <span class="game-icon" aria-hidden="true">✊</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/rock-paper-scissors.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Rock Paper Scissors</span>
             <span class="game-card-age">5+</span>
             <span class="game-card-mins">~3 min</span>
           </a>
           <a class="game-card" href="number-line-hop/">
-            <span class="game-icon" aria-hidden="true">🐾</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/number-line-hop.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Number Line Hop</span>
             <span class="game-card-age">5+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="pond-prix/">
-            <span class="game-icon" aria-hidden="true">🏎️</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/pond-prix.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Pond Prix</span>
             <span class="game-card-age">5+</span>
             <span class="game-card-mins">~5 min</span>
           </a>
           <a class="game-card" href="pebble-push/">
-            <span class="game-icon" aria-hidden="true">🪨</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/pebble-push.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Pebble Push</span>
             <span class="game-card-age">5+</span>
             <span class="game-card-mins">~10 min</span>
@@ -565,61 +571,61 @@
         <p class="age-outcome">Time, grammar, coding, maps and logic.</p>
         <div class="game-grid">
           <a class="game-card" href="silly-story-builder/">
-            <span class="game-icon" aria-hidden="true">📖</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/silly-story-builder.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Silly Story Builder</span>
             <span class="game-card-age">7+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="clock-shop/">
-            <span class="game-icon" aria-hidden="true">🕰️</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/clock-shop.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Clock Shop</span>
             <span class="game-card-age">7+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="code-the-robot/">
-            <span class="game-icon" aria-hidden="true">🤖</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/code-the-robot.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Code the Robot</span>
             <span class="game-card-age">7+</span>
             <span class="game-card-mins">~15 min</span>
           </a>
           <a class="game-card" href="word-scramble/">
-            <span class="game-icon" aria-hidden="true">🔤</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/word-scramble.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Word Scramble</span>
             <span class="game-card-age">7+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="math-puzzle/">
-            <span class="game-icon" aria-hidden="true">➕</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/math-puzzle.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Math Puzzle</span>
             <span class="game-card-age">7+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="geography-explorer/">
-            <span class="game-icon" aria-hidden="true">🌍</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/geography-explorer.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Geography Explorer</span>
             <span class="game-card-age">7+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="sentence-builder/">
-            <span class="game-icon" aria-hidden="true">📝</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/sentence-builder.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Sentence Builder</span>
             <span class="game-card-age">7+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="one-line-draw/">
-            <span class="game-icon" aria-hidden="true">✏️</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/one-line-draw.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">One Line Draw</span>
             <span class="game-card-age">7+</span>
             <span class="game-card-mins">~15 min</span>
           </a>
           <a class="game-card" href="stepping-stones/">
-            <span class="game-icon" aria-hidden="true">🐸</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/stepping-stones.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Stepping Stones</span>
             <span class="game-card-age">7+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="frozen-pond/">
-            <span class="game-icon" aria-hidden="true">❄️</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/frozen-pond.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Frozen Pond</span>
             <span class="game-card-age">7+</span>
             <span class="game-card-mins">~10 min</span>
@@ -632,79 +638,79 @@
         <p class="age-outcome">Real puzzles — sudoku, circuits, molecules, forces and 3D shapes.</p>
         <div class="game-grid">
           <a class="game-card" href="science-trivia/">
-            <span class="game-icon" aria-hidden="true">🔬</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/science-trivia.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Science Trivia</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="2048-slider/">
-            <span class="game-icon" aria-hidden="true">🧩</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/2048-slider.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">2048 Slider</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="minesweeper/">
-            <span class="game-icon" aria-hidden="true">💣</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/minesweeper.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Minesweeper</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="sudoku/">
-            <span class="game-icon" aria-hidden="true">9️⃣</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/sudoku.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Sudoku</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~20 min</span>
           </a>
           <a class="game-card" href="word-guess/">
-            <span class="game-icon" aria-hidden="true">🔠</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/word-guess.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Word Guess</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~5 min</span>
           </a>
           <a class="game-card" href="laser-mirrors/">
-            <span class="game-icon" aria-hidden="true">🔦</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/laser-mirrors.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Laser Mirrors</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~15 min</span>
           </a>
           <a class="game-card" href="twist-cube/">
-            <span class="game-icon" aria-hidden="true">🧊</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/twist-cube.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Twist Cube</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~10 min</span>
           </a>
           <a class="game-card" href="log-jam/">
-            <span class="game-icon" aria-hidden="true">🪵</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/log-jam.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Log Jam</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~15 min</span>
           </a>
           <a class="game-card" href="molecule-lab/">
-            <span class="game-icon" aria-hidden="true">⚗️</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/molecule-lab.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Molecule Lab</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~15 min</span>
           </a>
           <a class="game-card" href="projectile-range/">
-            <span class="game-icon" aria-hidden="true">🎯</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/projectile-range.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Projectile Range</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~15 min</span>
           </a>
           <a class="game-card" href="logic-gates/">
-            <span class="game-icon" aria-hidden="true">💡</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/logic-gates.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Logic Gates</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~15 min</span>
           </a>
           <a class="game-card" href="plans-and-elevations/">
-            <span class="game-icon" aria-hidden="true">🧱</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/plans-and-elevations.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Plans &amp; Elevations</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~15 min</span>
           </a>
           <a class="game-card" href="net-folding/">
-            <span class="game-icon" aria-hidden="true">📦</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/net-folding.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">Net Folding</span>
             <span class="game-card-age">14+</span>
             <span class="game-card-mins">~10 min</span>

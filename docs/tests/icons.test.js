@@ -239,3 +239,27 @@ test('homepage: every card shows its icon, the hero has the mark and the critter
   checkHero('index.html', '');
   assert.ok(read('index.html').includes('<meta name="theme-color" content="#2b2a5e" />'));
 });
+
+test('catalogue and 404: every card shows its icon; the catalogue hero has the critters', () => {
+  assert.equal(checkCards('games/index.html', '../'), C.games.length);
+  checkHero('games/index.html', '../');
+  assert.equal(checkCards('404.html', ''), 6);
+});
+
+test('for grown-ups: every table row shows its icon', () => {
+  const html = read('for-teachers.html');
+  for (const g of C.games) {
+    assert.ok(html.includes(`<a href="games/${g.slug}/"><img class="row-icon" src="icons/games/${g.slug}.svg" alt="" width="22" height="22"> `), `${g.slug} row has no icon`);
+  }
+});
+
+test('the catalogue carries no game emoji any more', () => {
+  for (const g of C.games) assert.equal(g.emoji, undefined, `${g.slug} still has an emoji field`);
+});
+
+test('the service worker precaches every icon', () => {
+  const sw = read('sw.js');
+  for (const g of C.games) assert.ok(sw.includes(`"/icons/games/${g.slug}.svg"`), `${g.slug}.svg not precached`);
+  for (const c of ['clover', 'pip', 'plum', 'mango']) assert.ok(sw.includes(`"/icons/critters/${c}.svg"`));
+  assert.ok(sw.includes('"/icons/mark.svg"'));
+});
