@@ -27,7 +27,7 @@ function head(opts) {
     <meta name="color-scheme" content="only light" />
     <!-- and the same to the Dark Reader extension, which darkens pages itself -->
     <meta name="darkreader-lock" />
-    <meta name="theme-color" content="#c2410c" />
+    <meta name="theme-color" content="#2b2a5e" />
 
     <link rel="icon" type="image/svg+xml" href="${opts.up}favicon.svg" />
 
@@ -122,7 +122,7 @@ const FOOT = (up) => `
 
 const PAGE_CSS = `      .page-intro {
         max-width: 760px;
-        margin: 0 auto 8px;
+        margin: 12px auto 8px;
         padding: 0 20px;
         text-align: center;
         color: var(--color-ink-soft);
@@ -169,6 +169,7 @@ const TEACHER_CSS = `      .tbl-wrap {
       table.games td.g { white-space: nowrap; font-weight: 600; }
       table.games td.g a { color: var(--color-primary-deep); text-decoration: none; }
       table.games td.g a:hover { text-decoration: underline; }
+      table.games .row-icon { width: 22px; height: 22px; vertical-align: -5px; margin-right: 4px; }
       td.age { white-space: nowrap; font-variant-numeric: tabular-nums; }
       .note {
         max-width: 760px;
@@ -224,14 +225,20 @@ function buildGamesIndex() {
   });
 
   h += `
-    <header class="hero">
-      <h1>🎮 All Games</h1>
+    <header class="hero has-critters">
+      <h1><img class="hero-mark" src="../icons/mark.svg" alt="" width="44" height="44">All Games</h1>
       <p class="tagline">${C.games.length} games. Every one worth playing.</p>
       <ul class="trust-badges">
         <li>No ads. Ever.</li>
         <li>No tracking. Ever.</li>
         <li>Nothing stored. Ever.</li>
         <li>Free. Actually free.</li>
+      </ul>
+      <ul class="hero-critters" aria-hidden="true">
+        <li><img src="../icons/critters/clover.svg" alt="" width="72" height="68"></li>
+        <li><img src="../icons/critters/pip.svg" alt="" width="72" height="68"></li>
+        <li><img src="../icons/critters/plum.svg" alt="" width="72" height="68"></li>
+        <li><img src="../icons/critters/mango.svg" alt="" width="72" height="68"></li>
       </ul>
     </header>
 
@@ -256,7 +263,7 @@ function buildGamesIndex() {
     for (const g of games) {
       h += `
           <a class="game-card" href="${g.slug}/">
-            <span class="game-icon" aria-hidden="true">${g.emoji}</span>
+            <span class="game-icon" aria-hidden="true"><img src="../icons/games/${g.slug}.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">${esc(g.name)}</span>
             <span class="game-card-age">${g.age}+</span>
             <span class="game-card-mins">${g.mins === 'open' ? 'open-ended' : '~' + g.mins + ' min'}</span>
@@ -343,7 +350,7 @@ function buildTeachers() {
     for (const g of games) {
       h += `
               <tr>
-                <td class="g"><a href="games/${g.slug}/">${g.emoji} ${esc(g.name)}</a></td>
+                <td class="g"><a href="games/${g.slug}/"><img class="row-icon" src="icons/games/${g.slug}.svg" alt="" width="22" height="22"> ${esc(g.name)}</a></td>
                 <td class="age">${g.age}+</td>
                 <td class="age">${g.mins === 'open' ? 'open' : '~' + g.mins + 'm'}</td>
                 <td>${esc(g.practises)}</td>
@@ -393,7 +400,7 @@ function build404() {
   for (const g of picks) {
     h += `
           <a class="game-card" href="games/${g.slug}/">
-            <span class="game-icon" aria-hidden="true">${g.emoji}</span>
+            <span class="game-icon" aria-hidden="true"><img src="icons/games/${g.slug}.svg" alt="" width="44" height="44"></span>
             <span class="game-card-name">${esc(g.name)}</span>
             <span class="game-card-age">${g.age}+</span>
           </a>`;
