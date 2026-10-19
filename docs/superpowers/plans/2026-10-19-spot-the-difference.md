@@ -1976,6 +1976,17 @@ Expected: `E2E PASS` twice with no `set aside` line, and the `findstr` prints no
 
 ---
 
+## Changes made while building
+
+Built inline on 2026-10-19 in the worktree `.claude/worktrees/spot`, branch `spot-the-difference`, while another session built Missing Tile in the main working tree.
+
+- **Task 2, art judged on the contact sheet:** the bird, dragonfly and ladybird were redrawn (the bird and ladybird read as ink blobs, the dragonfly as a car); the ladybird grew to 13×9 and its spots are drawn with `stroke="none"`, because a 2.5-unit outline round a 2-unit spot was all outline; frog and sheep eyes grew so the open/shut state shows; the pond's shoreline moved from y 232 to 256 so water-lane items (bases up to 255) never sit on sand.
+- **Task 2, a fairness rule added:** `count` and `state` differences need a half-extent of at least 12 (a ladybird's spots at 20 px on a phone were not a fair difference), checked in `spot.test.js` alongside the 14 for shade and tilt. The spec's table is updated to match.
+- **Task 3:** `games/shared/spot/spot.css` holds the shared styles (one copy for both pages). `hint()` re-enables the Hint button only while the round is still on. `newRound()` scrolls the intro line back into view from round 2 on: the 7+ done card's Next button sits below the pictures, focusing it scrolled a phone down, and the next round started with both pictures off the top of the screen (found by the phone e2e, which tapped at a negative y).
+- **Task 4:** the pages were checked headlessly (screenshots at 1200×860, 390×844 and 390×667 after one find) rather than by hand; both pictures fit the short phone with 60 px to spare.
+- **Task 5:** as planned; the suite went from 183 to 197 tests, all green, counts 47.
+- **Task 6, the player as finally run** (`$SCRATCH/spot/e2e.cjs`, the Step 1 script with these five changes): over `file://` every page on the site logs a manifest CORS error and a missing `/apple-touch-icon.png` (absolute links), so console errors from exactly those two URLs are ignored when the page URL is `file:`; `window.speechSynthesis` is a read-only accessor, so the stub is installed with `Object.defineProperty` (a plain assignment is silently ignored and no line is ever "spoken"); `page.focus()` refuses SVG elements, so the roving item is focused with `$eval(el => el.focus())`; the last find's live text and spoken line are replaced at once by the done line, so the player checks the previous spoken line and skips the live text on the last find; before giving up round 3 it waits for round 2's confetti to clear (bits live 5 s). A `DEBUG=1` env prints the miss tap's coordinates and the element under them. All eight runs pass: desktop, phone, short phone and reduced motion, for both games.
+
 ## Self-review notes
 
 - Spec coverage: the two games' rules (Tasks 3–4), the pictures and fairness (Tasks 1–2 with the 1,000-seed tests), accessibility (Task 3 keyboard, Task 4 live region and labels), sound and voice (Task 3, Task 4 strings), icons and wiring (Task 5), checks (Tasks 1, 2, 4, 6), release (Task 7). One addition to the spec's file list: `games/shared/spot/spot.css`, so the two pages do not carry two copies of the ring, dot and confetti styles.
