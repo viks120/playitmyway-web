@@ -96,8 +96,8 @@ function checkScene(scene, row, theme, where) {
       case 'swap': assert.ok(changed.kind !== same.kind && S.KINDS[changed.kind].lane === k.lane && S.KINDS[changed.kind].family !== k.family, `${where}: swap`); break;
       case 'size': assert.ok(Math.abs(changed.s / same.s - row.sizeFactor) < 0.01 || Math.abs(same.s / changed.s - row.sizeFactor) < 0.01, `${where}: size ${same.s}→${changed.s}`); break;
       case 'flip': assert.ok(k.asym && changed.flip !== same.flip, `${where}: flip`); break;
-      case 'count': assert.equal(Math.abs(changed.count - same.count), 1, `${where}: count`); break;
-      case 'state': assert.ok(changed.state !== same.state, `${where}: state`); break;
+      case 'count': assert.ok(Math.abs(changed.count - same.count) === 1 && S.half(same) >= 12, `${where}: count`); break;
+      case 'state': assert.ok(changed.state !== same.state && S.half(same) >= 12, `${where}: state`); break;
       case 'shift': { const m = Math.hypot(changed.x - same.x, changed.y - same.y); assert.ok(m >= 13.99 && m <= 20.01, `${where}: shift ${m}`); break; }
       case 'tilt': assert.ok(Math.abs(changed.rot) === 20 && same.rot === 0 && S.half(same) >= 14, `${where}: tilt`); break;
       default: assert.fail(`${where}: unknown kind ${d.kind}`);
@@ -172,4 +172,66 @@ test('levels adapt and stars count', () => {
   assert.equal(S.nextLevel(3, 2), 2);
   assert.equal(S.nextLevel(0, 5), 0);
   assert.deepEqual([S.stars(0, false), S.stars(1, false), S.stars(2, false), S.stars(9, false), S.stars(0, true)], [3, 2, 1, 1, 0]);
+});
+
+// ---------------------------------------------------------------- draw.js
+
+const D = require(path.join(ROOT, 'games', 'shared', 'spot', 'draw.js'));
+const HEAD = /^<g class="item" id="([abx])-(p\d+)" data-id="(p\d+)" role="button" aria-label="([^"]+)" tabindex="-1" transform="translate\(-?[\d.]+ -?[\d.]+\) rotate\(-?[\d.]+\) scale\(-?[\d.]+ [\d.]+\)" fill="none" stroke="#33302e" stroke-width="([\d.]+)" stroke-linejoin="round" stroke-linecap="round">/;
+const groupsOf = (markup) => {
+  const out = {};
+  for (const part of markup.split('<g class="item" ').slice(1)) out[/data-id="(p\d+)"/.exec(part)[1]] = part;
+  return out;
+};
+
+test('draw: every kind has a drawer, every drawer a kind, every theme a backdrop', () => {
+  assert.deepEqual(Object.keys(D.DRAWERS).sort(), Object.keys(S.KINDS).sort());
+  for (const t of S.THEMES) assert.ok(D.backdrop(t).startsWith('<rect width="400" height="300"'), `${t} backdrop`);
+  assert.ok(D.COLOURS.length <= 12 && D.COLOURS.every((c) => /^#[0-9a-f]{6}$/.test(c)));
+});
+
+test('draw: every seed renders well-formed markup in the house style', () => {
+  const allowed = new Set(Object.values(S.PALETTE).concat(D.COLOURS));
+  for (const [row, band] of [[S.LITTLE[7], 'little'], [S.BIG[3], 'big']]) for (const theme of S.THEMES) for (let seed = 1; seed <= 60; seed++) {
+    const scene = S.make(seed, row, theme);
+    for (const [side, items] of [['a', scene.a], ['b', scene.b]]) {
+      const m = D.picture(items, { theme, critters: '../../icons/critters/', side });
+      const where = `${band} ${theme} seed ${seed} side ${side}`;
+      const lower = m.toLowerCase();
+      for (const bad of ['<text', '<script', 'gradient', '<filter', 'style=', 'url(', '<foreignobject', 'opacity=']) assert.ok(!lower.includes(bad), `${where}: ${bad}`);
+      assert.ok(!/\son[a-z]+=/i.test(m), `${where}: event handler`);
+      let depth = 0;
+      for (const t of m.matchAll(/<(\/?)g\b[^>]*?(\/?)>/g)) { if (t[1]) depth--; else if (!t[2]) depth++; assert.ok(depth >= 0, `${where}: stray </g>`); }
+      assert.equal(depth, 0, `${where}: unclosed <g>`);
+      for (const c of m.match(/#[0-9a-f]{6}\b/gi) || []) assert.ok(allowed.has(c.toLowerCase()), `${where}: colour ${c}`);
+      const groups = groupsOf(m);
+      assert.equal(Object.keys(groups).length, items.length, `${where}: one group per item`);
+      for (const it of items) {
+        const g = '<g class="item" ' + groups[it.id];
+        const h = HEAD.exec(g);
+        assert.ok(h, `${where}: bad group head for ${it.id}: ${g.slice(0, 160)}`);
+        assert.equal(h[1], side);
+        assert.equal(h[4], S.label(it.kind));
+        assert.ok(Math.abs(Number(h[5]) - 2.5 / it.s) < 0.06, `${where}: stroke-width ${h[5]} for s=${it.s}`);
+        const isCritter = ['clover', 'pip', 'plum', 'mango'].includes(it.kind);
+        const images = g.match(/<image\b[^>]*>/g) || [];
+        if (isCritter) assert.ok(images.length === 1 && images[0].includes(`href="../../icons/critters/${it.kind}.svg"`), `${where}: critter image`);
+        else assert.equal(images.length, 0, `${where}: <image> outside a critter`);
+      }
+    }
+  }
+});
+
+test('draw: the two sides differ in exactly the changed groups', () => {
+  for (const theme of S.THEMES) for (let seed = 1; seed <= 200; seed++) {
+    const scene = S.make(seed, S.BIG[3], theme);
+    const ga = groupsOf(D.picture(scene.a, { theme, critters: 'c/', side: 'x' }));
+    const gb = groupsOf(D.picture(scene.b, { theme, critters: 'c/', side: 'x' }));
+    const changed = new Set(scene.diffs.map((d) => d.item));
+    for (const id of new Set([...Object.keys(ga), ...Object.keys(gb)])) {
+      if (changed.has(id)) assert.notEqual(ga[id], gb[id], `${theme} seed ${seed}: ${id} should differ`);
+      else assert.equal(ga[id], gb[id], `${theme} seed ${seed}: ${id} should match`);
+    }
+    assert.equal(D.backdrop(theme), D.picture([], { theme, critters: 'c/', side: 'x' }));
+  }
 });
