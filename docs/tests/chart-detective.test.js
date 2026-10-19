@@ -222,3 +222,21 @@ test('readChart names every category with its count', () => {
   const text = CD.readChart(round);
   round.categories.forEach((c, i) => assert.ok(text.includes(': ' + round.counts[i] + '.'), `${c.id}: ${text}`));
 });
+// ---- part: glyphs ----
+test('every category has a glyph in the house style, and no glyph is an orphan', () => {
+  const Gl = require(path.join(DIR, 'glyphs.js'));
+  const wanted = CD.THEMES.flatMap((t) => t.cats.map((c) => c.id));
+  assert.deepEqual(Gl.ids().sort(), wanted.slice().sort());
+  assert.equal(Gl.ids().length, 30);
+  const palette = new Set(Object.values(Gl.PALETTE).map((h) => h.toLowerCase()));
+  assert.equal(Gl.PALETTE.ink, '#33302e');
+  for (const id of Gl.ids()) {
+    const s = Gl.symbol(id);
+    assert.ok(s.startsWith(`<symbol id="g-${id}" viewBox="0 0 32 32"><g fill="none" stroke="#33302e" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">`), `${id}: wrapper`);
+    assert.ok(s.endsWith('</g></symbol>'), `${id}: closing`);
+    for (const bad of ['<text', 'gradient', '<image', 'style=', 'opacity=', 'href=']) assert.ok(!s.includes(bad), `${id}: contains ${bad}`);
+    for (const m of s.matchAll(/\b(fill|stroke)="([^"]+)"/g)) assert.ok(m[2] === 'none' || palette.has(m[2].toLowerCase()), `${id}: ${m[1]} ${m[2]} is off the palette`);
+    assert.ok(/<(circle|ellipse|path|rect)\b[^>]*fill="#(?!33302e)[0-9a-f]{6}"/i.test(s.replace(/stroke="none"/g, '')), `${id}: needs a filled, ink-outlined shape`);
+  }
+  assert.equal((Gl.sprite().match(/<symbol /g) || []).length, 30);
+});
