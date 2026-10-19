@@ -175,6 +175,8 @@
       render('a'); render('b');
       dots();
       $('intro').textContent = T.intro(S.row.diffs);
+      // the Next button sat below the pictures, so a phone is now scrolled past them
+      if (S.round > 1 && $('intro').scrollIntoView) $('intro').scrollIntoView({ block: 'nearest' });
       $('nextBtn').hidden = true;
       if ($('done')) $('done').hidden = true;
       if ($('roundLabel')) $('roundLabel').textContent = T.round(S.round);
