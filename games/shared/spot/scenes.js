@@ -48,7 +48,7 @@
     mushroom: K('the mushroom', 'ground', 13, 15, 'mushroom', { counts: [3, 4], colours: ['red', 'orange', 'purple'], themes: M }),
     butterfly: K('the butterfly', 'air', 15, 11, 'butterfly', { colours: ['orange', 'blue', 'pink', 'purple', 'yellow'], themes: M }),
     bee: K('the bee', 'air', 11, 9, 'bee', { asym: true, themes: M }),
-    ladybird: K('the ladybird', 'ground', 11, 8, 'ladybird', { asym: true, counts: [3, 4], themes: M }),
+    ladybird: K('the ladybird', 'ground', 13, 9, 'ladybird', { asym: true, counts: [3, 4], themes: M }),
     snail: K('the snail', 'ground', 15, 11, 'snail', { asym: true, colours: ['yellow', 'orange', 'pink', 'purple'], themes: M }),
     kite: K('the kite', 'sky', 14, 22, 'kite', { asym: true, colours: ['red', 'blue', 'green', 'purple', 'orange'], themes: M, max: 1 }),
     basket: K('the basket', 'ground', 17, 13, 'basket', { counts: [2, 3], themes: M, max: 1 }),
@@ -184,9 +184,10 @@
       return c.length ? { colour: pick(r, c) } : false;
     },
     flip: (r, it, d) => (d.asym ? { flip: !it.flip } : false),
-    state: (r, it, d) => (d.states ? { state: d.states[0] === it.state ? d.states[1] : d.states[0] } : false),
+    // a changed part has to be visible: states and counts need a half-extent of 12, shades and tilts 14
+    state: (r, it, d) => (d.states && half(it) >= 12 ? { state: d.states[0] === it.state ? d.states[1] : d.states[0] } : false),
     count: (r, it, d) => {
-      if (!d.counts) return false;
+      if (!d.counts || half(it) < 12) return false;
       const up = it.count === d.counts[0] ? true : it.count === d.counts[1] ? false : r() < 0.5;
       return { count: it.count + (up ? 1 : -1) };
     },
