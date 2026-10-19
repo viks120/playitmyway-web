@@ -18,7 +18,7 @@ module.exports = {
     { id: '3',  label: 'Ages 3+',  title: 'Little Learners', band: 'band-3',
       outcome: 'Counting, colours, memory and first pen strokes.' },
     { id: '5',  label: 'Ages 5+',  title: 'Fun & Games',     band: 'band-5',
-      outcome: 'Phonics, sorting, quick reactions and fair play.' },
+      outcome: 'Phonics, sorting, charts, quick reactions and fair play.' },
     { id: '7',  label: 'Ages 7+',  title: 'Brain Boosters',  band: 'band-7',
       outcome: 'Time, grammar, coding, maps, patterns and logic.' },
     { id: '14', label: 'Ages 14+', title: 'Challenge Zone',  band: 'band-14',
@@ -98,6 +98,9 @@ module.exports = {
     { slug: 'pebble-push', name: 'Pebble Push', age: '5', mins: '10',
       skills: ['logic'],
       practises: 'Planning ahead: pebbles can only be pushed, never pulled, so a careless push can wedge one in a corner. 18 levels from one pebble to three, every one checked solvable by computer, with undo, restart and a hint that knows the way.' },
+    { slug: 'chart-detective', name: 'Chart Detective', age: '5', mins: '10',
+      skills: ['numbers', 'logic'],
+      practises: 'Reading and making charts: tally marks in fives, pictograms and block diagrams, then pictograms with a key, bar charts with axis steps of 2, 5 and 10, and two-way tables. Things arrive one at a time to be counted, then the questions ask which was most or least, how many more, and how many altogether. A wrong answer gets a hint and another go, then the worked answer with the columns it is about lit up.' },
 
     // --- 7+ ---
     { slug: 'silly-story-builder', name: 'Silly Story Builder', age: '7', mins: '10',
