@@ -283,7 +283,7 @@ test('the kit stores nothing, fetches nothing and guards every sound', () => {
     for (const bad of ['localStorage', 'sessionStorage', 'cookie', 'fetch(', 'XMLHttpRequest', 'import(']) assert.ok(!src.includes(bad), `${f}: ${bad}`);
     for (const u of src.match(/https?:\/\/[^"'\s<)]+/g) || []) assert.ok(u.startsWith('http://www.w3.org/'), `${f}: foreign URL ${u}`);
   }
-  const play = read('games', 'shared', 'spot', 'play.js');
+  const play = read('games', 'shared', 'spot', 'play.js').replace(/\r\n/g, '\n');   // git may check the file out with CRLF
   assert.ok(play.includes('function sound(kind) {\n    if (root.pimwMuted) return;'), 'sound() must start with the mute guard');
   assert.ok(play.includes("'(prefers-reduced-motion: reduce)'"), 'confetti must respect reduced motion');
 });
