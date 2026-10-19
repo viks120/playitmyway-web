@@ -240,3 +240,17 @@ test('every category has a glyph in the house style, and no glyph is an orphan',
   }
   assert.equal((Gl.sprite().match(/<symbol /g) || []).length, 30);
 });
+// ---- part: page ----
+test('the page is wired the way the site expects', () => {
+  const page = read('games', 'chart-detective', 'index.html');
+  const order = ['<script src="../shared/voice.js"></script>', '<script src="charts.js"></script>', '<script src="glyphs.js"></script>', '<script src="game.js"></script>', '<script src="../../components.js"></script>'];
+  let at = -1;
+  for (const tag of order) { const i = page.indexOf(tag); assert.ok(i > at, `${tag} must come after the previous script`); at = i; }
+  assert.equal((page.match(/<main\b/g) || []).length, 1, 'one <main>');
+  assert.equal((page.match(/aria-live=/g) || []).length, 1, 'one live region');
+  assert.ok(page.includes('<img class="title-icon" src="../../icons/games/chart-detective.svg" alt="" width="40" height="40">'), 'the title icon');
+  assert.ok(page.includes('href="../../tokens.css"') && page.includes('href="../../components.css"'), 'the shared stylesheets');
+  assert.ok(page.includes('src="../../icons/critters/mango.svg"'), 'Mango is the detective');
+  assert.ok(page.includes('<svg class="sprite" id="sprite"'), 'the glyph sprite, hidden by CSS (the hidden attribute does nothing on an SVG element)');
+  assert.ok(!/localStorage|sessionStorage|indexedDB|document\.cookie/.test(page + read('games', 'chart-detective', 'game.js')), 'nothing is stored');
+});
