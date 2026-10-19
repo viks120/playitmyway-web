@@ -16,7 +16,7 @@ export {
   BackSide, BoxGeometry, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Color,
   ConeGeometry, CylinderGeometry, DataTexture, DirectionalLight, Euler, ExtrudeGeometry, Fog, Group,
   HemisphereLight, InstancedMesh, LatheGeometry, Matrix4, Mesh, MeshBasicMaterial, MeshToonMaterial,
-  NearestFilter, PerspectiveCamera, Plane, PlaneGeometry, Quaternion, Raycaster, RedFormat,
+  NearestFilter, OrthographicCamera, PerspectiveCamera, Plane, PlaneGeometry, Quaternion, Raycaster, RedFormat,
   RingGeometry, Scene, ShaderMaterial, Shape, SphereGeometry, SRGBColorSpace, TorusGeometry,
   TubeGeometry, UniformsLib, UniformsUtils, Vector2, Vector3, WebGLRenderer,
 } from 'three';
