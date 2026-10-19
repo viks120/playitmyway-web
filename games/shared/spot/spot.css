@@ -1,0 +1,36 @@
+/* Shared by What's Different? and Spot the Difference: the two pictures,
+   the found rings, the progress dots, a miss ripple and the confetti. */
+.pics { display: grid; gap: 10px; width: 100%; max-width: 960px; justify-items: center; }
+.pic {
+  display: block; width: 100%; aspect-ratio: 4 / 3; border-radius: 16px; background: #dff4ff;
+  touch-action: manipulation; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.pic .item { outline: none; cursor: pointer; }
+/* side by side when wider than tall; stacked and fitted to the screen when upright */
+@media (min-aspect-ratio: 1/1) { .pics { grid-template-columns: 1fr 1fr; } }
+@media (max-aspect-ratio: 1/1) {
+  .pic { width: min(100%, max(280px, calc((100vh - 250px) * 2 / 3))); }
+  .pic { width: min(100%, max(280px, calc((100dvh - 250px) * 2 / 3))); }
+}
+.ring { fill: none; stroke: #ef4444; stroke-width: 4; }
+.halo { fill: none; stroke: #ffffff; stroke-width: 7; }
+.hint .ring, .shown .ring { stroke-dasharray: 9 6; }
+.hint { transform-box: fill-box; transform-origin: center; animation: spotPulse 0.6s ease-in-out infinite alternate; }
+@keyframes spotPulse { from { transform: scale(0.9); } to { transform: scale(1.1); } }
+.focus { fill: none; stroke: #33302e; stroke-width: 3; stroke-dasharray: 6 4; }
+.focus-halo { fill: none; stroke: #ffffff; stroke-width: 6; }
+.ripple { fill: none; stroke: #33302e; stroke-width: 3; animation: spotRipple 0.5s ease-out forwards; transform-box: fill-box; transform-origin: center; }
+@keyframes spotRipple { from { transform: scale(0.4); opacity: 0.9; } to { transform: scale(1.4); opacity: 0; } }
+.dots { display: flex; justify-content: center; gap: 8px; margin: 10px 0; }
+.dot { width: 18px; height: 18px; border-radius: 50%; border: 3px solid #ef4444; background: transparent; }
+.dot.on { background: #ef4444; }
+.confetti-bit {
+  position: fixed; top: -14px; width: 10px; height: 14px; border-radius: 3px; pointer-events: none; z-index: 50;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall { to { transform: translateY(105vh) rotate(720deg); opacity: 0.7; } }
+@media (prefers-reduced-motion: reduce) {
+  .hint, .ripple { animation: none; }
+  .ripple { opacity: 0.6; }
+  .confetti-bit { display: none; }
+}
