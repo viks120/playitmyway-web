@@ -254,3 +254,13 @@ test('the page is wired the way the site expects', () => {
   assert.ok(page.includes('<svg class="sprite" id="sprite"'), 'the glyph sprite, hidden by CSS (the hidden attribute does nothing on an SVG element)');
   assert.ok(!/localStorage|sessionStorage|indexedDB|document\.cookie/.test(page + read('games', 'chart-detective', 'game.js')), 'nothing is stored');
 });
+// ---- part: catalogue ----
+test('the catalogue lists the game honestly', () => {
+  const C = require(path.join(ROOT, 'docs', 'catalogue.js'));
+  const entry = C.games.find((g) => g.slug === 'chart-detective');
+  assert.ok(entry, 'the catalogue entry');
+  assert.equal(entry.age, '5');
+  assert.deepEqual(entry.skills, ['numbers', 'logic']);
+  for (const word of ['tally', 'pictograms', 'block diagrams', 'bar charts', 'tables', 'key', 'most or least', 'how many more']) assert.ok(entry.practises.toLowerCase().includes(word), `the catalogue text must mention ${word}`);
+  assert.ok(C.bands.find((b) => b.id === '5').outcome.includes('charts'), 'the 5+ band outcome names charts');
+});

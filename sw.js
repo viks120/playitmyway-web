@@ -5,7 +5,7 @@
  * analytics. There is deliberately no push code here — push would require a
  * per-device subscription held by a third party, which this site does not do.
  */
-const CACHE = 'pimw-93d8f4ea';
+const CACHE = 'pimw-54a3f8ab';
 
 const PRECACHE = [
   "/",
@@ -23,6 +23,10 @@ const PRECACHE = [
   "/games/2048-slider/",
   "/games/balloon-pop/",
   "/games/catch-falling-object/",
+  "/games/chart-detective/",
+  "/games/chart-detective/charts.js",
+  "/games/chart-detective/game.js",
+  "/games/chart-detective/glyphs.js",
   "/games/clock-shop/",
   "/games/code-the-robot/",
   "/games/color-matcher/",
@@ -141,6 +145,7 @@ const PRECACHE = [
   "/icons/games/2048-slider.svg",
   "/icons/games/balloon-pop.svg",
   "/icons/games/catch-falling-object.svg",
+  "/icons/games/chart-detective.svg",
   "/icons/games/clock-shop.svg",
   "/icons/games/code-the-robot.svg",
   "/icons/games/color-matcher.svg",
