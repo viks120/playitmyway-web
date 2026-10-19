@@ -20,7 +20,7 @@ module.exports = {
     { id: '5',  label: 'Ages 5+',  title: 'Fun & Games',     band: 'band-5',
       outcome: 'Phonics, sorting, quick reactions and fair play.' },
     { id: '7',  label: 'Ages 7+',  title: 'Brain Boosters',  band: 'band-7',
-      outcome: 'Time, grammar, coding, maps and logic.' },
+      outcome: 'Time, grammar, coding, maps, patterns and logic.' },
     { id: '14', label: 'Ages 14+', title: 'Challenge Zone',  band: 'band-14',
       outcome: 'Real puzzles — sudoku, circuits, molecules, forces and 3D shapes.' }
   ],
@@ -127,6 +127,9 @@ module.exports = {
     { slug: 'frozen-pond', name: 'Frozen Pond', age: '7', mins: '10',
       skills: ['logic'],
       practises: 'Planning several moves ahead and working backwards from the goal: on ice you slide until a rock stops you, so the route to the fish has to be thought through. 18 levels, each with its fewest-slides target, all checked solvable by computer, with undo, restart and hints.' },
+    { slug: 'missing-tile', name: 'Missing Tile', age: '7', mins: '10',
+      skills: ['logic'],
+      practises: 'Matrix reasoning: spotting what changes along the rows and down the columns of a 3×3 grid, then finding the one tile that fits the gap. 36 puzzles from one rule to three, each checked by computer to have exactly one answer, with hints that name the rule and a wrong tile that explains itself. Practice, not a test: nothing is scored or saved.' },
 
     // --- 14+ ---
     { slug: 'science-trivia', name: 'Science Trivia', age: '14', mins: '10',
