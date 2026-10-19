@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#7c3aed" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Spot the Difference – Free Picture Puzzle for Kids | Play It My Way</title>
+    <meta name="description" content="Two busy pictures of a pond, meadow or farm, five to eight differences between them. Free hints, no clock, stars for finding them all. Ages 7+. No ads." />
+    <meta name="keywords" content="spot the difference for kids, find the differences game, picture puzzle for children, observation game ages 7+, free puzzle game" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Spot the Difference – Free Picture Puzzle for Kids" />
+    <meta property="og:description" content="Find every difference between two busy pictures: a missing item, a changed shade, an extra apple, a flipped boat. Free hints, no clock. Ages 7+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/spot-the-difference/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Spot the Difference – Free Picture Puzzle for Kids" />
+    <meta name="twitter:description" content="Find every difference between two busy pictures: a missing item, a changed shade, an extra apple, a flipped boat. Free hints, no clock. Ages 7+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/spot-the-difference/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <link rel="stylesheet" href="../shared/spot/spot.css" />
+    <style>
+      :root {
+        --band: var(--color-violet);
+        --band-tint: var(--color-violet-tint);
+        --band-tint-deep: #c9bbf0;
+        --band-deep: var(--candy-violet);
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+      }
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body { background: var(--color-bg); overscroll-behavior-y: contain; }
+      body {
+        font-family: var(--font-display); color: var(--ink); margin: 0; padding: 16px 12px 48px;
+        display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+      }
+      button { font-family: inherit; }
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600; font-size: 15px; padding: 9px 14px;
+        border-radius: var(--radius-pill); background: var(--band-tint); align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center; box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+      header.game-head { text-align: center; margin: 4px 0 8px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0; text-wrap: balance; }
+      .stage-card {
+        width: 100%; max-width: 980px; background: var(--color-surface); border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest); padding: 10px; display: flex; flex-direction: column; align-items: center;
+      }
+      .intro { margin: 0 0 8px; font-size: 20px; font-weight: 700; color: var(--deep); text-align: center; }
+      .tell { min-height: 26px; margin: 0; text-align: center; font-size: 18px; font-weight: 600; color: var(--deep); }
+      .go-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 22px; font-weight: 700; padding: 14px 30px; min-height: 56px;
+        margin-top: 10px; cursor: pointer; background: var(--band); color: #fff; box-shadow: 0 6px 0 var(--band-deep);
+      }
+      .go-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--band-deep); }
+      .toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 16px; margin: 4px 0 6px; }
+      .soft-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 17px; font-weight: 600; padding: 10px 18px; min-height: 44px;
+        cursor: pointer; background: var(--band-tint); color: var(--band); box-shadow: 0 4px 0 var(--band-tint-deep);
+      }
+      .soft-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--band-tint-deep); }
+      .soft-btn:disabled { opacity: 0.55; cursor: default; }
+      .label { font-weight: 700; font-size: 17px; color: var(--deep); }
+      .text-btn { border: 0; background: none; color: var(--band); font-size: 15px; font-weight: 600; text-decoration: underline; min-height: 44px; padding: 0 8px; cursor: pointer; }
+      .text-btn:disabled { opacity: 0.55; cursor: default; }
+      .done { width: 100%; display: flex; justify-content: center; margin-top: 10px; }
+      .done-card {
+        background: #fff; border-radius: 24px; padding: 16px 22px 18px; text-align: center; width: 100%; max-width: 360px;
+        box-shadow: 0 8px 0 var(--band-tint-deep), var(--shadow-lift);
+      }
+      .done-card h2 { margin: 0; font-size: 26px; }
+      .done-sub { margin: 4px 0 0; color: var(--ink-soft); font-weight: 600; font-size: 18px; }
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px; background: var(--color-surface);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-rest); line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1><img class="title-icon" src="../../icons/games/spot-the-difference.svg" alt="" width="40" height="40"> Spot the Difference</h1>
+    </header>
+
+    <main class="stage-card">
+      <p class="intro" id="intro">Find all 5 differences. Tap them in either picture.</p>
+      <div class="pics">
+        <svg class="pic" id="picA" viewBox="0 0 400 300" role="group" aria-label="Left picture"></svg>
+        <svg class="pic" id="picB" viewBox="0 0 400 300" role="group" aria-label="Right picture"></svg>
+      </div>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <div class="toolbar">
+        <button type="button" class="soft-btn" id="hintBtn">💡 Hint</button>
+        <span class="label" id="roundLabel">Round 1</span>
+        <span class="label" id="starsLabel">★ 0</span>
+        <button type="button" class="text-btn" id="showBtn">Show me the rest</button>
+      </div>
+      <p class="tell" id="tell" aria-live="polite"></p>
+      <section class="done" id="done" hidden aria-labelledby="doneTitle">
+        <div class="done-card">
+          <h2 id="doneTitle"></h2>
+          <p class="done-sub" id="doneSub"></p>
+          <button type="button" class="go-btn" id="nextBtn" hidden>Next picture →</button>
+        </div>
+      </section>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>The two pictures look the same, but five or more things are different: something missing, a different colour or shade, bigger or smaller, flipped, moved, tilted, or one more apple than before.</li>
+        <li>Tap each difference in either picture. A ring marks it in both.</li>
+        <li>Find them all for stars: three with no hint, two with one, one with more. Stuck? 💡 Hint shows one; "Show me the rest" gives up the round.</li>
+      </ol>
+      <p>There is no clock and wrong taps cost nothing. Each round has a few more, and smaller, differences than the last. With a keyboard, <kbd>Tab</kbd> into a picture, move with the arrow keys and press <kbd>Enter</kbd>. Nothing is saved: the stars last only this visit.</p>
+      <h3>What it practises</h3>
+      <p>Careful, systematic looking and visual memory: comparing two scenes part by part, noticing small changes of colour, size, position and number, and keeping track of what has been checked.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/spot/scenes.js"></script>
+    <script src="../shared/spot/draw.js"></script>
+    <script src="../shared/spot/play.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>

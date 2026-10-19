@@ -235,3 +235,55 @@ test('draw: the two sides differ in exactly the changed groups', () => {
     assert.equal(D.backdrop(theme), D.picture([], { theme, critters: 'c/', side: 'x' }));
   }
 });
+
+// ---------------------------------------------------------------- the pages
+
+const PAGES = [
+  { slug: 'whats-different', band: 'little', title: "What's Different?", voice: true, theme: '#0f766e' },
+  { slug: 'spot-the-difference', band: 'big', title: 'Spot the Difference', voice: false, theme: '#7c3aed' },
+];
+
+test('pages: shell, script order, title icon, live region, no storage, no foreign URLs', () => {
+  for (const p of PAGES) {
+    const html = read('games', p.slug, 'index.html');
+    const js = read('games', p.slug, 'game.js');
+    for (const need of [
+      '<link rel="stylesheet" href="../../tokens.css" />', '<link rel="stylesheet" href="../../components.css" />', '<link rel="stylesheet" href="../shared/spot/spot.css" />',
+      `<link rel="canonical" href="https://playitmyway.com/games/${p.slug}/" />`, `<meta property="og:url" content="https://playitmyway.com/games/${p.slug}/" />`,
+      `<meta name="theme-color" content="${p.theme}" />`,
+      `<h1><img class="title-icon" src="../../icons/games/${p.slug}.svg" alt="" width="40" height="40"> ${p.title}</h1>`,
+      'id="picA" viewBox="0 0 400 300" role="group" aria-label="Left picture"', 'id="picB" viewBox="0 0 400 300" role="group" aria-label="Right picture"',
+      'id="dots" aria-hidden="true"', 'id="tell" aria-live="polite"', 'id="nextBtn"', 'id="intro"', 'class="site-footer"', 'class="pimw-appbar"',
+    ]) assert.ok(html.includes(need), `${p.slug}: missing ${need}`);
+    assert.equal((html.match(/<main\b/g) || []).length, 1, `${p.slug}: one <main>`);
+    assert.equal((html.match(/aria-live=/g) || []).length, 1, `${p.slug}: one live region`);
+    const scripts = Array.from(html.matchAll(/<script src="([^"]+)"><\/script>/g)).map((m) => m[1]);
+    const want = (p.voice ? ['../shared/voice.js'] : []).concat(['../shared/spot/scenes.js', '../shared/spot/draw.js', '../shared/spot/play.js', 'game.js', '../../components.js']);
+    assert.deepEqual(scripts, want, `${p.slug}: script order`);
+    assert.ok(!html.includes('type="module"'), `${p.slug}: no modules (file://)`);
+    assert.ok(js.includes(`band: '${p.band}'`), `${p.slug}: band`);
+    assert.ok(js.includes('window.spot = window.Spot.Play.start('), `${p.slug}: handle for the e2e`);
+    if (p.voice) assert.ok(js.includes('voice: window.Voice || null'), 'the 3+ page speaks');
+    else assert.ok(!js.includes('Voice') && !html.includes('voice.js'), 'the 7+ page does not');
+    for (const src of [html, js]) {
+      for (const bad of ['localStorage', 'sessionStorage', 'document.cookie', 'fetch(', 'XMLHttpRequest', 'googleapis', 'cloudflareinsights']) assert.ok(!src.includes(bad), `${p.slug}: ${bad}`);
+      for (const u of src.match(/https?:\/\/[^"'\s<)]+/g) || []) assert.ok(u.startsWith('https://playitmyway.com/'), `${p.slug}: foreign URL ${u}`);
+    }
+  }
+  const big = read('games', 'spot-the-difference', 'index.html'), little = read('games', 'whats-different', 'index.html');
+  for (const id of ['hintBtn', 'showBtn', 'roundLabel', 'starsLabel', 'done', 'doneTitle', 'doneSub']) {
+    assert.ok(big.includes(`id="${id}"`), `7+ needs #${id}`);
+    assert.ok(!little.includes(`id="${id}"`), `3+ must not have #${id}`);
+  }
+});
+
+test('the kit stores nothing, fetches nothing and guards every sound', () => {
+  for (const f of ['scenes.js', 'draw.js', 'play.js', 'spot.css']) {
+    const src = read('games', 'shared', 'spot', f);
+    for (const bad of ['localStorage', 'sessionStorage', 'cookie', 'fetch(', 'XMLHttpRequest', 'import(']) assert.ok(!src.includes(bad), `${f}: ${bad}`);
+    for (const u of src.match(/https?:\/\/[^"'\s<)]+/g) || []) assert.ok(u.startsWith('http://www.w3.org/'), `${f}: foreign URL ${u}`);
+  }
+  const play = read('games', 'shared', 'spot', 'play.js');
+  assert.ok(play.includes('function sound(kind) {\n    if (root.pimwMuted) return;'), 'sound() must start with the mute guard');
+  assert.ok(play.includes("'(prefers-reduced-motion: reduce)'"), 'confetti must respect reduced motion');
+});
