@@ -142,8 +142,8 @@ A difference changes exactly one item, on one side chosen at random, so neither 
 | swap | the item becomes a kind of the same lane and a different family | `{ kind }` | ✓ | ✓ |
 | size | the item is scaled by ×1.8 (3+) or ×1.3 (7+), up or down | `{ s }` | ✓ | ✓ |
 | flip | mirrored left to right; `asym` kinds only | `{ flip }` | | ✓ |
-| count | one more or one fewer of the counted part, within the kind's range | `{ count }` | | ✓ |
-| state | the other state (eyes shut, bud, door shut, flag gone) | `{ state }` | | ✓ |
+| count | one more or one fewer of the counted part, within the kind's range; the item's longer half-extent must be at least 12 | `{ count }` | | ✓ |
+| state | the other state (eyes shut, bud, door shut, flag gone); the item's longer half-extent must be at least 12 | `{ state }` | | ✓ |
 | shade | a near hue; the item's longer half-extent must be at least 14 | `{ colour }` | | ✓ |
 | shift | moved 14 to 20 units in any direction | `{ x, y }` | | ✓ |
 | tilt | rotated 20° either way; the item's longer half-extent must be at least 14 | `{ rot }` | | ✓ |
@@ -158,7 +158,7 @@ Each difference has a **region**: a circle at the item's centre with radius *r* 
 - no two items' bounding boxes overlap, with 4 units of padding, in either picture, including after a size change or a shift;
 - exactly the requested number of differences, on distinct items, only of the kinds the level or tier allows;
 - every region lies wholly inside the picture, and any two regions are at least 6 units apart edge to edge;
-- the changed item's longer half-extent, before the change, is at least the level's or tier's minimum from the tables above (and at least 14 for shade and tilt);
+- the changed item's longer half-extent, before the change, is at least the level's or tier's minimum from the tables above (and at least 12 for count and state, 14 for shade and tilt);
 - magnitudes as the table says: far hues for colour, near for shade, the band's size factor, a shift of 14 to 20 units, a tilt of 20°, a count of exactly ±1 within the kind's range, a swap to a kind of the same lane and a different family that also fits where the item stands, a flip only on an `asym` kind;
 - rendered through `draw.js` with the same `side`, the two pictures differ in exactly the `<g>` groups of the changed items and nowhere else; a missing item's group is absent on its side.
 
@@ -207,6 +207,7 @@ If a layout cannot host the requested differences, `make` discards it and lays o
 | `scenes.js` | Pure logic, tested in Node: the kinds table, the palette, the level and tier tables, the seeded scene maker, the difference engine, the hit test, `theme`, `nextLevel` and `stars`. A classic script that sets `window.Spot.Scenes`, or `module.exports` in Node. |
 | `draw.js` | Turns a scene into SVG markup: `backdrop(theme)` and one drawer per kind, each returning a string in the item's own box. Pure string building, no DOM, so a test can render every seed in Node. Sets `window.Spot.Draw` or `module.exports`. |
 | `play.js` | The shared play loop: builds the two pictures, hit-testing by pointer and keyboard, rings, dots, hints, sounds, the live region, confetti, the toolbar and the Next button. Sets `window.Spot.Play`. |
+| `spot.css` | The shared styles both pages link: the picture grid and its portrait fit, rings, focus ring, ripple, dots and confetti. |
 
 Each game folder has `index.html` (the usual head, `tokens.css`, `components.css`, band colours, the title icon, the page's own styles) and a short `game.js` that calls `Play.start` with its band and strings. Scripts load in this order: `../shared/voice.js` (3+ only), `../shared/spot/scenes.js`, `../shared/spot/draw.js`, `../shared/spot/play.js`, `game.js`, `../../components.js`. `components.js` adds the sound and fullscreen buttons by itself.
 
