@@ -114,3 +114,17 @@ Also: `icons/games/chart-detective.svg`; the catalogue entry; `node docs/build-p
 - Line and time graphs, pie charts, the mean and timetables (Years 4 to 6): a later stage or a second game.
 - Typed answers, saved progress of any kind, printable sheets, and any case-file text beyond one sentence per question.
 - Halfway-between-gridlines bars appear only in stage 4's later cases, because they are the hardest reading in the game.
+
+## Amendments while building (2026-10-19)
+
+- **"Ways to school" became "Shape spotting"** (circle, square, triangle, star, heart). Its categories were phrases ("by bus"), and every question template that uses a category as a subject ("how many extra do by bus have?") broke. Nouns only now, so every sentence reads.
+- **"Weather week" is "Weather diary":** stage 1 has 9 to 15 days and stage 2 up to 34, more than a week.
+- **The tables' verbs:** themes used for tables carry both forms, "picked" and "pick", so "did Pip pick" is grammatical.
+- **The page's logic lives in `game.js`**, a classic script beside `index.html`, as the newest games do, so the test can read it without parsing the page.
+- **Sound uses the site-wide toggle** from `components.js` (bottom right), not a mute button of the page's own; it honours `window.pimwMuted` the same way.
+- **Scrolling is instant, never smooth:** a tap during a smooth scroll lands on whatever slid under the finger. Found by the phone end-to-end run.
+- **The hidden screen-reader table is wrapped** in a clipped `<div class="sr-only">`: the class on the table itself left it 402px wide and made phones zoom the whole page out. Found by the phone end-to-end run; the player now fails on any element wider than the viewport.
+- **A `counted` phase** sits between collecting and the first question, so nothing (and nobody) acts on an empty question.
+- **The worked answer lights the columns the explanation is about** and, on tally, pictogram and block charts, rings the extra blocks for how-many-more questions; on bar charts the columns light up without block-by-block counting. The catalogue text says so.
+- **The catalogue text** reads: "A wrong answer gets a hint and another go, then the worked answer with the columns it is about lit up."
+- **The homepage's own 5+ outcome line** was updated by hand to match the catalogue's, as the homepage is not generated.
