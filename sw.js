@@ -5,7 +5,7 @@
  * analytics. There is deliberately no push code here — push would require a
  * per-device subscription held by a third party, which this site does not do.
  */
-const CACHE = 'pimw-be5df1cf';
+const CACHE = 'pimw-93d8f4ea';
 
 const PRECACHE = [
   "/",
@@ -105,10 +105,16 @@ const PRECACHE = [
   "/games/shared/3d/sound.js",
   "/games/shared/3d/three.min.js",
   "/games/shared/3d/toon.js",
+  "/games/shared/spot/draw.js",
+  "/games/shared/spot/play.js",
+  "/games/shared/spot/scenes.js",
+  "/games/shared/spot/spot.css",
   "/games/shared/voice.js",
   "/games/silly-story-builder/",
   "/games/sort-it-out/",
   "/games/sound-it-out/",
+  "/games/spot-the-difference/",
+  "/games/spot-the-difference/game.js",
   "/games/stepping-stones/",
   "/games/stepping-stones/game.js",
   "/games/stepping-stones/ponds.js",
@@ -123,6 +129,8 @@ const PRECACHE = [
   "/games/twist-cube/game.js",
   "/games/twist-cube/world.js",
   "/games/whack-a-mole/",
+  "/games/whats-different/",
+  "/games/whats-different/game.js",
   "/games/word-guess/",
   "/games/word-guess/words.js",
   "/games/word-scramble/",
@@ -166,6 +174,7 @@ const PRECACHE = [
   "/icons/games/silly-story-builder.svg",
   "/icons/games/sort-it-out.svg",
   "/icons/games/sound-it-out.svg",
+  "/icons/games/spot-the-difference.svg",
   "/icons/games/stepping-stones.svg",
   "/icons/games/sudoku.svg",
   "/icons/games/tic-tac-toe.svg",
@@ -174,6 +183,7 @@ const PRECACHE = [
   "/icons/games/trace-shapes.svg",
   "/icons/games/twist-cube.svg",
   "/icons/games/whack-a-mole.svg",
+  "/icons/games/whats-different.svg",
   "/icons/games/word-guess.svg",
   "/icons/games/word-scramble.svg",
   "/icons/icon-192.png",

@@ -63,6 +63,9 @@ module.exports = {
     { slug: 'peekaboo-pond', name: 'Peekaboo Pond', age: '3', mins: '5',
       skills: ['logic'],
       practises: 'Watching and remembering: following a hidden friend as the flowers slide around, then finding it. It gets trickier only as the child gets it right, and a wrong flower just holds a surprise.' },
+    { slug: 'whats-different', name: "What's Different?", age: '3', mins: '5',
+      skills: ['logic'],
+      practises: "Looking carefully and comparing: two pictures of the same scene with two to four big things changed, such as a missing frog, a red flower turned blue or a bigger boat. The voice names each find, a hint glows by itself when the child is stuck, and wrong taps never matter." },
 
     // --- 5+ ---
     { slug: 'sound-it-out', name: 'Sound It Out', age: '5', mins: '10',
@@ -130,6 +133,9 @@ module.exports = {
     { slug: 'missing-tile', name: 'Missing Tile', age: '7', mins: '10',
       skills: ['logic'],
       practises: 'Matrix reasoning: spotting what changes along the rows and down the columns of a 3×3 grid, then finding the one tile that fits the gap. 36 puzzles from one rule to three, each checked by computer to have exactly one answer, with hints that name the rule and a wrong tile that explains itself. Practice, not a test: nothing is scored or saved.' },
+    { slug: 'spot-the-difference', name: 'Spot the Difference', age: '7', mins: '10',
+      skills: ['logic'],
+      practises: 'Careful, systematic looking and visual memory: five to eight differences between two busy pictures, from a missing item or a far colour to a changed shade, an extra apple, a flipped boat or a tilted tree. Free hints, no clock, stars for finding them all.' },
 
     // --- 14+ ---
     { slug: 'science-trivia', name: 'Science Trivia', age: '14', mins: '10',
