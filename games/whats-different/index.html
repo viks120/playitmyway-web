@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#0f766e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>What's Different? – Free Spot the Difference Game for Little Ones | Play It My Way</title>
+    <meta name="description" content="Two pictures of the same pond, meadow or farm, and two to four big things changed. Tap what's different! A gentle looking game for ages 3+ with a friendly voice. No ads." />
+    <meta name="keywords" content="spot the difference for toddlers, whats different game, preschool picture game, looking game for 3 year olds, free game ages 3+" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="What's Different? – Free Spot the Difference Game for Little Ones" />
+    <meta property="og:description" content="Two pictures, a few big differences, a voice that names what your child finds. No reading, no failing. Ages 3+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/whats-different/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="What's Different? – Free Spot the Difference Game for Little Ones" />
+    <meta name="twitter:description" content="Two pictures, a few big differences, a voice that names what your child finds. Ages 3+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/whats-different/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <link rel="stylesheet" href="../shared/spot/spot.css" />
+    <style>
+      :root {
+        --band: var(--color-teal);
+        --band-tint: var(--color-teal-tint);
+        --band-tint-deep: #99d5cb;
+        --band-deep: #134e4a;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+      }
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body { background: var(--color-bg); overscroll-behavior-y: contain; }
+      body {
+        font-family: var(--font-display); color: var(--ink); margin: 0; padding: 16px 12px 48px;
+        display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+      }
+      button { font-family: inherit; }
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600; font-size: 15px; padding: 9px 14px;
+        border-radius: var(--radius-pill); background: var(--band-tint); align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center; box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+      header.game-head { text-align: center; margin: 4px 0 8px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0; text-wrap: balance; }
+      .stage-card {
+        width: 100%; max-width: 980px; background: var(--color-surface); border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest); padding: 10px; display: flex; flex-direction: column; align-items: center;
+      }
+      .intro { margin: 0 0 8px; font-size: 20px; font-weight: 700; color: var(--deep); text-align: center; }
+      .tell { min-height: 26px; margin: 0; text-align: center; font-size: 18px; font-weight: 600; color: var(--deep); }
+      .go-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 22px; font-weight: 700; padding: 14px 30px; min-height: 56px;
+        margin-top: 10px; cursor: pointer; background: var(--band); color: #fff; box-shadow: 0 6px 0 var(--band-deep);
+      }
+      .go-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--band-deep); }
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px; background: var(--color-surface);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-rest); line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1><img class="title-icon" src="../../icons/games/whats-different.svg" alt="" width="40" height="40"> What's Different?</h1>
+    </header>
+
+    <main class="stage-card">
+      <p class="intro" id="intro">Tap what's different!</p>
+      <div class="pics">
+        <svg class="pic" id="picA" viewBox="0 0 400 300" role="group" aria-label="Left picture"></svg>
+        <svg class="pic" id="picB" viewBox="0 0 400 300" role="group" aria-label="Right picture"></svg>
+      </div>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <p class="tell" id="tell" aria-live="polite"></p>
+      <button type="button" class="go-btn" id="nextBtn" hidden>Next picture →</button>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Look at the two pictures. They are nearly the same.</li>
+        <li>Tap anything that is different, in either picture. A ring shows every one you find.</li>
+        <li>Find them all and a new picture comes. It gets a little trickier only as your child gets them.</li>
+      </ol>
+      <p>If nothing is found for a while, one difference glows and the voice says "Look here!". Wrong taps never matter. With a keyboard, <kbd>Tab</kbd> into a picture, move with the arrow keys and press <kbd>Enter</kbd>. The voice is your device's own; nothing is sent anywhere, and nothing is saved.</p>
+      <h3>What it practises</h3>
+      <p>Looking carefully and comparing: noticing that something is missing, a different colour, or bigger, and holding one picture in mind while looking at the other.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/voice.js"></script>
+    <script src="../shared/spot/scenes.js"></script>
+    <script src="../shared/spot/draw.js"></script>
+    <script src="../shared/spot/play.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>
