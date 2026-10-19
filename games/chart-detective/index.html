@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#b45309" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- SEO Meta Tags -->
+    <title>Chart Detective – Free Tally Chart, Pictogram and Bar Chart Game for Kids | Play It My Way</title>
+    <meta name="description" content="Count things as they arrive, build the tally chart or pictogram, then answer the detective's questions: most, least, how many more. Grows into pictograms with a key, bar charts and tables. Ages 5+. No ads." />
+    <meta name="keywords" content="tally chart game for kids, pictogram game ks1, bar chart game ks2, data handling game, statistics game year 2, reading charts for children, free maths game ages 5+" />
+    <meta name="author" content="Play It My Way" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Chart Detective – Free Tally Chart, Pictogram and Bar Chart Game for Kids" />
+    <meta property="og:description" content="Count things as they arrive, build the chart, then solve the case: most, least, how many more. Tally charts to bar charts and tables. Ages 5+. No ads, no download!" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://playitmyway.com/games/chart-detective/" />
+    <meta property="og:site_name" content="Play It My Way" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Chart Detective – Free Tally Chart, Pictogram and Bar Chart Game for Kids" />
+    <meta name="twitter:description" content="Build the chart, then solve the case: most, least, how many more. Tally charts to bar charts and tables. Ages 5+. No ads, no download!" />
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="canonical" href="https://playitmyway.com/games/chart-detective/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="../../tokens.css" />
+    <link rel="stylesheet" href="../../components.css" />
+    <style>
+      :root {
+        --band: var(--color-amber);
+        --band-tint: var(--color-amber-tint);
+        --band-tint-deep: #d8c897;
+        --band-deep: #7c2d12;
+        --ink: var(--color-ink);
+        --ink-soft: var(--color-ink-soft);
+        --deep: var(--color-deep);
+        --right: #15803d;
+        --right-tint: #dcfce7;
+        --wrong: #b91c1c;
+        --wrong-tint: #fee2e2;
+        --lit: #fde68a;
+      }
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body { background: var(--color-bg); overscroll-behavior-y: contain; }
+      body {
+        font-family: var(--font-display); color: var(--ink); margin: 0; padding: 16px 12px 48px;
+        display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+      }
+      button { font-family: inherit; }
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+      .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+      .back-link {
+        color: var(--band); text-decoration: none; font-weight: 600; font-size: 15px; padding: 9px 14px;
+        border-radius: var(--radius-pill); background: var(--band-tint); align-self: flex-start; margin-bottom: 6px;
+        min-height: 44px; display: inline-flex; align-items: center; box-shadow: 0 3px 0 0 var(--band-tint-deep);
+        transition: transform var(--ease-quick), box-shadow var(--ease-quick);
+      }
+      .back-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--band-tint-deep); }
+      .back-link:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+      header.game-head { text-align: center; margin: 4px 0 8px; }
+      header.game-head h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 0; text-wrap: balance; }
+      .stage-card {
+        width: 100%; max-width: 760px; background: var(--color-surface); border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-rest); padding: 12px 10px; display: flex; flex-direction: column; align-items: center;
+      }
+      .intro { margin: 0 0 10px; font-size: 22px; font-weight: 700; color: var(--deep); text-align: center; }
+
+      /* ---- picking a case ---- */
+      .stages { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; max-width: 520px; }
+      @media (min-width: 560px) { .stages { grid-template-columns: 1fr 1fr; } .stages .stage-btn:last-child { grid-column: 1 / -1; } }
+      .stage-btn {
+        display: grid; grid-template-columns: 44px 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center; text-align: left;
+        border: 0; border-radius: var(--radius-lg); padding: 10px 12px; min-height: 64px; cursor: pointer; color: var(--ink);
+        background: var(--band-tint); box-shadow: 0 4px 0 0 var(--band-tint-deep);
+      }
+      .stage-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+      .stage-btn .num { grid-row: 1 / 3; width: 44px; height: 44px; border-radius: 50%; background: var(--band); color: #fff; font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+      .stage-btn .name { font-size: 20px; font-weight: 700; }
+      .stage-btn .blurb { font-size: 14px; color: var(--ink-soft); }
+
+      /* ---- the detective and the bubble ---- */
+      .bubble-row { display: flex; align-items: center; gap: 8px; width: 100%; margin-bottom: 8px; }
+      .detective { flex: 0 0 auto; width: 56px; height: 52px; }
+      .bubble {
+        flex: 1 1 auto; position: relative; background: var(--band-tint); border-radius: 16px; padding: 10px 12px; min-height: 52px;
+        display: flex; align-items: center;
+      }
+      .bubble::before { content: ""; position: absolute; left: -8px; top: 20px; border: 8px solid transparent; border-right-color: var(--band-tint); border-left: 0; }
+      .tell { margin: 0; font-size: 19px; font-weight: 600; color: var(--deep); line-height: 1.25; }
+      .tell.is-right { color: var(--right); }
+      .tell.is-wrong { color: var(--wrong); }
+      .say-btn {
+        flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--band); color: #fff; font-size: 20px;
+        cursor: pointer; box-shadow: 0 3px 0 0 var(--band-deep);
+      }
+      .say-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--band-deep); }
+
+      /* ---- the spotlight: what is arriving ---- */
+      .spot {
+        display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; margin-bottom: 8px; padding: 8px 12px;
+        border-radius: 14px; background: #fff7e6; border: 2px dashed var(--band-tint-deep);
+      }
+      .spot .glyph { width: 48px; height: 48px; }
+      .spot-name { font-size: 20px; font-weight: 700; }
+      .spot-count { font-size: 14px; color: var(--ink-soft); margin-left: auto; }
+      @media (prefers-reduced-motion: no-preference) {
+        .spot.pop .glyph { animation: spotPop 0.35s ease-out; }
+        @keyframes spotPop { from { transform: scale(0.4); } to { transform: scale(1); } }
+      }
+
+      /* ---- charts ---- */
+      .chart-wrap { width: 100%; }
+      .chart-title { margin: 0 0 6px; text-align: center; font-size: 17px; font-weight: 700; color: var(--ink-soft); }
+      .chart { width: 100%; }
+      .glyph { width: 24px; height: 24px; flex: 0 0 auto; }
+      .col {
+        border: 2px solid transparent; border-radius: 12px; background: #fff; padding: 4px 2px 6px; cursor: default; color: var(--ink); font: inherit;
+        display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0;
+      }
+      .col .label { font-size: 12px; line-height: 1.1; text-align: center; overflow-wrap: anywhere; }
+      .col.pickable { cursor: pointer; border-color: var(--band-tint-deep); background: var(--band-tint); }
+      .col.pickable:hover, .col.pickable:focus-visible { border-color: var(--band); }
+      .col.lit { background: var(--lit); border-color: var(--band); }
+      .col.is-right { background: var(--right-tint); border-color: var(--right); }
+      .col.is-wrong { background: var(--wrong-tint); border-color: var(--wrong); }
+      @media (prefers-reduced-motion: no-preference) {
+        .col.nudge { animation: nudge 0.3s ease; }
+        @keyframes nudge { 0%, 100% { transform: translateX(0); } 30% { transform: translateX(-6px); } 70% { transform: translateX(6px); } }
+      }
+      /* tally: one row per category */
+      .chart.tally { display: flex; flex-direction: column; gap: 6px; }
+      .chart.tally .col { flex-direction: row; justify-content: flex-start; gap: 8px; padding: 6px 8px; min-height: 48px; }
+      .chart.tally .label { width: 78px; text-align: left; font-size: 14px; flex: 0 0 auto; }
+      .tally-marks { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+      .tally-marks svg { width: 34px; height: 28px; }
+      .tally-marks path { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; fill: none; }
+      .tally-marks .new path { stroke: var(--band); }
+      /* pictogram, block and bar: columns side by side */
+      .chart.cols { display: flex; align-items: flex-end; gap: 6px; }
+      .chart.cols .col { flex: 1 1 0; }
+      .stack { display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; gap: 2px; height: 224px; }
+      .stack .glyph { width: 22px; height: 22px; }
+      .stack .glyph.half { clip-path: inset(0 50% 0 0); }
+      .stack .block { width: 22px; height: 18px; border-radius: 4px; border: 2px solid var(--ink); }
+      .stack .extra { outline: 3px solid var(--band); outline-offset: 1px; border-radius: 4px; }
+      @media (prefers-reduced-motion: no-preference) {
+        .stack .extra { animation: pulse 0.7s ease-in-out infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.18); } }
+      }
+      .chart.bars { display: grid; grid-template-columns: 30px 1fr; column-gap: 2px; }
+      .axis { position: relative; height: 224px; }
+      .axis span { position: absolute; right: 2px; transform: translateY(50%); font-size: 12px; color: var(--ink-soft); }
+      .plot { position: relative; display: flex; align-items: flex-end; gap: 6px; height: 224px; border-left: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding-left: 4px; }
+      .plot .grid { position: absolute; left: 0; right: 0; border-top: 1px solid var(--band-tint-deep); pointer-events: none; }
+      /* no padding or border here: the bar's height is a percentage of the column, which must equal the plot */
+      .plot .col { flex: 1 1 0; height: 100%; justify-content: flex-end; background: transparent; border: 0; border-radius: 8px 8px 0 0; padding: 0; }
+      .plot .col.pickable { background: var(--band-tint); }
+      .plot .col.lit { background: var(--lit); }
+      .plot .col.is-right { background: var(--right-tint); }
+      .plot .col.is-wrong { background: var(--wrong-tint); }
+      .bar { width: 70%; border: 2px solid var(--ink); border-bottom: 0; border-radius: 6px 6px 0 0; }
+      .bar-labels { grid-column: 2; display: flex; gap: 6px; padding-left: 4px; }
+      .bar-labels .lab { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; text-align: center; overflow-wrap: anywhere; min-width: 0; }
+      .chart-key { margin: 8px 0 0; text-align: center; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+      /* the table */
+      table.data { border-collapse: collapse; margin: 0 auto; font-size: 17px; }
+      table.data th, table.data td { border: 2px solid var(--band-tint-deep); padding: 6px 10px; text-align: center; min-width: 44px; }
+      table.data .short { display: none; }
+      @media (max-width: 480px) {
+        table.data { font-size: 15px; }
+        table.data th, table.data td { padding: 5px 6px; min-width: 40px; }
+        table.data .long { display: none; }
+        table.data .short { display: inline; }
+      }
+      table.data th { background: var(--band-tint); font-weight: 700; }
+      table.data th.name { text-align: left; }
+      table.data td.hidden-cell { font-weight: 700; color: var(--band); }
+      table.data td.lit { background: var(--lit); }
+      table.data th.total { background: #fff7e6; }
+      .c-blue { background: #60a5fa; } .c-green { background: #4ade80; } .c-yellow { background: #fbbf24; } .c-purple { background: #a78bfa; } .c-pink { background: #ff8fab; }
+
+      /* ---- answers ---- */
+      .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; margin-top: 12px; min-height: 52px; }
+      .chip {
+        min-width: 64px; min-height: 52px; padding: 8px 16px; border: 2px solid var(--band); border-radius: var(--radius-pill); font-size: 22px; font-weight: 700; cursor: pointer;
+        background: #fff; color: var(--band-deep); box-shadow: 0 4px 0 0 var(--band);
+      }
+      .chip:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--band); }
+      .chip.is-right { background: var(--right-tint); color: var(--right); border-color: var(--right); box-shadow: 0 4px 0 0 var(--right); }
+      .chip.is-wrong { background: var(--wrong-tint); color: var(--wrong); border-color: #fca5a5; box-shadow: 0 4px 0 0 #fca5a5; text-decoration: line-through; }
+      .chip:disabled { cursor: default; }
+      .chips .note { width: 100%; text-align: center; font-size: 15px; color: var(--ink-soft); margin: 0; }
+      .go-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 20px; font-weight: 700; padding: 12px 24px; min-height: 52px;
+        cursor: pointer; background: var(--band); color: #fff; box-shadow: 0 5px 0 var(--band-deep);
+      }
+      .go-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--band-deep); }
+      .soft-btn {
+        border: 0; border-radius: var(--radius-pill); font-size: 16px; font-weight: 600; padding: 10px 18px; min-height: 44px; cursor: pointer;
+        background: var(--band-tint); color: var(--band); box-shadow: 0 3px 0 0 var(--band-tint-deep);
+      }
+      .soft-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--band-tint-deep); }
+      .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; margin-top: 12px; }
+
+      /* ---- case closed ---- */
+      .done { width: 100%; margin-top: 12px; padding: 12px; border-radius: 16px; background: #fff7e6; }
+      .done-head { margin: 0 0 6px; text-align: center; font-size: 24px; color: var(--deep); }
+      .findings { list-style: none; margin: 0; padding: 0; font-size: 17px; }
+      .findings li { padding: 4px 0; }
+      .findings li::before { content: "✔ "; color: var(--right); }
+      .findings li.helped::before { content: "• "; color: var(--band); }
+
+      .how-to {
+        width: 100%; max-width: 760px; margin: 22px auto 0; padding: 18px 22px; background: var(--color-surface);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-rest); line-height: 1.6;
+      }
+      .how-to h2 { margin: 0 0 8px; font-size: 22px; }
+      .how-to h3 { margin: 14px 0 4px; font-size: 18px; }
+      .how-to ol { margin: 0; padding-left: 22px; }
+      .how-to p { margin: 10px 0 0; }
+      kbd { font-family: inherit; background: var(--band-tint); border-radius: 6px; padding: 1px 6px; font-size: 0.9em; }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="../../">← Back to Games</a>
+
+    <header class="game-head">
+      <h1><img class="title-icon" src="../../icons/games/chart-detective.svg" alt="" width="40" height="40"> Chart Detective</h1>
+    </header>
+
+    <main class="stage-card">
+      <svg class="sprite" id="sprite" aria-hidden="true" focusable="false"></svg>
+
+      <section id="pickView" aria-label="Pick a case">
+        <p class="intro">Pick a case</p>
+        <div class="stages" id="stages" role="group" aria-label="Stages"></div>
+      </section>
+
+      <section id="playView" aria-label="The case" hidden data-phase="pick" data-qi="0" data-attempts="0">
+        <div class="bubble-row">
+          <img class="detective" src="../../icons/critters/mango.svg" alt="" width="64" height="60" />
+          <div class="bubble"><p class="tell" id="tell" aria-live="polite"></p></div>
+          <button type="button" class="say-btn" id="sayBtn" aria-label="Say it again">🔊</button>
+        </div>
+
+        <div class="spot" id="spot" hidden>
+          <svg class="glyph" id="spotGlyph" aria-hidden="true" focusable="false"><use id="spotUse" href="#g-apple" /></svg>
+          <span class="spot-name" id="spotName"></span>
+          <span class="spot-count" id="spotCount"></span>
+        </div>
+
+        <div class="chart-wrap">
+          <p class="chart-title" id="chartTitle"></p>
+          <div class="chart" id="chart" role="group" aria-label="The chart"></div>
+          <p class="chart-key" id="chartKey" hidden></p>
+          <!-- the wrapper is clipped, not the table: a table ignores a 1px width and would widen the page on phones -->
+          <div class="sr-only"><table id="srTable"><caption id="srCaption"></caption><tbody id="srBody"></tbody></table></div>
+        </div>
+
+        <div class="chips" id="chips" role="group" aria-label="Answers"></div>
+
+        <div class="done" id="done" hidden>
+          <h2 class="done-head" id="doneHead" tabindex="-1">Case closed!</h2>
+          <ul class="findings" id="findings"></ul>
+          <div class="controls">
+            <button type="button" class="go-btn" id="nextStageBtn" hidden>Next stage →</button>
+            <button type="button" class="go-btn" id="nextCaseBtn">Next case →</button>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button type="button" class="soft-btn" id="casesBtn">All cases</button>
+        </div>
+      </section>
+    </main>
+
+    <section class="how-to">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li><strong>Pick a case.</strong> Tally Time and Picture It are for ages 5 and up; Key of Two, Bar Charts and Tables are for 7 and up.</li>
+        <li><strong>Count what arrives.</strong> In the first two cases things come one at a time. Tap the row or column where each one goes and watch the chart grow.</li>
+        <li><strong>Answer the detective.</strong> Which was most? How many more? Tap a column on the chart, or tap a number.</li>
+        <li><strong>Case closed.</strong> Every finding is read back, then it's on to the next case, or the next stage when every answer was right first time.</li>
+      </ol>
+      <p>A wrong answer gets a hint and another go. A second wrong answer gets the worked answer, with the two columns lit up, before the case moves on. On a keyboard, the number keys <kbd>1</kbd> to <kbd>5</kbd> pick a column, <kbd>Tab</kbd> and <kbd>Enter</kbd> press any button. The voice is your device's own; nothing is sent anywhere, and nothing is saved.</p>
+      <h3>What it practises</h3>
+      <p>Reading and making charts, as taught from Year 1 to Year 4: tally marks in fives, pictograms and block diagrams, then pictograms with a key, bar charts with axis steps of 2, 5 and 10, and two-way tables. The questions are the ones the school asks: which is most or least, how many more or fewer, how many altogether, and true or false.</p>
+    </section>
+
+    <footer class="site-footer">
+      <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
+      <nav class="site-footer-links" aria-label="Site links">
+        <a href="../../">🏠 All games</a>
+        <a href="../../privacy-policy.html">Privacy</a>
+        <a href="../../disclaimer.html">Disclaimer</a>
+        <a href="mailto:contact@playitmyway.com">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="../shared/voice.js"></script>
+    <script src="charts.js"></script>
+    <script src="glyphs.js"></script>
+    <script src="game.js"></script>
+    <script src="../../components.js"></script>
+    <script>
+      /* Installed-app flag: drives the bottom bar. display-mode covers Android
+         and modern iOS; navigator.standalone is the older iOS signal. */
+      if (
+        (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone
+      ) {
+        document.documentElement.classList.add("pimw-installed");
+      }
+      /* Back, with a floor: a game opened directly from a search result has no
+         history to go back to, so fall through to the games index. */
+      function pimwBack() {
+        if (history.length > 1) history.back();
+        else location.href = "/games/";
+      }
+      /* offline support; skipped over file:// where service workers do not run */
+      if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+        addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {});
+        });
+      }
+    </script>
+    <nav class="pimw-appbar" aria-label="App navigation">
+      <button type="button" class="pimw-appbar-btn" onclick="pimwBack()">
+        <span class="pimw-appbar-ic" aria-hidden="true">←</span>
+        <span class="pimw-appbar-label">Back</span>
+      </button>
+      <a class="pimw-appbar-btn" href="/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🏠</span>
+        <span class="pimw-appbar-label">Home</span>
+      </a>
+      <a class="pimw-appbar-btn" href="/games/">
+        <span class="pimw-appbar-ic" aria-hidden="true">🎮</span>
+        <span class="pimw-appbar-label">Games</span>
+      </a>
+    </nav>
+  </body>
+</html>
