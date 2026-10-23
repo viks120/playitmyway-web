@@ -289,3 +289,19 @@ html.pimw-fs .game-head,
 html.pimw-fs .how-to {
   display: none;
 }
+
+/* In-game pictures from games/shared/art/pictures.js: a page holds one
+   hidden sprite of <symbol>s and each picture is an <svg class="pic"> that
+   points at one. The sprite must not take space or be seen; the hidden
+   attribute does nothing on an SVG element, so it is sized away instead. */
+.sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+.pic {
+  display: inline-block;
+  vertical-align: middle;
+  flex: 0 0 auto;
+}
