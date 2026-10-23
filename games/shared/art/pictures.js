@@ -208,6 +208,11 @@
     ram: pic('a ram', p('M38 22Q40.6 28.9 33.9 31.9Q30.9 38.6 24 36Q17.1 38.6 14.1 31.9Q7.4 28.9 10 22Q7.4 15.1 14.1 12.1Q17.1 5.4 24 8Q30.9 5.4 33.9 12.1Q40.6 15.1 38 22Z', P.white) + p('M17 23c-8 0-12-5-10-11 1-3 5-5 9-4l-1 4c-2-1-4 0-5 2-1 4 2 6 7 6z', P.wood) + p('M31 23c8 0 12-5 10-11-1-3-5-5-9-4l1 4c2-1 4 0 5 2 1 4-2 6-7 6z', P.wood) + e(24, 31, 9, 11, P.sand) + dot(22, 36, 1.3) + dot(26, 36, 1.3) + l('M21.5 39.5q2.5 2 5 0') + eyes(20, 28, 28)),
     bug: pic('a bug', l('M12 24l-7-4M12 30l-8 1M14 36l-6 5M36 24l7-4M36 30l8 1M34 36l6 5') + c(24, 16, 7, P.ink) + e(24, 30, 15, 13, P.red) + l('M24 17v26') + dot(17, 26, 2.6) + dot(31, 26, 2.6) + dot(19, 35, 2.6) + dot(29, 35, 2.6) + c(21.5, 14, 1.8, P.white, ' stroke="none"') + c(26.5, 14, 1.8, P.white, ' stroke="none"') + l('M21 10c-1-3-3-5-6-6M27 10c1-3 3-5 6-6')),
     'snail-asleep': pic('a sleeping snail', p('M8 38c-2-9 1-19 7-19 4 0 7 3 7 7v12z', P.pipGreen) + l('M12 20l-2-9M18 20l2-9') + c(10, 10, 2.8, P.pipGreen) + c(20, 10, 2.8, P.pipGreen) + l('M8.6 10.5q1.4 1.6 2.8 0M18.6 10.5q1.4 1.6 2.8 0', ' stroke-width="1.5"') + p('M4 41c0-4 3-7 7-7h30c2 0 4 2 4 4v3z', P.pipGreen) + c(30, 25, 11, P.orange) + l('M31 25a3 3 0 0 1-3 3a6 6 0 0 1-5-6a7.5 7.5 0 0 1 7.5-6.5', ' stroke-width="2"') + l('M37 4h8l-8 8h8', ' stroke-width="6"') + l('M37 4h8l-8 8h8', ` stroke="${P.white}" stroke-width="2.5"`)),
+// --- group: arrows (program tiles in Code the Robot) ---
+    'arrow-up': pic('an up arrow', p('M24 6l16 18h-9v18h-14V24h-9z', P.blue)),
+    'arrow-down': pic('a down arrow', p('M24 42L8 24h9V6h14v18h9z', P.blue)),
+    'arrow-left': pic('a left arrow', p('M6 24l18-16v9h18v14H24v9z', P.blue)),
+    'arrow-right': pic('a right arrow', p('M42 24L24 40v-9H6V17h18V8z', P.blue)),
     // --- end of pictures ---
   };
 
