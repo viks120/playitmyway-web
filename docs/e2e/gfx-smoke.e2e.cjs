@@ -33,21 +33,21 @@ const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null;
  * works. Games not listed here use the fallback: click the first button
  * that looks like a start button, check <main>. */
 const GAMES = {
-  'memory-game': { start: ['text:Easy'], area: '#gameBoard, .game-board, main' },
-  'counting-game': { start: ['text:New Game'], area: '.game-area, #gameArea, main' },
-  'whack-a-mole': { start: ['text:New Game'], area: '#moleGrid, .mole-grid, main' },
-  'catch-falling-object': { start: ['text:Start'], area: '#gameArea, .game-area, main', keys: ['ArrowLeft', 'ArrowRight'] },
-  'sound-it-out': { start: ['text:Short a'], area: 'main' },
-  'sort-it-out': { start: ['text:Living'], area: 'main' },
-  'trace-letters': { start: [], area: 'main' },
-  'dot-to-dot': { start: [], area: 'main' },
-  'balloon-pop': { start: ['text:Start'], area: '#gameArea, .game-area, main' },
-  'tic-tac-toe': { start: ['text:New Game'], area: '.board, #board, main' },
-  'rock-paper-scissors': { start: ['text:Rock'], area: 'main' },
-  'code-the-robot': { start: [], area: 'main' },
-  'geography-explorer': { start: [], area: 'main' },
-  '2048-slider': { start: ['text:New Game'], area: '.grid, #grid, main', keys: ['ArrowLeft', 'ArrowUp'] },
-  'minesweeper': { start: ['text:Easy'], area: '#board, .board, main' },
+  'memory-game': { start: ['text:Easy'], area: '#gameBoard' },
+  'counting-game': { start: ['text:New Game'], area: '#objectsContainer' },
+  'whack-a-mole': { start: ['text:New Game'], area: '#moleGrid' },
+  'catch-falling-object': { start: ['text:Start'], area: '#gameArea', keys: ['ArrowLeft', 'ArrowRight'] },
+  'sound-it-out': { start: ['text:Short a'], area: '.stage' },
+  'sort-it-out': { start: ['text:Living'], area: '.stage' },
+  'trace-letters': { start: [], area: '#board' },
+  'dot-to-dot': { start: [], area: '#board' },
+  'balloon-pop': { start: ['text:Start'], area: '#gameArea' },
+  'tic-tac-toe': { start: ['text:New Game'], area: '#board' },
+  'rock-paper-scissors': { start: ['text:Rock'], area: '.arena' },
+  'code-the-robot': { start: [], area: '#boardWrap' },
+  'geography-explorer': { start: [], area: '#worldMap' },
+  '2048-slider': { start: ['text:New Game'], area: '#grid', keys: ['ArrowLeft', 'ArrowUp'], noPictures: true },
+  'minesweeper': { start: ['text:Easy'], area: '#grid' },
 };
 const START_RE = /^(▶|play|start|go|begin|new game|easy)/i;
 const JOINERS = String.fromCodePoint(0xfe0f, 0x20e3, 0x200d);
@@ -109,7 +109,7 @@ async function run(browser, slug, phone) {
     if (!text) problems.push(`play area not found: ${spec.area}`);
     else if (hasPicto(text)) problems.push('emoji still in the play area: ' + [...text].filter((ch) => /\p{Extended_Pictographic}/u.test(ch)).slice(0, 8).join(' '));
     const sprite = await page.evaluate(() => !!document.getElementById('pictures-sprite'));
-    if (!sprite) problems.push('the picture sprite is not in the page');
+    if (!sprite && !spec.noPictures) problems.push('the picture sprite is not in the page');
     const broken = await page.evaluate(() => [...document.querySelectorAll('svg.pic use')].filter((u) => { const id = (u.getAttribute('href') || '').slice(1); return !document.getElementById(id); }).length);
     if (broken) problems.push(`${broken} pictures point at a symbol the sprite lacks`);
     await page.screenshot({ path: path.join(OUT, `${slug}${phone ? '-phone' : ''}.png`) });

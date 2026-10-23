@@ -58,10 +58,6 @@
 
   /* The pictures, grouped the way the games use them. Each line is one id. */
   const PICTURES = {
-    // --- group: samples (kept until the artists' groups replace them) ---
-    apple: pic('an apple', p('M24 15c-8-6-18 2-16 14 2 10 8 15 16 13 8 2 14-3 16-13 2-12-8-20-16-14z', P.red) + l('M24 15c0-4 2-7 5-9', ` stroke="${P.brown}" stroke-width="3"`) + p('M26 11q7-6 12-1-6 6-12 1z', P.green)),
-    star: pic('a star', p(star(24, 26, 18, 7.5), P.yellow)),
-    cat: pic('a cat', e(24, 38, 12, 8, P.yellow) + p('M13 22L13 8l9 6z', P.yellow) + p('M35 22L35 8l-9 6z', P.yellow) + c(24, 22, 12, P.yellow) + p('M15 19L15 11l5 4z', P.pink, ' stroke="none"') + p('M33 19L33 11l-5 4z', P.pink, ' stroke="none"') + eyes(19.5, 28.5, 21, 2) + p('M22 26h4l-2 2.5z', P.pink, ' stroke="none"') + l('M11 24l-6-1M11 27l-6 1M37 24l6-1M37 27l6 1', ' stroke-width="1.5"')),
     // --- end of pictures ---
   };
 
