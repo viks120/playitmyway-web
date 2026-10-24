@@ -105,8 +105,9 @@ async function run(browser, slug, phone) {
       await new Promise((r) => setTimeout(r, 700));
     }
     for (const k of spec.keys || []) { await page.keyboard.press(k); await new Promise((r) => setTimeout(r, 150)); }
-    const text = await page.evaluate((sel) => { const el = document.querySelector(sel); return el ? el.textContent : ''; }, spec.area);
-    if (!text) problems.push(`play area not found: ${spec.area}`);
+    const found = await page.evaluate((sel) => { const el = document.querySelector(sel); return el ? { text: el.textContent || '' } : null; }, spec.area);
+    const text = found ? found.text : '';
+    if (!found) problems.push(`play area not found: ${spec.area}`);
     else if (hasPicto(text)) problems.push('emoji still in the play area: ' + [...text].filter((ch) => /\p{Extended_Pictographic}/u.test(ch)).slice(0, 8).join(' '));
     const sprite = await page.evaluate(() => !!document.getElementById('pictures-sprite'));
     if (!sprite && !spec.noPictures) problems.push('the picture sprite is not in the page');
