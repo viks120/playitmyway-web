@@ -5,7 +5,7 @@
  * analytics. There is deliberately no push code here — push would require a
  * per-device subscription held by a third party, which this site does not do.
  */
-const CACHE = 'pimw-54a3f8ab';
+const CACHE = 'pimw-006cb92f';
 
 const PRECACHE = [
   "/",
@@ -109,6 +109,7 @@ const PRECACHE = [
   "/games/shared/3d/sound.js",
   "/games/shared/3d/three.min.js",
   "/games/shared/3d/toon.js",
+  "/games/shared/art/pictures.js",
   "/games/shared/spot/draw.js",
   "/games/shared/spot/play.js",
   "/games/shared/spot/scenes.js",
