@@ -81,6 +81,10 @@ const USERS = [
   { slug: 'memory-game', ownScript: '// Screen-reader status line', ids: ['dog', 'cat', 'mouse', 'hamster', 'bear', 'panda', 'fox', 'koala', 'tiger', 'lion', 'cow', 'pig'], dataRange: ['const PICS = [', 'const difficultyConfig = {'] },
   { slug: 'counting-game', ownScript: '// the fruit pictures: one hidden sprite of symbols', ids: ['apple', 'banana', 'grapes', 'orange', 'strawberry', 'cherries', 'kiwi', 'pineapple', 'mango', 'peach'], dataRange: ['const objects = [', 'const numbers = ['] },
   { slug: 'tic-tac-toe', ownScript: 'Pictures.install([\'mark-x\', \'mark-o\'])', ids: ['mark-x', 'mark-o'], dataRange: ['function markPic(', 'const move = cellLabel(index, player)'] },
+  { slug: 'balloon-pop', ownScript: 'Pictures.install([\'pop-burst\'])', ids: ['pop-burst'], dataRange: ['const balloonColors = [', 'function showScorePopup('] },
+  { slug: 'catch-falling-object', ownScript: '// the pictures: one hidden sprite of symbols, put in the page before', ids: ['apple', 'orange', 'lemon', 'grapes', 'strawberry', 'banana', 'peach', 'kiwi', 'star', 'bomb', 'basket', 'heart', 'heart-empty'], dataRange: ['const fruits = [', 'let score = 0'] },
+  { slug: 'whack-a-mole', ownScript: '// Screen-reader status line', ids: ['hamster', 'dog', 'bear', 'panda'], dataRange: ['const PIECES = [', 'const messages = ['] },
+  { slug: 'sound-it-out', ownScript: '/* ==WORD_DATA_START==', ids: ['cat', 'rat', 'bat', 'ram', 'man', 'dad', 'cab', 'van', 'bag', 'map', 'can', 'pan', 'fan', 'cap', 'hat', 'tag', 'sax', 'tap', 'ham', 'yam', 'gas-pump', 'face-sleepy', 'face-sad', 'face-angry', 'lightning', 'chicken', 'pen', 'dot', 'bed', 'leg', 'net', 'web', 'gem', 'jet', 'red-swatch', 'water-drops', 'pig', 'kid', 'lips', 'bin', 'pin', 'trophy', 'dog', 'fox', 'cop', 'mom', 'box', 'pot', 'rod', 'log', 'fog', 'face-hot', 'pod', 'bug', 'bus', 'mug', 'cup', 'tub', 'hut', 'nut', 'sun', 'runner', 'hug', 'scissors', 'face-yum'], dataRange: ['/* ==WORD_DATA_START==', '/* ==WORD_DATA_END== */'] },
 ];
 for (const u of USERS) {
   test(`${u.slug}: wired to the picture library and free of gameplay emoji`, () => {

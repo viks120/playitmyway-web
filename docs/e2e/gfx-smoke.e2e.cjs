@@ -37,7 +37,7 @@ const GAMES = {
   'counting-game': { start: ['text:New Game'], area: '#objectsContainer' },
   'whack-a-mole': { start: ['text:New Game'], area: '#moleGrid' },
   'catch-falling-object': { start: ['text:Start'], area: '#gameArea', keys: ['ArrowLeft', 'ArrowRight'] },
-  'sound-it-out': { start: ['text:Short a'], area: '.stage' },
+  'sound-it-out': { start: ['.chip[data-set="a"]'], area: '#picGlyph' },
   'sort-it-out': { start: ['text:Living'], area: '.stage' },
   'trace-letters': { start: [], area: '#board' },
   'dot-to-dot': { start: [], area: '#board' },
