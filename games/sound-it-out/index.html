@@ -174,7 +174,30 @@
       }
       .rung.rung-now { background: var(--band); color: #fff; opacity: 1; }
 
-      .prompt { text-align: center; color: var(--ink-soft); font-size: 16.5px; margin: 2px 0 6px; min-height: 24px; }
+      /* Pip hosts the prompt from a speech bubble, the house pattern of Chart
+         Detective's detective; the text in #prompt is set by the same code */
+      .bubble-row { display: flex; align-items: center; gap: 8px; width: 100%; margin: 2px 0 10px; text-align: left; }
+      .host { flex: 0 0 auto; width: 56px; height: 52px; }
+      .bubble {
+        flex: 1 1 auto;
+        position: relative;
+        background: var(--band-tint);
+        border-radius: 16px;
+        padding: 10px 14px;
+        min-height: 52px;
+        display: flex;
+        align-items: center;
+      }
+      .bubble::before {
+        content: "";
+        position: absolute;
+        left: -8px;
+        top: 20px;
+        border: 8px solid transparent;
+        border-right-color: var(--band-tint);
+        border-left: 0;
+      }
+      .prompt { color: var(--ink); font-weight: 600; font-size: 16.5px; line-height: 1.3; margin: 0; min-height: 24px; }
       .prompt strong { color: var(--band); letter-spacing: 0.1em; }
 
       .stage {
@@ -184,7 +207,7 @@
         justify-content: center;
         margin-bottom: 10px;
       }
-      .pic {
+      .pic-btn {
         position: relative;
         border: none;
         background: transparent;
@@ -196,20 +219,26 @@
         user-select: none;
       }
       /* the picture becomes tappable only when a local voice exists */
-      body.has-voice .pic.speakable { cursor: pointer; }
-      body.has-voice .pic.speakable:hover { background: var(--band-tint); }
+      body.has-voice .pic-btn.speakable { cursor: pointer; }
+      body.has-voice .pic-btn.speakable:hover { background: var(--band-tint); }
       .speak-badge {
         display: none;
         position: absolute;
-        right: -4px;
-        bottom: 2px;
+        right: -10px;
+        bottom: -6px;
         font-size: 20px;
         background: var(--band-tint);
         border-radius: var(--radius-pill);
         padding: 3px 6px;
       }
-      body.has-voice .pic.speakable .speak-badge { display: block; }
-      .pic.pop { animation: picPop 220ms ease; }
+      body.has-voice .pic-btn.speakable .speak-badge { display: block; }
+      .pic-btn.pop { animation: picPop 220ms ease; }
+      /* the word's picture from the library, boxed like the glyph it replaces so
+         the stage never jumps between the picture and the printed-word state */
+      .pic-art { width: clamp(60px, 19vw, 84px); height: clamp(60px, 19vw, 84px); pointer-events: none; }
+      /* "six" and "ten": a row of small dots, grouped in fives */
+      .dot-row { display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; pointer-events: none; }
+      .dot-row .pic:nth-child(6) { margin-left: 12px; }
       @keyframes picPop { 0% { transform: scale(0.7); opacity: 0.4; } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
       .read-word {
         font-size: clamp(38px, 13vw, 54px);
@@ -457,10 +486,13 @@
 
         <div class="rungs" id="rungs" hidden></div>
 
-        <p class="prompt" id="prompt"></p>
+        <div class="bubble-row">
+          <img class="host" src="../../icons/critters/pip.svg" alt="" width="64" height="60" />
+          <div class="bubble"><p class="prompt" id="prompt"></p></div>
+        </div>
 
         <div class="stage">
-          <button class="pic" id="picBtn" type="button" tabindex="-1" aria-hidden="true">
+          <button class="pic-btn" id="picBtn" type="button" tabindex="-1" aria-hidden="true">
             <span id="picGlyph"></span>
             <span class="speak-badge" aria-hidden="true">🔊</span>
           </button>
@@ -517,6 +549,7 @@
       </ul>
     </section>
 
+    <script src="../shared/art/pictures.js"></script>
     <script>
       (function () {
         "use strict";
@@ -525,15 +558,16 @@
            Pure data only — no DOM access in this section.
            The build validator extracts and evaluates this slice in Node.
            Every word is a strict short-vowel CVC: consonant + a/e/i/o/u + consonant.
-           An empty emoji string marks a ladder-only word (no unambiguous picture). */
+           A pictured word names its picture in games/shared/art/pictures.js;
+           an empty id marks a ladder-only word (no unambiguous picture). */
 
         var WORDS = [
           // --- short a ---
-          ["cat", "🐱"], ["rat", "🐀"], ["bat", "🦇"], ["ram", "🐏"], ["man", "👨"],
-          ["dad", "🧔"], ["cab", "🚕"], ["van", "🚐"], ["bag", "👜"], ["map", "🗺️"],
-          ["can", "🥫"], ["pan", "🍳"], ["fan", "🪭"], ["cap", "🧢"], ["hat", "🎩"],
-          ["tag", "🏷️"], ["sax", "🎷"], ["tap", "🚰"], ["ham", "🍖"], ["yam", "🍠"],
-          ["gas", "⛽"], ["nap", "😴"], ["sad", "😢"], ["mad", "😠"], ["zap", "⚡"],
+          ["cat", "cat"], ["rat", "rat"], ["bat", "bat"], ["ram", "ram"], ["man", "man"],
+          ["dad", "dad"], ["cab", "cab"], ["van", "van"], ["bag", "bag"], ["map", "map"],
+          ["can", "can"], ["pan", "pan"], ["fan", "fan"], ["cap", "cap"], ["hat", "hat"],
+          ["tag", "tag"], ["sax", "sax"], ["tap", "tap"], ["ham", "ham"], ["yam", "yam"],
+          ["gas", "gas-pump"], ["nap", "face-sleepy"], ["sad", "face-sad"], ["mad", "face-angry"], ["zap", "lightning"],
           ["mat", ""], ["sat", ""], ["fat", ""], ["pat", ""],
           ["bad", ""], ["had", ""], ["pad", ""],
           ["gap", ""], ["lap", ""], ["rap", ""], ["sap", ""],
@@ -543,17 +577,17 @@
           ["jab", ""], ["lab", ""], ["tab", ""],
           ["wax", ""],
           // --- short e ---
-          ["hen", "🐔"], ["pen", "🖊️"], ["ten", "🔟"], ["bed", "🛏️"], ["leg", "🦵"],
-          ["net", "🥅"], ["web", "🕸️"], ["gem", "💎"], ["jet", "✈️"], ["red", "🟥"],
-          ["wet", "💦"],
+          ["hen", "chicken"], ["pen", "pen"], ["ten", "dot"], ["bed", "bed"], ["leg", "leg"],
+          ["net", "net"], ["web", "web"], ["gem", "gem"], ["jet", "jet"], ["red", "red-swatch"],
+          ["wet", "water-drops"],
           ["fed", ""], ["led", ""], ["wed", ""],
           ["beg", ""], ["peg", ""],
           ["den", ""], ["men", ""],
           ["bet", ""], ["get", ""], ["let", ""], ["met", ""], ["pet", ""], ["set", ""], ["vet", ""], ["yet", ""],
           ["yes", ""],
           // --- short i ---
-          ["pig", "🐷"], ["kid", "🧒"], ["lip", "👄"], ["bin", "🗑️"], ["pin", "📌"],
-          ["six", "6️⃣"], ["win", "🏆"],
+          ["pig", "pig"], ["kid", "kid"], ["lip", "lips"], ["bin", "bin"], ["pin", "pin"],
+          ["six", "dot"], ["win", "trophy"],
           ["bid", ""], ["did", ""], ["hid", ""], ["lid", ""], ["rid", ""],
           ["big", ""], ["dig", ""], ["fig", ""], ["wig", ""],
           ["fin", ""], ["tin", ""],
@@ -563,18 +597,18 @@
           ["bib", ""], ["rib", ""],
           ["fix", ""], ["mix", ""],
           // --- short o ---
-          ["dog", "🐶"], ["fox", "🦊"], ["cop", "👮"], ["mom", "👩"], ["box", "📦"],
-          ["pot", "🫖"], ["dot", "🔴"], ["rod", "🎣"], ["log", "🪵"], ["fog", "🌫️"],
-          ["hot", "🥵"], ["pod", "🫛"],
+          ["dog", "dog"], ["fox", "fox"], ["cop", "cop"], ["mom", "mom"], ["box", "box"],
+          ["pot", "pot"], ["dot", "dot"], ["rod", "rod"], ["log", "log"], ["fog", "fog"],
+          ["hot", "face-hot"], ["pod", "pod"],
           ["cob", ""], ["job", ""], ["sob", ""],
           ["cod", ""], ["nod", ""],
           ["hog", ""], ["jog", ""],
           ["hop", ""], ["mop", ""], ["pop", ""], ["top", ""],
           ["cot", ""], ["got", ""], ["lot", ""], ["not", ""], ["rot", ""], ["tot", ""],
           // --- short u ---
-          ["bug", "🐛"], ["bus", "🚌"], ["mug", "☕"], ["cup", "🥤"], ["tub", "🛁"],
-          ["hut", "🛖"], ["nut", "🥜"], ["sun", "☀️"], ["run", "🏃"], ["hug", "🤗"],
-          ["cut", "✂️"], ["yum", "😋"],
+          ["bug", "bug"], ["bus", "bus"], ["mug", "mug"], ["cup", "cup"], ["tub", "tub"],
+          ["hut", "hut"], ["nut", "nut"], ["sun", "sun"], ["run", "runner"], ["hug", "hug"],
+          ["cut", "scissors"], ["yum", "face-yum"],
           ["cub", ""], ["rub", ""], ["sub", ""],
           ["bud", ""], ["mud", ""],
           ["dug", ""], ["jug", ""], ["pug", ""], ["rug", ""], ["tug", ""],
@@ -582,6 +616,10 @@
           ["bun", ""], ["fun", ""], ["nun", ""],
           ["pup", ""], ["but", ""]
         ];
+
+        // "six" and "ten" have no drawn numeral in the library: the stage shows
+        // that many small dots instead of one picture
+        var DOT_COUNT = { six: 6, ten: 10 };
 
         // easily-confused letters (similar sound or mirror shape) for distractor tiles
         var CONFUSABLE = {
@@ -611,10 +649,10 @@
         var ROUND_SIZE = 8;
 
         // fast lookups + one-letter-apart adjacency for ladder chains
-        var wordSet = {}, emojiOf = {}, picturedWords = [];
+        var wordSet = {}, pictureOf = {}, picturedWords = [];
         WORDS.forEach(function (entry) {
           wordSet[entry[0]] = true;
-          emojiOf[entry[0]] = entry[1];
+          pictureOf[entry[0]] = entry[1];
           if (entry[1]) picturedWords.push(entry[0]);
         });
         function oneApart(a, b) {
@@ -630,6 +668,15 @@
           });
           NEIGHBORS[w] = list;
         });
+
+        // the word pictures: one hidden sprite holding only the symbols this
+        // page uses, put in the page before anything draws (pictures.js loads
+        // as a classic script above this one)
+        var PICTURE_IDS = [];
+        WORDS.forEach(function (entry) {
+          if (entry[1] && PICTURE_IDS.indexOf(entry[1]) === -1) PICTURE_IDS.push(entry[1]);
+        });
+        Pictures.install(PICTURE_IDS);
 
         // ---------- helpers ----------
         function $(id) { return document.getElementById(id); }
@@ -914,9 +961,16 @@
             ? buildTray([word[changedIdx]], prevWord[changedIdx])
             : buildTray(word.split(""));
 
-          var emoji = emojiOf[word];
-          if (emoji) {
-            picGlyph.textContent = emoji;
+          var id = pictureOf[word];
+          if (id) {
+            if (DOT_COUNT[word]) {
+              // a row of small dots, as many as the word says (grouped in fives by CSS)
+              var row = "";
+              for (var d = 0; d < DOT_COUNT[word]; d++) row += Pictures.use("dot", { size: 20 });
+              picGlyph.innerHTML = '<span class="dot-row" role="img" aria-label="' + word + '">' + row + "</span>";
+            } else {
+              picGlyph.innerHTML = Pictures.use(id, { size: 84, label: word, cls: "pic-art" });
+            }
             picGlyph.className = "";
             picBtn.classList.add("speakable");
             promptEl.innerHTML = "";
@@ -945,7 +999,7 @@
           var intro = prevWord
             ? "New rung. One sound changed — the " + POS_NAMES[changedIdx] +
               " box is empty. Make the word " + word + "."
-            : (emoji
+            : (id
               ? "New picture word: " + word + ". Three empty sound boxes."
               : "New word to build: " + word + ".");
           srStatus.textContent = intro + " Tap a letter tile to fill a box.";
@@ -1145,7 +1199,7 @@
               if (options.length === 0) break;
               shuffle(options);
               options.sort(function (a, b) {
-                return (emojiOf[b] ? 1 : 0) - (emojiOf[a] ? 1 : 0) + (Math.random() - 0.5);
+                return (pictureOf[b] ? 1 : 0) - (pictureOf[a] ? 1 : 0) + (Math.random() - 0.5);
               });
               var next = options[0];
               path.push(next);
