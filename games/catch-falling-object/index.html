@@ -104,39 +104,74 @@
         width: 100%;
         max-width: 400px;
         height: 500px;
-        /* kept: sky down to grass, the scene the fruit falls through */
-        background: linear-gradient(180deg, #87CEEB 0%, #98FB98 100%);
+        /* flat sky; the orchard scene (the area's first child) paints over it */
+        background: #dff4ff;
         border-radius: 15px;
         overflow: hidden;
         border: 4px solid #333;
         touch-action: none;
       }
 
+      /* the orchard the fruit falls through: flat inline SVG pinned to the
+         bottom edge (xMidYMax slice), absolutely positioned behind every
+         piece and overlay, so the area's size, the hit boxes and the timers
+         are untouched; never a pointer target */
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      /* Mango carries the basket: one moving element whose box (80 by 60,
+         the catch zone the collision loop measures) is exactly the old one.
+         The basket picture fills the box; Mango's head overflows above it
+         and is painted after the basket, chin on the rim, so the fruit lands
+         in front of him */
       .basket {
         position: absolute;
         bottom: 10px;
         width: 80px;
         height: 60px;
-        font-size: 50px;
-        line-height: 60px;
-        text-align: center;
         transition: left 0.05s linear;
       }
 
+      .basket .basket-pic {
+        position: absolute;
+        inset: 0;
+        display: block;
+      }
+
+      .basket .carrier {
+        position: absolute;
+        left: 50%;
+        bottom: 28px;
+        margin-left: -32px;
+      }
+
+      /* explicit boxes for the falling pieces, the size the emoji glyphs
+         had, so the hit boxes no longer depend on the OS emoji font */
       .fruit {
         position: absolute;
-        font-size: 40px;
-        line-height: 40px;
-        text-align: center;
+        width: 40px;
+        height: 40px;
         animation: fall linear forwards;
       }
 
       .bad-item {
         position: absolute;
-        font-size: 35px;
-        line-height: 35px;
-        text-align: center;
+        width: 35px;
+        height: 35px;
         animation: fall linear forwards;
+      }
+
+      .fruit .pic,
+      .bad-item .pic,
+      .basket .pic {
+        display: block;
+        width: 100%;
+        height: 100%;
       }
 
       @keyframes fall {
@@ -166,7 +201,8 @@
         position: absolute;
         top: 10px;
         right: 10px;
-        font-size: 24px;
+        display: flex;
+        gap: 2px;
       }
 
       .controls {
@@ -322,14 +358,26 @@
         z-index: 50;
       }
 
-      .start-screen h2 { font-size: 1.8em; margin-bottom: 20px; }
+      .start-screen h2 { font-size: 1.8em; margin: 0 0 20px; }
       .start-screen p { font-size: 1.1em; margin: 5px 0; }
+
+      /* Clover hosts the start screen and the game-over dialog */
+      .start-screen .host { margin-bottom: 4px; }
+      .legend-pic { display: inline-block; line-height: 0; vertical-align: middle; }
+      .legend-pic + .legend-pic { margin-left: 2px; }
+      .modal .host-row { display: flex; align-items: center; justify-content: center; gap: 10px; }
+      .modal .host-row h2 { margin: 10px 0; }
 
       @media (max-width: 480px) {
         body { padding-top: 50px; }
         .game-area { height: 400px; max-width: 100%; }
-        .basket { width: 70px; height: 50px; font-size: 40px; line-height: 50px; }
-        .fruit { font-size: 35px; }
+        .basket { width: 70px; height: 50px; }
+        .basket .carrier { bottom: 22px; }
+        .fruit { width: 35px; height: 35px; }
+        /* the start screen is 400px tall here: Clover takes the room the title's
+           bottom margin and his own gap gave up */
+        .start-screen .host { margin-bottom: 0; }
+        .start-screen h2 { margin-bottom: 12px; }
       }
     </style>
   </head>
@@ -350,23 +398,44 @@
       </div>
 
       <div class="game-area" id="gameArea">
-        <div class="lives" id="lives" role="img" aria-label="3 lives left">❤️❤️❤️</div>
-        <div class="basket" id="basket" aria-hidden="true">🧺</div>
+        <!-- the orchard: sky, far hills, the tree line (a canopy band with ink
+             along its top edge) on a few trunks, and the field the basket runs
+             on; decorative, behind every piece, pinned to the bottom edge -->
+        <svg class="scene" viewBox="0 0 400 500" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+          <rect x="0" y="0" width="400" height="500" fill="#dff4ff" />
+          <ellipse cx="70" cy="430" rx="190" ry="80" fill="#a7e3a1" />
+          <ellipse cx="330" cy="440" rx="210" ry="95" fill="#a7e3a1" />
+          <path d="M-10 470V400C5 372 35 372 50 396C62 376 88 374 102 398C118 370 152 370 166 396C180 378 206 378 220 400C236 368 272 368 286 396C300 378 326 378 340 398C356 372 392 372 410 398V470Z" fill="#4ade80" />
+          <path d="M-10 400C5 372 35 372 50 396C62 376 88 374 102 398C118 370 152 370 166 396C180 378 206 378 220 400C236 368 272 368 286 396C300 378 326 378 340 398C356 372 392 372 410 398" fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+          <rect x="0" y="446" width="400" height="54" fill="#9be28f" />
+          <g fill="#8b5e3c" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round">
+            <rect x="30" y="430" width="12" height="26" rx="2" />
+            <rect x="128" y="432" width="12" height="24" rx="2" />
+            <rect x="222" y="430" width="12" height="26" rx="2" />
+            <rect x="318" y="432" width="12" height="24" rx="2" />
+          </g>
+        </svg>
+        <div class="lives" id="lives" role="img" aria-label="3 lives left"></div>
+        <div class="basket" id="basket" aria-hidden="true">
+          <span class="basket-pic" data-pic="basket" data-size="60"></span>
+          <img class="carrier" src="../../icons/critters/mango.svg" alt="" width="64" height="60" />
+        </div>
         <div class="start-screen" id="startScreen">
-          <h2><span aria-hidden="true">🍎</span> Catch the Fruit! <span aria-hidden="true">🍊</span></h2>
+          <img class="host" src="../../icons/critters/clover.svg" alt="" width="64" height="60" />
+          <h2><span class="legend-pic" data-pic="apple" data-size="32"></span> Catch the Fruit! <span class="legend-pic" data-pic="orange" data-size="32"></span></h2>
           <p>Move the basket with your finger, the mouse, or the left and right arrow keys</p>
-          <p>🍎🍊🍋🍇🍓 = +10 points</p>
-          <p>⭐ = +50 bonus!</p>
-          <p>🔥 Catch 5 in a row = +20 combo!</p>
-          <p>💣 = Lose a life!</p>
+          <p><span class="legend-pic" data-pic="apple" data-size="24" data-label="true"></span><span class="legend-pic" data-pic="orange" data-size="24" data-label="true"></span><span class="legend-pic" data-pic="lemon" data-size="24" data-label="true"></span><span class="legend-pic" data-pic="grapes" data-size="24" data-label="true"></span><span class="legend-pic" data-pic="strawberry" data-size="24" data-label="true"></span> = +10 points</p>
+          <p><span class="legend-pic" data-pic="star" data-size="24" data-label="true"></span> = +50 bonus!</p>
+          <p>Catch 5 in a row = +20 combo!</p>
+          <p><span class="legend-pic" data-pic="bomb" data-size="24" data-label="true"></span> = Lose a life!</p>
           <br>
           <button type="button" class="btn" onclick="startGame()">Start Game</button>
         </div>
         <div class="start-screen" id="pauseScreen" style="display: none;">
-          <h2><span aria-hidden="true">⏸️</span> Paused</h2>
+          <h2>Paused</h2>
           <p>Take a break!</p>
           <br>
-          <button type="button" class="btn" onclick="togglePause()"><span aria-hidden="true">▶️</span> Resume</button>
+          <button type="button" class="btn" onclick="togglePause()">Resume</button>
         </div>
       </div>
 
@@ -379,7 +448,10 @@
     <div class="modal-overlay" id="modal">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <button type="button" class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
-        <h2 id="modalTitle">Game Over!</h2>
+        <div class="host-row">
+          <img class="host" src="../../icons/critters/clover.svg" alt="" width="64" height="60" />
+          <h2 id="modalTitle">Game Over!</h2>
+        </div>
         <div class="stars" id="starRating" aria-hidden="true">
           <span class="star">★</span>
           <span class="star">★</span>
@@ -392,7 +464,17 @@
       </div>
     </div>
 
+    <script src="../shared/art/pictures.js"></script>
     <script>
+      // the pictures: one hidden sprite of symbols, put in the page before
+      // the basket, the legend and the lives render (this script runs at
+      // parse time); then every static picture slot gets its picture, the
+      // legend's labelled so a screen reader still hears the fruit names
+      Pictures.install(['apple', 'orange', 'lemon', 'grapes', 'strawberry', 'banana', 'peach', 'kiwi', 'star', 'bomb', 'basket', 'heart', 'heart-empty']);
+      document.querySelectorAll('[data-pic]').forEach((slot) => {
+        slot.innerHTML = Pictures.use(slot.dataset.pic, { size: Number(slot.dataset.size) || 48, label: slot.dataset.label === 'true' || undefined });
+      });
+
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       let audioCtx = null;
 
@@ -448,9 +530,11 @@
         }
       }
 
-      const fruits = ['🍎', '🍊', '🍋', '🍇', '🍓', '🍌', '🍑', '🥝'];
-      const bonus = '⭐';
-      const bad = '💣';
+      // picture ids from the library: eight fruit worth +10, the star bonus
+      // and the bomb that costs a life
+      const fruits = ['apple', 'orange', 'lemon', 'grapes', 'strawberry', 'banana', 'peach', 'kiwi'];
+      const bonus = 'star';
+      const bad = 'bomb';
 
       let score = 0, level = 1, lives = 3, combo = 0;
       let gameRunning = false;
@@ -474,7 +558,8 @@
         document.getElementById('level').textContent = level;
         document.getElementById('best').textContent = best;
         const livesEl = document.getElementById('lives');
-        livesEl.textContent = '❤️'.repeat(lives) + '🖤'.repeat(3 - lives);
+        const heart = (id) => Pictures.use(id, { size: 24, cls: 'life' });
+        livesEl.innerHTML = heart('heart').repeat(lives) + heart('heart-empty').repeat(3 - lives);
         // a row of heart emoji reads as noise — say the number instead
         livesEl.setAttribute('aria-label', lives === 1 ? '1 life left' : lives + ' lives left');
       }
@@ -524,17 +609,19 @@
         const item = document.createElement('div');
         
         const rand = Math.random();
-        let type, emoji;
+        let type, id;
         if (rand < 0.1) {
-          type = 'bonus'; emoji = bonus;
+          type = 'bonus'; id = bonus;
         } else if (rand < 0.2) {
-          type = 'bad'; emoji = bad;
+          type = 'bad'; id = bad;
         } else {
-          type = 'fruit'; emoji = fruits[Math.floor(Math.random() * fruits.length)];
+          type = 'fruit'; id = fruits[Math.floor(Math.random() * fruits.length)];
         }
 
+        // the wrapper div is the piece the collision loop, the pause rule and
+        // the miss detector hang off; the picture inside fills its box
         item.className = type === 'bad' ? 'bad-item' : 'fruit';
-        item.textContent = emoji;
+        item.innerHTML = Pictures.use(id, { size: type === 'bad' ? 35 : 40 });
         // falling props: the live region narrates catches, so these must not
         // fill a screen reader with a stream of loose emoji
         item.setAttribute('aria-hidden', 'true');
@@ -542,7 +629,12 @@
         item.style.left = Math.random() * (areaRect.width - 50) + 'px';
         
         const fallDuration = Math.max(2, 4 - level * 0.3);
-        item.style.animationDuration = fallDuration + 's';
+        // inline and important on purpose: tokens.css collapses every
+        // animation to 0.01ms under Reduce Motion, which here would end each
+        // fall before it is seen and make every item a miss; the fall is the
+        // game, so its duration is kept (an inline important declaration
+        // outranks a stylesheet's)
+        item.style.setProperty('animation-duration', fallDuration + 's', 'important');
 
         gameArea.appendChild(item);
 
