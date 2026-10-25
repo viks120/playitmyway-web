@@ -13,14 +13,14 @@
 
     <!-- SEO Meta Tags -->
     <title>Memory Match – Free Brain Game for Kids | Play It My Way</title>
-    <meta name="description" content="Flip cards and find matching pairs of cute emoji! A free memory game for kids ages 3+ that builds focus and concentration. No ads, no download." />
+    <meta name="description" content="Flip cards and find matching pairs of friendly critters and animals! A free memory game for kids ages 3+ that builds focus and concentration. No ads, no download." />
     <meta name="keywords" content="memory match game, card matching game, memory game for kids, concentration game, brain game for children" />
     <meta name="author" content="Play It My Way" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Free Memory Match Game for Kids | Brain Training Online" />
-    <meta property="og:description" content="Fun & free memory card matching game for children ages 3+. Boost memory skills with cute emoji cards. Play online - no download needed!" />
+    <meta property="og:description" content="Fun & free memory card matching game for children ages 3+. Boost memory skills with cute animal cards. Play online - no download needed!" />
     <meta property="og:type" content="game" />
     <meta property="og:url" content="https://playitmyway.com/games/memory-game/" />
     <meta property="og:site_name" content="Play It My Way" />
@@ -220,9 +220,11 @@
         font-weight: bold;
       }
 
+      /* The hidden face: a flat teal tint with an ink question mark, the same
+         on every card so a face-down card gives no tell. */
       .card-front {
-        background: var(--color-teal);
-        color: white;
+        background: var(--color-teal-tint);
+        color: var(--color-ink);
       }
 
       .card-back {
@@ -230,6 +232,20 @@
         transform: rotateY(180deg);
         border: 3px solid #ddd;
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      /* The pair picture (a library symbol, or a critter file as an <img>) is
+         60% of the card: 72 / 48 / 42px at the three card sizes, so the
+         font-size breakpoints need no rule of their own. The percentage
+         resolves against the face's content box, which on a flipped card is
+         the card less its own 2px border and the face's 3px border (10px in
+         all), hence the 6px. object-fit keeps the 64 by 60 critters in
+         proportion; the card, not the picture, is the hit target. */
+      .card-back .pic {
+        width: calc(60% + 6px);
+        height: calc(60% + 6px);
+        object-fit: contain;
+        pointer-events: none;
       }
 
       .controls {
@@ -599,6 +615,7 @@
       </div>
     </div>
 
+    <script src="../shared/art/pictures.js"></script>
     <script>
       // Screen-reader status line. Alternating a trailing no-break space keeps the
       // text genuinely different, so repeats ("Match!" twice) still get announced.
@@ -765,24 +782,41 @@
         const modal = document.getElementById('winModal');
         if (e.key === 'Escape' && modal.classList.contains('show')) closeModal();
       });
-      const emojis = [
-        "🐶",
-        "🐱",
-        "🐭",
-        "🐹",
-        "🐰",
-        "🦊",
-        "🐻",
-        "🐼",
-        "🐨",
-        "🐯",
-        "🦁",
-        "🐮",
-        "🐷",
-        "🐸",
-        "🐵",
-        "🐔",
+      // The pair pictures, in play order: each level deals a fixed prefix of
+      // this list (Easy the first 2, Medium 4, Hard 8), so the four critters
+      // come first and the library animals follow. The critters are the flat
+      // files in icons/critters/; the rest are ids in games/shared/art/pictures.js.
+      const PICS = [
+        "clover",
+        "pip",
+        "plum",
+        "mango",
+        "dog",
+        "cat",
+        "mouse",
+        "hamster",
+        "bear",
+        "panda",
+        "fox",
+        "koala",
+        "tiger",
+        "lion",
+        "cow",
+        "pig",
       ];
+      const CRITTERS = ["clover", "pip", "plum", "mango"];
+      const isCritter = (id) => CRITTERS.includes(id);
+      // What a flipped card is called, in its aria-label and the live region:
+      // the critters by name, the animals as plain words.
+      const PIC_NAMES = {
+        clover: "Clover", pip: "Pip", plum: "Plum", mango: "Mango",
+        dog: "dog", cat: "cat", mouse: "mouse", hamster: "hamster",
+        bear: "bear", panda: "panda", fox: "fox", koala: "koala",
+        tiger: "tiger", lion: "lion", cow: "cow", pig: "pig",
+      };
+      // The hidden symbol sheet goes into the page before the first card is
+      // drawn (initializeGame runs at the end of this script, while parsing).
+      Pictures.install(PICS.filter((id) => !isCritter(id)));
       let cards = [];
       let flippedCards = [];
       let flipTimer = null;   // pending match / no-match resolution
@@ -835,20 +869,34 @@
         return array;
       }
 
-      function createCard(emoji, index) {
+      // The picture on a card's face: a critter is its flat file as an <img>,
+      // anything else a symbol from the library. Both faces are aria-hidden;
+      // the card's own aria-label carries the name (see picName).
+      function picMarkup(id) {
+        if (isCritter(id)) {
+          return `<img class="pic" src="../../icons/critters/${id}.svg" alt="" width="64" height="60">`;
+        }
+        return Pictures.use(id);
+      }
+
+      function picName(card) {
+        return PIC_NAMES[card.dataset.pic] || card.dataset.pic;
+      }
+
+      function createCard(id, index) {
         // Stays a <div> so the flip transform and grid sizing are untouched;
         // role + tabindex + keydown give it the behaviour of a button.
         const card = document.createElement("div");
         card.className = "card";
         card.dataset.index = index;
-        card.dataset.emoji = emoji;
+        card.dataset.pic = id;
         card.setAttribute("role", "button");
         card.setAttribute("tabindex", "0");
         card.setAttribute("aria-label", `Card ${index + 1}, face down`);
 
         card.innerHTML = `
                 <div class="card-front" aria-hidden="true">?</div>
-                <div class="card-back" aria-hidden="true">${emoji}</div>
+                <div class="card-back" aria-hidden="true">${picMarkup(id)}</div>
             `;
 
         card.addEventListener("click", () => flipCard(card));
@@ -882,8 +930,8 @@
 
         playSound('flip');
         card.classList.add("flipped");
-        card.setAttribute("aria-label", `Card ${cardNumber(card)}, ${card.dataset.emoji}`);
-        announce(card.dataset.emoji);
+        card.setAttribute("aria-label", `Card ${cardNumber(card)}, ${picName(card)}`);
+        announce(picName(card));
         flippedCards.push(card);
 
         if (flippedCards.length === 2) {
@@ -891,7 +939,7 @@
           document.getElementById("moves").textContent = moves;
 
           const [card1, card2] = flippedCards;
-          if (card1.dataset.emoji === card2.dataset.emoji) {
+          if (card1.dataset.pic === card2.dataset.pic) {
             // Match found
             playSound('match');
             flipTimer = setTimeout(() => {
@@ -904,7 +952,7 @@
 
               const config = difficultyConfig[currentDifficulty];
               [card1, card2].forEach((c) => {
-                c.setAttribute("aria-label", `Card ${cardNumber(c)}, ${c.dataset.emoji}, matched`);
+                c.setAttribute("aria-label", `Card ${cardNumber(c)}, ${picName(c)}, matched`);
                 c.setAttribute("aria-disabled", "true");
               });
               announce(`Match! ${matchedPairs} of ${config.pairs} pairs found.`);
@@ -974,12 +1022,12 @@
         gameBoard.innerHTML = "";
 
         const config = difficultyConfig[currentDifficulty];
-        const selectedEmojis = emojis.slice(0, config.pairs);
-        cards = [...selectedEmojis, ...selectedEmojis]; // Duplicate for pairs
+        const selectedPics = PICS.slice(0, config.pairs);
+        cards = [...selectedPics, ...selectedPics]; // Duplicate for pairs
 
         const shuffledCards = shuffleArray([...cards]);
-        shuffledCards.forEach((emoji, index) => {
-          const card = createCard(emoji, index);
+        shuffledCards.forEach((id, index) => {
+          const card = createCard(id, index);
           gameBoard.appendChild(card);
         });
       }
