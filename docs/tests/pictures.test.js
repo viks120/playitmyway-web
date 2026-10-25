@@ -77,7 +77,11 @@ test('the sprite and the use() markup are what pages expect', () => {
 /* Pages that use the library: each must load the script before its own
  * game script, hold no emoji in the gameplay data it draws from, and only
  * reference pictures that exist. The list grows as games are converted. */
-const USERS = [];
+const USERS = [
+  { slug: 'memory-game', ownScript: '// Screen-reader status line', ids: ['dog', 'cat', 'mouse', 'hamster', 'bear', 'panda', 'fox', 'koala', 'tiger', 'lion', 'cow', 'pig'], dataRange: ['const PICS = [', 'const difficultyConfig = {'] },
+  { slug: 'counting-game', ownScript: '// the fruit pictures: one hidden sprite of symbols', ids: ['apple', 'banana', 'grapes', 'orange', 'strawberry', 'cherries', 'kiwi', 'pineapple', 'mango', 'peach'], dataRange: ['const objects = [', 'const numbers = ['] },
+  { slug: 'tic-tac-toe', ownScript: 'Pictures.install([\'mark-x\', \'mark-o\'])', ids: ['mark-x', 'mark-o'], dataRange: ['function markPic(', 'const move = cellLabel(index, player)'] },
+];
 for (const u of USERS) {
   test(`${u.slug}: wired to the picture library and free of gameplay emoji`, () => {
     const page = read('games', u.slug, 'index.html');
