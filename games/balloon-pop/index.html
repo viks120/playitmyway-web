@@ -130,11 +130,23 @@
         width: 100%;
         max-width: 500px;
         height: 450px;
-        /* kept: this gradient is the sky the balloons float in */
-        background: linear-gradient(180deg, #87CEEB 0%, #E0F7FA 100%);
+        /* flat sky; the drawn scene below paints the same colour and the clouds */
+        background: #dff4ff;
         border-radius: 15px;
         overflow: hidden;
-        border: 4px solid #333;
+        border: 4px solid #33302e;
+      }
+
+      /* the sky scene: first child of the play area, so it paints under every
+         balloon; absolutely positioned and never hit-tested, so the box the
+         spawn maths reads (offsetWidth/offsetHeight) is unchanged */
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        pointer-events: none;
       }
 
       /* the game area keeps the same column layout the body used to give
@@ -182,46 +194,35 @@
         transform: scale(1.1);
       }
 
-      .balloon-body {
+      /* the drawn balloon: an inline SVG in a 60 by 90 box (body 60 by 70 at
+         the top, knot and string hanging below the 60 by 75 button, as the old
+         string did); the float animation, hover scale and wrong-tap shrink
+         stay on the button, which also stays the whole hit target */
+      .balloon-art {
+        position: absolute;
+        left: 0;
+        top: 0;
         width: 60px;
+        height: 90px;
+        display: block;
+        overflow: visible;
+        pointer-events: none;
+      }
+
+      /* the number or letter: real text centred on the balloon body */
+      .balloon-label {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
         height: 70px;
-        border-radius: 50% 50% 50% 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.5em;
         font-weight: bold;
-        color: white;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        position: relative;
-        box-shadow: inset -5px -5px 15px rgba(0, 0, 0, 0.2), 
-                    inset 5px 5px 15px rgba(255, 255, 255, 0.3);
-      }
-
-      .balloon-body::after {
-        content: '';
-        position: absolute;
-        bottom: -8px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        /* `solid inherit` is invalid in a shorthand, so the whole declaration
-           was dropped and the knot never drew — the balloon's colour comes
-           through a custom property instead */
-        border-top: 12px solid var(--balloon-color, #ff6b6b);
-      }
-
-      .balloon-string {
-        position: absolute;
-        bottom: -20px;
-        left: 50%;
-        width: 2px;
-        height: 20px;
-        background: #666;
-        transform: translateX(-50%);
+        color: #33302e;
+        pointer-events: none;
       }
 
       @keyframes float {
@@ -231,10 +232,21 @@
 
       .pop-effect {
         position: absolute;
-        font-size: 40px;
+        width: 48px;
+        height: 48px;
+        /* x and y are the balloon body's centre; pull the burst's own centre
+           onto it (the pop keyframes own transform, so margins, not translate) */
+        margin: -24px 0 0 -24px;
+        line-height: 0;
         animation: pop 0.4s ease-out forwards;
         pointer-events: none;
         z-index: 100;
+      }
+
+      .pop-effect .pic {
+        display: block;
+        width: 100%;
+        height: 100%;
       }
 
       @keyframes pop {
@@ -455,6 +467,26 @@
         padding: 15px 40px;
       }
 
+      /* Pip stands beside the prompt on the start overlay */
+      .start-host {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 0 16px;
+      }
+
+      .start-pip {
+        flex: 0 0 auto;
+        width: 64px;
+        height: 60px;
+      }
+
+      .btn-glyph {
+        vertical-align: -3px;
+        margin-right: 2px;
+      }
+
       @media (max-width: 480px) {
         body { padding: 5px; padding-top: 35px; }
         .header { margin-bottom: 5px; }
@@ -468,7 +500,8 @@
         .game-area { height: clamp(240px, calc(100vh - 300px), 460px); }
         .game-area { height: clamp(240px, calc(100dvh - 300px), 460px); }
         .balloon { width: 50px; height: 65px; }
-        .balloon-body { width: 50px; height: 60px; font-size: 1.2em; }
+        .balloon-art { width: 50px; height: 75px; }
+        .balloon-label { height: 58px; font-size: 1.2em; }
         .back-link { top: 5px; left: 5px; padding: 5px 8px; font-size: 0.75em; }
         .mode-selector { gap: 5px; margin-bottom: 5px; }
         .mode-btn { padding: 6px 12px; font-size: 0.8em; }
@@ -506,9 +539,27 @@
       <div class="feedback" id="feedback"></div>
 
       <div class="game-area" id="gameArea">
+        <!-- the sky the balloons float in: a flat sky and six clouds in the
+             house palette (sky #dff4ff, white, ink #33302e). Each cloud is the
+             library's own cloud shape, scaled; non-scaling-stroke keeps its
+             outline at the 2.5 ink width whatever the scale -->
+        <svg class="scene" viewBox="0 0 500 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+          <rect width="500" height="450" fill="#dff4ff" />
+          <g fill="#ffffff" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M9 37C3 37 3 28 10 28C9 19 20 13 25 19C30 11 43 15 40 27C46 27 46 37 39 37Z" transform="translate(85 45) scale(2.4)" vector-effect="non-scaling-stroke" />
+            <path d="M9 37C3 37 3 28 10 28C9 19 20 13 25 19C30 11 43 15 40 27C46 27 46 37 39 37Z" transform="translate(395 22) scale(1.6)" vector-effect="non-scaling-stroke" />
+            <path d="M9 37C3 37 3 28 10 28C9 19 20 13 25 19C30 11 43 15 40 27C46 27 46 37 39 37Z" transform="translate(300 120) scale(1.9)" vector-effect="non-scaling-stroke" />
+            <path d="M9 37C3 37 3 28 10 28C9 19 20 13 25 19C30 11 43 15 40 27C46 27 46 37 39 37Z" transform="translate(30 205) scale(1.2)" vector-effect="non-scaling-stroke" />
+            <path d="M9 37C3 37 3 28 10 28C9 19 20 13 25 19C30 11 43 15 40 27C46 27 46 37 39 37Z" transform="translate(120 290) scale(1.5)" vector-effect="non-scaling-stroke" />
+            <path d="M9 37C3 37 3 28 10 28C9 19 20 13 25 19C30 11 43 15 40 27C46 27 46 37 39 37Z" transform="translate(370 310) scale(1.3)" vector-effect="non-scaling-stroke" />
+          </g>
+        </svg>
         <div class="start-overlay" id="startOverlay">
-          <div class="start-msg">Pop the balloons in order — ready?</div>
-          <button type="button" class="btn start-btn" onclick="startGame(true)"><span aria-hidden="true">▶️</span> Start</button>
+          <div class="start-host">
+            <img class="start-pip" src="../../icons/critters/pip.svg" alt="" width="64" height="60" />
+            <div class="start-msg">Pop the balloons in order — ready?</div>
+          </div>
+          <button type="button" class="btn start-btn" onclick="startGame(true)"><svg class="btn-glyph" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M7 4l13 8-13 8z" fill="currentColor" /></svg> Start</button>
         </div>
       </div>
 
@@ -533,7 +584,11 @@
       </div>
     </div>
 
+    <script src="../shared/art/pictures.js"></script>
     <script>
+      // the one library picture this page draws: the burst where a balloon pops
+      Pictures.install(['pop-burst']);
+
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       let audioCtx = null;
 
@@ -590,7 +645,10 @@
         }
       }
 
-      const balloonColors = ['#ff6b6b', '#4ecdc4', '#ffd700', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43'];
+      // eight candy colours from the picture library's palette; a balloon's
+      // colour is random and carries no meaning
+      const PAL = Pictures.PALETTE;
+      const balloonColors = [PAL.red, PAL.orange, PAL.yellow, PAL.green, PAL.teal, PAL.blue, PAL.purple, PAL.pink];
       const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
       let mode = 'numbers';
@@ -652,11 +710,18 @@
 
         const color = balloonColors[Math.floor(Math.random() * balloonColors.length)];
         
+        // the drawn balloon (string, body, knot, highlight) with the label as
+        // real text on top; the button around it is unchanged
         balloon.innerHTML = `
-          <div class="balloon-body" style="background: ${color}; --balloon-color: ${color}">
-            ${displayValue}
-          </div>
-          <div class="balloon-string"></div>
+          <svg class="balloon-art" viewBox="0 0 60 90" aria-hidden="true" focusable="false">
+            <g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M30 75c-4 4 4 7 0 13" stroke-width="2" />
+              <ellipse cx="30" cy="35" rx="28.5" ry="33.5" fill="${color}" />
+              <path d="M26 68h8l-4 7z" fill="${color}" />
+              <ellipse cx="18" cy="22" rx="5" ry="8" fill="#ffffff" stroke="none" />
+            </g>
+          </svg>
+          <span class="balloon-label">${displayValue}</span>
         `;
 
         const areaWidth = gameArea.offsetWidth - 70;
@@ -675,8 +740,10 @@
 
         const rect = balloon.getBoundingClientRect();
         const areaRect = gameArea.getBoundingClientRect();
-        const x = rect.left - areaRect.left + 30;
-        const y = rect.top - areaRect.top + 35;
+        // the balloon body's centre, whatever the button's size (60 by 75 on
+        // desktop, 50 by 65 on phones): the burst and the score popup sit there
+        const x = rect.left - areaRect.left + rect.width / 2;
+        const y = rect.top - areaRect.top + rect.height * (35 / 75);
 
         if (mode === 'free' || value === currentTarget) {
           // Correct pop
@@ -736,7 +803,7 @@
         const effect = document.createElement('div');
         effect.className = 'pop-effect';
         effect.setAttribute('aria-hidden', 'true');
-        effect.textContent = '💥';
+        effect.innerHTML = Pictures.use('pop-burst', { size: 48 });
         effect.style.left = x + 'px';
         effect.style.top = y + 'px';
         gameArea.appendChild(effect);
