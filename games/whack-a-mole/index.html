@@ -141,15 +141,29 @@
         position: relative;
         width: 100%;
         max-width: 380px;
-        /* kept: sky, grass and soil, the scene the moles pop out of */
-        background: linear-gradient(180deg, #87CEEB 0%, #90EE90 50%, #8B4513 100%);
+        /* the sky colour, under the drawn meadow scene */
+        background: #dff4ff;
         border-radius: 15px;
         overflow: hidden;
-        border: 4px solid #333;
+        border: 4px solid var(--color-ink);
         padding: 15px;
       }
 
+      /* the meadow (sky, far hills, field) is one inline SVG laid behind the
+         grid; absolutely positioned, so it adds no height, moves nothing and
+         takes no taps */
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+      }
+
       .mole-grid {
+        position: relative;
+        z-index: 1;
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
@@ -165,27 +179,51 @@
         overflow: hidden;
       }
 
-      .hole-bg {
+      /* The earth mound is drawn per hole in two layers that fill the square
+         hole: .hole-bg (the mound and its dark opening) sits BEHIND the piece
+         and .hole-rim (the mound's front, below the opening's lip) sits IN
+         FRONT of it. The rim hides the lower part of a piece that is up, and
+         with the hole's overflow clip it hides all of a piece slid down by
+         translateY(120%): the slid-down box's top ends about 11px above the
+         hole floor, well inside the rim, which reaches the floor across the
+         piece's whole width. */
+      .hole-bg,
+      .hole-rim {
         position: absolute;
-        bottom: 0;
-        width: 90%;
-        height: 35%;
-        /* kept: the soil of the mound */
-        background: linear-gradient(180deg, #654321 0%, #3d2817 100%);
-        border-radius: 50%;
-        box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);
-        z-index: 10;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
       }
+
+      .hole-bg { z-index: 1; }
+
+      .hole-rim { z-index: 10; }
+
+      /* the rim's earth catches taps as the old mound div did, so the hit
+         target stays the part of the piece that shows */
+      .hole-rim .rim { pointer-events: visiblePainted; }
 
       .animal {
         position: absolute;
         bottom: 20%;
-        font-size: clamp(2em, 8vw, 2.8em);
+        /* an explicit box in place of the old emoji line box (about 45 by 54px
+           on desktop): the pop-up transform, the hover scale and the hit
+           animation all work in percentages of it */
+        width: 56px;
+        height: 56px;
         cursor: pointer;
         transform: translateY(120%);
         transition: transform 0.3s ease-out;
         z-index: 5;
-        filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));
+      }
+
+      /* the piece fills the box: a critter file as an <img> (64 by 60, so it
+         sits 56 by 52.5, centred) or a library symbol (48 box, scaled) */
+      .animal .piece {
+        display: block;
+        width: 100%;
+        height: 100%;
       }
 
       .animal.visible {
@@ -378,7 +416,9 @@
 
       .start-screen h2 { font-size: 1.6em; margin-bottom: 15px; }
       .start-screen p { font-size: 1em; margin: 5px 0; line-height: 1.4; }
-      .start-screen .animals-preview { font-size: 2em; margin: 15px 0; }
+      .start-screen h2 img { width: 32px; height: 30px; vertical-align: -8px; }
+      .start-screen .animals-preview { display: flex; justify-content: center; gap: 12px; margin: 15px 0; }
+      .start-screen .animals-preview img { width: 48px; height: 45px; }
 
       .message {
         background: var(--color-amber-tint);
@@ -424,7 +464,6 @@
         .stats { font-size: 0.9em; gap: 15px; margin-bottom: 8px; }
         .game-area { padding: 10px; }
         .mole-grid { gap: 8px; }
-        .animal { font-size: 1.8em; }
         .back-link { top: 5px; left: 5px; padding: 5px 8px; font-size: 0.75em; }
         .controls { margin-top: 10px; }
         .btn { padding: 10px 20px; font-size: 0.95em; }
@@ -460,10 +499,40 @@
       <div class="message" id="message">Tap to start! 🎮</div>
 
       <div class="game-area" id="gameArea">
+        <!-- the meadow behind the holes (sky, two clouds, far hills, the field
+             with a few grass tufts and daisies): decorative, laid behind the
+             grid, so nothing about the holes, the pieces or the taps changes -->
+        <svg class="scene" viewBox="0 0 380 380" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+          <rect x="-2" y="-2" width="384" height="384" fill="#dff4ff" />
+          <g fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M98 56H148C155 56 155 46 147 46C147 36 134 32 128 40C122 32 109 36 109 46C100 44 92 56 98 56Z" fill="#ffffff" />
+            <path d="M262 46H302C308 46 308 38 301 38C301 30 290 27 285 33C280 27 270 30 270 38C263 36 257 46 262 46Z" fill="#ffffff" />
+            <ellipse cx="60" cy="122" rx="120" ry="46" fill="#a7e3a1" />
+            <ellipse cx="320" cy="126" rx="140" ry="50" fill="#a7e3a1" />
+            <ellipse cx="190" cy="132" rx="110" ry="40" fill="#a7e3a1" />
+            <path d="M-4 106C60 98 130 98 190 103 250 108 320 102 384 106V384H-4Z" fill="#9be28f" />
+            <path d="M16 172l4-13 4 6 4-12 4 12 4-6 4 13z" fill="#2e9e5b" stroke-width="2" />
+            <path d="M100 186l4-13 4 6 4-12 4 12 4-6 4 13z" fill="#2e9e5b" stroke-width="2" />
+            <path d="M224 176l4-13 4 6 4-12 4 12 4-6 4 13z" fill="#2e9e5b" stroke-width="2" />
+            <path d="M340 188l4-13 4 6 4-12 4 12 4-6 4 13z" fill="#2e9e5b" stroke-width="2" />
+            <path d="M18 300l4-13 4 6 4-12 4 12 4-6 4 13z" fill="#2e9e5b" stroke-width="2" />
+            <path d="M134 288l4-13 4 6 4-12 4 12 4-6 4 13z" fill="#2e9e5b" stroke-width="2" />
+            <path d="M252 304l4-13 4 6 4-12 4 12 4-6 4 13z" fill="#2e9e5b" stroke-width="2" />
+            <path d="M334 296l4-13 4 6 4-12 4 12 4-6 4 13z" fill="#2e9e5b" stroke-width="2" />
+            <circle cx="122" cy="160" r="6" fill="#ffffff" /><circle cx="122" cy="160" r="2.5" fill="#fbbf24" stroke="none" />
+            <circle cx="262" cy="166" r="6" fill="#ffffff" /><circle cx="262" cy="166" r="2.5" fill="#fbbf24" stroke="none" />
+            <circle cx="228" cy="282" r="6" fill="#ffffff" /><circle cx="228" cy="282" r="2.5" fill="#fbbf24" stroke="none" />
+          </g>
+        </svg>
         <div class="mole-grid" id="moleGrid"></div>
         <div class="start-screen" id="startScreen">
-          <h2><span aria-hidden="true">🐹</span> Whack-a-Mole! <span aria-hidden="true">🐰</span></h2>
-          <div class="animals-preview" aria-hidden="true">🐹 🐰 🐸 🐱</div>
+          <h2><img src="../../icons/critters/clover.svg" alt="" width="64" height="60"> Whack-a-Mole! <img src="../../icons/critters/pip.svg" alt="" width="64" height="60"></h2>
+          <div class="animals-preview" aria-hidden="true">
+            <img src="../../icons/critters/clover.svg" alt="" width="64" height="60">
+            <img src="../../icons/critters/pip.svg" alt="" width="64" height="60">
+            <img src="../../icons/critters/plum.svg" alt="" width="64" height="60">
+            <img src="../../icons/critters/mango.svg" alt="" width="64" height="60">
+          </div>
           <p>Tap the cute animals when they pop up!</p>
           <p>You have 2 minutes - score as many as you can!</p>
           <br>
@@ -491,6 +560,7 @@
       </div>
     </div>
 
+    <script src="../shared/art/pictures.js"></script>
     <script>
       // Screen-reader status line. Alternating a trailing no-break space keeps the
       // text genuinely different, so repeats still get announced.
@@ -558,7 +628,55 @@
         }
       }
 
-      const animals = ['🐹', '🐰', '🐸', '🐱', '🐶', '🐻', '🐼', '🦊'];
+      // The eight pop-up pieces: the four critters (their flat files in
+      // icons/critters/, shown as <img>) and four animals from the picture
+      // library. Every piece scores the same; none is a decoy.
+      const PIECES = ['clover', 'pip', 'plum', 'mango', 'hamster', 'dog', 'bear', 'panda'];
+      const CRITTERS = ['clover', 'pip', 'plum', 'mango'];
+      // the library symbols this page uses, installed as one hidden sprite
+      // before createGrid() below draws the first pieces
+      Pictures.install(PIECES.filter((id) => !CRITTERS.includes(id)));
+
+      // the markup for one piece; both kinds fill the .animal box
+      function pieceMarkup(id) {
+        if (CRITTERS.includes(id)) return `<img class="piece" src="../../icons/critters/${id}.svg" alt="" width="64" height="60">`;
+        return Pictures.use(id, { cls: 'piece' });
+      }
+      function randomPiece() {
+        return PIECES[Math.floor(Math.random() * PIECES.length)];
+      }
+      // repaints a hole's piece; the .animal div itself (role, tabindex,
+      // label, listeners, transform classes) is untouched
+      function setPiece(animal, id) {
+        animal.innerHTML = pieceMarkup(id);
+      }
+
+      // The mound every piece pops out of, in hole units (the hole is square,
+      // viewBox 0 0 100 100, the floor at y=100). Two layers, see the .hole-bg
+      // rule: the earth with its dark opening goes behind the piece; the front
+      // rim (the earth below the opening's lip, re-drawing the same two
+      // outlines) goes in front of it. Grass tufts are drawn first on the
+      // back ring, so the earth covers their roots, and at the foot in front.
+      const INK = 'fill="none" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"';
+      // a three-blade grass tuft with its base at (x, y); a thinner line than
+      // the mound's, since it is a small detail at this scale
+      const tuft = (x, y) => `<path d="M${x - 9} ${y}l3-10 3 5 3-9 3 9 3-5 3 10z" fill="#2e9e5b" stroke-width="2"/>`;
+      // the mound is the top of an ellipse centred just under the floor, so it
+      // is widest at the ground and reads as a molehill, not a pot; the
+      // opening sits at its crown
+      const MOUND_BACK =
+        `<svg class="hole-bg" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g ${INK}>` +
+        tuft(38, 60) +
+        '<ellipse cx="50" cy="98" rx="47" ry="44" fill="#8b5e3c"/>' +
+        '<ellipse cx="50" cy="66.5" rx="29" ry="6" fill="#5a3b22"/>' +
+        '</g></svg>';
+      const MOUND_RIM =
+        `<svg class="hole-rim" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g ${INK}>` +
+        '<path class="rim" d="M17.2 66.5H21A29 6 0 0 0 79 66.5H82.8A47 44 0 1 1 17.2 66.5Z" fill="#8b5e3c" stroke="none"/>' +
+        '<path d="M21 66.5A29 6 0 0 0 79 66.5"/>' +
+        '<path d="M17.2 66.5A47 44 0 1 0 82.8 66.5"/>' +
+        tuft(10, 104) + tuft(90, 103) +
+        '</g></svg>';
       const messages = [
         'Great job! 🌟',
         'Awesome! 🎉',
@@ -620,8 +738,9 @@
           const hole = document.createElement('div');
           hole.className = 'hole';
           hole.innerHTML = `
-            <div class="hole-bg" aria-hidden="true"></div>
-            <div class="animal" data-index="${i}">${animals[Math.floor(Math.random() * animals.length)]}</div>
+            ${MOUND_BACK}
+            <div class="animal" data-index="${i}">${pieceMarkup(randomPiece())}</div>
+            ${MOUND_RIM}
           `;
 
           // The animal stays a <div> so its pop-up transform and the hole's
@@ -698,7 +817,7 @@
           animal.classList.remove('hit');
           if (holes[index].seq === mySeq && !holes[index].isUp) {
             animal.classList.remove('visible');
-            animal.textContent = animals[Math.floor(Math.random() * animals.length)];
+            setPiece(animal, randomPiece());
           }
         }, 300));
       }
@@ -723,7 +842,7 @@
         hole.isUp = true;
         hole.seq++;
         const mySeq = hole.seq;
-        hole.animal.textContent = animals[Math.floor(Math.random() * animals.length)];
+        setPiece(hole.animal, randomPiece());
         hole.animal.classList.remove('hit');
         hole.animal.classList.add('visible');
         setAnimalLabel(hole.animal, index, true);
