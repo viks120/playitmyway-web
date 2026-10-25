@@ -130,20 +130,30 @@
         margin-bottom: 20px;
       }
 
+      /* Candy tiles: a flat cream tile with the ink border and the hard shadow
+         of the site's candy buttons (no blur, no gradient). */
       .cell {
         width: 90px;
         height: 90px;
-        background: white;
-        border: 3px solid #333;
+        background: #fff8ef;
+        border: 3px solid var(--color-ink);
         border-radius: 15px;
+        box-shadow: 0 4px 0 0 #e8d6bd;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 3em;
-        font-weight: bold;
         cursor: pointer;
         transition: all 0.2s ease;
         user-select: none;
+      }
+
+      /* The X and O are pictures from the shared library, sized here to about
+         70% of the cell so the phone rule below keeps control; a tap on the
+         picture falls through to the cell. */
+      .cell > .mark {
+        width: 63px;
+        height: 63px;
+        pointer-events: none;
       }
 
       .cell:hover:not(.taken) {
@@ -153,14 +163,6 @@
 
       .cell.taken {
         cursor: not-allowed;
-      }
-
-      .cell.x {
-        color: var(--wc-verb);
-      }
-
-      .cell.o {
-        color: var(--wc-noun);
       }
 
       .cell.winning {
@@ -173,13 +175,55 @@
         to { transform: scale(1.05); }
       }
 
+      /* The status line, with Plum beside it as the computer's face in vs
+         Computer mode. The row takes no part in sizing the card (contain), so
+         the board alone sets the card's width in either mode and a long line
+         wraps instead of spreading the grid. */
+      .status-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 15px;
+        min-height: 40px;
+        contain: inline-size;
+        /* the same for browsers without size containment: no width of its own, then the card's */
+        width: 0;
+        min-width: 100%;
+      }
+
+      .computer-face {
+        flex: 0 0 auto;
+        width: 48px;
+        height: 45px;
+      }
+
+      .computer-face[hidden] {
+        display: none;
+      }
+
       .status {
         text-align: center;
         font-size: clamp(1.2em, 4vw, 1.5em);
         font-weight: bold;
         color: var(--color-ink);
-        margin-bottom: 15px;
         min-height: 40px;
+      }
+
+      /* the same drawn X and O as on the board, scaled to the text beside them */
+      .status .pic {
+        width: 1.1em;
+        height: 1.1em;
+      }
+
+      .stats .pic {
+        width: 1.15em;
+        height: 1.15em;
+      }
+
+      .modal p .pic {
+        width: 1.3em;
+        height: 1.3em;
       }
 
       .controls {
@@ -366,7 +410,8 @@
         .header { margin-bottom: 5px; }
         .header h1 { font-size: 1.2em; }
         .header p { font-size: 0.85em; margin: 3px 0; }
-        .cell { width: 70px; height: 70px; font-size: 2.2em; }
+        .cell { width: 70px; height: 70px; }
+        .cell > .mark { width: 49px; height: 49px; }
         .stats { flex-direction: row; gap: 10px; font-size: 0.85em; margin-bottom: 8px; }
         .back-link { top: 5px; left: 5px; padding: 5px 8px; font-size: 0.75em; }
         .game-board { gap: 8px; }
@@ -387,8 +432,8 @@
       </div>
 
       <div class="stats">
-        <div>❌ Wins: <span id="xWins">0</span></div>
-        <div>⭕ Wins: <span id="oWins">0</span></div>
+        <div><svg class="pic" width="20" height="20" viewBox="0 0 48 48" role="img" aria-label="X" focusable="false"><use href="#p-mark-x"/></svg> Wins: <span id="xWins">0</span></div>
+        <div><svg class="pic" width="20" height="20" viewBox="0 0 48 48" role="img" aria-label="O" focusable="false"><use href="#p-mark-o"/></svg> Wins: <span id="oWins">0</span></div>
         <div>Draws: <span id="draws">0</span></div>
       </div>
 
@@ -398,7 +443,10 @@
       </div>
 
       <div class="game-container">
-        <div class="status" id="status">❌ Player X's turn</div>
+        <div class="status-row">
+          <img class="computer-face" id="computerFace" src="../../icons/critters/plum.svg" alt="" width="64" height="60" hidden />
+          <div class="status" id="status"><svg class="pic" width="48" height="48" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-mark-x"/></svg> Player X's turn</div>
+        </div>
         <div class="board" id="board"></div>
         <div class="controls">
           <button type="button" class="btn" onclick="resetGame()">New Game</button>
@@ -416,7 +464,12 @@
       </div>
     </div>
 
+    <script src="../shared/art/pictures.js"></script>
     <script>
+      // The X and O marks come from the shared picture library; the sprite goes
+      // in first, before anything can draw a mark.
+      Pictures.install(['mark-x', 'mark-o']);
+
       // Screen-reader status line. Alternating a trailing no-break space keeps the
       // text genuinely different, so repeats still get announced.
       const srStatus = document.getElementById('srStatus');
@@ -493,6 +546,8 @@
 
       function setMode(m, clickedBtn) {
         mode = m;
+        // Plum is the computer's face: shown only when there is a computer to play
+        document.getElementById('computerFace').hidden = m !== 'computer';
         // the button is passed in rather than read off the global event, so
         // keyboard activation (and clicks landing on the emoji) mark the right one
         document.querySelectorAll('.mode-btn').forEach(btn => {
@@ -510,6 +565,13 @@
         const row = Math.floor(index / 3) + 1;
         const col = (index % 3) + 1;
         return `Row ${row}, column ${col}, ${mark || 'empty'}`;
+      }
+
+      // The drawn X or O: the one picture used on the board, in the status line
+      // and in the win message. Decorative, because the cell's aria-label and
+      // the words beside it already name the player.
+      function markPic(player, cls) {
+        return Pictures.use(player === 'X' ? 'mark-x' : 'mark-o', { cls });
       }
 
       function createBoard() {
@@ -555,7 +617,7 @@
       function makeMove(index, player) {
         board[index] = player;
         const cell = document.querySelectorAll('.cell')[index];
-        cell.textContent = player === 'X' ? '❌' : '⭕';
+        cell.innerHTML = markPic(player, 'mark');
         cell.classList.add('taken', player.toLowerCase());
         cell.setAttribute('aria-label', cellLabel(index, player));
         cell.setAttribute('aria-disabled', 'true');
@@ -569,7 +631,7 @@
           scores[player]++;
           updateScores();
           announce(`${move}. Player ${player} wins!`);
-          setTimeout(() => showModal('🎉 Winner!', player === 'X' ? '❌ Player X Wins!' : '⭕ Player O Wins!'), 300);
+          setTimeout(() => showModal('🎉 Winner!', markPic(player) + (player === 'X' ? ' Player X Wins!' : ' Player O Wins!')), 300);
         } else if (board.every(cell => cell !== '')) {
           gameActive = false;
           scores.draws++;
@@ -633,8 +695,8 @@
       }
 
       function updateStatus() {
-        document.getElementById('status').textContent = 
-          currentPlayer === 'X' ? "❌ Player X's turn" : "⭕ Player O's turn";
+        document.getElementById('status').innerHTML =
+          markPic(currentPlayer) + (currentPlayer === 'X' ? " Player X's turn" : " Player O's turn");
       }
 
       function updateScores() {
@@ -645,7 +707,8 @@
 
       function showModal(title, message) {
         document.getElementById('modalTitle').textContent = title;
-        document.getElementById('modalMessage').textContent = message || '';
+        // the message is page-authored text that may carry the drawn mark
+        document.getElementById('modalMessage').innerHTML = message || '';
         const modal = document.getElementById('modal');
         modal.classList.add('show');
         modal.querySelector('.modal-btn').focus();
