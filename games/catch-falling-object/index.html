@@ -186,6 +186,9 @@
 
       .catch-effect {
         position: absolute;
+        display: flex;
+        align-items: center;
+        gap: 2px;
         font-size: 24px;
         animation: floatUp 0.8s ease-out forwards;
         pointer-events: none;
@@ -470,7 +473,7 @@
       // the basket, the legend and the lives render (this script runs at
       // parse time); then every static picture slot gets its picture, the
       // legend's labelled so a screen reader still hears the fruit names
-      Pictures.install(['apple', 'orange', 'lemon', 'grapes', 'strawberry', 'banana', 'peach', 'kiwi', 'star', 'bomb', 'basket', 'heart', 'heart-empty']);
+      Pictures.install(['apple', 'orange', 'lemon', 'grapes', 'strawberry', 'banana', 'peach', 'kiwi', 'star', 'bomb', 'basket', 'heart', 'heart-empty', 'cloud', 'pop-burst', 'lightning']);
       document.querySelectorAll('[data-pic]').forEach((slot) => {
         slot.innerHTML = Pictures.use(slot.dataset.pic, { size: Number(slot.dataset.size) || 48, label: slot.dataset.label === 'true' || undefined });
       });
@@ -642,7 +645,7 @@
           if (item.parentNode) {
             if (item.dataset.type !== 'bad' && gameRunning) {
               combo = 0;
-              showEffect(parseFloat(item.style.left), gameArea.offsetHeight - 60, '💨', '#999');
+              showEffect(parseFloat(item.style.left), gameArea.offsetHeight - 60, '', '#999', 'cloud');
             }
             item.remove();
           }
@@ -674,7 +677,7 @@
             if (type === 'bad') {
               combo = 0;
               loseLife();
-              showEffect(fxX, fxY, '💥');
+              showEffect(fxX, fxY, '', '', 'pop-burst');
             } else if (type === 'bonus') {
               combo++;
               score += 50;
@@ -692,7 +695,7 @@
             if (combo > 0 && combo % 5 === 0) {
               score += 20;
               playSound('bonus');
-              showEffect(fxX, fxY - 30, '🔥 +20');
+              showEffect(fxX, fxY - 30, '+20', '', 'lightning');
               announce(`${combo} in a row! Plus 20 combo. Score ${score}.`);
             }
 
@@ -705,11 +708,13 @@
       // x/y are GAME-AREA coordinates, not viewport ones — the effect is
       // appended inside the (relatively positioned, overflow:hidden) area,
       // so viewport values would land it outside and clip it away
-      function showEffect(x, y, text, color) {
+      // pic, when given, is a picture from the library drawn before the text
+      function showEffect(x, y, text, color, pic) {
         const effect = document.createElement('div');
         effect.className = 'catch-effect';
         effect.setAttribute('aria-hidden', 'true');
-        effect.textContent = text;
+        if (pic) effect.innerHTML = Pictures.use(pic, { size: 34 }) + (text ? '<span>' + text + '</span>' : '');
+        else effect.textContent = text;
         effect.style.left = x + 'px';
         effect.style.top = y + 'px';
         effect.style.color = color || (text.includes('+') ? '#4ecdc4' : '#ff6b6b');
