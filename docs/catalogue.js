@@ -85,7 +85,7 @@ module.exports = {
       practises: 'Finding numbers or letters in order, quickly — recognising the symbol, not just reciting the sequence.' },
     { slug: 'whack-a-mole', name: 'Whack-a-Mole', age: '5', mins: '3',
       skills: ['speed'],
-      practises: 'Reaction time and impulse control — some things you tap, one thing you must not.' },
+      practises: 'Reaction time and hand-eye coordination — tap each animal before it hides.' },
     { slug: 'rock-paper-scissors', name: 'Rock Paper Scissors', age: '5', mins: '3',
       skills: ['logic'],
       practises: 'Spotting a pattern in an opponent’s choices — a first taste of prediction.' },
