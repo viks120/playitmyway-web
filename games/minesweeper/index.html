@@ -83,36 +83,52 @@
       max-width: 100%;
     }
     .board-scroll { overflow-x: auto; }
+    /* Candy tiles: a hidden square is a raised sand tile with an ink outline
+       and the hard ink lip of the site's candy buttons (no blur, no
+       gradient); an opened square is a flat cream face. The gap, padding and
+       square sizes are unchanged, so every board keeps its width. */
     .grid {
       display: grid; gap: 2px; margin: 0 auto; width: max-content;
-      background: #7f8c8d; padding: 5px; border-radius: 5px;
+      background: var(--candy-cream); padding: 5px; border-radius: 10px;
+      --lip: 2px;
     }
+    /* the hard board packs 480 squares, so its lip is thinner */
+    .grid[data-level="hard"] { --lip: 1px; }
     .cell {
-      width: var(--cell-size); height: var(--cell-size); background: #bdc3c7;
-      border: 2px outset #ecf0f1; display: flex;
+      width: var(--cell-size); height: var(--cell-size); background: #f1dcb0;
+      border: 2px solid var(--color-ink); border-radius: 5px;
+      box-shadow: 0 var(--lip) 0 0 var(--color-ink); display: flex;
       align-items: center; justify-content: center;
       font-weight: bold; font-size: 14px; cursor: pointer;
       user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
     }
     /* cells are 2px apart, so an outside ring is clipped by its neighbours —
-       inset the ring and lift the focused cell above them */
+       inset the ring and lift the focused cell above them. The ring is the
+       site's focus blue, because a dark ring would vanish into the ink outline. */
     .cell:focus-visible {
-      outline: 3px solid #2c3e50; outline-offset: -3px;
+      outline: 3px solid var(--color-focus); outline-offset: -3px;
       position: relative; z-index: 2;
     }
-    .cell.holding { background: #f9e79f; border-color: #f1c40f; }
-    .cell.revealed { background: #ecf0f1; border: 1px solid #95a5a6; }
-    .cell.mine { background: #e74c3c; }
-    .cell.flagged::after { content: "🚩"; }
-    .cell.revealed.mine::after { content: "💣"; }
-    .cell[data-num="1"] { color: #3498db; }
-    .cell[data-num="2"] { color: #27ae60; }
-    .cell[data-num="3"] { color: #e74c3c; }
-    .cell[data-num="4"] { color: #9b59b6; }
-    .cell[data-num="5"] { color: #e67e22; }
-    .cell[data-num="6"] { color: #1abc9c; }
+    /* the long-press highlight: candy yellow, so it reads against the sand */
+    .cell.holding { background: #fbbf24; }
+    .cell.revealed { background: var(--color-bg); border: 1px solid var(--color-ink); box-shadow: none; }
+    .cell.mine { background: var(--color-primary); }
+    /* The flag and the mine are pictures inside the square (toggleFlag and
+       revealAll put them there), sized to the square so the small squares of
+       the hard board still show them whole; a tap or a right click on one
+       falls through to the square. */
+    .cell .pic { width: 78%; height: 78%; pointer-events: none; }
+    /* the classic order (1 blue, 2 green, 3 red, 4 purple, 5 orange, 6 teal,
+       7 slate, 8 grey) in the palette's deep tones, each at least 4.5:1 on
+       the cream face */
+    .cell[data-num="1"] { color: #1d4ed8; }
+    .cell[data-num="2"] { color: #15803d; }
+    .cell[data-num="3"] { color: #b91c1c; }
+    .cell[data-num="4"] { color: #7c3aed; }
+    .cell[data-num="5"] { color: #b45309; }
+    .cell[data-num="6"] { color: #0f766e; }
     .cell[data-num="7"] { color: #2c3e50; }
-    .cell[data-num="8"] { color: #7f8c8d; }
+    .cell[data-num="8"] { color: #5f5751; }
     .controls { margin-top: 15px; text-align: center; }
     .kbd-tip {
       margin: 10px 0 0; text-align: center;
@@ -210,7 +226,13 @@
       <button type="button" class="modal-btn" id="modalBtn" onclick="closeModal()">Play Again</button>
     </div>
   </div>
+  <script src="../shared/art/pictures.js"></script>
   <script>
+    // The flag and the mine on the board are pictures from the shared
+    // picture library. The sprite goes in first, before any square can show
+    // one; FLAG_PIC names the flag marker once, for every flag drawn below.
+    const FLAG_PIC = 'pennant';
+    Pictures.install([FLAG_PIC, 'mine']);
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
@@ -352,6 +374,7 @@
       updateBest();
       const gridEl = document.getElementById('grid');
       gridEl.style.gridTemplateColumns = `repeat(${cols}, var(--cell-size))`;
+      gridEl.dataset.level = difficulty; // the hard board draws a thinner tile lip
       gridEl.innerHTML = '';
       for (let r = 0; r < rows; r++) {
         grid[r] = [];
@@ -502,6 +525,9 @@
       const cell = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
       grid[r][c].flagged = !grid[r][c].flagged;
       cell.classList.toggle('flagged');
+      // the flag is a picture inside the square; only a hidden square, which
+      // holds nothing else, can carry one
+      cell.innerHTML = grid[r][c].flagged ? Pictures.use(FLAG_PIC, { size: 20 }) : '';
       flagged += grid[r][c].flagged ? 1 : -1;
       document.getElementById('mineCount').textContent = mines - flagged;
       setCellLabel(r, c);
@@ -523,6 +549,9 @@
           if (grid[r][c].mine) {
             const cell = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
             cell.classList.add('revealed', 'mine');
+            // the mine replaces the flag on a correctly flagged mine, as the
+            // old CSS did; a wrong flag is not visited here and stays
+            cell.innerHTML = Pictures.use('mine', { size: 20 });
             // label only — the model stays untouched, the game is already over
             cell.setAttribute('aria-label', `Row ${r + 1}, column ${c + 1}, mine`);
           }
