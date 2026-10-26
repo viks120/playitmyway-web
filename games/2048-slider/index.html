@@ -106,9 +106,18 @@
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 10px;
-        background: #bbada0;
+        /* a sand plate, the board of the game's own icon, with an ink edge.
+           The edge is a box-shadow ring, not a border, so the board keeps its
+           size and every tile its whole-pixel offset from the board. */
+        background: var(--candy-cream);
+        box-shadow: 0 0 0 2.5px var(--color-ink);
         padding: 10px;
-        border-radius: 10px;
+        border-radius: 14px;
+        /* the candy tiles' hard drop: the house's ink-tinted 0 Npx 0 0 shadow
+           (as under the round buttons in components.css), 3px tall so it stays
+           inside the 6px phone gap and never reaches the next row */
+        --tile-under: rgba(51, 48, 46, 0.18);
+        --tile-drop: 0 3px 0 0 var(--tile-under);
         /* tiles are absolutely-positioned children, so the grid anchors them */
         position: relative;
         /* the game needs swipes in all four directions, so the board must
@@ -119,84 +128,113 @@
 
       /* Tiles live in a layer above the background cells and slide between
          positions with a transform, so a move glides instead of teleporting.
-         .cell.tile so this outranks .cell's position: relative */
+         .cell.tile so this outranks .cell's position: relative.
+         Each tile is a candy tile: the sockets' corners, a 2.5px ink border
+         (inside the copied size, since every box is border-box) and the hard
+         drop, on a flat fill from the ramp below. The default fill is the
+         last step's, so a value past every rule still reads as a tile and
+         never as an empty socket. */
       .cell.tile {
         position: absolute;
         top: 0;
         left: 0;
         z-index: 2;
+        border: 2.5px solid var(--color-ink);
+        background: var(--color-ink);
+        color: #ffffff;
+        box-shadow: var(--tile-drop);
         transition: transform 0.15s ease;
       }
 
+      /* The sixteen sockets: a flat sand lighter than the board, with a thin
+         ink line. They keep a fixed size and no margin, because placeTile()
+         copies each socket's box onto the tile above it. */
       .cell {
         width: 80px;
         height: 80px;
-        background: #cdc1b4;
-        border-radius: 8px;
+        background: var(--candy-card);
+        border: 1.5px solid var(--color-ink);
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.8rem;
         font-weight: bold;
-        color: #776e65;
+        color: var(--color-ink);
         transition: all 0.15s ease;
         position: relative;
       }
 
+      /* Twelve looks on one ramp that only ever gets deeper: cream and sand,
+         the warm candy colours, the jewel tones, then navy for 2048 and ink
+         for everything past it. Ink numbers on the light five and white on
+         the dark seven; each pair's contrast is on its line, all 4.5:1 or
+         better. The font sizes step down with the number of digits. */
       .cell[data-value="2"] {
-        background: #eee4da;
+        background: #fff8ef; /* cream, ink 12.4:1 */
+        color: var(--color-ink);
       }
       .cell[data-value="4"] {
-        background: #ede0c8;
+        background: #f1dcb0; /* sand, ink 9.7:1 */
+        color: var(--color-ink);
       }
       .cell[data-value="8"] {
-        background: #f2b179;
-        color: #f9f6f2;
+        background: #facc15; /* yellow, ink 8.5:1 */
+        color: var(--color-ink);
       }
       .cell[data-value="16"] {
-        background: #f59563;
-        color: #f9f6f2;
+        background: #f59e0b; /* amber, ink 6.1:1 */
+        color: var(--color-ink);
       }
       .cell[data-value="32"] {
-        background: #f67c5f;
-        color: #f9f6f2;
+        background: #f97316; /* orange, ink 4.6:1 */
+        color: var(--color-ink);
       }
       .cell[data-value="64"] {
-        background: #f65e3b;
-        color: #f9f6f2;
+        background: #dc2626; /* red, white 4.8:1 */
+        color: #ffffff;
       }
       .cell[data-value="128"] {
-        background: #edcf72;
-        color: #f9f6f2;
+        background: #be185d; /* pink, white 6.0:1 */
+        color: #ffffff;
         font-size: 1.6rem;
       }
       .cell[data-value="256"] {
-        background: #edcc61;
-        color: #f9f6f2;
+        background: #6d28d9; /* purple, white 7.1:1 */
+        color: #ffffff;
         font-size: 1.6rem;
       }
       .cell[data-value="512"] {
-        background: #edc850;
-        color: #f9f6f2;
+        background: #1e40af; /* blue, white 8.7:1 */
+        color: #ffffff;
         font-size: 1.6rem;
       }
       .cell[data-value="1024"] {
-        background: #edc53f;
-        color: #f9f6f2;
+        background: #134e4a; /* teal, white 9.4:1 */
+        color: #ffffff;
         font-size: 1.4rem;
       }
       .cell[data-value="2048"] {
-        background: #edc22e;
-        color: #f9f6f2;
+        background: var(--color-deep); /* navy, white 13.1:1 */
+        color: #ffffff;
         font-size: 1.4rem;
       }
-      /* "Keep going" runs past 2048, so the bigger tiles need colours too */
+      /* "Keep going" runs past 2048, so the bigger tiles need a look too:
+         one ink bucket for 4096 and up (131072 is the largest tile a 4 by 4
+         board can hold). Navy and ink measure the same luminance (0.030);
+         the neutral near-black reads as the deeper of the two. */
       .cell[data-value="4096"],
       .cell[data-value="8192"],
-      .cell[data-value="16384"] {
-        background: #3c3a32;
-        color: #f9f6f2;
+      .cell[data-value="16384"],
+      .cell[data-value="32768"],
+      .cell[data-value="65536"],
+      .cell[data-value="131072"] {
+        background: var(--color-ink); /* ink, white 13.1:1 */
+        color: #ffffff;
         font-size: 1.2rem;
+      }
+      .cell[data-value="131072"] {
+        font-size: 1rem;
       }
 
       .cell.new {
@@ -207,31 +245,36 @@
         animation: merge 0.3s ease;
       }
 
-      /* These animate the independent `scale` property, NOT `transform`.
-         Animation declarations outrank inline styles, so keyframes touching
-         `transform` would discard each tile's inline translate and snap it
-         to the board's top-left corner for the whole animation. */
+      /* Each tile's place is its inline transform (placeTile), and
+         animation declarations outrank inline styles, so keyframes touching
+         `transform` would discard that translate and snap the tile to the
+         board's top-left corner for the whole animation. These animate
+         opacity, filter and box-shadow only: a new tile fades in as its hard
+         drop rises under it, and a merged tile flashes a white ring that
+         stays inside the gap. */
       @keyframes pop {
         0% {
-          scale: 0;
-        }
-        50% {
-          scale: 1.1;
+          opacity: 0;
+          box-shadow: 0 0 0 0 var(--tile-under);
         }
         100% {
-          scale: 1;
+          opacity: 1;
+          box-shadow: var(--tile-drop);
         }
       }
 
       @keyframes merge {
         0% {
-          scale: 1;
+          box-shadow: var(--tile-drop), 0 0 0 0 #ffffff;
+          filter: brightness(1);
         }
-        50% {
-          scale: 1.2;
+        40% {
+          box-shadow: var(--tile-drop), 0 0 0 4px #ffffff;
+          filter: brightness(1.15);
         }
         100% {
-          scale: 1;
+          box-shadow: var(--tile-drop), 0 0 0 0 #ffffff;
+          filter: brightness(1);
         }
       }
 
@@ -268,16 +311,16 @@
         justify-content: center;
         gap: 6px;
         box-shadow: 0 4px 0 0 #0d4f26;
-        transition: transform 120ms ease, box-shadow 120ms ease;
+        transition: translate 120ms ease, box-shadow 120ms ease;
       }
 
       .btn:hover {
-        transform: translateY(-2px);
+        translate: 0 -2px;
         box-shadow: 0 6px 0 0 #0d4f26;
       }
 
       .btn:active {
-        transform: translateY(3px);
+        translate: 0 3px;
         box-shadow: 0 1px 0 0 #0d4f26;
       }
 
@@ -386,14 +429,17 @@
         to { opacity: 1; }
       }
 
+      /* the independent scale / translate / rotate properties, the same
+         motion as before, so no keyframe on this page sets transform: that
+         property is each tile's place on the board */
       @keyframes scaleIn {
-        from { transform: scale(0.8); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
+        from { scale: 0.8; opacity: 0; }
+        to { scale: 1; opacity: 1; }
       }
 
       @keyframes confettiFall {
-        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        0% { translate: 0 0; rotate: 0deg; opacity: 1; }
+        100% { translate: 0 100vh; rotate: 720deg; opacity: 0; }
       }
 
       .back-link {
@@ -410,17 +456,17 @@
         display: inline-flex;
         align-items: center;
         box-shadow: 0 3px 0 0 #a7e6bd;
-        transition: transform 120ms ease, box-shadow 120ms ease;
+        transition: translate 120ms ease, box-shadow 120ms ease;
         z-index: 100;
       }
 
       .back-link:hover {
-        transform: translateY(-2px);
+        translate: 0 -2px;
         box-shadow: 0 5px 0 0 #a7e6bd;
       }
 
       .back-link:active {
-        transform: translateY(2px);
+        translate: 0 2px;
         box-shadow: 0 1px 0 0 #a7e6bd;
       }
 
@@ -478,6 +524,22 @@
         .grid {
           gap: 6px;
           padding: 8px;
+        }
+        /* a 55px tile is 50px inside its ink border, so the four- and
+           five-digit numbers step down here to keep clear of it */
+        .cell[data-value="1024"],
+        .cell[data-value="2048"] {
+          font-size: 1.2rem;
+        }
+        .cell[data-value="4096"],
+        .cell[data-value="8192"],
+        .cell[data-value="16384"],
+        .cell[data-value="32768"],
+        .cell[data-value="65536"] {
+          font-size: 1rem;
+        }
+        .cell[data-value="131072"] {
+          font-size: 0.85rem;
         }
         .score-container {
           flex-direction: row;
