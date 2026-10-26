@@ -261,7 +261,7 @@
       .map-label {
         position: absolute;
         transform: translate(-50%, -50%);
-        pointer-events: none;
+        cursor: pointer;
         font-size: 14px;
         font-weight: 600;
         line-height: 1.2;
@@ -342,9 +342,13 @@
         stroke-width: 5;
       }
 
+      /* dashed as well as red, so a wrong pick reads apart from the right
+         one without telling red from green */
       .world-map .continent.incorrect path {
         stroke: #b91c1c;
         stroke-width: 5;
+        stroke-dasharray: 6 6;
+        stroke-linecap: butt;
       }
 
       /* the pin that marks the country once its answer is shown: the ink
@@ -1377,6 +1381,12 @@
             e.preventDefault();
             checkContinentAnswer(continent, continentEl);
           });
+        });
+        // Some names sit over the sea beside their land, so a tap on a name
+        // answers for its continent exactly as a tap on the land does.
+        document.querySelectorAll("#worldMap .map-label").forEach((label) => {
+          const target = document.querySelector('#worldMap .continent[data-continent="' + label.textContent.trim() + '"]');
+          if (target) label.addEventListener("click", () => target.dispatchEvent(new MouseEvent("click", { bubbles: true })));
         });
       }
 
