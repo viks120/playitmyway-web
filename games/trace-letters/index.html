@@ -220,7 +220,10 @@
         padding: 0 4px;
         overflow: hidden;
       }
-      .fact-sound { font-size: 15px; line-height: 1.3; color: var(--ink); font-weight: 600; }
+      /* the keyword picture (28px, drawn in games/shared/art/pictures.js) sits
+         beside the sentence; the sentence alone may wrap, the picture never
+         shrinks, and two lines plus the picture still fit the 58px strip */
+      .fact-sound { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px; line-height: 1.3; color: var(--ink); font-weight: 600; }
       .fact-line { font-size: 16px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
       .fact-frames { display: flex; align-items: center; gap: 6px; }
       .tf { width: 52px; height: 22px; display: block; }
@@ -319,6 +322,15 @@
         font-weight: 600;
         color: var(--coral);
       }
+      /* Mango presents the finished letter: a row, so the critter takes width,
+         not height — the overlay is exactly the board's square and a phone
+         board is already full with a two-line praise */
+      .win-top { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+      .win-critter { flex: 0 0 auto; }
+      /* under 360px the square is already full (a two-line praise and the
+         wrapped buttons spill past it with or without a critter), so Mango
+         sits out there rather than poke above the card */
+      @media (max-width: 359px) { .win-critter { display: none; } }
       .win-overlay h2 { margin: 4px 0 0; font-size: clamp(22px, 6vw, 30px); color: var(--color-deep-ink); }
       .win-overlay p { margin: 0; color: var(--color-deep-soft); font-size: 17px; }
       .win-overlay .win-praise { color: var(--color-deep-soft); font-weight: 600; font-size: 15.5px; }
@@ -457,8 +469,11 @@
         <svg class="board" id="board" viewBox="0 0 100 100" role="img"
              aria-label="Tracing board"></svg>
         <div class="win-overlay hidden" id="winOverlay" role="dialog" aria-label="Tracing finished">
-          <span class="win-big" id="winBig">A</span>
-          <svg class="win-trace hidden" id="winTrace" viewBox="0 0 100 100" aria-hidden="true"></svg>
+          <div class="win-top">
+            <img class="win-critter" src="../../icons/critters/mango.svg" alt="" width="64" height="60">
+            <span class="win-big" id="winBig">A</span>
+            <svg class="win-trace hidden" id="winTrace" viewBox="0 0 100 100" aria-hidden="true"></svg>
+          </div>
           <h2 id="winTitle">You traced it!</h2>
           <p id="winSub">Wonderful writing!</p>
           <p class="win-praise" id="winPraise"></p>
@@ -499,6 +514,7 @@
       <p class="note">This activity is traced by touch or mouse. Grown-ups: tracing with one finger, nice and slow, is great pencil practice.</p>
     </section>
 
+    <script src="../shared/art/pictures.js"></script>
     <script>
       (function () {
         "use strict";
@@ -539,34 +555,43 @@
         // honestly be held on its own — continuants and short vowels. Stop
         // consonants get "as in" wording instead: saying "buh" for b teaches
         // a vowel that isn't there and makes blending harder later.
+        // k is the printed keyword; e is its picture's id in
+        // games/shared/art/pictures.js (drawn there, so every phone shows the
+        // same apple). The two match today, but the word is what the child
+        // reads and the id is what the library calls the drawing.
         var FACTS = {
-          a: { k: "apple", e: "🍎", s: "aaa" },
-          b: { k: "bear", e: "🐻" },
-          c: { k: "cat", e: "🐱" },
-          d: { k: "dog", e: "🐶" },
-          e: { k: "egg", e: "🥚", s: "eh" },
-          f: { k: "fish", e: "🐟", s: "fff" },
-          g: { k: "goat", e: "🐐" },
-          h: { k: "hat", e: "🎩", s: "hhh" },
-          i: { k: "igloo", e: "🧊", s: "ih" },
-          j: { k: "jam", e: "🍓" },
-          k: { k: "kite", e: "🪁" },
-          l: { k: "leaf", e: "🍃", s: "lll" },
-          m: { k: "monkey", e: "🐵", s: "mmm" },
-          n: { k: "nest", e: "🪺", s: "nnn" },
-          o: { k: "octopus", e: "🐙", s: "ooo" },
-          p: { k: "pig", e: "🐷" },
-          q: { k: "queen", e: "👑" },
-          r: { k: "rocket", e: "🚀", s: "rrr" },
-          s: { k: "sun", e: "☀️", s: "sss" },
-          t: { k: "tiger", e: "🐯" },
-          u: { k: "umbrella", e: "☂️", s: "uh" },
-          v: { k: "van", e: "🚐", s: "vvv" },
-          w: { k: "whale", e: "🐳" },
-          x: { k: "fox", e: "🦊" },
-          y: { k: "yo-yo", e: "🪀" },
-          z: { k: "zebra", e: "🦓", s: "zzz" }
+          a: { k: "apple", e: "apple", s: "aaa" },
+          b: { k: "bear", e: "bear" },
+          c: { k: "cat", e: "cat" },
+          d: { k: "dog", e: "dog" },
+          e: { k: "egg", e: "egg", s: "eh" },
+          f: { k: "fish", e: "fish", s: "fff" },
+          g: { k: "goat", e: "goat" },
+          h: { k: "hat", e: "hat", s: "hhh" },
+          i: { k: "igloo", e: "igloo", s: "ih" },
+          j: { k: "jam", e: "jam" },
+          k: { k: "kite", e: "kite" },
+          l: { k: "leaf", e: "leaf", s: "lll" },
+          m: { k: "monkey", e: "monkey", s: "mmm" },
+          n: { k: "nest", e: "nest", s: "nnn" },
+          o: { k: "octopus", e: "octopus", s: "ooo" },
+          p: { k: "pig", e: "pig" },
+          q: { k: "queen", e: "queen" },
+          r: { k: "rocket", e: "rocket", s: "rrr" },
+          s: { k: "sun", e: "sun", s: "sss" },
+          t: { k: "tiger", e: "tiger" },
+          u: { k: "umbrella", e: "umbrella", s: "uh" },
+          v: { k: "van", e: "van", s: "vvv" },
+          w: { k: "whale", e: "whale" },
+          x: { k: "fox", e: "fox" },
+          y: { k: "yo-yo", e: "yo-yo" },
+          z: { k: "zebra", e: "zebra", s: "zzz" }
         };
+
+        // the keyword pictures: one hidden sprite holding only the 26 symbols
+        // this page uses, put in the page before anything draws (pictures.js
+        // loads as a classic script above this one)
+        Pictures.install(Object.keys(FACTS).map(function (k) { return FACTS[k].e; }));
 
         var NUM_NAMES = ["zero", "one", "two", "three", "four", "five", "six",
           "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen",
@@ -698,8 +723,8 @@
           }
           var f = FACTS[g.l.toLowerCase()];
           if (!f) { factStrip.innerHTML = ""; return; }
-          factStrip.innerHTML = '<div class="fact-sound"><span aria-hidden="true">' + f.e + "</span> " +
-            g.l + (f.s ? " says " + f.s : "") + " — as in " + f.k + "</div>";
+          factStrip.innerHTML = '<div class="fact-sound">' + Pictures.use(f.e, { size: 28, cls: "fact-pic" }) +
+            "<span>" + g.l + (f.s ? " says " + f.s : "") + " — as in " + f.k + "</span></div>";
         }
 
         // Navigation follows the CHOSEN order, not the index order — otherwise
