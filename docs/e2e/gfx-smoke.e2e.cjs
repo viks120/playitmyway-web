@@ -38,7 +38,7 @@ const GAMES = {
   'whack-a-mole': { start: ['text:New Game'], area: '#moleGrid' },
   'catch-falling-object': { start: ['text:Start'], area: '#gameArea', keys: ['ArrowLeft', 'ArrowRight'] },
   'sound-it-out': { start: ['.chip[data-set="a"]'], area: '#picGlyph' },
-  'sort-it-out': { start: ['text:Living'], area: '.stage' },
+  'sort-it-out': { start: ['.chip[data-pack="living"]'], area: '.stage' },
   'trace-letters': { start: [], area: '#board' },
   'dot-to-dot': { start: [], area: '#board' },
   'balloon-pop': { start: ['text:Start'], area: '#gameArea' },
