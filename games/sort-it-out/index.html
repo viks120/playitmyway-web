@@ -171,6 +171,9 @@
         border-radius: var(--radius-pill);
       }
       .glyph { font-size: clamp(58px, 18vw, 84px); line-height: 1.15; user-select: none; }
+      /* a pictured card: the drawing fills the same 1.15em line box the big
+         text cards use, so the stage never changes height between packs */
+      .glyph .card-pic { display: block; width: 1em; height: 1em; margin: 0.075em auto; }
       .glyph.pop { animation: glyphPop 220ms ease; }
       @keyframes glyphPop { 0% { transform: scale(0.7); opacity: 0.4; } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
       .word { font-size: 22px; font-weight: 600; min-height: 28px; }
@@ -205,7 +208,8 @@
         padding: 1px 6px;
         opacity: 0.7;
       }
-      .bin .bin-emoji { font-size: 30px; line-height: 1; }
+      /* the bin's drawn symbol sits above its label; the label is the cue, the symbol only helps */
+      .bin .bin-pic { display: block; pointer-events: none; }
       .bin .bin-label { font-size: 18px; font-weight: 600; }
       .bin.is-right { background: var(--good-tint); border-color: var(--good); color: var(--good); }
       .bin.is-wrong { background: #fee2e2; border-color: var(--coral-deep); color: var(--coral-deep); animation: binNudge 320ms ease; }
@@ -215,13 +219,25 @@
         75% { transform: translateX(-2px); }
       }
 
-      /* the reason ALWAYS renders here — height is reserved so the bins never jump */
+      /* the reason ALWAYS renders here — height is reserved so the bins never jump.
+         Clover hosts it: the verdict and reason are her speech bubble (the house
+         pattern of Chart Detective's detective), tinted green or amber as before;
+         between cards the bubble is clear, as the box was, and Clover waits */
       .feedback {
         min-height: 118px;
         margin-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-align: left;
+      }
+      .feedback .host { flex: 0 0 auto; width: 56px; height: 52px; }
+      .feedback .bubble {
+        flex: 1 1 auto;
+        align-self: stretch;
+        position: relative;
         border-radius: var(--radius-md);
         padding: 10px 12px;
-        text-align: center;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -229,8 +245,20 @@
         background: transparent;
         transition: background var(--ease-quick);
       }
-      .feedback.good { background: var(--good-tint); }
-      .feedback.oops { background: var(--band-tint); }
+      .feedback .bubble::before {
+        content: "";
+        position: absolute;
+        left: -8px;
+        top: 50%;
+        margin-top: -8px;
+        border: 8px solid transparent;
+        border-left: 0;
+        transition: border-color var(--ease-quick);
+      }
+      .feedback.good .bubble { background: var(--good-tint); }
+      .feedback.good .bubble::before { border-right-color: var(--good-tint); }
+      .feedback.oops .bubble { background: var(--band-tint); }
+      .feedback.oops .bubble::before { border-right-color: var(--band-tint); }
       .verdict { font-size: 17px; font-weight: 600; margin: 0; }
       .feedback.good .verdict { color: var(--good); }
       .feedback.oops .verdict { color: var(--band); }
@@ -279,6 +307,9 @@
         padding: 4px 11px;
         font-size: 14px;
         font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
       }
       /* success-green cue, lightened so it stays legible on the deep card
          (#15803d is only 2.6:1 against #2b2a5e; #86efac is ~9:1) */
@@ -376,7 +407,7 @@
         <p class="prompt" id="packPrompt"></p>
 
         <div class="stage">
-          <span class="retry-chip" id="retryChip" hidden>👀 Second look!</span>
+          <span class="retry-chip" id="retryChip" hidden>Second look!</span>
           <div class="glyph" id="cardGlyph" aria-hidden="true"></div>
           <div class="word" id="cardWord"></div>
         </div>
@@ -384,9 +415,12 @@
         <div class="bins" id="bins" role="group" aria-label="Sorting bins"></div>
 
         <div class="feedback" id="feedback" aria-live="polite">
-          <p class="verdict" id="verdict"></p>
-          <p class="reason" id="reason"></p>
-          <p class="requeue-note" id="requeueNote"></p>
+          <img class="host" src="../../icons/critters/clover.svg" alt="" width="64" height="60" />
+          <div class="bubble">
+            <p class="verdict" id="verdict"></p>
+            <p class="reason" id="reason"></p>
+            <p class="requeue-note" id="requeueNote"></p>
+          </div>
         </div>
 
         <div class="advance-row" id="advanceRow">
@@ -429,13 +463,16 @@
       </ul>
     </section>
 
+    <script src="../shared/art/pictures.js"></script>
     <script>
       (function () {
         "use strict";
 
         /* ==PACK_DATA_START==
            Pure data only — no DOM access in this section.
-           The build validator extracts and evaluates this slice in Node. */
+           The build validator extracts and evaluates this slice in Node.
+           A pictured card or bin names its picture (pic) in
+           games/shared/art/pictures.js; numbers and letters are text. */
 
         // --- Odd / Even: numbers are generated, reasons are authored per ones-digit ---
         var SINGLE_DIGIT_REASONS = {
@@ -470,7 +507,7 @@
               : TENS_REASONS[d].split("{n}").join(String(n));
             cards.push({
               label: String(n),
-              emoji: String(n),
+              text: String(n),
               bin: n % 2 === 0 ? "even" : "odd",
               reason: reason
             });
@@ -514,7 +551,7 @@
             var reason = bin === "vowel"
               ? letter + " says " + sound + " " + phrase + " — it's one of the five vowels: A, E, I, O, U."
               : letter + " says " + sound + " " + phrase + " — it's a consonant." + (extra ? " " + extra : "");
-            return { label: "Letter " + letter, emoji: letter, bin: bin, reason: reason };
+            return { label: "Letter " + letter, text: letter, bin: bin, reason: reason };
           });
         }
 
@@ -522,100 +559,121 @@
           {
             id: "living",
             name: "Living or not?",
-            emoji: "🌱",
             prompt: "Is it living, or not living?",
             bins: [
-              { id: "living", label: "Living", emoji: "🌱" },
-              { id: "notliving", label: "Not living", emoji: "🪨" }
+              { id: "living", label: "Living", pic: "seedling" },
+              { id: "notliving", label: "Not living", pic: "rock" }
             ],
             cards: [
-              { label: "Dog", emoji: "🐶", bin: "living", reason: "A dog eats, grows and has puppies — it's a living thing." },
-              { label: "Tree", emoji: "🌳", bin: "living", reason: "A tree grows from a tiny seed and drinks water through its roots — it's alive." },
-              { label: "Sunflower", emoji: "🌻", bin: "living", reason: "A sunflower grows, drinks water and turns to face the sun — it's alive." },
-              { label: "Butterfly", emoji: "🦋", bin: "living", reason: "A butterfly eats, flies and grew from a caterpillar — it's a living thing." },
-              { label: "Fish", emoji: "🐟", bin: "living", reason: "A fish eats, swims and grows bigger — it's a living thing." },
-              { label: "Frog", emoji: "🐸", bin: "living", reason: "A frog eats, hops and grew from a little tadpole — it's alive." },
-              { label: "Bird", emoji: "🐦", bin: "living", reason: "A bird eats, breathes and hatches from an egg — it's a living thing." },
-              { label: "Mushroom", emoji: "🍄", bin: "living", reason: "A mushroom grows bigger every day — it's living, even though it's not a plant or an animal." },
-              { label: "Snail", emoji: "🐌", bin: "living", reason: "A snail eats, moves and grows — it's a living thing, just a very slow one!" },
-              { label: "Bee", emoji: "🐝", bin: "living", reason: "A bee eats, flies and grows — it's a living thing." },
-              { label: "Cactus", emoji: "🌵", bin: "living", reason: "A cactus is a plant — it grows and drinks the water it stores inside, so it's alive." },
-              { label: "Grass", emoji: "🌿", bin: "living", reason: "Grass drinks water and keeps growing taller — it's alive. That's why lawns need mowing!" },
-              { label: "Elephant", emoji: "🐘", bin: "living", reason: "An elephant eats, breathes and grows — it's a living thing." },
-              { label: "Rock", emoji: "🪨", bin: "notliving", reason: "A rock never eats, grows or breathes — it's not living." },
-              { label: "Chair", emoji: "🪑", bin: "notliving", reason: "A chair can't eat, grow or move on its own — it's not living." },
-              { label: "Bicycle", emoji: "🚲", bin: "notliving", reason: "A bicycle moves only when someone pedals it — it doesn't eat or grow, so it's not living." },
-              { label: "Ball", emoji: "⚽", bin: "notliving", reason: "A ball bounces, but it can't eat, grow or breathe — it's not living." },
-              { label: "Car", emoji: "🚗", bin: "notliving", reason: "A car moves, but it doesn't eat, grow or have babies — machines are not living." },
-              { label: "Spoon", emoji: "🥄", bin: "notliving", reason: "A spoon can't eat, grow or move by itself — it's not living." },
-              { label: "Book", emoji: "📕", bin: "notliving", reason: "A book can't eat, grow or breathe — it's not living." },
-              { label: "Robot", emoji: "🤖", bin: "notliving", reason: "A robot can move and beep, but it doesn't eat, grow or have babies — it's not living." },
-              { label: "Teddy bear", emoji: "🧸", bin: "notliving", reason: "A teddy bear looks like an animal, but it can't eat, grow or breathe — it's not living." },
-              { label: "Cloud", emoji: "☁️", bin: "notliving", reason: "A cloud floats and changes shape, but it doesn't eat, breathe or have babies — it's not living." },
-              { label: "Pencil", emoji: "✏️", bin: "notliving", reason: "A pencil can't eat, grow or move on its own — it's not living." },
-              { label: "Kite", emoji: "🪁", bin: "notliving", reason: "A kite flies only when the wind pushes it — it doesn't eat or grow, so it's not living." },
-              { label: "Moon", emoji: "🌙", bin: "notliving", reason: "The Moon shines in the night sky, but it doesn't eat, grow or breathe — it's not living." }
+              { label: "Dog", pic: "dog", bin: "living", reason: "A dog eats, grows and has puppies — it's a living thing." },
+              { label: "Tree", pic: "tree", bin: "living", reason: "A tree grows from a tiny seed and drinks water through its roots — it's alive." },
+              { label: "Sunflower", pic: "sunflower", bin: "living", reason: "A sunflower grows, drinks water and turns to face the sun — it's alive." },
+              { label: "Butterfly", pic: "butterfly", bin: "living", reason: "A butterfly eats, flies and grew from a caterpillar — it's a living thing." },
+              { label: "Fish", pic: "fish", bin: "living", reason: "A fish eats, swims and grows bigger — it's a living thing." },
+              { label: "Frog", pic: "frog", bin: "living", reason: "A frog eats, hops and grew from a little tadpole — it's alive." },
+              { label: "Bird", pic: "bird", bin: "living", reason: "A bird eats, breathes and hatches from an egg — it's a living thing." },
+              { label: "Mushroom", pic: "mushroom", bin: "living", reason: "A mushroom grows bigger every day — it's living, even though it's not a plant or an animal." },
+              { label: "Snail", pic: "snail", bin: "living", reason: "A snail eats, moves and grows — it's a living thing, just a very slow one!" },
+              { label: "Bee", pic: "bee", bin: "living", reason: "A bee eats, flies and grows — it's a living thing." },
+              { label: "Cactus", pic: "cactus", bin: "living", reason: "A cactus is a plant — it grows and drinks the water it stores inside, so it's alive." },
+              { label: "Grass", pic: "grass", bin: "living", reason: "Grass drinks water and keeps growing taller — it's alive. That's why lawns need mowing!" },
+              { label: "Elephant", pic: "elephant", bin: "living", reason: "An elephant eats, breathes and grows — it's a living thing." },
+              { label: "Rock", pic: "rock", bin: "notliving", reason: "A rock never eats, grows or breathes — it's not living." },
+              { label: "Chair", pic: "chair", bin: "notliving", reason: "A chair can't eat, grow or move on its own — it's not living." },
+              { label: "Bicycle", pic: "bicycle", bin: "notliving", reason: "A bicycle moves only when someone pedals it — it doesn't eat or grow, so it's not living." },
+              { label: "Ball", pic: "ball", bin: "notliving", reason: "A ball bounces, but it can't eat, grow or breathe — it's not living." },
+              { label: "Car", pic: "car", bin: "notliving", reason: "A car moves, but it doesn't eat, grow or have babies — machines are not living." },
+              { label: "Spoon", pic: "spoon", bin: "notliving", reason: "A spoon can't eat, grow or move by itself — it's not living." },
+              { label: "Book", pic: "book", bin: "notliving", reason: "A book can't eat, grow or breathe — it's not living." },
+              { label: "Robot", pic: "robot", bin: "notliving", reason: "A robot can move and beep, but it doesn't eat, grow or have babies — it's not living." },
+              { label: "Teddy bear", pic: "teddy-bear", bin: "notliving", reason: "A teddy bear looks like an animal, but it can't eat, grow or breathe — it's not living." },
+              { label: "Cloud", pic: "cloud", bin: "notliving", reason: "A cloud floats and changes shape, but it doesn't eat, breathe or have babies — it's not living." },
+              { label: "Pencil", pic: "pencil", bin: "notliving", reason: "A pencil can't eat, grow or move on its own — it's not living." },
+              { label: "Kite", pic: "kite", bin: "notliving", reason: "A kite flies only when the wind pushes it — it doesn't eat or grow, so it's not living." },
+              { label: "Moon", pic: "moon", bin: "notliving", reason: "The Moon shines in the night sky, but it doesn't eat, grow or breathe — it's not living." }
             ]
           },
           {
             id: "oddeven",
             name: "Odd or even?",
-            emoji: "🔢",
             prompt: "Is this number odd, or even?",
             roundSize: 20,
             bins: [
-              { id: "odd", label: "Odd", emoji: "🧍" },
-              { id: "even", label: "Even", emoji: "👫" }
+              { id: "odd", label: "Odd", pic: "one-person" },
+              { id: "even", label: "Even", pic: "two-people" }
             ],
             cards: buildOddEvenCards()
           },
           {
             id: "vowels",
             name: "Vowel or consonant?",
-            emoji: "🔤",
             prompt: "Is this letter a vowel, or a consonant?",
             bins: [
-              { id: "vowel", label: "Vowel", emoji: "🎵" },
-              { id: "consonant", label: "Consonant", emoji: "🥁" }
+              { id: "vowel", label: "Vowel", pic: "music-note" },
+              { id: "consonant", label: "Consonant", pic: "drum" }
             ],
             cards: buildLetterCards()
           },
           {
             id: "floats",
             name: "Sinks or floats?",
-            emoji: "🌊",
             prompt: "In water, does it sink, or float?",
             bins: [
-              { id: "sinks", label: "Sinks", emoji: "⬇️" },
-              { id: "floats", label: "Floats", emoji: "⬆️" }
+              { id: "sinks", label: "Sinks", pic: "arrow-down" },
+              { id: "floats", label: "Floats", pic: "arrow-up" }
             ],
             cards: [
-              { label: "Stone", emoji: "🪨", bin: "sinks", reason: "A stone is heavy for its size — heavy-for-its-size things always sink." },
-              { label: "Coin", emoji: "🪙", bin: "sinks", reason: "A coin is solid metal — heavy for its size, so it sinks." },
-              { label: "Key", emoji: "🔑", bin: "sinks", reason: "A key is solid metal — heavy for its size, so down it goes." },
-              { label: "Metal spoon", emoji: "🥄", bin: "sinks", reason: "A metal spoon is heavy for its size, so it sinks." },
-              { label: "Metal fork", emoji: "🍴", bin: "sinks", reason: "A metal fork is heavy for its size, so it sinks." },
-              { label: "Brick", emoji: "🧱", bin: "sinks", reason: "A brick is very heavy for its size — it sinks straight to the bottom." },
-              { label: "Metal bolt", emoji: "🔩", bin: "sinks", reason: "A bolt is a chunky piece of metal — heavy for its size, so it sinks." },
-              { label: "Scissors", emoji: "✂️", bin: "sinks", reason: "Scissors are made of metal — heavy for their size, so they sink." },
-              { label: "Anchor", emoji: "⚓", bin: "sinks", reason: "An anchor is a big lump of heavy metal — sinking is its job! It holds the boat still." },
-              { label: "Ring", emoji: "💍", bin: "sinks", reason: "A ring is solid metal — small but heavy for its size, so it sinks." },
-              { label: "Leaf", emoji: "🍃", bin: "floats", reason: "A leaf is light for its size — light-for-its-size things float." },
-              { label: "Feather", emoji: "🪶", bin: "floats", reason: "A feather is one of the lightest things for its size — it floats easily." },
-              { label: "Log", emoji: "🪵", bin: "floats", reason: "Wood is light for its size — logs float. That's how wooden rafts work!" },
-              { label: "Sailboat", emoji: "⛵", bin: "floats", reason: "A boat is full of air inside, so it's light for its size — floating is what boats do best." },
-              { label: "Canoe", emoji: "🛶", bin: "floats", reason: "A canoe is light for its size and full of air space — it floats, ready to paddle." },
-              { label: "Apple", emoji: "🍎", bin: "floats", reason: "An apple has tiny air pockets inside, so it's light for its size — that's why you can bob for apples!" },
-              { label: "Ice cube", emoji: "🧊", bin: "floats", reason: "Ice is a little lighter than water — ice cubes always bob up to the top." },
-              { label: "Soccer ball", emoji: "⚽", bin: "floats", reason: "A soccer ball is full of air — very light for its size, so it floats." },
-              { label: "Volleyball", emoji: "🏐", bin: "floats", reason: "A volleyball is full of air — light for its size, so it floats." },
-              { label: "Balloon", emoji: "🎈", bin: "floats", reason: "A balloon is full of air — super light for its size, so it floats on top." },
-              { label: "Duck", emoji: "🦆", bin: "floats", reason: "A duck is light for its size, and its feathers trap tiny air bubbles — it floats along happily." },
-              { label: "Wooden pencil", emoji: "✏️", bin: "floats", reason: "A wooden pencil is light for its size — wood floats." }
+              { label: "Stone", pic: "rock", bin: "sinks", reason: "A stone is heavy for its size — heavy-for-its-size things always sink." },
+              { label: "Coin", pic: "coin", bin: "sinks", reason: "A coin is solid metal — heavy for its size, so it sinks." },
+              { label: "Key", pic: "key", bin: "sinks", reason: "A key is solid metal — heavy for its size, so down it goes." },
+              { label: "Metal spoon", pic: "spoon", bin: "sinks", reason: "A metal spoon is heavy for its size, so it sinks." },
+              { label: "Metal fork", pic: "fork", bin: "sinks", reason: "A metal fork is heavy for its size, so it sinks." },
+              { label: "Brick", pic: "brick", bin: "sinks", reason: "A brick is very heavy for its size — it sinks straight to the bottom." },
+              { label: "Metal bolt", pic: "bolt", bin: "sinks", reason: "A bolt is a chunky piece of metal — heavy for its size, so it sinks." },
+              { label: "Scissors", pic: "scissors", bin: "sinks", reason: "Scissors are made of metal — heavy for their size, so they sink." },
+              { label: "Anchor", pic: "anchor", bin: "sinks", reason: "An anchor is a big lump of heavy metal — sinking is its job! It holds the boat still." },
+              { label: "Ring", pic: "ring", bin: "sinks", reason: "A ring is solid metal — small but heavy for its size, so it sinks." },
+              { label: "Leaf", pic: "leaf", bin: "floats", reason: "A leaf is light for its size — light-for-its-size things float." },
+              { label: "Feather", pic: "feather", bin: "floats", reason: "A feather is one of the lightest things for its size — it floats easily." },
+              { label: "Log", pic: "log", bin: "floats", reason: "Wood is light for its size — logs float. That's how wooden rafts work!" },
+              { label: "Sailboat", pic: "sailboat", bin: "floats", reason: "A boat is full of air inside, so it's light for its size — floating is what boats do best." },
+              { label: "Canoe", pic: "canoe", bin: "floats", reason: "A canoe is light for its size and full of air space — it floats, ready to paddle." },
+              { label: "Apple", pic: "apple", bin: "floats", reason: "An apple has tiny air pockets inside, so it's light for its size — that's why you can bob for apples!" },
+              { label: "Ice cube", pic: "ice-cube", bin: "floats", reason: "Ice is a little lighter than water — ice cubes always bob up to the top." },
+              { label: "Soccer ball", pic: "ball", bin: "floats", reason: "A soccer ball is full of air — very light for its size, so it floats." },
+              { label: "Volleyball", pic: "volleyball", bin: "floats", reason: "A volleyball is full of air — light for its size, so it floats." },
+              { label: "Balloon", pic: "balloon", bin: "floats", reason: "A balloon is full of air — super light for its size, so it floats on top." },
+              { label: "Duck", pic: "duck", bin: "floats", reason: "A duck is light for its size, and its feathers trap tiny air bubbles — it floats along happily." },
+              { label: "Wooden pencil", pic: "pencil", bin: "floats", reason: "A wooden pencil is light for its size — wood floats." }
             ]
           }
         ];
         /* ==PACK_DATA_END== */
+
+        // the pack pill's glyph is UI decoration, kept out of the data block above
+        var PACK_GLYPH = { living: "🌱", oddeven: "🔢", vowels: "🔤", floats: "🌊" };
+
+        // the pictures: one hidden sprite holding only the symbols this page
+        // uses, put in the page before anything draws (pictures.js loads as a
+        // classic script above this one)
+        var PICTURE_IDS = [];
+        PACKS.forEach(function (p) {
+          p.bins.concat(p.cards).forEach(function (item) {
+            if (item.pic && PICTURE_IDS.indexOf(item.pic) === -1) PICTURE_IDS.push(item.pic);
+          });
+        });
+        Pictures.install(PICTURE_IDS);
+        // No card may give its answer away. The library's sailboat and canoe
+        // sit on a water-coloured wave line, which says "floats" before the
+        // child decides, so this page takes that stroke out of its own copy
+        // of the two symbols (nothing is drawn here). Once the library draws
+        // them without water this finds nothing and can go.
+        ["sailboat", "canoe"].forEach(function (id) {
+          var symbol = document.getElementById("p-" + id);
+          if (!symbol) return;
+          var waves = symbol.querySelectorAll('[stroke="' + Pictures.PALETTE.water + '"]');
+          for (var i = 0; i < waves.length; i++) waves[i].parentNode.removeChild(waves[i]);
+        });
 
         // ---------- helpers ----------
         function $(id) { return document.getElementById(id); }
@@ -718,9 +776,11 @@
             var btn = document.createElement("button");
             btn.className = "bin";
             btn.dataset.bin = b.id;
+            // the drawn symbol is decorative and sits above the label text,
+            // which stays the cue (the number key is the other)
             btn.innerHTML =
               '<span class="bin-key" aria-hidden="true">' + (i + 1) + "</span>" +
-              '<span class="bin-emoji" aria-hidden="true">' + b.emoji + "</span>" +
+              Pictures.use(b.pic, { size: 36, cls: "bin-pic" }) +
               '<span class="bin-label"></span>';
             btn.querySelector(".bin-label").textContent = b.label;
             btn.addEventListener("click", function () { choose(b.id); });
@@ -739,7 +799,7 @@
           sorted = 0;
           score = 0;
           revisited = [];
-          statPack.textContent = pack.emoji + " " + pack.name;
+          statPack.textContent = PACK_GLYPH[pack.id] + " " + pack.name;
           promptEl.textContent = pack.prompt;
           renderBins();
           updateStats();
@@ -767,9 +827,16 @@
           var card = current.card;
           clearFeedback();
           retryChip.hidden = current.misses === 0;
-          glyphEl.textContent = card.emoji;
-          // numbers show once, big — don't repeat "37" as the word too
-          wordEl.textContent = card.label === card.emoji ? "" : card.label;
+          if (card.pic) {
+            // a drawn card, named after its label for assistive tech
+            glyphEl.innerHTML = Pictures.use(card.pic, { label: card.label, cls: "card-pic" });
+            wordEl.textContent = card.label;
+          } else {
+            // numbers and letters stay big text; numbers show once — don't
+            // repeat "37" as the word too
+            glyphEl.textContent = card.text;
+            wordEl.textContent = card.label === card.text ? "" : card.label;
+          }
           if (!reducedMotion) {
             glyphEl.classList.remove("pop");
             void glyphEl.offsetWidth; // restart the pop animation
@@ -818,7 +885,7 @@
           } else {
             current.misses++;
             var already = revisited.some(function (r) { return r.label === card.label; });
-            if (!already) revisited.push({ label: card.label, emoji: card.emoji });
+            if (!already) revisited.push({ label: card.label, pic: card.pic, text: card.text });
             // the missed card comes back three cards later for a second meeting
             deck.splice(Math.min(REQUEUE_GAP, deck.length), 0, current);
             feedbackEl.className = "feedback oops";
@@ -868,7 +935,13 @@
             revisited.forEach(function (r) {
               var span = document.createElement("span");
               span.className = "tricky-item";
-              span.textContent = (r.emoji === r.label ? "" : r.emoji + " ") + r.label;
+              if (r.pic) {
+                // the picture ids come from PACKS only, never from a player
+                span.innerHTML = Pictures.use(r.pic, { size: 14 });
+                span.appendChild(document.createTextNode(r.label));
+              } else {
+                span.textContent = (r.text === r.label ? "" : r.text + " ") + r.label;
+              }
               list.appendChild(span);
             });
           }
