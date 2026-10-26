@@ -177,71 +177,192 @@
         margin-bottom: 25px;
       }
 
-      .question {
-        font-size: clamp(1.4em, 5vw, 1.8em);
-        color: var(--color-ink);
-        font-weight: bold;
+      /* Clover asks the question from a speech bubble at the top of the
+         card, the house pattern of Chart Detective's detective */
+      .bubble-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
         margin-bottom: 15px;
+        text-align: left;
       }
 
+      .host {
+        flex: 0 0 auto;
+        width: 56px;
+        height: 52px;
+      }
+
+      .bubble {
+        flex: 1 1 auto;
+        position: relative;
+        background: var(--color-violet-tint);
+        border-radius: 16px;
+        padding: 10px 14px;
+        min-height: 52px;
+        display: flex;
+        align-items: center;
+      }
+
+      .bubble::before {
+        content: "";
+        position: absolute;
+        left: -8px;
+        top: 18px;
+        border: 8px solid transparent;
+        border-right-color: var(--color-violet-tint);
+        border-left: 0;
+      }
+
+      .question {
+        font-size: clamp(1.1em, 4.5vw, 1.5em);
+        color: var(--color-ink);
+        font-weight: bold;
+        line-height: 1.3;
+        margin: 0;
+      }
+
+      /* the flag comes from the picture library and draws its own ink
+         border: a 72 by 48 flag at 120 wide fills this box exactly */
       .flag-display {
         width: 120px;
         height: 80px;
         margin: 15px auto;
-        border: 3px solid #333;
-        border-radius: var(--radius-md);
-        background: #f0f0f0;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2em;
       }
 
+      .flag-display .pic {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* The world map: the artist's drawing, inline, in a box of its own
+         360 by 200 shape so it never letterboxes (the sea is part of the
+         drawing). The continent names are HTML labels laid over it, because
+         the map's markup holds no text; taps go straight through them. */
       .world-map {
+        position: relative;
         width: 100%;
         max-width: 600px;
-        height: 300px;
+        aspect-ratio: 360 / 200;
         margin: 20px auto;
-        background: #dbeafe; /* the sea */
-        border-radius: 15px;
-        position: relative;
-        overflow: hidden;
-        border: 3px solid #333;
       }
 
-      .continent {
+      .map-svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .map-label {
         position: absolute;
-        background: rgba(255, 255, 255, 0.8);
-        border: 2px solid #333;
-        border-radius: 8px;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.2;
+        color: var(--color-ink);
+        background: rgba(255, 248, 239, 0.7);
+        border-radius: var(--radius-pill);
+        padding: 1px 8px;
+        white-space: nowrap;
+      }
+
+      /* each name sits on or beside its continent, clear of every pin */
+      .map-label.na { left: 14.4%; top: 22%; }
+      .map-label.sa { left: 34.4%; top: 91.5%; }
+      .map-label.eu { left: 59.2%; top: 24.5%; }
+      .map-label.af { left: 54.4%; top: 68.5%; }
+      .map-label.as { left: 77.8%; top: 24%; }
+      .map-label.oc { left: 82.5%; top: 92%; }
+
+      /* The six continents are the drawing's own shapes, each a button (a
+         group of paths with role="button"). Hover (where there is one) and
+         keyboard focus grow a continent in place, and focus thickens its
+         ink; with reduced motion nothing grows. The attempt ladder shows as
+         classes that beat the shapes' own colours: eliminated turns grey,
+         incorrect gets a thick red outline and correct a thick green one.
+         Equal-weight rules, so their order below is what decides. */
+      .world-map .continent {
         cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        color: #333;
-        font-size: clamp(0.8em, 2vw, 1em);
-        /* the map regions are real <button>s now (keyboard reachable) —
-           strip the UA chrome so they render exactly as the old divs did */
-        font-family: inherit;
-        padding: 0;
+        outline: none;
+        transform-box: fill-box;
+        transform-origin: center;
       }
 
-      .continent:hover {
-        background: rgba(255, 255, 255, 1);
-        transform: scale(1.05);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      .world-map .continent[aria-disabled="true"] {
+        cursor: default;
       }
 
-      .continent.correct {
-        background: #a8e6cf;
-        border-color: #2d5a3d;
+      .world-map .continent path {
+        transition: fill 0.3s ease, stroke 0.3s ease, stroke-width 0.3s ease;
       }
 
-      .continent.incorrect {
-        background: #ff6b6b;
-        border-color: #8b0000;
+      @media (hover: hover) {
+        .world-map .continent:hover path {
+          stroke-width: 3.5;
+        }
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        .world-map .continent {
+          transition: transform 0.3s ease;
+        }
+        .world-map .continent:focus-visible {
+          transform: scale(1.05);
+        }
+      }
+
+      @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+        .world-map .continent:hover {
+          transform: scale(1.05);
+        }
+      }
+
+      .world-map .continent.eliminated {
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .world-map .continent.eliminated path {
+        fill: #d6d3d1;
+        stroke-width: 2.5;
+      }
+
+      .world-map .continent:focus-visible path {
+        stroke-width: 5;
+      }
+
+      .world-map .continent.correct path {
+        stroke: #15803d;
+        stroke-width: 5;
+      }
+
+      .world-map .continent.incorrect path {
+        stroke: #b91c1c;
+        stroke-width: 5;
+      }
+
+      /* the pin that marks the country once its answer is shown: the ink
+         ring is painted under the red head, so the red reads this small */
+      #pins circle {
+        paint-order: stroke;
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        #pins .pin {
+          transform-box: fill-box;
+          transform-origin: center;
+          animation: pinDrop 0.35s ease-out;
+        }
+        @keyframes pinDrop {
+          from { transform: translateY(-14px) scale(0.6); }
+          to { transform: none; }
+        }
       }
 
       .answer-options {
@@ -378,18 +499,6 @@
         box-shadow: 0 3px 0 0 var(--ab-candy);
       }
 
-      .continent.eliminated {
-        background: #cccccc;
-        color: #888;
-        cursor: not-allowed;
-      }
-
-      .continent.eliminated:hover {
-        background: #cccccc;
-        transform: none;
-        box-shadow: none;
-      }
-
       .btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
@@ -439,12 +548,8 @@
           margin: 0 5px;
         }
 
-        .world-map {
-          height: 250px;
-        }
-
-        .continent {
-          font-size: 0.7em;
+        .map-label {
+          font-size: 12px;
         }
 
         .answer-options {
@@ -478,17 +583,14 @@
           padding-top: 50px; /* Less space on smaller screens */
         }
 
-        .world-map {
-          height: 200px;
-        }
-
-        .continent {
-          font-size: 0.6em;
+        .map-label {
+          font-size: 10px;
+          padding: 1px 5px;
         }
 
         .flag-display {
-          width: 100px;
-          height: 60px;
+          width: 96px;
+          height: 64px;
         }
 
         .mode-btn {
@@ -686,21 +788,61 @@
       </div>
 
       <div class="game-container">
+        <div class="bubble-row">
+          <img class="host" src="../../icons/critters/clover.svg" alt="" width="64" height="60" />
+          <div class="bubble"><div class="question" id="question">Find the country on the map</div></div>
+        </div>
         <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
         <div class="hint" id="hint" role="status" aria-live="polite"></div>
-
         <div class="question-area">
-          <div class="question" id="question">Find the country on the map</div>
-          <div class="flag-display" id="flagDisplay">🏳️</div>
+          <div class="flag-display" id="flagDisplay"><svg class="pic" width="120" height="80" viewBox="0 0 72 48" aria-hidden="true" focusable="false"><use href="#p-flag-blank"/></svg></div>
         </div>
-
-        <div
-          class="world-map"
-          id="worldMap"
-          role="group"
-          aria-label="World map — pick the continent"
-        >
-          <!-- Continents will be generated here -->
+        <!-- The world map, drawn in the page: one group of paths per continent,
+             each a button; the pins group stays empty until an answer is
+             shown. The names are HTML labels over the drawing, hidden from
+             screen readers because each continent carries its own label. -->
+        <div class="world-map" id="worldMap">
+          <svg class="map-svg" id="mapSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 200" width="100%" preserveAspectRatio="xMidYMid meet" role="group" aria-label="World map — pick the continent" focusable="false">
+            <rect width="360" height="200" rx="12" fill="#8ed0ff"/>
+            <g class="continent" data-continent="North America" role="button" tabindex="0" aria-label="North America">
+              <path d="M20.8 43.2C20.1 42.1 20.8 39.7 22.2 38.3C23.7 36.8 27.9 33.3 31 32.8C34 32.4 40.8 34.7 43.8 35.1C46.8 35.6 49.1 35.7 52.1 36.1C55.1 36.4 61.6 37.9 65 37.9C68.4 37.9 72.8 36.7 76 36.1C79.3 35.4 85.5 33 88 33.2C90.5 33.5 92.3 36.6 93.5 37.9C94.7 39.2 96.5 41 96.3 42.3C96 43.7 92.7 45.7 91.7 47.4C90.6 49 88 52.4 88.7 54.1C89.5 55.7 95.3 57.5 97.2 59C99.1 60.5 100.8 64.6 101.8 64.7C102.8 64.8 103.8 61.3 104.1 59.7C104.4 58.2 103.6 55.4 103.6 53.7C103.6 52.1 103.2 48.6 104.1 48.2C105 47.8 108.4 50.1 110.1 50.6C111.8 51.1 114.8 50.5 116.1 51.6C117.4 52.6 118.2 56.6 119.3 58.3C120.4 59.9 123.4 61.9 123.9 63.3C124.4 64.7 123.5 67 123 68.1C122.4 69.3 121.1 70.6 120.2 71.5C119.3 72.3 117.4 73.8 116.5 74.1C115.6 74.4 114.6 73.2 113.8 73.7C113 74.1 111.7 76.5 110.8 77.3C109.9 78 108.1 78.1 107.3 79C106.6 79.9 105.7 82.5 105.5 83.4C105.3 84.3 106.5 84.7 105.9 85.6C105.4 86.4 102.1 88.5 101.3 89.3C100.6 90.1 100.4 90.6 100.4 91.3C100.5 91.9 101.5 93.1 101.6 93.9C101.7 94.7 101.5 97 101.1 97C100.7 97.1 99.3 95.2 98.8 94.5C98.2 93.7 97.9 92.1 97.2 91.6C96.5 91.2 94.8 91.1 94 91.3C93.2 91.4 92.5 92.4 91.7 92.5C90.9 92.7 89 91.8 88.2 92.3C87.4 92.8 86.3 95 85.9 96.2C85.5 97.3 85.3 99.2 85.4 100.3C85.6 101.3 86.3 103 86.9 103.6C87.5 104.3 88.6 104.7 89.4 104.6C90.1 104.6 91.3 103.8 92.1 103.3C93 102.8 95 101 95.4 101.1C95.7 101.3 94.4 103.5 94.4 104.4C94.4 105.3 94.8 106.8 95.4 107.3C95.9 107.9 98.1 107.5 98.6 108.2C99 108.8 98.2 111.1 98.4 111.9C98.6 112.7 99.5 113.6 100 113.9C100.5 114.2 101.4 114 102 114.1C102.6 114.3 104 114.7 104.3 115L103.8 116.2C103.4 116.4 102.2 116.2 101.5 116C100.8 115.8 99.5 115.5 98.8 115C98 114.5 97.1 113.4 96.3 112.6C95.5 111.9 94.2 110.8 93.1 110C91.9 109.2 89.4 107.7 88 107.1C86.6 106.5 84.2 106.6 82.9 106C81.6 105.5 79.6 104.2 78.8 103.3C78 102.4 78.1 100.3 77.6 99.5C77.1 98.7 75.6 97.8 75.1 97.8C74.6 97.8 74.5 99.7 73.9 99.5C73.3 99.3 71.7 97.2 71 96.2C70.3 95.1 69.6 93.2 69.1 92.2C68.7 91.1 68.2 89.5 67.6 88.7C67 87.9 65.7 87.5 65 86.6C64.3 85.7 63.3 83.6 62.7 82.4C62.1 81.3 61.2 80 61 78.5C60.8 77 61.5 73.6 61.3 72.1C61.2 70.7 60.7 69.5 59.9 68.1C59.2 66.8 57.2 64.2 55.8 62.6C54.4 61 52 58.2 50.3 56.8C48.6 55.3 45.8 53.2 43.8 52.5C41.9 51.9 38 51.7 36.5 52.2C34.9 52.7 34.1 55.1 32.8 56C31.5 57 27.7 59.2 27.3 59C26.8 58.8 29.8 55.4 29.6 54.5C29.3 53.6 26.4 53.4 25.4 52.5C24.5 51.6 22.9 49.2 23.1 48.2C23.4 47.2 27.6 46.4 27.3 45.7C27 45 21.6 44.2 20.8 43.2Z" fill="#4ade80" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M120.2 29.3C120.3 27.8 121.9 24.5 123.9 23.1C125.8 21.8 131 20.3 134 19.8C137 19.4 142.3 19.2 145 19.8C147.8 20.4 151.9 22.3 153.3 24.2C154.8 26.1 155.9 30.7 155.2 33.2C154.4 35.8 150.3 40 147.8 42.3C145.3 44.7 139.6 48.4 137.7 49.8C135.7 51.2 135.2 52.4 134 52.2C132.8 52 130.5 49.8 129.4 48.2C128.3 46.6 127 42.6 126.2 40.6C125.3 38.6 124.3 35.8 123.4 34.2C122.6 32.6 120.1 30.9 120.2 29.3Z" fill="#ffffff" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M99.5 100.6C100 100.2 101.5 100.2 102.3 100.3C103 100.3 104.3 100.8 105 101.1C105.7 101.4 107 102 107.1 102.5C107.3 102.9 106.5 103.9 105.9 104.1C105.4 104.3 103.9 104.2 103.2 104.1C102.5 104 101.5 103.5 100.9 103.3C100.3 103.2 99.2 103.4 99 103C98.8 102.6 99 101 99.5 100.6Z" fill="#4ade80" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            </g>
+            <g class="continent" data-continent="South America" role="button" tabindex="0" aria-label="South America">
+              <path d="M104.3 115C104.6 114.5 105.5 113.5 105.9 113.1C106.4 112.7 106.8 112.4 107.3 112.1C107.8 111.8 109 110.9 109.4 110.9C109.9 111 109.9 112.4 110.5 112.6C111.2 112.9 113.2 112.8 114.2 112.9C115.2 112.9 116.7 112.9 117.4 113.2C118.2 113.5 118.8 114.3 119.7 115C120.7 115.6 122.7 117.1 123.9 117.7C125 118.4 127.1 118.6 127.9 119.5C128.7 120.4 128.8 123.1 129.4 124C130 124.9 131.1 125.1 132.2 125.6C133.2 126 135.6 126.8 136.8 127.1C137.9 127.5 139.6 127.8 140.4 128.2C141.3 128.5 142.5 128.8 142.9 129.6C143.3 130.3 143.6 132.3 143.2 133.4C142.8 134.6 140.5 136.4 140 137.7C139.4 139 139.7 141.1 139.3 142.5C138.9 144 138.3 146.8 137.2 148C136.1 149.1 132.7 149.7 131.7 150.7C130.7 151.8 130.6 153.9 129.9 155.2C129.1 156.5 127.6 158.8 126.6 159.8C125.7 160.9 124.1 161.9 123.4 162.8C122.8 163.7 123 165.5 122 166.4C121.1 167.4 118.1 168.2 117 169.5C115.9 170.7 114.9 173.6 114.2 175.2C113.6 176.9 112.6 179.7 112.4 181.2C112.2 182.8 112.6 185.1 112.8 186.1C113 187.1 114.3 188.2 113.8 188.3C113.2 188.4 110.2 187.8 109.2 186.8C108.1 185.8 106.7 183 106.4 181.2C106.1 179.5 106.7 176.6 106.9 174.6C107.1 172.6 107.4 169.1 107.8 167C108.1 164.9 109 162 109.4 159.8C109.8 157.7 110.4 154.1 110.5 151.8C110.7 149.5 111.3 145.4 110.5 143.6C109.8 141.8 106.6 140.9 105.5 139.3C104.3 137.7 103.1 133.8 102.4 132.4C101.8 131 100.8 130.1 100.6 129.2C100.4 128.3 100.8 127.1 101.1 126.1C101.4 125.1 102.3 123.4 102.7 122.4C103.2 121.5 104 120.2 104.2 119.3C104.3 118.4 103.8 116.8 103.8 116.2L104.3 115Z" fill="#fbbf24" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            </g>
+            <g class="continent" data-continent="Europe" role="button" tabindex="0" aria-label="Europe">
+              <path d="M233.4 37.9C232.2 37.1 226.1 38.4 223.2 38.8C220.4 39.2 215.5 41 213.1 40.6C210.8 40.2 208.5 37.1 206.7 36.1C204.9 35 202.3 33.1 200.2 33.2C198.2 33.4 193.8 35.7 192 37C190.1 38.3 188.3 40.8 186.9 42.3C185.5 43.8 183.3 46 182.3 47.4C181.3 48.8 180.1 51.1 180 52.2C179.9 53.3 181.1 55.2 181.8 55.3C182.6 55.4 184.5 52.9 185.1 53C185.6 53.1 185.7 55.3 186 56C186.3 56.8 186.8 58.2 187.4 58.3C187.9 58.4 189.2 57.5 189.7 56.8C190.1 56 190.4 54.1 190.6 53C190.7 51.9 190.2 50.2 190.6 49C191 47.9 192.5 45.8 193.3 44.9C194.2 43.9 195.8 42.1 196.6 42.3C197.3 42.6 198.2 45.4 198.4 46.6C198.6 47.7 197.9 49.7 197.9 50.6C198 51.5 198.9 52.2 198.9 53C198.8 53.7 198.1 55.2 197.5 56C196.9 56.9 195.6 58.4 194.7 59C193.8 59.6 192.2 60.2 191 60.5C189.9 60.7 187.5 60.6 186.4 60.7C185.3 60.9 184.1 61.3 183.2 61.5C182.4 61.7 181 61.8 180.5 62.2C179.9 62.5 179.7 63.5 179.4 64C179 64.6 178.1 65.6 177.7 66.1C177.3 66.6 177.2 67.4 176.8 67.7C176.4 68.1 175.3 68.5 174.9 68.5C174.5 68.6 174.2 68.1 173.9 68.1C173.7 68.2 173.5 68.5 173.1 68.7C172.7 68.8 171 68.8 171 69.1C171 69.3 172.8 70 173.3 70.5C173.8 71.1 174.2 72.1 174.3 72.8C174.4 73.5 174.3 75 173.8 75.4C173.3 75.7 171.8 75.2 170.8 75.2C169.8 75.2 167.6 74.9 167.1 75.4C166.6 75.8 167.4 77.7 167.3 78.5C167.2 79.4 166.7 80.6 166.7 81.3C166.6 82 166.9 83.1 167.1 83.4C167.4 83.7 168 83.4 168.5 83.4C169 83.5 169.8 83.7 170.3 83.8C170.9 83.8 172.1 83.7 172.6 83.5C173.2 83.4 174.1 83.1 174.5 82.8C174.9 82.5 175.3 81.7 175.6 81.2C175.8 80.7 175.8 79.6 176.1 79.1C176.4 78.7 177.4 78.3 177.7 77.9C178 77.4 178.1 76.4 178.4 76C178.8 75.6 179.5 75.5 180 75.4C180.5 75.2 181.8 75.1 182.3 75C182.8 74.8 182.9 74.2 183.2 74.3C183.5 74.5 184.2 75.5 184.6 76C185 76.5 185.5 77.4 186 77.9C186.4 78.4 187.4 79.2 187.8 79.7C188.3 80.3 188.8 81.2 189.2 81.6C189.6 82 190 82.8 190.3 82.8C190.6 82.8 191.2 81.9 191.5 81.5C191.8 81.1 192.7 80.5 192.7 80C192.7 79.5 191.8 78.7 191.3 78.1C190.9 77.6 189.9 76.8 189.5 76.2C189 75.7 188.4 75 188.1 74.5C187.8 74 187.2 73 187.4 72.8C187.5 72.6 188.5 72.9 189.2 73C189.9 73.2 191.4 73.7 192 74.1C192.5 74.5 193.1 75.5 193.3 76C193.6 76.5 193.7 77.4 193.8 77.9C193.9 78.3 193.7 78.8 193.8 79.1C193.9 79.5 194.1 79.9 194.3 80.4C194.5 80.8 194.9 81.7 195.2 82.2C195.4 82.7 195.8 83.4 196.1 83.6C196.4 83.9 196.8 84.2 197 84C197.3 83.8 197.8 82.7 197.9 82.2C198.1 81.7 198.1 80.8 197.9 80.4C197.8 79.9 196.9 79.4 197 79.1C197.2 78.9 198.4 78.8 198.9 78.8C199.3 78.7 199.8 79 200.2 79C200.6 79 201.5 78.9 201.6 78.5C201.8 78.1 201 76.8 201.2 76C201.3 75.2 202 73.4 202.5 72.8C203.1 72.1 204 71.7 204.8 71.5C205.7 71.3 207.7 71.4 208.5 71.5C209.4 71.6 210.3 71.6 210.8 72.1C211.3 72.7 211.1 74.8 211.9 75.2L216.8 75.4L218.6 74.1L220.5 72.1L222.9 70.8L226.9 65.4L229.7 58.3L230.6 52.2L231.5 44L233.4 37.9Z" fill="#60a5fa" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M169.9 63.7C170.4 63.9 172.8 63.6 173.6 63.5C174.3 63.3 175.1 63.3 175.4 62.9C175.7 62.5 175.6 61.2 175.4 60.5C175.2 59.7 174.3 58.4 174 57.5C173.7 56.7 173.6 55.3 173.1 54.5C172.6 53.8 171.4 52.2 170.8 52.2C170.2 52.2 169.2 53.8 169 54.5C168.8 55.3 169.2 56.7 169.4 57.5C169.7 58.4 170.7 59.7 170.8 60.5C170.9 61.2 170 62.1 169.9 62.6C169.7 63.1 169.4 63.6 169.9 63.7Z" fill="#60a5fa" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            </g>
+            <g class="continent" data-continent="Africa" role="button" tabindex="0" aria-label="Africa">
+              <path d="M169.9 86.4C170.7 86.1 172.4 86 173.6 85.8C174.7 85.6 176.6 85.1 178.2 84.8C179.7 84.6 183.6 84.3 184.6 84.2C185.6 84.2 185.5 83.8 185.5 84.2C185.6 84.7 184.7 86.9 185.1 87.6C185.4 88.2 186.8 88.2 187.8 88.7C188.9 89.2 191.5 90.9 192.4 91C193.3 91.2 193.5 89.8 194.3 89.5C195 89.3 196.8 89.4 197.9 89.5C199.1 89.7 201.5 90.3 202.5 90.5C203.6 90.6 204.7 90.3 205.1 90.5C205.5 90.6 205.2 91.1 205.3 91.6C205.4 92.2 205.4 93.4 205.8 94.5C206.1 95.5 207.1 97.7 207.6 98.9C208.1 100.2 208.9 102.1 209.4 103.3C210 104.6 210.5 106.6 211.3 107.6C212.1 108.7 214.1 110.2 215 110.8C215.8 111.5 216.5 112.3 217.3 112.4C218 112.6 219.7 112 220.5 111.9C221.2 111.8 222.5 111.1 222.6 111.6C222.7 112.1 222 114.4 221.4 115.6C220.8 116.8 219.1 118.6 218.2 119.8C217.2 121 215.5 122.7 214.6 124C213.7 125.3 212.2 127.5 211.7 128.7C211.3 129.9 211.4 131.4 211.6 132.4C211.7 133.4 212.5 134.4 212.7 135.6C212.8 136.7 213.2 139.1 212.7 140.4C212.1 141.7 209.2 143.4 208.5 144.7C207.9 145.9 208.5 148 208.1 149.1C207.7 150.2 206.3 151.4 205.7 152.4C205.1 153.4 204.7 155.2 203.9 156.4C203.2 157.5 201.5 159.6 200.2 160.4C198.9 161.2 195.8 161.9 194.7 162C193.6 162.1 192.8 162.1 192.3 161.3C191.9 160.5 192 157.9 191.5 156.4C191 154.9 189.7 152.5 189 150.7C188.4 149 187.1 146 186.8 144.1C186.5 142.3 187.1 139.4 187.2 137.7C187.3 136 187.7 133.7 187.5 132.4C187.4 131 186.5 129.3 186 128.2C185.4 127.1 183.9 125.6 183.7 124.5C183.4 123.5 184.6 121.6 184.2 120.9C183.9 120.1 182.2 119.9 181.4 119.5C180.6 119 179.5 117.8 178.6 117.7C177.8 117.6 176.2 118.6 175.4 118.8C174.6 119 173.6 119.1 172.6 119.2C171.7 119.3 169.7 119.7 168.5 119.3C167.3 118.9 164.9 117 163.9 116.1C162.9 115.2 162.2 114 161.6 113C161 111.9 159.5 109.7 159.4 108.5C159.2 107.3 160.5 105.4 160.5 104.4C160.5 103.4 159.5 102.7 159.7 101.7C159.8 100.7 160.9 98.5 161.6 97.3C162.3 96.1 163.7 94.3 164.4 93.3C165 92.4 165.9 91.3 166.4 90.5C166.9 89.7 167.5 88.1 168 87.6C168.5 87 169.1 86.6 169.9 86.4Z" fill="#fb923c" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M220.8 136.4C221.1 136.6 222.1 138.7 222.1 139.8C222.1 140.9 221.1 142.9 220.8 144.1C220.4 145.4 220.1 147.4 219.6 148.5C219.1 149.6 217.8 151.5 217.3 151.6C216.7 151.7 215.6 150.1 215.4 149.1C215.2 148 215.6 145.3 215.7 144.1C215.8 143 215.8 141.7 216.3 140.9C216.9 140.1 218.9 138.9 219.6 138.2C220.2 137.6 220.4 136.2 220.8 136.4Z" fill="#fb923c" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            </g>
+            <g class="continent" data-continent="Asia" role="button" tabindex="0" aria-label="Asia">
+              <path d="M233.4 37.9C234.5 36.2 237.6 33.5 239.8 32.3C242 31.1 245.1 30.5 249 29.3C252.9 28.2 263.1 24.3 267.4 24.2C271.7 24 275.7 27.4 279.4 28.3C283 29.2 289.6 29.8 293.2 30.3C296.7 30.9 300 31.6 304.2 32.3C308.4 32.9 318.4 34.6 322.6 35.1C326.8 35.7 331 35.2 333.6 36.1C336.2 36.9 340.2 40.2 341 41.5C341.8 42.7 340.1 43.8 339.2 44.9C338.2 46 336.3 48 334.6 49C332.9 50 328.5 51.1 327.2 52.2C325.9 53.3 326.3 55.1 325.4 56.8C324.4 58.5 321.6 62.8 320.8 64C319.9 65.2 319.9 65.9 319.6 65.4C319.3 64.9 318.7 61.9 318.7 60.5C318.8 59 320.5 56.3 319.8 55.3C319.2 54.2 316.3 53.1 314.3 53C312.4 52.9 307.9 53.4 306 54.5C304.2 55.6 301.6 59.3 301.4 60.5C301.3 61.6 304.8 61.2 305.1 62.6C305.4 64 304.9 68.3 303.7 70.2C302.6 72 298.3 74.5 296.8 76C295.3 77.4 293.5 79.3 293.2 80.4C292.8 81.4 294.3 82.6 294.4 83.4C294.4 84.2 294 85.6 293.6 86C293.3 86.5 292 86.8 291.8 86.4C291.5 85.9 292 83.7 291.8 82.8C291.6 81.9 290.7 80.8 290.4 80.4C290.1 79.9 290.7 79.7 289.9 79.7C289.2 79.8 285.1 80.5 284.9 81C284.6 81.4 288 82.1 288.1 82.8C288.2 83.5 285.6 85 285.3 85.8C285.1 86.6 286.2 87.5 286.5 88.2C286.8 88.8 287.4 89.7 287.5 90.5C287.5 91.3 287.5 92.9 287.2 93.9C286.8 94.9 285.6 96.4 284.9 97.3C284.2 98.1 282.8 99.3 282.1 99.7C281.4 100.1 280.5 100.1 279.8 100.4C279.1 100.6 277.8 101.2 277.1 101.4C276.3 101.5 275.3 101 274.8 101.1C274.2 101.3 273.4 101.5 273.4 102.2C273.3 102.9 273.9 104.8 274.3 106C274.7 107.2 276.3 109.6 276 110.8C275.6 112.1 272.8 114.7 272 115C271.2 115.2 271.2 113.4 270.6 112.6C270 111.9 268.4 109.8 267.9 109.9C267.3 109.9 266.9 112 266.9 113C266.9 113.9 267.4 115.8 267.9 116.7C268.4 117.5 270 117.9 270.4 118.8C270.9 119.6 271.1 122.2 270.9 122.5C270.7 122.9 269.2 122 268.8 121.4C268.3 120.8 268 119.1 267.6 118.2C267.2 117.3 266 116.1 265.8 115.1C265.6 114 266.2 112 266.1 110.8C266 109.7 265.6 107.3 265.1 106.8C264.6 106.3 262.9 107.6 262.3 107.1C261.8 106.6 261.8 104.2 261.4 103.3C261.1 102.4 260.5 100.9 259.9 100.6C259.2 100.3 257.5 100.8 256.8 101.1C256.1 101.4 255.7 102.2 255 102.8C254.3 103.4 252.5 104.8 251.8 105.5C251 106.2 249.8 107 249.5 107.6C249.1 108.3 249.4 109.5 249.3 110.3C249.2 111.1 249 112.8 248.6 113.5C248.3 114.2 247.2 115.6 246.7 115.5C246.2 115.4 245.7 113.9 245.3 113C244.9 112 244.2 110 243.8 108.7C243.3 107.4 242.6 104.9 242.4 103.9C242.1 102.8 242.4 101.4 242.1 101.1C241.8 100.8 240.8 102 240.3 101.8C239.7 101.6 238.9 100.1 238.4 99.5C237.9 98.9 237.5 97.9 236.6 97.5C235.7 97.1 233.2 97.4 232 96.9C230.7 96.5 228.9 95.1 227.8 94.5C226.7 93.8 225.2 92.8 224.2 92.2C223.1 91.5 221.2 89.7 220.5 89.9C219.8 90.1 219 92.9 219.1 93.9C219.2 94.9 220.7 96.1 221.4 96.7C222.1 97.3 223.4 98.2 224.2 98.4C224.9 98.5 226.2 97.7 226.9 97.8C227.7 97.9 229 98.5 229.5 98.9C230 99.3 230.5 99.9 230.4 100.6C230.3 101.3 229.2 103.1 228.6 103.9C228 104.6 227 105.5 226 106C225 106.6 222.6 107.1 221.4 107.6C220.2 108.2 218.5 109.8 217.7 109.8C216.9 109.8 216.3 108.5 215.9 107.6C215.5 106.8 215.4 105 215 103.9C214.6 102.7 213.7 100.6 213.1 99.5C212.5 98.4 211.4 97 210.8 96.2C210.2 95.3 209.5 93.7 209 93.3C208.5 93 207.9 94.1 207.4 93.9C206.9 93.7 205.5 92.1 205.3 91.6C205.1 91.1 205.7 90.8 206 90.4C206.3 89.9 207.2 89.3 207.5 88.7C207.8 88.2 208.2 87.1 208.3 86.4C208.5 85.7 208.8 84.4 208.5 84C208.2 83.6 207 83.8 206.2 83.8C205.4 83.8 203.7 84 203 84C202.3 84 201.8 84.3 201.6 84C201.4 83.7 201.8 82.4 201.6 81.8C201.5 81.2 200.6 80.2 200.7 79.7C200.8 79.3 201.5 78.8 202.1 78.5C202.7 78.2 204 77.9 204.8 77.9C205.7 77.8 207.2 78 208.1 78.1C208.9 78.3 210 78.7 210.8 78.8C211.6 78.8 213.4 78.8 213.6 78.3C213.7 77.8 211.5 75.6 211.9 75.2L216.8 75.4L218.6 74.1L220.5 72.1L222.9 70.8L226.9 65.4L229.7 58.3L230.6 52.2L231.5 44L233.4 37.9Z" fill="#ff8fab" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M305.9 77.9C306.4 78.1 306.9 79.7 307 80.4C307 81.1 306.4 82.1 306.2 82.8C306 83.5 306 84.8 305.6 85.4C305.2 86 304 86.6 303.3 87C302.6 87.4 301.4 88 300.5 88.4C299.6 88.8 297.9 89.5 297.1 89.9C296.4 90.3 295.8 91.2 295.3 91C294.8 90.9 293.8 89.3 293.7 88.6C293.7 87.9 294.5 86.8 295 86.3C295.5 85.7 296.5 85.2 297.3 84.7C298.1 84.3 299.5 83.5 300.3 82.9C301.1 82.4 302.5 81.4 302.9 80.7C303.3 80.1 302.9 78.9 303.3 78.5C303.7 78.1 305.3 77.6 305.9 77.9Z" fill="#ff8fab" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M305.8 72.9C306.4 72.7 308.7 73.9 309.2 74.3C309.6 74.8 309.3 75.8 309 76.2C308.7 76.7 307.7 77.1 307.1 77.4C306.6 77.6 305.2 78.3 304.8 78C304.5 77.8 304.6 76.3 304.8 75.6C304.9 74.9 305.1 73.1 305.8 72.9Z" fill="#ff8fab" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M262.3 117.7C263 117.7 265.2 118.9 266.5 119.8C267.8 120.7 270.5 122.6 271.5 124C272.6 125.4 273.9 128.8 273.8 129.8C273.8 130.7 272 131.2 271.1 130.8C270.2 130.4 268.4 128.1 267.4 127.1C266.4 126.2 265 125 264.2 124C263.4 123 262.1 120.7 261.9 119.8C261.6 118.9 261.7 117.7 262.3 117.7Z" fill="#ff8fab" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M283 116.6C283.6 116.6 284.4 118.6 284.7 119.5C285 120.4 285.4 121.8 285.1 123C284.7 124.1 283.4 127 282.4 127.8C281.4 128.5 279.1 128.2 278.3 128.1C277.4 127.9 276.6 127.3 276.2 126.6C275.8 125.9 274.9 124 275.5 123C276.1 121.9 279.6 120.2 280.6 119.3C281.7 118.4 282.5 116.5 283 116.6Z" fill="#ff8fab" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M285.8 104.4C286.3 104.3 287.8 104.7 288.6 105.5C289.3 106.2 290.3 108.5 290.9 109.8C291.4 111.1 292.2 113.4 292.2 114.6C292.2 115.7 291.6 117.3 290.9 117.7C290.1 118.1 288 117.7 287.2 117.2C286.4 116.7 285.6 115.1 285.3 114C285.1 113 285.4 110.8 285.3 109.8C285.3 108.7 284.8 107.3 284.9 106.6C284.9 105.8 285.3 104.6 285.8 104.4Z" fill="#ff8fab" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            </g>
+            <g class="continent" data-continent="Oceania" role="button" tabindex="0" aria-label="Oceania">
+              <path d="M292.1 138.4C293 137.9 295 137.2 295.7 136.8C296.5 136.4 296.5 135.6 297.3 135.6C298.1 135.6 300.8 136.2 301.3 136.8C301.8 137.4 300.3 139 300.8 139.8C301.3 140.6 304 142.6 304.7 142.5C305.3 142.4 305.3 140.3 305.6 139.3C305.8 138.3 306 135.3 306.5 135.4C307 135.4 308.4 138.4 309 139.6C309.5 140.9 309.8 143 310.5 144.1C311.1 145.3 312.6 146.8 313.4 148C314.2 149.1 315.9 151.1 316.3 152.4C316.8 153.7 316.7 155.7 316.4 157C316.2 158.2 314.9 159.9 314.5 161C314.1 162.2 314 164.1 313.4 165C312.8 165.8 310.9 166.8 310.1 167C309.2 167.2 308.3 166.6 307.4 166.4C306.6 166.2 305 166.1 304.2 165.6C303.4 165 302.5 163.1 301.9 162.6C301.3 162 300.7 162.2 300.1 161.6C299.4 161.1 298.4 159 297.3 158.7C296.2 158.4 293.6 159 292.2 159.3C290.9 159.6 289.2 160.6 287.6 160.9C286.1 161.2 282.2 162 281.4 161.5C280.5 161 281.8 158.8 281.7 157.5C281.5 156.2 280.3 153.8 280.1 152.4C279.9 151 279.7 148.4 280.3 147.4C280.9 146.4 283.3 145.9 284.4 145.2C285.5 144.6 287.1 143.5 287.9 142.8C288.7 142.1 289.3 141 289.9 140.4C290.5 139.7 291.3 138.9 292.1 138.4Z" fill="#a78bfa" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M307.9 168.6C308.6 168.4 311.9 168.2 312.5 168.9C313 169.5 312.3 172.4 311.8 173C311.3 173.7 309.6 173.6 309 173.3C308.4 173 307.6 171.4 307.4 170.7C307.3 170.1 307.2 168.9 307.9 168.6Z" fill="#a78bfa" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M333.6 161.3C333.9 161.1 336.1 162.3 336.7 162.8C337.3 163.3 337.5 164.2 338.1 164.6C338.6 165 340.2 165 340.4 165.4C340.5 165.9 339.7 166.9 339.2 167.6C338.7 168.4 337.5 170.3 336.9 170.5C336.2 170.7 334.9 169.5 334.6 169C334.2 168.5 334.3 167.7 334.4 167.3C334.4 166.8 335 166.3 335 165.8C335 165.3 334.8 164.4 334.6 163.8C334.4 163.1 333.3 161.4 333.6 161.3Z" fill="#a78bfa" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M333.6 169.7C334.2 169.8 336.1 170.3 336.4 170.9C336.7 171.4 335.9 173.1 335.5 173.7C335.1 174.3 334.2 174.5 333.6 175.1C333.1 175.7 332.1 177.6 331.3 178C330.5 178.4 328.3 178.2 327.9 177.7C327.6 177.2 328.5 175.3 329 174.6C329.6 173.8 331.1 173 331.6 172.4C332.1 171.8 332.4 170.9 332.7 170.5C333 170.1 333.1 169.7 333.6 169.7Z" fill="#a78bfa" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M295.9 124.5C296.7 124.6 300.4 126.1 301.9 126.4C303.4 126.8 305.2 126.5 306.5 126.9C307.8 127.4 310.2 128.8 310.9 129.6C311.7 130.4 311.4 131.8 311.8 132.6C312.3 133.4 314 134.8 313.9 135C313.8 135.3 312.1 134.8 311.1 134.5C310.1 134.2 308.1 133.3 307 132.9C305.9 132.5 304.3 132 303.3 131.6C302.3 131.1 300.8 129.9 300.1 129.5C299.3 129 298.3 128.6 297.8 128.1C297.2 127.6 296.5 126.2 296.3 125.7C296 125.2 295.1 124.4 295.9 124.5Z" fill="#a78bfa" stroke="#33302e" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            </g>
+            <g id="pins" aria-hidden="true"></g>
+          </svg>
+          <span class="map-label na" aria-hidden="true">North America</span>
+          <span class="map-label sa" aria-hidden="true">South America</span>
+          <span class="map-label eu" aria-hidden="true">Europe</span>
+          <span class="map-label af" aria-hidden="true">Africa</span>
+          <span class="map-label as" aria-hidden="true">Asia</span>
+          <span class="map-label oc" aria-hidden="true">Oceania</span>
         </div>
 
         <div
@@ -747,7 +889,20 @@
       </div>
     </div>
 
+    <script src="../shared/art/pictures.js"></script>
     <script>
+      // the flags: one hidden sprite of symbols, put in the page before the
+      // first question renders (this script runs at parse time)
+      Pictures.install([
+        "flag-blank",
+        "flag-united-states", "flag-canada", "flag-mexico", "flag-cuba", "flag-jamaica",
+        "flag-brazil", "flag-argentina", "flag-peru", "flag-chile", "flag-colombia",
+        "flag-united-kingdom", "flag-france", "flag-germany", "flag-italy", "flag-spain",
+        "flag-china", "flag-japan", "flag-india", "flag-south-korea", "flag-thailand",
+        "flag-australia", "flag-new-zealand", "flag-fiji", "flag-papua-new-guinea", "flag-samoa",
+        "flag-south-africa", "flag-egypt", "flag-kenya", "flag-nigeria", "flag-morocco",
+      ]);
+
       // Sound effects using Web Audio API
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       let audioCtx = null;
@@ -898,232 +1053,253 @@
             name: "United States",
             capital: "Washington D.C.",
             continent: "North America",
-            flag: "🇺🇸",
+            pic: "flag-united-states",
             hint: "Home to Hollywood and the Statue of Liberty",
           },
           {
             name: "Canada",
             capital: "Ottawa",
             continent: "North America",
-            flag: "🇨🇦",
+            pic: "flag-canada",
             hint: "Known for maple syrup and hockey",
           },
           {
             name: "Mexico",
             capital: "Mexico City",
             continent: "North America",
-            flag: "🇲🇽",
+            pic: "flag-mexico",
             hint: "Famous for tacos and ancient pyramids",
           },
           {
             name: "Cuba",
             capital: "Havana",
             continent: "North America",
-            flag: "🇨🇺",
+            pic: "flag-cuba",
             hint: "Known for classic cars and salsa music",
           },
           {
             name: "Jamaica",
             capital: "Kingston",
             continent: "North America",
-            flag: "🇯🇲",
+            pic: "flag-jamaica",
             hint: "Famous for reggae music and super-fast sprinters",
           },
           {
             name: "Brazil",
             capital: "Brasília",
             continent: "South America",
-            flag: "🇧🇷",
+            pic: "flag-brazil",
             hint: "Home to the Amazon rainforest and Carnival",
           },
           {
             name: "Argentina",
             capital: "Buenos Aires",
             continent: "South America",
-            flag: "🇦🇷",
+            pic: "flag-argentina",
             hint: "Known for tango dancing and beef",
           },
           {
             name: "Peru",
             capital: "Lima",
             continent: "South America",
-            flag: "🇵🇪",
+            pic: "flag-peru",
             hint: "Home to Machu Picchu and llamas",
           },
           {
             name: "Chile",
             capital: "Santiago",
             continent: "South America",
-            flag: "🇨🇱",
+            pic: "flag-chile",
             hint: "Known for the Andes mountains and its long, thin shape",
           },
           {
             name: "Colombia",
             capital: "Bogotá",
             continent: "South America",
-            flag: "🇨🇴",
+            pic: "flag-colombia",
             hint: "Famous for coffee beans and emeralds",
           },
           {
             name: "United Kingdom",
             capital: "London",
             continent: "Europe",
-            flag: "🇬🇧",
+            pic: "flag-united-kingdom",
             hint: "Famous for Big Ben and the Royal Family",
           },
           {
             name: "France",
             capital: "Paris",
             continent: "Europe",
-            flag: "🇫🇷",
+            pic: "flag-france",
             hint: "Home to the Eiffel Tower and Louvre Museum",
           },
           {
             name: "Germany",
             capital: "Berlin",
             continent: "Europe",
-            flag: "🇩🇪",
+            pic: "flag-germany",
             hint: "Known for Oktoberfest and BMW cars",
           },
           {
             name: "Italy",
             capital: "Rome",
             continent: "Europe",
-            flag: "🇮🇹",
+            pic: "flag-italy",
             hint: "Famous for pizza, pasta, and the Colosseum",
           },
           {
             name: "Spain",
             capital: "Madrid",
             continent: "Europe",
-            flag: "🇪🇸",
+            pic: "flag-spain",
             hint: "Known for flamenco dancing and bullfighting",
           },
           {
             name: "China",
             capital: "Beijing",
             continent: "Asia",
-            flag: "🇨🇳",
+            pic: "flag-china",
             hint: "Home to the Great Wall and pandas",
           },
           {
             name: "Japan",
             capital: "Tokyo",
             continent: "Asia",
-            flag: "🇯🇵",
+            pic: "flag-japan",
             hint: "Famous for sushi, anime, and Mount Fuji",
           },
           {
             name: "India",
             capital: "New Delhi",
             continent: "Asia",
-            flag: "🇮🇳",
+            pic: "flag-india",
             hint: "Known for Bollywood movies and the Taj Mahal",
           },
           {
             name: "South Korea",
             capital: "Seoul",
             continent: "Asia",
-            flag: "🇰🇷",
+            pic: "flag-south-korea",
             hint: "Known for K-pop music and kimchi",
           },
           {
             name: "Thailand",
             capital: "Bangkok",
             continent: "Asia",
-            flag: "🇹🇭",
+            pic: "flag-thailand",
             hint: "Famous for golden temples and elephants",
           },
           {
             name: "Australia",
             capital: "Canberra",
             continent: "Oceania",
-            flag: "🇦🇺",
+            pic: "flag-australia",
             hint: "Home to kangaroos and the Great Barrier Reef",
           },
           {
             name: "New Zealand",
             capital: "Wellington",
             continent: "Oceania",
-            flag: "🇳🇿",
+            pic: "flag-new-zealand",
             hint: "Home to kiwi birds and hobbit movie sets",
           },
           {
             name: "Fiji",
             capital: "Suva",
             continent: "Oceania",
-            flag: "🇫🇯",
+            pic: "flag-fiji",
             hint: "Known for tropical islands and coral reefs",
           },
           {
             name: "Papua New Guinea",
             capital: "Port Moresby",
             continent: "Oceania",
-            flag: "🇵🇬",
+            pic: "flag-papua-new-guinea",
             hint: "Home to rainforests and birds of paradise",
           },
           {
             name: "Samoa",
             capital: "Apia",
             continent: "Oceania",
-            flag: "🇼🇸",
+            pic: "flag-samoa",
             hint: "Known for Polynesian islands and coconut palms",
           },
           {
             name: "South Africa",
             capital: "Pretoria",
             continent: "Africa",
-            flag: "🇿🇦",
+            pic: "flag-south-africa",
             hint: "Known for safaris and Nelson Mandela",
           },
           {
             name: "Egypt",
             capital: "Cairo",
             continent: "Africa",
-            flag: "🇪🇬",
+            pic: "flag-egypt",
             hint: "Famous for pyramids and the Nile River",
           },
           {
             name: "Kenya",
             capital: "Nairobi",
             continent: "Africa",
-            flag: "🇰🇪",
+            pic: "flag-kenya",
             hint: "Famous for safaris and long-distance runners",
           },
           {
             name: "Nigeria",
             capital: "Abuja",
             continent: "Africa",
-            flag: "🇳🇬",
+            pic: "flag-nigeria",
             hint: "Known for Nollywood movies and jollof rice",
           },
           {
             name: "Morocco",
             capital: "Rabat",
             continent: "Africa",
-            flag: "🇲🇦",
+            pic: "flag-morocco",
             hint: "Known for colorful markets and the Sahara Desert",
           },
         ],
       };
 
-      const continentPositions = {
-        "North America": {
-          top: "20%",
-          left: "15%",
-          width: "25%",
-          height: "35%",
-        },
-        "South America": {
-          top: "55%",
-          left: "25%",
-          width: "20%",
-          height: "35%",
-        },
-        Europe: { top: "15%", left: "45%", width: "20%", height: "25%" },
-        Africa: { top: "40%", left: "45%", width: "25%", height: "35%" },
-        Asia: { top: "20%", left: "70%", width: "25%", height: "40%" },
-        Oceania: { top: "60%", left: "75%", width: "20%", height: "25%" },
+      // The six continents, in the order of the map's groups and of the
+      // Countries-mode answer grid
+      const CONTINENTS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"];
+
+      // Where each country's pin drops on the map once its answer is shown,
+      // in the drawing's own 360 by 200 box. Never before: a pin would give
+      // the continent away.
+      const MAP_PINS = {
+        "United States": [85, 81],
+        "Canada": [79, 58],
+        "Mexico": [82, 99],
+        "Cuba": [103, 102],
+        "Jamaica": [104, 107],
+        "Brazil": [128, 135],
+        "Argentina": [116, 162],
+        "Peru": [106, 135],
+        "Chile": [110, 156],
+        "Colombia": [107, 119],
+        "United Kingdom": [172, 60],
+        "France": [178, 71],
+        "Germany": [185, 65],
+        "Italy": [187, 77],
+        "Spain": [172, 80],
+        "China": [270, 86],
+        "Japan": [302, 85],
+        "India": [247, 101],
+        "South Korea": [293, 84],
+        "Thailand": [268, 108],
+        "Australia": [299, 151],
+        "New Zealand": [335, 169],
+        "Fiji": [339, 143],
+        "Papua New Guinea": [309, 131],
+        "Samoa": [348, 139],
+        "South Africa": [198, 155],
+        "Egypt": [203, 95],
+        "Kenya": [210, 123],
+        "Nigeria": [183, 114],
+        "Morocco": [170, 89],
       };
 
       // Nearest continents first, so any top-up distractors stay confusable
@@ -1187,28 +1363,73 @@
         newChallenge();
       }
 
-      function createWorldMap() {
-        const mapContainer = document.getElementById("worldMap");
-        mapContainer.innerHTML = "";
-
-        Object.entries(continentPositions).forEach(([continent, pos]) => {
-          // real <button> so the map is reachable with the keyboard
-          const continentDiv = document.createElement("button");
-          continentDiv.type = "button";
-          continentDiv.className = "continent";
-          continentDiv.textContent = continent;
-          continentDiv.style.top = pos.top;
-          continentDiv.style.left = pos.left;
-          continentDiv.style.width = pos.width;
-          continentDiv.style.height = pos.height;
-          continentDiv.dataset.continent = continent;
-
-          continentDiv.addEventListener("click", () =>
-            checkContinentAnswer(continent, continentDiv)
+      // The map is drawn in the page and each continent group is a button.
+      // SVG elements get no keyboard activation for free, so Enter and Space
+      // are wired here beside the click.
+      function wireWorldMap() {
+        document.querySelectorAll("#worldMap .continent").forEach((continentEl) => {
+          const continent = continentEl.dataset.continent;
+          continentEl.addEventListener("click", () =>
+            checkContinentAnswer(continent, continentEl)
           );
-
-          mapContainer.appendChild(continentDiv);
+          continentEl.addEventListener("keydown", (e) => {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            e.preventDefault();
+            checkContinentAnswer(continent, continentEl);
+          });
         });
+      }
+
+      // Answer buttons have a disabled property; the continents are SVG
+      // groups, which do not, so a locked one says so with aria-disabled and
+      // leaves the Tab order
+      function setLocked(el, locked) {
+        if (el.tagName === "BUTTON") {
+          el.disabled = locked;
+        } else if (locked) {
+          el.setAttribute("aria-disabled", "true");
+          el.setAttribute("tabindex", "-1");
+        } else {
+          el.removeAttribute("aria-disabled");
+          el.setAttribute("tabindex", "0");
+        }
+      }
+
+      // The question's flag, from the picture library (120 by 80; the
+      // stylesheet makes it 96 by 64 on a phone)
+      function showFlag(country, label) {
+        document.getElementById("flagDisplay").innerHTML = Pictures.use(
+          country.pic,
+          { size: 120, label: label }
+        );
+      }
+
+      // The country's pin, dropped once its answer is shown: a red head with
+      // an ink ring and a white centre
+      const SVG_NS = "http://www.w3.org/2000/svg";
+      function svgShape(name, attrs) {
+        const el = document.createElementNS(SVG_NS, name);
+        Object.keys(attrs).forEach((k) => el.setAttribute(k, attrs[k]));
+        return el;
+      }
+      function dropPin(country) {
+        const at = MAP_PINS[country.name];
+        const pinsEl = document.getElementById("pins");
+        if (!at || !pinsEl) return;
+        const pin = svgShape("g", { class: "pin" });
+        pin.appendChild(svgShape("circle", {
+          cx: at[0], cy: at[1], r: 4,
+          fill: Pictures.PALETTE.red, stroke: Pictures.PALETTE.ink,
+          "stroke-width": 2.5, "stroke-linejoin": "round", "stroke-linecap": "round",
+        }));
+        pin.appendChild(svgShape("circle", {
+          cx: at[0], cy: at[1], r: 1.5, fill: Pictures.PALETTE.white, stroke: "none",
+        }));
+        pinsEl.appendChild(pin);
+      }
+      function clearPins() {
+        const pinsEl = document.getElementById("pins");
+        while (pinsEl && pinsEl.firstChild) pinsEl.removeChild(pinsEl.firstChild);
       }
 
       function generateCountryChallenge() {
@@ -1219,13 +1440,13 @@
         const question = `Find ${country.name} on the map`;
 
         document.getElementById("question").textContent = question;
-        document.getElementById("flagDisplay").textContent = country.flag;
+        showFlag(country, country.name + " flag");
 
         // Show the world map for country challenges
         document.getElementById("worldMap").style.display = "block";
 
         // Create answer options (continents)
-        const continents = Object.keys(continentPositions);
+        const continents = CONTINENTS;
         const answerOptions = document.getElementById("answerOptions");
         answerOptions.innerHTML = "";
 
@@ -1249,7 +1470,7 @@
         const question = `What is the capital of ${country.name}?`;
 
         document.getElementById("question").textContent = question;
-        document.getElementById("flagDisplay").textContent = country.flag;
+        showFlag(country, country.name + " flag");
 
         // Hide the world map for capital challenges
         document.getElementById("worldMap").style.display = "none";
@@ -1284,7 +1505,8 @@
         const question = `Which country does this flag belong to?`;
 
         document.getElementById("question").textContent = question;
-        document.getElementById("flagDisplay").textContent = country.flag;
+        // the flag IS the question here, so its label must not name the country
+        showFlag(country, "the mystery flag");
 
         // Hide the world map for flag challenges
         document.getElementById("worldMap").style.display = "none";
@@ -1345,9 +1567,11 @@
         document.getElementById("nextBtn").style.display = "none";
         document.querySelectorAll(".continent").forEach((c) => {
           c.classList.remove("correct", "incorrect", "eliminated");
-          // continents are buttons now, so an eliminated one must be re-enabled
-          c.disabled = false;
+          // an eliminated continent is unlocked again for the new question
+          setLocked(c, false);
         });
+        // and the last question's pin comes off the map
+        clearPins();
         document.querySelectorAll(".answer-btn").forEach((btn) => {
           btn.classList.remove("correct", "incorrect", "eliminated");
           btn.disabled = false;
@@ -1423,8 +1647,10 @@
         // in countries mode the map IS the answer set — leaving it live let a
         // child keep picking continents after the question was already over
         document.querySelectorAll(".continent").forEach((c) => {
-          c.disabled = true;
+          setLocked(c, true);
         });
+        // the answer is out now, right or wrong, so the country's pin drops
+        if (currentMode === "countries") dropPin(currentChallenge.country);
         document.getElementById("hintBtn").disabled = true;
         const nextBtn = document.getElementById("nextBtn");
         nextBtn.style.display = "inline-block";
@@ -1477,7 +1703,7 @@
             // First miss: grey out the chosen option and hint — no reveal yet
             findOptionElements(selected).forEach((el) => {
               el.classList.add("eliminated");
-              if (el.tagName === "BUTTON") el.disabled = true;
+              setLocked(el, true);
             });
             showHint(eliminationHint(selected));
             showFeedback("😅 Not quite — try again!", "incorrect", 2000);
@@ -1521,7 +1747,7 @@
       }
 
       // Initialize game
-      createWorldMap();
+      wireWorldMap();
       newChallenge();
     </script>
     <footer class="site-footer">
