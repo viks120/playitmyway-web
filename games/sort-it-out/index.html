@@ -663,17 +663,6 @@
           });
         });
         Pictures.install(PICTURE_IDS);
-        // No card may give its answer away. The library's sailboat and canoe
-        // sit on a water-coloured wave line, which says "floats" before the
-        // child decides, so this page takes that stroke out of its own copy
-        // of the two symbols (nothing is drawn here). Once the library draws
-        // them without water this finds nothing and can go.
-        ["sailboat", "canoe"].forEach(function (id) {
-          var symbol = document.getElementById("p-" + id);
-          if (!symbol) return;
-          var waves = symbol.querySelectorAll('[stroke="' + Pictures.PALETTE.water + '"]');
-          for (var i = 0; i < waves.length; i++) waves[i].parentNode.removeChild(waves[i]);
-        });
 
         // ---------- helpers ----------
         function $(id) { return document.getElementById(id); }
