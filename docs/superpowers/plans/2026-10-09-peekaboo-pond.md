@@ -16,7 +16,7 @@
 - Sounds through the kit's `Sfx`, which respects `window.pimwMuted`.
 - 3+ band chrome: teal `#0f766e`, tint `#ccfbf1`, deep tint `#99d5cb`, button shadow `#134e4a`, theme colour `#0f766e`.
 - No reading needed to play; no spoken words; no stars or scores.
-- No names of other games or brands in code, comments or commits. Commits end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- No names of other games or brands in code, comments or commits.
 - Branch `peekaboo-pond`. Release with `git -c credential.https://github.com.username=viks120 push origin main`, and nothing else on the network meanwhile.
 
 ## Decisions made while planning

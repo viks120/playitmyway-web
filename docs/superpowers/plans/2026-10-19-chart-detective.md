@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-19
 **Spec:** `docs/superpowers/specs/2026-10-19-chart-detective-design.md` (approved; the amendments in Task 6 record where the build departs from it and why).
-**Branch:** `chart-detective`, in its own git worktree (three other Claude sessions share the main working tree on this machine).
+**Branch:** `chart-detective`, in its own git worktree (three other sessions share the main working tree on this machine).
 
 **Goal:** A data-handling game for ages 5+, `games/chart-detective/`, in which things arrive one at a time to be tallied or stacked into a chart, then a detective critter asks the school's questions about it (how many, most, least, how many more, altogether, true or false), across five stages from tally charts to two-way tables, with a two-step hint ladder on wrong answers.
 
@@ -26,7 +26,7 @@
 - **Phones:** everything fits a 360px wide viewport with nothing wider than the page (a wider element makes a phone zoom the whole page out and every tap lands elsewhere; the e2e checks). Keyboard: every control is a real `<button>`; number keys 1 to 5 pick a column.
 - **git here checks files out with CRLF:** tests normalise with `.replace(/\r\n/g, '\n')` before matching text.
 - **Headless Chrome:** never run more than two at once (SwiftShader makes the machine crawl); run the e2e's three modes one after another.
-- **Commit at the end of every task.** Every commit keeps `node --test docs/tests/*.test.js` green. Commit messages end with the trailer `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
+- **Commit at the end of every task.** Every commit keeps `node --test docs/tests/*.test.js` green.
 - **Generated pages:** never hand-edit `games/index.html`, `for-teachers.html`, `404.html` or `sw.js`; edit `docs/catalogue.js` and run `node docs/build-pages.js`.
 - **Never push:** pushing `main` deploys the live site. Task 6 ends with the branch ready; Vikrant decides when it goes live.
 
@@ -755,9 +755,7 @@ Expected (among others): stage 5 asks `How many shells did Plum find on Wednesda
 
 ```bash
 git add games/chart-detective/charts.js docs/tests/chart-detective.test.js
-git commit -m "feat(chart-detective): the cases: themes, five stages, a seeded generator and the questions, tested over 500 seeds a stage
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(chart-detective): the cases: themes, five stages, a seeded generator and the questions, tested over 500 seeds a stage"
 ```
 
 ---
@@ -970,9 +968,7 @@ Expected: six rows of five pictures, each shown at 64px and 24px with its name; 
 
 ```bash
 git add games/chart-detective/glyphs.js docs/tests/chart-detective.test.js
-git commit -m "feat(chart-detective): thirty category glyphs as SVG symbols, in the house style, tested in Node
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(chart-detective): thirty category glyphs as SVG symbols, in the house style, tested in Node"
 ```
 
 ---
@@ -1827,9 +1823,7 @@ Expected, each with `(no errors)` on its line: `start.png` shows "Pick a case" a
 
 ```bash
 git add games/chart-detective/index.html games/chart-detective/game.js docs/tests/chart-detective.test.js
-git commit -m "feat(chart-detective): the page: five chart kinds, collecting, the questions with the hint ladder, the worked answer and case closed
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(chart-detective): the page: five chart kinds, collecting, the questions with the hint ladder, the worked answer and case closed"
 ```
 
 ---
@@ -1945,9 +1939,7 @@ Expected: the Chart Detective card with its icon appears at the end of the Ages 
 
 ```bash
 git add icons/games/chart-detective.svg docs/catalogue.js docs/tests/chart-detective.test.js index.html sitemap.xml games/index.html for-teachers.html 404.html sw.js
-git commit -m "feat(chart-detective): icon, catalogue entry, homepage card, sitemap, counts and the generated pages
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(chart-detective): icon, catalogue entry, homepage card, sitemap, counts and the generated pages"
 ```
 
 ---
@@ -2356,9 +2348,7 @@ Expected: `E2E PASS chart-detective (calm; ...)`.
 
 ```bash
 git add docs/e2e/chart-detective.e2e.cjs
-git commit -m "test(chart-detective): end-to-end player: six cases up the stage ladder, the hint ladder, the house rules, on desktop, phone and reduced motion
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "test(chart-detective): end-to-end player: six cases up the stage ladder, the hint ladder, the house rules, on desktop, phone and reduced motion"
 ```
 
 ---
@@ -2399,9 +2389,7 @@ Expected: `E2E PASS chart-detective (desktop; ...)`.
 
 ```bash
 git add docs/superpowers/specs/2026-10-19-chart-detective-design.md
-git commit -m "docs(chart-detective): what changed while building, and why
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "docs(chart-detective): what changed while building, and why"
 ```
 
 - [ ] **Step 4: Hand over**

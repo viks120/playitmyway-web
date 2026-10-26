@@ -17,7 +17,7 @@
 - Every sound returns early when `window.pimwMuted` is set; Sfx in the kit already does this.
 - 5+ band chrome: amber `#b45309`, tint `#fef3c7`, deep tint `#d8c897`, theme colour `#b45309`.
 - No names of other games or brands in code, comments or commits.
-- Branch `number-line-hop`. Commit messages end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Branch `number-line-hop`.
 - Release (Task 6) pushes `main` with `git -c credential.https://github.com/.username=viks120 push origin main`. Never run another git network command while a push is waiting.
 - Message wording is exactly the spec's table; the minus sign is `−` (U+2212).
 
@@ -39,7 +39,7 @@
 | `games/index.html`, `for-teachers.html`, `404.html`, `sw.js` (regenerate) | `node docs/build-pages.js` |
 
 Scratchpad only: `tools/nlh-e2e.cjs` (new), plus the existing `tools/e2e.cjs` (Stepping Stones), `tools/shot.cjs`, `tools/preview-server.cjs` and `drafts/harness-line.html` (new).
-`SP` = `C:/Users/shrik/AppData/Local/Temp/claude/c--Users-shrik-playitmyway-web/dc31ac27-f660-4f19-a863-0449cae27b09/scratchpad`. The preview server serves the repo on port 47123 (`/screen/<name>` serves `$SP/drafts/<name>`).
+`SP` = `C:/Users/shrik/AppData/Local/Temp/pimw-scratchpad`. The preview server serves the repo on port 47123 (`/screen/<name>` serves `$SP/drafts/<name>`).
 
 ---
 

@@ -16,7 +16,6 @@
 - Game pages, `disclaimer.html`, `privacy-policy.html`, `robots.txt`, `favicon.svg` are NOT modified.
 - Site URL in metadata: `https://playitmyway.com`.
 - The repo root is the deployed site — do not commit dev scripts (`check-home.sh` stays untracked and is deleted in Task 4).
-- Commit messages end with: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`
 
 ---
 
@@ -158,9 +157,7 @@ Full file content:
 
 ```bash
 git add fonts/fredoka-400.woff2 fonts/fredoka-600.woff2 tokens.css
-git commit -m "feat: add shared design tokens and self-hosted Fredoka font
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
+git commit -m "feat: add shared design tokens and self-hosted Fredoka font"
 ```
 
 ---
@@ -776,9 +773,7 @@ Checklist:
 
 ```bash
 git add index.html styles.css
-git commit -m "feat: redesign homepage with semantic markup, emoji icons, no cookie banner
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
+git commit -m "feat: redesign homepage with semantic markup, emoji icons, no cookie banner"
 ```
 
 ---
@@ -852,9 +847,7 @@ Expected: `19` (1 homepage + 16 games + 2 legal pages).
 
 ```bash
 git add sitemap.xml
-git commit -m "chore: remove favicon dev utilities, add missing games to sitemap
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
+git commit -m "chore: remove favicon dev utilities, add missing games to sitemap"
 ```
 
 ---

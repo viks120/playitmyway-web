@@ -19,7 +19,7 @@
 - Every sound returns early when `window.pimwMuted` is set.
 - Light-only, like the rest of the site; page styling uses `tokens.css` variables; theme colour `#7c3aed` (7+ band).
 - No names of other games or brands anywhere in code, comments or commit messages.
-- Work on branch `stepping-stones`; never push. Commit messages end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Work on branch `stepping-stones`; never push.
 - Grid 8 rows × 4 columns; critters Clover the Bunny, Pip the Frog, Plum the Baby Dino, Mango the Kitten.
 
 ## File structure
@@ -43,7 +43,7 @@
 Scratchpad only (never committed): `tools/preview-server.cjs` (exists), `tools/shot.cjs` (exists), `tools/harness-world.html`, `tools/e2e.cjs`.
 
 `SP` below means the session scratchpad:
-`C:/Users/shrik/AppData/Local/Temp/claude/c--Users-shrik-playitmyway-web/dc31ac27-f660-4f19-a863-0449cae27b09/scratchpad`.
+`C:/Users/shrik/AppData/Local/Temp/pimw-scratchpad`.
 The preview server runs with `ROOT` = the repo and `CONTENT` = `$SP/drafts` on port 47123.
 
 ---

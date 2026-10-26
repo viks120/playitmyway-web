@@ -20,7 +20,7 @@
 - Scripts that edit pages must target the FIRST `<h1` only; `drawing-pad` embeds a whole HTML document inside a template literal further down the file.
 - Do not run `chrome.exe --version` (it opens a window). Do not launch three or more headless Chromes at once.
 - Test command: `node --test docs/tests/*.test.js` (Git Bash). In PowerShell: `node --test (Get-ChildItem docs/tests/*.test.js).FullName`.
-- Commit messages end with `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`. No competitor or inspiration-source names anywhere in the repo.
+- No competitor or inspiration-source names anywhere in the repo.
 - The 3D critter models and every game board are untouched.
 
 ---
@@ -272,9 +272,7 @@ Expected: FAIL, 5 of 7 tests. The three "obeys the style rules" tests fail with 
 
 ```bash
 git add docs/tests/icons.test.js
-git commit -m "test: rules for the site's original icon artwork
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "test: rules for the site's original icon artwork"
 ```
 
 ---
@@ -381,9 +379,7 @@ Expected: `icons/games: every file obeys the style rules` PASSES and `no two fil
 
 ```bash
 git add icons/games
-git commit -m "feat(icons): original pictures for the 2+ and 3+ games
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(icons): original pictures for the 2+ and 3+ games"
 ```
 
 ---
@@ -474,9 +470,7 @@ Expected: the `icons/games` style test and the duplicate test PASS; the coverage
 
 ```bash
 git add icons/games
-git commit -m "feat(icons): original pictures for the 5+ games
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(icons): original pictures for the 5+ games"
 ```
 
 ---
@@ -567,9 +561,7 @@ Expected: style and duplicate tests PASS; coverage still FAILS (13 missing).
 
 ```bash
 git add icons/games
-git commit -m "feat(icons): original pictures for the 7+ games
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(icons): original pictures for the 7+ games"
 ```
 
 ---
@@ -705,9 +697,7 @@ Open `contact.png` with the Read tool and check each icon at both sizes. An icon
 
 ```bash
 git add icons/games
-git commit -m "feat(icons): original pictures for the 14+ games; all 45 games now have one
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(icons): original pictures for the 14+ games; all 45 games now have one"
 ```
 
 ---
@@ -768,9 +758,7 @@ Expected: every test in the file PASSES (critters palette check uses the colours
 
 ```bash
 git add icons/critters icons/mark.svg favicon.svg
-git commit -m "feat(icons): the four critters drawn flat, and a brand mark that is also the favicon
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(icons): the four critters drawn flat, and a brand mark that is also the favicon"
 ```
 
 ---
@@ -1034,9 +1022,7 @@ Screenshot (Git Bash, from the repo root):
 
 ```bash
 git add index.html styles.css docs/tests/icons.test.js
-git commit -m "feat(home): original icons on every card, the critters and the mark on the hero, short rows centred
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(home): original icons on every card, the critters and the mark on the hero, short rows centred"
 ```
 
 ---
@@ -1158,9 +1144,7 @@ Expected: no new changes (the generator is byte-identical on re-run).
 
 ```bash
 git add docs/catalogue.js docs/build-pages.js games/index.html for-teachers.html 404.html sw.js docs/tests/icons.test.js
-git commit -m "feat(pages): generated catalogue, 404 and grown-ups pages use the icon files; precache includes them
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(pages): generated catalogue, 404 and grown-ups pages use the icon files; precache includes them"
 ```
 
 ---
@@ -1255,9 +1239,7 @@ Read both. The icon sits beside the title at the text's size. (Logic Gates draws
 
 ```bash
 git add components.css games/*/index.html docs/tests/icons.test.js
-git commit -m "feat(games): every game's title shows its own icon instead of an emoji
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(games): every game's title shows its own icon instead of an emoji"
 ```
 
 ---
@@ -1331,9 +1313,7 @@ Expected: four `wrote …` lines, then `192x192`, `512x512`, `512x512`, `180x180
 
 ```bash
 git add icons/icon-192.png icons/icon-512.png icons/icon-maskable-512.png apple-touch-icon.png
-git commit -m "feat(icons): app icons and the Apple touch icon re-made from the mark
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "feat(icons): app icons and the Apple touch icon re-made from the mark"
 ```
 
 ---
@@ -1446,9 +1426,7 @@ Read both: flat teal card backs with a white question mark; white cells with an 
 
 ```bash
 git add games/memory-game/index.html games/word-scramble/index.html games/geography-explorer/index.html games/tic-tac-toe/index.html games/balloon-pop/index.html games/catch-falling-object/index.html games/whack-a-mole/index.html games/color-matcher/index.html docs/tests/icons.test.js
-git commit -m "style(games): retire the last old-palette gradients; the scene gradients stay and say why
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git commit -m "style(games): retire the last old-palette gradients; the scene gradients stay and say why"
 ```
 
 ---

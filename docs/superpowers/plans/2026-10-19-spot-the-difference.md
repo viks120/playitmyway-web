@@ -19,7 +19,7 @@
 - Tests: `node --test docs/tests/*.test.js` (in PowerShell: `node --test (Get-ChildItem docs/tests/*.test.js).FullName`). Never run `python`; never run `chrome.exe --version`.
 - Edit files with the Write/Edit tools or node, never a PowerShell read-replace-write (encoding traps). Bash heredocs over ~70 lines fail here; use the Write tool.
 - The icon test `docs/tests/icons.test.js` fails on any icon without a catalogue entry and any catalogue entry without a homepage card, a generated card, a title icon and a precache line, so **icons, catalogue, homepage cards, sitemap, counts and `node docs/build-pages.js` land together in Task 6** and never earlier.
-- Another session is building a different game (Missing Tile) in the main working tree. **Work in a git worktree on branch `spot-the-difference`** (`git worktree add .claude/worktrees/spot -b spot-the-difference`), and never touch `docs/vendor/three-entry.js`, `games/missing-tile/` or that spec. Commit as soon as each task's tests pass.
+- Another session is building a different game (Missing Tile) in the main working tree. **Work in a git worktree on branch `spot-the-difference`** (`git worktree add ../pimw-spot -b spot-the-difference`), and never touch `docs/vendor/three-entry.js`, `games/missing-tile/` or that spec. Commit as soon as each task's tests pass.
 - Game count wiring (homepage tagline, `manifest.json`) rises by **two from whatever `main` holds at release**, not to a fixed number.
 
 ## File map
@@ -44,12 +44,12 @@
 - [ ] **Step 1: Create the worktree**
 
 ```powershell
-git worktree add .claude/worktrees/spot -b spot-the-difference main
-cd .claude/worktrees/spot
+git worktree add ../pimw-spot -b spot-the-difference main
+cd ../pimw-spot
 node --test (Get-ChildItem docs/tests/*.test.js).FullName
 ```
 
-Expected: every existing test passes (the baseline). All later commands in this plan run inside `.claude/worktrees/spot`.
+Expected: every existing test passes (the baseline). All later commands in this plan run inside `../pimw-spot`.
 
 ---
 
@@ -834,7 +834,7 @@ Expected: all pass. A `colour #… ` failure means a drawer used a hex outside t
 
 - [ ] **Step 5: Judge the art by eye with a contact sheet**
 
-Write `$SCRATCH/spot/sheet.html` (the session scratchpad, never the repo) that loads the three kit files from the worktree with absolute `file://` paths and renders, for every kind, every state, count and colour, one `<svg viewBox="-48 -48 96 96" width="96" height="96">` holding `Draw.group({ id: 'p0', kind, x: 0, y: 0, s: 1, flip: false, rot: 0, colour, state, count }, 'a', { critters: 'file:///C:/Users/shrik/playitmyway-web/.claude/worktrees/spot/icons/critters/' })`, plus one full picture per theme at `Scenes.make(7, Scenes.BIG[3], theme)` as two side-by-side `<svg viewBox="0 0 400 300" width="400">`. Screenshot it with puppeteer-core (Chrome at `C:/Program Files/Google/Chrome/Application/chrome.exe`, headless, `page.setViewport({ width: 1200, height: 2400 })`) and look at the PNG. Fix any drawer that does not read as its kind at 96 px, re-run the tests, and re-shoot. Expect two or three rounds.
+Write `$SCRATCH/spot/sheet.html` (the session scratchpad, never the repo) that loads the three kit files from the worktree with absolute `file://` paths and renders, for every kind, every state, count and colour, one `<svg viewBox="-48 -48 96 96" width="96" height="96">` holding `Draw.group({ id: 'p0', kind, x: 0, y: 0, s: 1, flip: false, rot: 0, colour, state, count }, 'a', { critters: 'file:///C:/Users/shrik/pimw-spot/icons/critters/' })`, plus one full picture per theme at `Scenes.make(7, Scenes.BIG[3], theme)` as two side-by-side `<svg viewBox="0 0 400 300" width="400">`. Screenshot it with puppeteer-core (Chrome at `C:/Program Files/Google/Chrome/Application/chrome.exe`, headless, `page.setViewport({ width: 1200, height: 2400 })`) and look at the PNG. Fix any drawer that does not read as its kind at 96 px, re-run the tests, and re-shoot. Expect two or three rounds.
 
 - [ ] **Step 6: Commit**
 
@@ -1559,7 +1559,7 @@ test('the kit stores nothing, fetches nothing and guards every sound', () => {
 
 Run: `node --test docs/tests/spot.test.js` — Expected: all pass.
 
-Open `file:///C:/Users/shrik/playitmyway-web/.claude/worktrees/spot/games/whats-different/index.html?seed=7` and `.../spot-the-difference/index.html?seed=7` in Chrome by hand (the title icons are missing until Task 6; everything else must work): two pictures, taps ring both sides, dots fill, Next appears; on 7+ Hint pulses and Show me the rest ends the round with ☆☆☆. Also narrow the window to a portrait shape and confirm the pictures stack and both fit.
+Open `file:///C:/Users/shrik/pimw-spot/games/whats-different/index.html?seed=7` and `.../spot-the-difference/index.html?seed=7` in Chrome by hand (the title icons are missing until Task 6; everything else must work): two pictures, taps ring both sides, dots fill, Next appears; on 7+ Hint pulses and Show me the rest ends the round with ☆☆☆. Also narrow the window to a portrait shape and confirm the pictures stack and both fit.
 
 ```bash
 git add games/whats-different games/spot-the-difference docs/tests/spot.test.js
@@ -1710,7 +1710,7 @@ git commit -m "feat(spot): icons, catalogue, homepage cards, sitemap, counts and
 const puppeteer = require('puppeteer-core');
 const path = require('path');
 const assert = require('assert/strict');
-const ROOT = process.env.ROOT || 'C:/Users/shrik/playitmyway-web/.claude/worktrees/spot';
+const ROOT = process.env.ROOT || 'C:/Users/shrik/pimw-spot';
 const S = require(ROOT + '/games/shared/spot/scenes.js');
 const [band, url, shots, tag = band] = process.argv.slice(2);
 const SEED = 7;
@@ -1907,8 +1907,8 @@ From the worktree root, with `$SP = "$env:TEMP\...scratchpad\spot"` and `New-Ite
 
 ```powershell
 $env:NODE_PATH = "$env:TEMP\pimw-puppeteer\node_modules"
-$L = "file:///C:/Users/shrik/playitmyway-web/.claude/worktrees/spot/games/whats-different/index.html"
-$B = "file:///C:/Users/shrik/playitmyway-web/.claude/worktrees/spot/games/spot-the-difference/index.html"
+$L = "file:///C:/Users/shrik/pimw-spot/games/whats-different/index.html"
+$B = "file:///C:/Users/shrik/pimw-spot/games/spot-the-difference/index.html"
 node "$SP\e2e.cjs" little $L "$SP\shots" little-desktop
 node "$SP\e2e.cjs" big $B "$SP\shots" big-desktop
 $env:PHONE = '1'; node "$SP\e2e.cjs" little $L "$SP\shots" little-phone; node "$SP\e2e.cjs" big $B "$SP\shots" big-phone; Remove-Item env:PHONE
@@ -1972,13 +1972,13 @@ Expected: `E2E PASS` twice with no `set aside` line, and the `findstr` prints no
 
 - [ ] **Step 6: Tidy and record**
 
-`git worktree remove .claude/worktrees/spot` and `git branch -d spot-the-difference`. Append a `## Changes made while building` section to this plan listing every deviation, commit it (`docs: what changed while building the two spot-the-difference games`), and push. Update the memory file `playitmyway-site-context.md` with one bullet: the two games, their slugs, the kit at `games/shared/spot/`, the date and the `main` commit, and that the e2e passed live.
+`git worktree remove ../pimw-spot` and `git branch -d spot-the-difference`. Append a `## Changes made while building` section to this plan listing every deviation, commit it (`docs: what changed while building the two spot-the-difference games`), and push. Update the memory file `playitmyway-site-context.md` with one bullet: the two games, their slugs, the kit at `games/shared/spot/`, the date and the `main` commit, and that the e2e passed live.
 
 ---
 
 ## Changes made while building
 
-Built inline on 2026-10-19 in the worktree `.claude/worktrees/spot`, branch `spot-the-difference`, while another session built Missing Tile in the main working tree.
+Built inline on 2026-10-19 in the worktree `../pimw-spot`, branch `spot-the-difference`, while another session built Missing Tile in the main working tree.
 
 - **Task 2, art judged on the contact sheet:** the bird, dragonfly and ladybird were redrawn (the bird and ladybird read as ink blobs, the dragonfly as a car); the ladybird grew to 13×9 and its spots are drawn with `stroke="none"`, because a 2.5-unit outline round a 2-unit spot was all outline; frog and sheep eyes grew so the open/shut state shows; the pond's shoreline moved from y 232 to 256 so water-lane items (bases up to 255) never sit on sand.
 - **Task 2, a fairness rule added:** `count` and `state` differences need a half-extent of at least 12 (a ladybird's spots at 20 px on a phone were not a fair difference), checked in `spot.test.js` alongside the 14 for shade and tilt. The spec's table is updated to match.
