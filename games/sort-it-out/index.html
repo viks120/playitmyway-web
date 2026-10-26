@@ -232,6 +232,10 @@
         text-align: left;
       }
       .feedback .host { flex: 0 0 auto; width: 56px; height: 52px; }
+      /* Clover's seat narrows the text, so a long reason takes one more line;
+         from 504px (the card at full width) the box reserves room for it and
+         the Next button stays put between cards */
+      @media (min-width: 504px) { .feedback { min-height: 136px; } }
       .feedback .bubble {
         flex: 1 1 auto;
         align-self: stretch;
