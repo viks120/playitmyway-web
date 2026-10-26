@@ -231,7 +231,10 @@
     // The flag and the mine on the board are pictures from the shared
     // picture library. The sprite goes in first, before any square can show
     // one; FLAG_PIC names the flag marker once, for every flag drawn below.
-    const FLAG_PIC = 'pennant';
+    // A returning visitor's offline cache can hold the older picture library
+    // for one visit after a deploy (a page and the library refresh
+    // separately); it has no pennant yet, so its flag stands in.
+    const FLAG_PIC = Pictures.has('pennant') ? 'pennant' : 'flag';
     Pictures.install([FLAG_PIC, 'mine']);
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
