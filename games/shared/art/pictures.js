@@ -274,6 +274,9 @@
     'flower-head': pic('a flower', e(24, 13, 5.5, 9, P.pink) + e(24, 13, 5.5, 9, P.pink, ' transform="rotate(60 24 24)"') + e(24, 13, 5.5, 9, P.pink, ' transform="rotate(120 24 24)"') + e(24, 13, 5.5, 9, P.pink, ' transform="rotate(180 24 24)"') + e(24, 13, 5.5, 9, P.pink, ' transform="rotate(240 24 24)"') + e(24, 13, 5.5, 9, P.pink, ' transform="rotate(300 24 24)"') + c(24, 24, 7.5, P.yellow)),
     hedge: pic('a hedge', r(1.25, 1.25, 45.5, 45.5, P.green) + l('M4.5 10a3.5 3.5 0 0 1 7 0M20.5 10a3.5 3.5 0 0 1 7 0M36.5 10a3.5 3.5 0 0 1 7 0M4.5 26a3.5 3.5 0 0 1 7 0M20.5 26a3.5 3.5 0 0 1 7 0M36.5 26a3.5 3.5 0 0 1 7 0M4.5 42a3.5 3.5 0 0 1 7 0M20.5 42a3.5 3.5 0 0 1 7 0M36.5 42a3.5 3.5 0 0 1 7 0', ` stroke="${P.leaf}" stroke-width="2.5"`)),
     'duck-right': pic('a duck', '<g transform="matrix(-1 0 0 1 48 0)">' + p('M38 30l7-7-1 10z', P.yellow) + e(26, 34, 16, 9, P.yellow) + e(30, 35, 7, 4, P.yellow) + p('M9 17c-4 0-8 1-8 4s4 4 8 4z', P.orange) + c(17, 19, 9.5, P.yellow) + '</g>' + dot(33, 16.5, 2.2) + c(33.8, 15.7, 0.8, P.white, ' stroke="none"')),
+// --- group: set chips (Sound It Out's Mixed and Word Ladder sets) ---
+    dice: pic('a dice', r(7, 7, 34, 34, P.red, 8) + c(16, 16, 3.2, P.white, ' stroke="none"') + c(32, 16, 3.2, P.white, ' stroke="none"') + c(24, 24, 3.2, P.white, ' stroke="none"') + c(16, 32, 3.2, P.white, ' stroke="none"') + c(32, 32, 3.2, P.white, ' stroke="none"')),
+    ladder: pic('a ladder', r(13, 10.5, 22, 4.5, P.wood) + r(13, 21.5, 22, 4.5, P.wood) + r(13, 32.5, 22, 4.5, P.wood) + r(8, 3, 6, 42, P.wood, 3) + r(34, 3, 6, 42, P.wood, 3)),
     // --- end of pictures ---
   };
 
@@ -283,15 +286,25 @@
     if (!has(id)) throw new Error('Pictures: no picture called ' + id);
     return PICTURES[id];
   };
+  /* In a page an unknown id is reported on the console and drawn as nothing
+   * rather than stopping the game: a returning visitor's offline cache can
+   * hold an older library for one visit after a deploy. In Node (the tests
+   * and the tools) it still throws, so a typo cannot slip through. */
+  const known = (id) => {
+    if (has(id) || typeof document === 'undefined') return true;
+    if (typeof console !== 'undefined') console.error('Pictures: no picture called ' + id);
+    return false;
+  };
   const symbol = (id) => `<symbol id="p-${id}" viewBox="${entry(id).box}">${OUT}${entry(id).markup}${END}</symbol>`;
-  const sprite = (only) => (only || ids()).map(symbol).join('');
+  const sprite = (only) => (only || ids()).filter(known).map(symbol).join('');
   /* The markup a page puts where a picture goes. `o.size` is the CSS pixel
    * size (flags take their width from it); `o.label` makes it an image a
    * screen reader names, otherwise it is decorative; `o.cls` adds classes. */
   const use = (id, o) => {
     const opt = o || {};
-    const box = entry(id).box;
     const size = opt.size || 48;
+    if (!known(id)) return `<svg class="pic${opt.cls ? ' ' + opt.cls : ''}" width="${size}" height="${size}" viewBox="${BOX}" aria-hidden="true" focusable="false"></svg>`;
+    const box = entry(id).box;
     const wide = box === FLAG_BOX;
     const w = size, h = wide ? Math.round((size * 48) / 72) : size;
     const a11y = opt.label ? ` role="img" aria-label="${opt.label === true ? entry(id).label : opt.label}"` : ' aria-hidden="true"';

@@ -74,6 +74,23 @@ test('the sprite and the use() markup are what pages expect', () => {
   assert.throws(() => Pictures.use('no-such-picture'), /no picture called/);
 });
 
+test('in a page an unknown picture is reported and drawn as nothing, never thrown', () => {
+  const errors = [];
+  const realError = console.error;
+  globalThis.document = {};
+  console.error = (m) => errors.push(String(m));
+  try {
+    const out = Pictures.use('no-such-picture', { size: 20, cls: 'x' });
+    assert.ok(out.startsWith('<svg class="pic x" width="20" height="20"') && !out.includes('<use'), out);
+    assert.equal((Pictures.sprite(['no-such-picture', Pictures.ids()[0]]).match(/<symbol /g) || []).length, 1);
+    assert.equal(errors.length, 2);
+    assert.match(errors[0], /no picture called no-such-picture/);
+  } finally {
+    delete globalThis.document;
+    console.error = realError;
+  }
+});
+
 /* Pages that use the library: each must load the script before its own
  * game script, hold no emoji in the gameplay data it draws from, and only
  * reference pictures that exist. The list grows as games are converted. */
@@ -82,10 +99,10 @@ const USERS = [
   { slug: 'counting-game', ownScript: '// the fruit pictures: one hidden sprite of symbols', ids: ['apple', 'banana', 'grapes', 'orange', 'strawberry', 'cherries', 'kiwi', 'pineapple', 'mango', 'peach'], dataRange: ['const objects = [', 'const numbers = ['] },
   { slug: 'tic-tac-toe', ownScript: 'Pictures.install([\'mark-x\', \'mark-o\'])', ids: ['mark-x', 'mark-o'], dataRange: ['function markPic(', 'const move = cellLabel(index, player)'] },
   { slug: 'balloon-pop', ownScript: 'Pictures.install([\'pop-burst\'])', ids: ['pop-burst'], dataRange: ['const balloonColors = [', 'function showScorePopup('] },
-  { slug: 'catch-falling-object', ownScript: '// the pictures: one hidden sprite of symbols, put in the page before', ids: ['apple', 'orange', 'lemon', 'grapes', 'strawberry', 'banana', 'peach', 'kiwi', 'star', 'bomb', 'basket', 'heart', 'heart-empty'], dataRange: ['const fruits = [', 'let score = 0'] },
+  { slug: 'catch-falling-object', ownScript: '// the pictures: one hidden sprite of symbols, put in the page before', ids: ['apple', 'orange', 'lemon', 'grapes', 'strawberry', 'banana', 'peach', 'kiwi', 'star', 'bomb', 'basket', 'heart', 'heart-empty', 'cloud', 'pop-burst', 'lightning'], dataRange: ['const fruits = [', 'let score = 0'] },
   { slug: 'whack-a-mole', ownScript: '// Screen-reader status line', ids: ['hamster', 'dog', 'bear', 'panda'], dataRange: ['const PIECES = [', 'const messages = ['] },
-  { slug: 'sound-it-out', ownScript: '/* ==WORD_DATA_START==', ids: ['cat', 'rat', 'bat', 'ram', 'man', 'dad', 'cab', 'van', 'bag', 'map', 'can', 'pan', 'fan', 'cap', 'hat', 'tag', 'sax', 'tap', 'ham', 'yam', 'gas-pump', 'face-sleepy', 'face-sad', 'face-angry', 'lightning', 'chicken', 'pen', 'dot', 'bed', 'leg', 'net', 'web', 'gem', 'jet', 'red-swatch', 'water-drops', 'pig', 'kid', 'lips', 'bin', 'pin', 'trophy', 'dog', 'fox', 'cop', 'mom', 'box', 'pot', 'rod', 'log', 'fog', 'face-hot', 'pod', 'bug', 'bus', 'mug', 'cup', 'tub', 'hut', 'nut', 'sun', 'runner', 'hug', 'scissors', 'face-yum'], dataRange: ['/* ==WORD_DATA_START==', '/* ==WORD_DATA_END== */'] },
-  { slug: 'sort-it-out', ownScript: '/* ==PACK_DATA_START==', ids: ['dog', 'tree', 'sunflower', 'butterfly', 'fish', 'frog', 'bird', 'mushroom', 'snail', 'bee', 'cactus', 'grass', 'elephant', 'rock', 'chair', 'bicycle', 'ball', 'car', 'spoon', 'book', 'robot', 'teddy-bear', 'cloud', 'pencil', 'kite', 'moon', 'coin', 'key', 'fork', 'brick', 'bolt', 'scissors', 'anchor', 'ring', 'leaf', 'feather', 'log', 'sailboat', 'canoe', 'apple', 'ice-cube', 'volleyball', 'balloon', 'duck', 'seedling', 'one-person', 'two-people', 'music-note', 'drum', 'arrow-down', 'arrow-up'], dataRange: ['/* ==PACK_DATA_START==', '/* ==PACK_DATA_END== */'] },
+  { slug: 'sound-it-out', ownScript: '/* ==WORD_DATA_START==', ids: ['cat', 'rat', 'bat', 'ram', 'man', 'dad', 'cab', 'van', 'bag', 'map', 'can', 'pan', 'fan', 'cap', 'hat', 'tag', 'sax', 'tap', 'ham', 'yam', 'gas-pump', 'face-sleepy', 'face-sad', 'face-angry', 'lightning', 'chicken', 'pen', 'dot', 'bed', 'leg', 'net', 'web', 'gem', 'jet', 'red-swatch', 'water-drops', 'pig', 'kid', 'lips', 'bin', 'pin', 'trophy', 'dog', 'fox', 'cop', 'mom', 'box', 'pot', 'rod', 'log', 'fog', 'face-hot', 'pod', 'bug', 'bus', 'mug', 'cup', 'tub', 'hut', 'nut', 'sun', 'runner', 'hug', 'scissors', 'face-yum', 'dice', 'ladder'], dataRange: ['/* ==WORD_DATA_START==', '/* ==WORD_DATA_END== */'] },
+  { slug: 'sort-it-out', ownScript: '/* ==PACK_DATA_START==', ids: ['dog', 'tree', 'sunflower', 'butterfly', 'fish', 'frog', 'bird', 'mushroom', 'snail', 'bee', 'cactus', 'grass', 'elephant', 'rock', 'chair', 'bicycle', 'ball', 'car', 'spoon', 'book', 'robot', 'teddy-bear', 'cloud', 'pencil', 'kite', 'moon', 'coin', 'key', 'fork', 'brick', 'bolt', 'scissors', 'anchor', 'ring', 'leaf', 'feather', 'log', 'sailboat', 'canoe', 'apple', 'ice-cube', 'volleyball', 'balloon', 'duck', 'seedling', 'one-person', 'two-people', 'music-note', 'drum', 'arrow-down', 'arrow-up', 'box'], dataRange: ['/* ==PACK_DATA_START==', '/* ==PACK_DATA_END== */'] },
   { slug: 'trace-letters', ownScript: 'var SETS = [', ids: ['apple', 'bear', 'cat', 'dog', 'egg', 'fish', 'goat', 'hat', 'igloo', 'jam', 'kite', 'leaf', 'monkey', 'nest', 'octopus', 'pig', 'queen', 'rocket', 'sun', 'tiger', 'umbrella', 'van', 'whale', 'fox', 'yo-yo', 'zebra'], dataRange: ['var FACTS = {', 'var NUM_NAMES = ['] },
   { slug: 'dot-to-dot', ownScript: '// the reward pictures: one hidden sprite of symbols', ids: ['kite', 'house', 'pennant', 'fir-tree', 'pencil-up', 'fish', 'ice-cream', 'crown', 'cupcake', 'star', 'cat', 'moon', 'balloon', 'mushroom', 'rocket', 'heart', 'butterfly', 'flower-head', 'apple', 'duck-right', 'sun'], dataRange: ['var PICTURES = [', 'var svg = document.getElementById("board");'] },
   { slug: 'rock-paper-scissors', ownScript: 'Pictures.install(["hand-rock"', ids: ['hand-rock', 'hand-paper', 'hand-scissors', 'plum-happy', 'plum-dizzy', 'plum-puzzled'], dataRange: ['var ICON = {', 'var WIN_LINES = ['] },

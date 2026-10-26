@@ -5,7 +5,7 @@
  * analytics. There is deliberately no push code here — push would require a
  * per-device subscription held by a third party, which this site does not do.
  */
-const CACHE = 'pimw-e7abd349';
+const CACHE = 'pimw-4aad1acc';
 
 const PRECACHE = [
   "/",
