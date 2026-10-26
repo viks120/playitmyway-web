@@ -128,6 +128,8 @@
       .chip:hover { transform: translateY(-2px); border-color: var(--band); box-shadow: 0 5px 0 0 var(--candy-card); }
       .chip:active { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--candy-card); }
       .chip .chip-emoji { font-size: 28px; line-height: 1; }
+      .chip .chip-emoji .pic { display: block; width: 1em; height: 1em; }
+      .stat .stat-pic { width: 1.25em; height: 1.25em; vertical-align: -0.3em; }
       .chip .chip-name { font-size: 16.5px; font-weight: 600; color: var(--ink); }
       .chip .chip-sub { font-size: 13px; color: var(--ink-soft); }
       .chip.chip-wide {
@@ -438,37 +440,37 @@
         <h2 class="pick-title">🎯 Pick a sound set</h2>
         <div class="chips" role="group" aria-label="Practice sets">
           <button class="chip" data-set="a">
-            <span class="chip-emoji" aria-hidden="true">🐱</span>
+            <span class="chip-emoji" aria-hidden="true"><svg class="pic" width="28" height="28" viewBox="0 0 48 48" focusable="false"><use href="#p-cat"/></svg></span>
             <span class="chip-name">Short a</span>
             <span class="chip-sub">cat, hat, van…</span>
           </button>
           <button class="chip" data-set="e">
-            <span class="chip-emoji" aria-hidden="true">🛏️</span>
+            <span class="chip-emoji" aria-hidden="true"><svg class="pic" width="28" height="28" viewBox="0 0 48 48" focusable="false"><use href="#p-bed"/></svg></span>
             <span class="chip-name">Short e</span>
             <span class="chip-sub">bed, hen, ten…</span>
           </button>
           <button class="chip" data-set="i">
-            <span class="chip-emoji" aria-hidden="true">🐷</span>
+            <span class="chip-emoji" aria-hidden="true"><svg class="pic" width="28" height="28" viewBox="0 0 48 48" focusable="false"><use href="#p-pig"/></svg></span>
             <span class="chip-name">Short i</span>
             <span class="chip-sub">pig, pin, six…</span>
           </button>
           <button class="chip" data-set="o">
-            <span class="chip-emoji" aria-hidden="true">🦊</span>
+            <span class="chip-emoji" aria-hidden="true"><svg class="pic" width="28" height="28" viewBox="0 0 48 48" focusable="false"><use href="#p-fox"/></svg></span>
             <span class="chip-name">Short o</span>
             <span class="chip-sub">fox, dog, box…</span>
           </button>
           <button class="chip" data-set="u">
-            <span class="chip-emoji" aria-hidden="true">☀️</span>
+            <span class="chip-emoji" aria-hidden="true"><svg class="pic" width="28" height="28" viewBox="0 0 48 48" focusable="false"><use href="#p-sun"/></svg></span>
             <span class="chip-name">Short u</span>
             <span class="chip-sub">sun, bug, cup…</span>
           </button>
           <button class="chip" data-set="mix">
-            <span class="chip-emoji" aria-hidden="true">🎲</span>
+            <span class="chip-emoji" aria-hidden="true"><svg class="pic" width="28" height="28" viewBox="0 0 48 48" focusable="false"><use href="#p-dice"/></svg></span>
             <span class="chip-name">Mixed</span>
             <span class="chip-sub">every sound</span>
           </button>
           <button class="chip chip-wide" data-set="ladder">
-            <span class="chip-emoji" aria-hidden="true">🪜</span>
+            <span class="chip-emoji" aria-hidden="true"><svg class="pic" width="28" height="28" viewBox="0 0 48 48" focusable="false"><use href="#p-ladder"/></svg></span>
             <span class="chip-name">Word Ladder</span>
             <span class="chip-sub">change one sound at a time — cat → cot → cop…</span>
           </button>
@@ -645,7 +647,7 @@
         var SOUND_OF = { c: "k", x: "ks", q: "kw" };
         function soundFor(ch) { return SOUND_OF[ch] || ch; }
         var SET_NAMES = { a: "Short a", e: "Short e", i: "Short i", o: "Short o", u: "Short u", mix: "Mixed" };
-        var SET_ICONS = { a: "🐱", e: "🛏️", i: "🐷", o: "🦊", u: "☀️", mix: "🎲" };
+        var SET_ICONS = { a: "cat", e: "bed", i: "pig", o: "fox", u: "sun", mix: "dice", ladder: "ladder" };
         var ROUND_SIZE = 8;
 
         // fast lookups + one-letter-apart adjacency for ladder chains
@@ -676,7 +678,9 @@
         WORDS.forEach(function (entry) {
           if (entry[1] && PICTURE_IDS.indexOf(entry[1]) === -1) PICTURE_IDS.push(entry[1]);
         });
-        Pictures.install(PICTURE_IDS);
+        // the set chips and the stat pill also draw a die and a ladder, which an
+        // older library still cached for one visit after a deploy may lack
+        Pictures.install(PICTURE_IDS.concat(["dice", "ladder"].filter(Pictures.has)));
 
         // ---------- helpers ----------
         function $(id) { return document.getElementById(id); }
@@ -815,9 +819,9 @@
           resultsView.hidden = name !== "results";
         }
         function updateStats() {
-          statMode.textContent = mode === "ladder"
-            ? "🪜 Ladder"
-            : SET_ICONS[setId] + " " + SET_NAMES[setId];
+          var icon = SET_ICONS[mode === "ladder" ? "ladder" : setId];
+          statMode.innerHTML = (Pictures.has(icon) ? Pictures.use(icon, { size: 18, cls: "stat-pic" }) + " " : "") +
+            (mode === "ladder" ? "Ladder" : SET_NAMES[setId]);
           statProgress.textContent = mode === "ladder"
             ? "Rung " + Math.min(chainPos + 1, chain.length) + " of " + chain.length
             : "Word " + Math.min(solvedCount + 1, roundTotal) + " of " + roundTotal;
