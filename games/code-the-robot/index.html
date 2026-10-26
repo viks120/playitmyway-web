@@ -150,21 +150,40 @@
         width: 100%; aspect-ratio: 1 / 1;
         border-radius: var(--radius-md);
         overflow: hidden;
-        background: #f7f0e5;
+        /* the seam between the garden tiles: the palette's darker grass */
+        background: #7cc86f;
         user-select: none; -webkit-user-select: none;
       }
+      /* garden tiles: flat field greens from the house palette, rounded, with
+         the seam drawn by an inset shadow so there is never a gap (the robot's
+         percent transform must land exactly on cell centres, so no grid-gap,
+         padding or margin). overflow: hidden keeps the brick's oversized box
+         inside its tile, and because a clipping cell has no content-based
+         minimum size, that box can never widen a 1fr track either. */
       .cell {
+        position: relative;
         display: flex; align-items: center; justify-content: center;
-        background: #faf5ec;
-        /* grid lines without gaps, so the robot's percent transform
-           lands exactly on cell centres */
-        box-shadow: inset 0 0 0 1.5px #f1e7d8;
+        background: #9be28f;
+        box-shadow: inset 0 0 0 1.5px #7cc86f;
+        border-radius: 0.22em;
+        overflow: hidden;
         line-height: 1;
       }
-      .cell.alt { background: #f4ecdf; }
+      .cell.alt { background: #a7e3a1; }
+      /* the meaning tints stay: amber wall, a lighter green goal, violet start */
       .cell.wall { background: var(--amber-tint); }
       .cell.goal { background: var(--green-tint); }
       .cell.start { background: var(--band-tint); }
+      /* every picture on the board is sized in em, so the per-grid font-size
+         that buildBoard() sets on #boardWrap stays the one scaling rule (a
+         tile is about 1.55em across on every grid). The brick is drawn in the
+         middle of its 48 box, so its box is set larger to fill the tile. */
+      .cell.wall .pic { display: block; width: 1.7em; height: 1.7em; }
+      /* the star and Pip share the goal tile: the star top right, Pip sitting
+         bottom left. Both are below the robot's layer (z-index 2), so neither
+         can ever hide the robot when it arrives. */
+      .cell.goal .pic { position: absolute; top: 5%; right: 5%; width: 0.75em; height: 0.75em; pointer-events: none; }
+      .cell.goal .pip { position: absolute; left: 2%; bottom: 3%; width: 0.85em; height: auto; pointer-events: none; }
 
       .robot {
         position: absolute; top: 0; left: 0;
@@ -174,6 +193,10 @@
         line-height: 1;
       }
       .robot-inner { display: inline-block; }
+      /* the robot picture, 1em so the grid clamp drives it; display:block
+         so the span's box is exactly the picture (the bump percentages are of
+         that box) and no inline baseline gap shifts it off the cell centre */
+      .robot-inner .pic { display: block; width: 1em; height: 1em; }
       .robot-inner.bump-u { animation: bumpU 0.55s ease; }
       .robot-inner.bump-d { animation: bumpD 0.55s ease; }
       .robot-inner.bump-l { animation: bumpL 0.55s ease; }
@@ -231,6 +254,9 @@
       }
       .tile:hover { transform: translateY(-2px); box-shadow: 0 4px 0 0 var(--band); }
       .tile:active { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--band); }
+      /* the arrow pictures have no keycap square around them, as the emoji
+         did, so they sit a little over 1em of the tile's own font-size */
+      .tile .pic { display: block; width: 1.3em; height: 1.3em; }
       .tile .num {
         position: absolute; top: 1px; left: 4px;
         font-size: 10.5px; font-weight: 600; color: var(--band);
@@ -273,6 +299,7 @@
       }
       .pad-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--candy-under); }
       .pad-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--candy-under); }
+      .pad-btn .pic { display: block; width: 1.25em; height: 1.25em; }
       .pad-btn.erase {
         background: var(--amber-tint); color: var(--amber); font-size: 23px;
         --candy-under: var(--amber-tint-deep);
@@ -316,7 +343,9 @@
         animation: fadeIn 300ms ease;
       }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-      .win-stars { font-size: clamp(30px, 9vw, 44px); letter-spacing: 4px; }
+      .win-stars { font-size: clamp(30px, 9vw, 44px); display: flex; justify-content: center; gap: 6px; }
+      .win-stars .pic { width: 1em; height: 1em; }
+      .win-overlay h2 .pic { width: 1em; height: 1em; }
       .win-overlay h2 { margin: 0; font-size: clamp(24px, 6vw, 32px); color: var(--color-deep-ink); }
       .win-overlay p { margin: 0; color: var(--color-deep-soft); font-size: 16.5px; }
       .btn-next {
@@ -418,13 +447,13 @@
 
       <div class="board-wrap" id="boardWrap">
         <div class="board" id="board" aria-hidden="true"></div>
-        <div class="robot" id="robot" aria-hidden="true"><span class="robot-inner" id="robotInner">🤖</span></div>
+        <div class="robot" id="robot" aria-hidden="true"><span class="robot-inner" id="robotInner"></span></div>
         <div class="win-overlay hidden" id="winOverlay" role="dialog" aria-label="Level complete">
-          <div class="win-stars" id="winStars" aria-hidden="true">⭐⭐⭐</div>
-          <h2 id="winTitle">🎉 You did it!</h2>
+          <div class="win-stars" id="winStars" aria-hidden="true"></div>
+          <h2 id="winTitle"><svg class="pic" width="32" height="32" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-pop-burst"/></svg> You did it!</h2>
           <p id="winSub">Your program worked!</p>
           <div class="controls">
-            <button class="btn btn-again" id="againBtn">🔄 Try again</button>
+            <button class="btn btn-again" id="againBtn">↺ Try again</button>
             <button class="btn btn-next" id="nextBtn">Next level →</button>
           </div>
         </div>
@@ -434,10 +463,10 @@
       <div class="strip" id="strip" aria-label="Program steps"></div>
 
       <div class="pad" role="group" aria-label="Add a move">
-        <button class="pad-btn" data-dir="U" aria-label="Add move up">⬆️</button>
-        <button class="pad-btn" data-dir="D" aria-label="Add move down">⬇️</button>
-        <button class="pad-btn" data-dir="L" aria-label="Add move left">⬅️</button>
-        <button class="pad-btn" data-dir="R" aria-label="Add move right">➡️</button>
+        <button class="pad-btn" data-dir="U" aria-label="Add move up"><svg class="pic" width="32" height="32" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-arrow-up"/></svg></button>
+        <button class="pad-btn" data-dir="D" aria-label="Add move down"><svg class="pic" width="32" height="32" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-arrow-down"/></svg></button>
+        <button class="pad-btn" data-dir="L" aria-label="Add move left"><svg class="pic" width="32" height="32" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-arrow-left"/></svg></button>
+        <button class="pad-btn" data-dir="R" aria-label="Add move right"><svg class="pic" width="32" height="32" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-arrow-right"/></svg></button>
         <button class="pad-btn erase" id="eraseBtn" aria-label="Remove last step">⌫</button>
       </div>
 
@@ -466,17 +495,24 @@
       <p class="kbd-note">Keyboard: <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> add steps, <kbd>Backspace</kbd> removes the last one, <kbd>Enter</kbd> runs.</p>
     </section>
 
+    <script src="../shared/art/pictures.js"></script>
     <script>
     (function () {
       "use strict";
+      // The pieces come from the shared picture library: the sprite goes in
+      // first, before anything draws the board, the strip or the win overlay.
+      Pictures.install(["robot", "brick", "star", "arrow-up", "arrow-down", "arrow-left", "arrow-right", "trophy", "pop-burst"]);
+      // Pip waits at the goal: the flat critter file, decorative, sized by CSS
+      var PIP_IMG = '<img class="pip" src="../../icons/critters/pip.svg" alt="" width="64" height="60">';
       var LEVELS = [{"n":"First Steps","e":"👣","s":5,"w":[],"r":[1,2],"g":[3,2],"p":2},{"n":"Blast Off","e":"🚀","s":5,"w":[],"r":[2,4],"g":[2,1],"p":3},{"n":"Turn the Corner","e":"🐢","s":5,"w":[[2,1],[1,2]],"r":[1,4],"g":[3,2],"p":4},{"n":"Around the Rocks","e":"🪨","s":5,"w":[[3,3],[2,4]],"r":[4,4],"g":[1,2],"p":5},{"n":"Zig and Zag","e":"⚡","s":6,"w":[[1,2],[0,3],[3,4]],"r":[0,4],"g":[4,2],"p":6},{"n":"The Corridor","e":"🚪","s":6,"w":[[1,4],[4,4],[5,4],[2,5]],"r":[5,5],"g":[0,3],"p":7},{"n":"Over the Wall","e":"🧗","s":7,"w":[[3,3],[3,4],[3,5],[3,6]],"r":[2,5],"g":[4,5],"p":8},{"n":"The Big Detour","e":"🗺️","s":7,"w":[[2,3],[3,3],[4,3],[5,3],[6,3],[5,1],[5,5]],"r":[3,6],"g":[3,0],"p":10},{"n":"The Staircase","e":"🪜","s":7,"w":[[5,0],[5,1],[3,2],[2,3],[3,3],[6,3],[1,4],[4,5]],"r":[6,0],"g":[1,6],"p":11},{"n":"The Snail Shell","e":"🐌","s":7,"w":[[1,1],[2,1],[3,1],[4,1],[5,1],[1,2],[1,3],[1,4],[1,5],[5,2],[5,3],[3,4],[4,4]],"r":[0,0],"g":[3,3],"p":12}];
 
       var CAP = 12;
       var DIRS = {
-        U: { x: 0, y: -1, e: "⬆️", name: "up" },
-        D: { x: 0, y: 1, e: "⬇️", name: "down" },
-        L: { x: -1, y: 0, e: "⬅️", name: "left" },
-        R: { x: 1, y: 0, e: "➡️", name: "right" }
+        // pic draws the tile and the pad button; e stays for the helper prose
+        U: { x: 0, y: -1, e: "⬆️", name: "up", pic: "arrow-up" },
+        D: { x: 0, y: 1, e: "⬇️", name: "down", pic: "arrow-down" },
+        L: { x: -1, y: 0, e: "⬅️", name: "left", pic: "arrow-left" },
+        R: { x: 1, y: 0, e: "➡️", name: "right", pic: "arrow-right" }
       };
 
       var board = document.getElementById("board");
@@ -497,6 +533,10 @@
       var winSub = document.getElementById("winSub");
       var pickerGrid = document.getElementById("pickerGrid");
       var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      // the robot picture lives inside the span, which keeps taking the bump
+      // and cheer classes (className on an <svg> would silently do nothing)
+      robotInner.innerHTML = Pictures.use("robot");
 
       // ---------- state (in memory only — nothing is ever stored) ----------
       var li = 0;                 // current level index
@@ -575,8 +615,12 @@
           for (var x = 0; x < lvl.s; x++) {
             var c = document.createElement("div");
             c.className = "cell" + ((x + y) % 2 ? " alt" : "");
-            if (isWall(x, y)) { c.classList.add("wall"); c.textContent = "🧱"; }
-            else if (x === lvl.g[0] && y === lvl.g[1]) { c.classList.add("goal"); c.textContent = "⭐"; }
+            if (isWall(x, y)) { c.classList.add("wall"); c.innerHTML = Pictures.use("brick"); }
+            else if (x === lvl.g[0] && y === lvl.g[1]) {
+              // Pip waits beside the star; both sit under the robot layer
+              c.classList.add("goal");
+              c.innerHTML = PIP_IMG + Pictures.use("star");
+            }
             else if (x === lvl.r[0] && y === lvl.r[1]) { c.classList.add("start"); }
             board.appendChild(c);
           }
@@ -601,7 +645,7 @@
           num.setAttribute("aria-hidden", "true");
           num.textContent = i + 1;
           b.appendChild(num);
-          b.appendChild(document.createTextNode(DIRS[d].e));
+          b.insertAdjacentHTML("beforeend", Pictures.use(DIRS[d].pic));
           b.addEventListener("click", function () {
             removeAt(i);
             // buildStrip() has just replaced every tile; keep the keyboard on
@@ -636,6 +680,12 @@
       }
 
       function starsText(n) { return n === 3 ? "⭐⭐⭐" : n === 2 ? "⭐⭐" : n === 1 ? "⭐" : "—"; }
+      // the win overlay draws its stars as pictures; the chips keep text stars
+      function starsPics(n) {
+        var out = "";
+        for (var i = 0; i < n; i++) out += Pictures.use("star");
+        return out || "—";
+      }
       function updateBestChip() {
         bestChip.textContent = "Best this visit: " + starsText(best[li] || 0);
       }
@@ -783,8 +833,10 @@
         clearTimeout(bumpTimer);
         robotInner.className = "robot-inner cheer";
         bumpTimer = setTimeout(function () { robotInner.className = "robot-inner"; }, 800);
-        winStars.textContent = starsText(stars);
-        winTitle.textContent = stars === 3 ? "🏆 Perfect program!" : "🎉 You did it!";
+        winStars.innerHTML = starsPics(stars);
+        winTitle.innerHTML = stars === 3
+          ? Pictures.use("trophy") + " Perfect program!"
+          : Pictures.use("pop-burst") + " You did it!";
         winSub.textContent = "You reached the star in " + stepsUsed + " step" + (stepsUsed === 1 ? "" : "s") +
           (stars === 3 ? " — the shortest way!" : ". Shortest possible: " + lvl.p + ".");
         document.getElementById("nextBtn").classList.toggle("hidden", li === LEVELS.length - 1);
