@@ -9,15 +9,15 @@
     <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- SEO Meta Tags -->
-    <title>Rock Paper Scissors – Free Game vs Robot | Play It My Way</title>
-    <meta name="description" content="Play Rock Paper Scissors against Robo, a silly robot! Best-of-5 matches with funny reactions for kids ages 5+. No ads, no download." />
+    <title>Rock Paper Scissors – Free Game vs Computer | Play It My Way</title>
+    <meta name="description" content="Play Rock Paper Scissors against Plum, a silly purple dino! Best-of-5 matches with funny reactions for kids ages 5+. No ads, no download." />
     <meta name="keywords" content="rock paper scissors online, rock paper scissors vs computer, quick game for kids, free kids game online" />
     <meta name="author" content="Play It My Way" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Rock Paper Scissors – Free Online Game for Kids" />
-    <meta property="og:description" content="Beat Robo the robot at Rock Paper Scissors! Best-of-5 matches with silly reactions. Free for ages 5+, no ads, no download." />
+    <meta property="og:description" content="Beat Plum the purple dino at Rock Paper Scissors! Best-of-5 matches with silly reactions. Free for ages 5+, no ads, no download." />
     <meta property="og:type" content="game" />
     <meta property="og:url" content="https://playitmyway.com/games/rock-paper-scissors/" />
     <meta property="og:site_name" content="Play It My Way" />
@@ -26,7 +26,7 @@
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Rock Paper Scissors – Free Kids Game" />
-    <meta name="twitter:description" content="Play Rock Paper Scissors against a silly robot. Free, ages 5+, no download!" />
+    <meta name="twitter:description" content="Play Rock Paper Scissors against Plum, a silly purple dino. Free, ages 5+, no download!" />
 
     <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
     <link rel="canonical" href="https://playitmyway.com/games/rock-paper-scissors/" />
@@ -126,6 +126,9 @@
       }
       .score-you .score-num { color: var(--teal); }
       .score-robo .score-num { color: var(--violet); }
+      /* Plum beside its name; the negative margins keep the label line as
+         tall as the "You" label opposite, so the two scores stay level */
+      .score-who .who-pic { width: 26px; height: auto; vertical-align: middle; margin: -6px 2px -4px 0; }
       .score-mid {
         font-size: 13px;
         font-weight: 600;
@@ -152,6 +155,9 @@
         line-height: 1;
         text-align: center;
       }
+      /* the drawn hand is exactly as big as the glyph was (1em of the clamp
+         above), so the shake and pop still pivot on its centre */
+      .hand .pic { display: block; width: 1em; height: 1em; margin: 0 auto; }
       .hand-you { transform: scaleX(-1); }
       .hand.shake { animation: shakeHand 0.42s ease-in-out infinite; }
       .hand-you.shake { animation-name: shakeHandFlip; }
@@ -189,6 +195,7 @@
         margin-top: 6px;
       }
       .robo-face { text-align: center; font-size: 30px; line-height: 1.2; }
+      .robo-face .pic { display: block; width: 1.2em; height: 1.2em; margin: 0 auto; }
 
       .callout {
         text-align: center;
@@ -233,6 +240,7 @@
         transition: transform 120ms ease, box-shadow 120ms ease, border-color 150ms ease, background 150ms ease;
       }
       .choice .ico { font-size: clamp(34px, 10vw, 42px); line-height: 1; }
+      .choice .ico .pic { display: block; width: 1em; height: 1em; pointer-events: none; }
       .choice .lbl { font-size: 15px; font-weight: 600; }
       .choice:hover:not([aria-disabled="true"]) {
         transform: translateY(-3px);
@@ -288,6 +296,7 @@
       }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       .match-overlay .big { font-size: clamp(60px, 20vw, 96px); line-height: 1; }
+      .match-overlay .big .pic { display: block; width: 1em; height: 1em; }
       .match-overlay h2 { margin: 4px 0 0; font-size: clamp(26px, 7vw, 36px); color: var(--color-deep-ink); }
       .match-overlay p { margin: 0; color: var(--color-deep-soft); font-size: 17px; }
       .hidden { display: none !important; }
@@ -314,6 +323,7 @@
       .how-to h2 { font-size: 19px; margin: 0 0 8px; }
       .how-to ul { margin: 0; padding-left: 22px; color: var(--ink-soft); font-size: 16px; line-height: 1.7; }
       .how-to li::marker { color: var(--band); }
+      .how-to .pic { vertical-align: -5px; }
 
       .confetti-bit {
         position: fixed;
@@ -342,7 +352,7 @@
 
     <header class="game-head">
       <h1><img class="title-icon" src="../../icons/games/rock-paper-scissors.svg" alt="" width="40" height="40"> Rock Paper Scissors</h1>
-      <p>Play against Robo the robot. First to 5 wins the match!</p>
+      <p>Play against Plum. First to 5 wins the match!</p>
     </header>
 
     <main class="card">
@@ -353,20 +363,20 @@
         </div>
         <div class="score-mid" id="matchChip">Round 1 · first to 5</div>
         <div class="score-side score-robo">
-          <div class="score-who">🤖 Robo</div>
+          <div class="score-who"><img class="who-pic" src="../../icons/critters/plum.svg" alt="" width="64" height="60"> Plum</div>
           <div class="score-num" id="roboScore">0</div>
         </div>
       </div>
 
       <div class="arena">
         <div>
-          <div class="hand hand-you" id="handYou" aria-hidden="true">✊</div>
+          <div class="hand hand-you" id="handYou" aria-hidden="true"><svg class="pic" width="74" height="74" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-rock"/></svg></div>
           <div class="arena-label">You</div>
         </div>
         <div class="vs" aria-hidden="true">vs</div>
         <div>
-          <div class="hand hand-robo" id="handRobo" aria-hidden="true">✊</div>
-          <div class="robo-face" id="roboFace" aria-hidden="true">🤖</div>
+          <div class="hand hand-robo" id="handRobo" aria-hidden="true"><svg class="pic" width="74" height="74" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-rock"/></svg></div>
+          <div class="robo-face" id="roboFace" aria-hidden="true"><svg class="pic" width="36" height="36" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-plum-puzzled"/></svg></div>
         </div>
       </div>
 
@@ -377,15 +387,15 @@
 
       <div class="choices">
         <button class="choice" id="btnRock" data-move="rock">
-          <span class="ico" aria-hidden="true">✊</span>
+          <span class="ico" aria-hidden="true"><svg class="pic" width="42" height="42" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-rock"/></svg></span>
           <span class="lbl">Rock</span>
         </button>
         <button class="choice" id="btnPaper" data-move="paper">
-          <span class="ico" aria-hidden="true">✋</span>
+          <span class="ico" aria-hidden="true"><svg class="pic" width="42" height="42" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-paper"/></svg></span>
           <span class="lbl">Paper</span>
         </button>
         <button class="choice" id="btnScissors" data-move="scissors">
-          <span class="ico" aria-hidden="true">✌️</span>
+          <span class="ico" aria-hidden="true"><svg class="pic" width="42" height="42" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-scissors"/></svg></span>
           <span class="lbl">Scissors</span>
         </button>
       </div>
@@ -399,7 +409,7 @@
          aria-labelledby="matchTitle" aria-describedby="matchSub">
       <span class="big" id="matchEmoji" aria-hidden="true">🏆</span>
       <h2 id="matchTitle">You win the match!</h2>
-      <p id="matchSub">You beat Robo 5–3</p>
+      <p id="matchSub">You beat Plum 5–3</p>
       <div class="controls">
         <button class="btn btn-go" id="playAgainBtn">Play again →</button>
       </div>
@@ -408,30 +418,38 @@
     <section class="how-to">
       <h2>🤔 How to play</h2>
       <ul>
-        <li><strong>Rock</strong> ✊ smashes <strong>scissors</strong> ✌️</li>
-        <li><strong>Paper</strong> ✋ covers <strong>rock</strong> ✊</li>
-        <li><strong>Scissors</strong> ✌️ cut <strong>paper</strong> ✋</li>
+        <li><strong>Rock</strong> <svg class="pic" width="22" height="22" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-rock"/></svg> smashes <strong>scissors</strong> <svg class="pic" width="22" height="22" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-scissors"/></svg></li>
+        <li><strong>Paper</strong> <svg class="pic" width="22" height="22" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-paper"/></svg> covers <strong>rock</strong> <svg class="pic" width="22" height="22" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-rock"/></svg></li>
+        <li><strong>Scissors</strong> <svg class="pic" width="22" height="22" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-scissors"/></svg> cut <strong>paper</strong> <svg class="pic" width="22" height="22" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-paper"/></svg></li>
         <li>Same move? It's a tie — nobody scores, play again!</li>
         <li>First to <strong>5 points</strong> wins the match 🏆</li>
       </ul>
     </section>
 
+    <script src="../shared/art/pictures.js"></script>
     <script>
       (function () {
         "use strict";
 
+        // The hands and Plum's faces come from the shared picture library; the
+        // sprite goes in first, before newMatch() below draws anything.
+        Pictures.install(["hand-rock", "hand-paper", "hand-scissors", "plum-happy", "plum-dizzy", "plum-puzzled"]);
+
         var TARGET = 5;
         var MOVES = ["rock", "paper", "scissors"];
-        var ICON = { rock: "✊", paper: "✋", scissors: "✌️" };
+        var ICON = { rock: "hand-rock", paper: "hand-paper", scissors: "hand-scissors" };
         var LABEL = { rock: "Rock", paper: "Paper", scissors: "Scissors" };
         var BEATS = { rock: "scissors", paper: "rock", scissors: "paper" };
         var VERB = { rock: "smashes", paper: "covers", scissors: "cuts" };
 
-        var WIN_FACES = ["😵", "😱", "🥴", "😮", "🫠"];
-        var LOSE_FACES = ["😎", "😏", "🤩", "😁", "🙌"];
-        var TIE_FACES = ["😲", "🤔", "😐", "🙃"];
-        var WIN_LINES = ["You got Robo!", "Nice one!", "Too quick for Robo!", "Great pick!", "Robo did not see that coming!"];
-        var LOSE_LINES = ["Robo got that one.", "Robo wins the round!", "So close!", "Robo is pleased with itself.", "Try again!"];
+        // Plum's face under its hand: dizzy when you win the round, beaming when
+        // Plum wins it, puzzled on a tie and while it waits for your first move
+        var WIN_FACES = ["plum-dizzy"];
+        var LOSE_FACES = ["plum-happy"];
+        var TIE_FACES = ["plum-puzzled"];
+        var WAIT_FACE = "plum-puzzled";
+        var WIN_LINES = ["You got Plum!", "Nice one!", "Too quick for Plum!", "Great pick!", "Plum did not see that coming!"];
+        var LOSE_LINES = ["Plum got that one.", "Plum wins the round!", "So close!", "Plum looks very pleased.", "Try again!"];
         var TIE_LINES = ["Great minds think alike!", "Snap! Same move.", "A tie — go again!", "Twins!"];
 
         var handYou = document.getElementById("handYou");
@@ -474,9 +492,15 @@
           if (announce !== false) srStatus.textContent = main + (sub ? " " + sub : "");
         }
 
+        // you and robo are picture ids (ICON values); the mirror, the shake and
+        // the pop all live on the .hand divs, so only the picture inside swaps
         function setHands(you, robo) {
-          handYou.textContent = you;
-          handRobo.textContent = robo;
+          handYou.innerHTML = Pictures.use(you, { size: 74 });
+          handRobo.innerHTML = Pictures.use(robo, { size: 74 });
+        }
+
+        function setFace(id) {
+          roboFace.innerHTML = Pictures.use(id, { size: 36 });
         }
 
         function shake(on) {
@@ -522,7 +546,7 @@
             return;
           }
 
-          setHands("✊", "✊");
+          setHands(ICON.rock, ICON.rock);
           shake(true);
           say("Rock…", "", "count", false);
           later(function () { say("Paper…", "", "count", false); }, 420);
@@ -543,18 +567,18 @@
 
           if (result === "win") {
             youScore++;
-            roboFace.textContent = pick(WIN_FACES);
+            setFace(pick(WIN_FACES));
             say("You win the round! 🎉",
                 LABEL[myMove] + " " + VERB[myMove] + " " + LABEL[roboMove].toLowerCase() + " — " + pick(WIN_LINES),
                 "win");
           } else if (result === "lose") {
             roboScore++;
-            roboFace.textContent = pick(LOSE_FACES);
-            say("Robo wins the round!",
+            setFace(pick(LOSE_FACES));
+            say("Plum wins the round!",
                 LABEL[roboMove] + " " + VERB[roboMove] + " " + LABEL[myMove].toLowerCase() + " — " + pick(LOSE_LINES),
                 "lose");
           } else {
-            roboFace.textContent = pick(TIE_FACES);
+            setFace(pick(TIE_FACES));
             say("It's a tie!", "You both picked " + LABEL[myMove].toLowerCase() + ". " + pick(TIE_LINES), "tie");
           }
 
@@ -575,11 +599,13 @@
 
         function endMatch() {
           var youWon = youScore > roboScore;
-          matchEmoji.textContent = youWon ? "🏆" : "🤖";
-          matchTitle.textContent = youWon ? "You win the match!" : "Robo wins the match!";
+          // the trophy is a feedback glyph; when Plum takes the match, Plum beams
+          if (youWon) matchEmoji.textContent = "🏆";
+          else matchEmoji.innerHTML = Pictures.use("plum-happy", { size: 96 });
+          matchTitle.textContent = youWon ? "You win the match!" : "Plum wins the match!";
           matchSub.textContent = youWon
-            ? "You beat Robo " + youScore + "–" + roboScore + ". Champion!"
-            : "Robo got there first, " + roboScore + "–" + youScore + ". Rematch?";
+            ? "You beat Plum " + youScore + "–" + roboScore + ". Champion!"
+            : "Plum got there first, " + roboScore + "–" + youScore + ". Rematch?";
           matchOverlay.classList.remove("hidden");
           setBackgroundInert(true);
           // role=dialog + aria-labelledby + focus moving inside is what makes
@@ -610,8 +636,8 @@
           busy = false;
           matchOverlay.classList.add("hidden");
           setBackgroundInert(false);
-          roboFace.textContent = "🤖";
-          setHands("✊", "✊");
+          setFace(WAIT_FACE);
+          setHands(ICON.rock, ICON.rock);
           shake(false);
           // clearTimers() cancels the pending pop cleanup, so drop it here or
           // the class sticks and the reveal never animates again
