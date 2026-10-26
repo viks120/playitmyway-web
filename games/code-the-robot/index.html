@@ -389,6 +389,7 @@
       .how-to ol { margin: 0; padding-left: 22px; color: var(--ink-soft); font-size: 16px; line-height: 1.65; }
       .how-to li::marker { color: var(--band); font-weight: 600; }
       .how-to .kbd-note { margin: 10px 0 0; color: var(--ink-soft); font-size: 14.5px; }
+      .how-to .pic { width: 1.15em; height: 1.15em; vertical-align: -0.2em; }
       kbd {
         font-family: inherit; font-size: 13px; font-weight: 600;
         background: var(--band-tint); color: var(--band);
@@ -456,7 +457,7 @@
           <h2 id="winTitle"><svg class="pic" width="32" height="32" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-pop-burst"/></svg> You did it!</h2>
           <p id="winSub">Your program worked!</p>
           <div class="controls">
-            <button class="btn btn-again" id="againBtn">↺ Try again</button>
+            <button class="btn btn-again" id="againBtn">🔄 Try again</button>
             <button class="btn btn-next" id="nextBtn">Next level →</button>
           </div>
         </div>
@@ -491,7 +492,7 @@
       <ol>
         <li>Tap the arrow tiles ⬆️⬇️⬅️➡️ to build a program — up to <strong>12 steps</strong>.</li>
         <li>Press <strong>▶ Run</strong> and watch the robot follow your steps to the ⭐.</li>
-        <li>Bumped into a wall? 🧱 No problem — the step that went wrong <strong>stays highlighted</strong>. Tap it to remove it, fix your program, and run again!</li>
+        <li>Bumped into a wall? <svg class="pic" width="20" height="20" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hedge"/></svg> No problem — the step that went wrong <strong>stays highlighted</strong>. Tap it to remove it, fix your program, and run again!</li>
         <li>Use <strong>⏭ Step</strong> to walk through your program one move at a time.</li>
         <li>Match the 🎯 best path for <strong>3 stars</strong>. Nothing is saved — stars reset when you leave.</li>
       </ol>
@@ -504,7 +505,11 @@
       "use strict";
       // The pieces come from the shared picture library: the sprite goes in
       // first, before anything draws the board, the strip or the win overlay.
-      Pictures.install(["robot", "hedge", "star", "arrow-up", "arrow-down", "arrow-left", "arrow-right", "trophy", "pop-burst"]);
+      // A returning visitor's offline cache can hold the older picture
+      // library for one visit after a deploy (a page and the library refresh
+      // separately); it has no hedge yet, so the brick stands in.
+      var WALL_PIC = Pictures.has("hedge") ? "hedge" : "brick";
+      Pictures.install(["robot", WALL_PIC, "star", "arrow-up", "arrow-down", "arrow-left", "arrow-right", "trophy", "pop-burst"]);
       // Pip waits at the goal: the flat critter file, decorative, sized by CSS
       var PIP_IMG = '<img class="pip" src="../../icons/critters/pip.svg" alt="" width="64" height="60">';
       var LEVELS = [{"n":"First Steps","e":"👣","s":5,"w":[],"r":[1,2],"g":[3,2],"p":2},{"n":"Blast Off","e":"🚀","s":5,"w":[],"r":[2,4],"g":[2,1],"p":3},{"n":"Turn the Corner","e":"🐢","s":5,"w":[[2,1],[1,2]],"r":[1,4],"g":[3,2],"p":4},{"n":"Around the Rocks","e":"🪨","s":5,"w":[[3,3],[2,4]],"r":[4,4],"g":[1,2],"p":5},{"n":"Zig and Zag","e":"⚡","s":6,"w":[[1,2],[0,3],[3,4]],"r":[0,4],"g":[4,2],"p":6},{"n":"The Corridor","e":"🚪","s":6,"w":[[1,4],[4,4],[5,4],[2,5]],"r":[5,5],"g":[0,3],"p":7},{"n":"Over the Wall","e":"🧗","s":7,"w":[[3,3],[3,4],[3,5],[3,6]],"r":[2,5],"g":[4,5],"p":8},{"n":"The Big Detour","e":"🗺️","s":7,"w":[[2,3],[3,3],[4,3],[5,3],[6,3],[5,1],[5,5]],"r":[3,6],"g":[3,0],"p":10},{"n":"The Staircase","e":"🪜","s":7,"w":[[5,0],[5,1],[3,2],[2,3],[3,3],[6,3],[1,4],[4,5]],"r":[6,0],"g":[1,6],"p":11},{"n":"The Snail Shell","e":"🐌","s":7,"w":[[1,1],[2,1],[3,1],[4,1],[5,1],[1,2],[1,3],[1,4],[1,5],[5,2],[5,3],[3,4],[4,4]],"r":[0,0],"g":[3,3],"p":12}];
@@ -618,7 +623,7 @@
           for (var x = 0; x < lvl.s; x++) {
             var c = document.createElement("div");
             c.className = "cell" + ((x + y) % 2 ? " alt" : "");
-            if (isWall(x, y)) { c.classList.add("wall"); c.innerHTML = Pictures.use("hedge"); }
+            if (isWall(x, y)) { c.classList.add("wall"); c.innerHTML = Pictures.use(WALL_PIC); }
             else if (x === lvl.g[0] && y === lvl.g[1]) {
               // Pip waits beside the star; both sit under the robot layer
               c.classList.add("goal");

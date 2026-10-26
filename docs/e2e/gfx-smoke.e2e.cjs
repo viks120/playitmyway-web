@@ -44,7 +44,7 @@ const GAMES = {
   'balloon-pop': { start: ['text:Start'], area: '#gameArea' },
   'tic-tac-toe': { start: ['text:New Game'], area: '#board' },
   'rock-paper-scissors': { start: ['text:Rock'], area: '.arena' },
-  'code-the-robot': { start: [], area: '#boardWrap' },
+  'code-the-robot': { start: [], area: '#board' },
   'geography-explorer': { start: [], area: '#worldMap' },
   '2048-slider': { start: ['text:New Game'], area: '#grid', keys: ['ArrowLeft', 'ArrowUp'], noPictures: true },
   'minesweeper': { start: ['text:Easy'], area: '#grid' },
