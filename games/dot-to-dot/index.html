@@ -137,7 +137,7 @@
         position: relative;
         background: var(--band-tint);
         border-radius: 16px;
-        padding: 8px 14px;
+        padding: 2px 14px;
         min-height: 66px;
         display: flex;
         align-items: center;
@@ -162,7 +162,7 @@
         margin: 0;
         min-height: 50px;
       }
-      .prompt-label { font-size: 20px; font-weight: 600; color: var(--ink-soft); line-height: 1.2; }
+      .prompt-label { font-size: 20px; font-weight: 600; color: var(--ink-soft); line-height: 1.2; text-wrap: balance; }
       .prompt-number {
         font-size: 46px;
         font-weight: 600;
@@ -300,6 +300,9 @@
         border: 2.5px solid var(--ink, #33302e);
       }
       .win-plate .pic { width: clamp(60px, 20vw, 96px); height: clamp(60px, 20vw, 96px); }
+      /* on the narrowest phones the plate is no taller than the old emoji was,
+         so the win card stays inside the board */
+      @media (max-width: 340px) { .win-plate { padding: 4px; } .win-plate .pic { width: 44px; height: 44px; } }
       .win-overlay h2 { margin: 4px 0 0; font-size: clamp(24px, 6vw, 32px); color: var(--color-deep-ink); }
       .win-overlay p { margin: 0; color: var(--color-deep-soft); font-size: 17px; }
       .hidden { display: none !important; }
@@ -458,7 +461,13 @@
         var pickerGrid = document.getElementById("pickerGrid");
         var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-        Pictures.install(PICTURES.map(function (p) { return p.id; }));
+        // A returning visitor's offline cache can hold the older picture library
+        // for one visit after a deploy (a page and the library refresh
+        // separately), and five rewards were drawn after it shipped:
+        // each falls back to its older look rather than stop the page.
+        var OLDER = { "fir-tree": "tree", "pencil-up": "pencil", "pennant": "flag", "flower-head": "flower", "duck-right": "duck" };
+        function picFor(id) { return Pictures.has(id) ? id : OLDER[id]; }
+        Pictures.install(PICTURES.map(function (p) { return picFor(p.id); }));
 
         var pi = 0;          // picture index
         var joined = 0;      // how many dots are connected (0 = none tapped yet)
@@ -659,7 +668,7 @@
           rubber.style.display = "none";
           fillEl.classList.add("show");
           done[pi] = true;
-          winPlate.innerHTML = Pictures.use(pic.id, { size: 96, label: true });
+          winPlate.innerHTML = Pictures.use(picFor(pic.id), { size: 96 });
           winTitle.textContent = "It's a " + pic.n + "!";
           winSub.textContent = "You counted all the way to " + pic.d.length + "! 🎉";
           document.getElementById("nextBtn").classList.toggle("hidden", pi === PICTURES.length - 1);
@@ -834,7 +843,7 @@
             b.className = "pic-chip" + (i === pi ? " active" : "");
             b.setAttribute("aria-label", "Picture " + (i + 1) + ": " + p.n +
               " (" + p.d.length + " dots)" + (done[i] ? ", finished" : ""));
-            b.innerHTML = Pictures.use(p.id, { size: 28 }) +
+            b.innerHTML = Pictures.use(picFor(p.id), { size: 28 }) +
               (done[i] ? "<span class='tick' aria-hidden='true'>✓</span>" : "");
             b.addEventListener("click", function () {
               loadPicture(i);
