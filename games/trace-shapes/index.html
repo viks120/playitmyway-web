@@ -384,6 +384,68 @@
         .start-ring { opacity: 0.9; r: 7; }
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Trace Shapes",
+            "url": "https://playitmyway.com/games/trace-shapes/",
+            "description": "Trace circles, squares, triangles, stars and hearts with your finger! Free pre-writing practice for kids ages 3+ with guided demos. No ads, no download.",
+            "teaches": "Drawing circles, squares, triangles and stars in one controlled stroke, with the guide fading away as it gets easier.",
+            "about": [
+              "Writing & Fine Motor"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "3-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 3
+            },
+            "timeRequired": "PT5M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Trace Shapes",
+                "item": "https://playitmyway.com/games/trace-shapes/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a class="back-link" href="../../">← Back to Games</a>
@@ -437,12 +499,19 @@
       <h2>🤔 How to play</h2>
       <ol>
         <li>Put your finger (or mouse) on the <strong>green dot</strong>.</li>
-        <li>Trace slowly along the grey path — your line paints in as you go!</li>
-        <li>Follow the little arrow, and do the strokes in number order.</li>
+        <li>Trace slowly along the pale path — your line paints in as you go!</li>
+        <li>Follow the little green arrow by the dot. It shows which way to go round. Keep going until you are back at the start.</li>
         <li>Not sure how? Tap <strong>👀 Show me</strong> to watch first.</li>
-        <li>Traced it? Tap <strong>Again with less help</strong> — the shape fades away until you can draw it all by yourself!</li>
+        <li>Traced it? Tap <strong>Again with less help</strong> to trace the same shape again. First the shape goes faint, then it disappears and you draw it on your own inside a faint dashed box. After that, <strong>Next →</strong> takes you to the next shape.</li>
       </ol>
-      <p class="note">This activity is traced by touch or mouse. Grown-ups: tracing with one finger, nice and slow, is great pencil practice.</p>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> press on the green dot and drag along the path. Pressing away from the dot does not start a line. Lift your finger to rest, then touch the end of your line to carry on.</li>
+        <li><strong>Buttons:</strong> pick any of the 12 shapes under <strong>✏️ Pick one to trace</strong>. The <strong>Trace</strong>, <strong>Fading</strong> and <strong>On your own</strong> buttons above the board choose how much of the shape to show. <strong>🔄 Start over</strong> clears your line.</li>
+      </ul>
+      <h3>What it practises</h3>
+      <p>Drawing 12 shapes, from a circle and square to a star and a heart. Each shape is one line that starts and ends at the green dot. The line only paints in while your finger stays close to the path. After <strong>On your own</strong>, your line is shown on top of the real shape so you can compare them. Ticks for finished shapes last only this visit.</p>
+      <p class="note">This activity is traced by touch or mouse; there is no keyboard way to trace.</p>
     </section>
 
     <script>
@@ -1007,6 +1076,26 @@
         buildPicker();
       })();
     </script>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Trace Shapes</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 3+ · Writing &amp; Fine Motor · about 5 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../trace-letters/"><img src="../../icons/games/trace-letters.svg" alt="" width="40" height="40"><span class="game-more-name">Trace Letters &amp; Numbers</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../trace-name/"><img src="../../icons/games/trace-name.svg" alt="" width="40" height="40"><span class="game-more-name">Trace Your Name</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../dot-to-dot/"><img src="../../icons/games/dot-to-dot.svg" alt="" width="40" height="40"><span class="game-more-name">Dot to Dot</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../first-strokes/"><img src="../../icons/games/first-strokes.svg" alt="" width="40" height="40"><span class="game-more-name">First Strokes</span><span class="game-more-age">Ages 2+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

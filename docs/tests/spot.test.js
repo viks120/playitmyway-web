@@ -267,7 +267,8 @@ test('pages: shell, script order, title icon, live region, no storage, no foreig
     else assert.ok(!js.includes('Voice') && !html.includes('voice.js'), 'the 7+ page does not');
     for (const src of [html, js]) {
       for (const bad of ['localStorage', 'sessionStorage', 'document.cookie', 'fetch(', 'XMLHttpRequest', 'googleapis', 'cloudflareinsights']) assert.ok(!src.includes(bad), `${p.slug}: ${bad}`);
-      for (const u of src.match(/https?:\/\/[^"'\s<)]+/g) || []) assert.ok(u.startsWith('https://playitmyway.com/'), `${p.slug}: foreign URL ${u}`);
+      // https://schema.org is the structured data's vocabulary name, never fetched
+      for (const u of src.match(/https?:\/\/[^"'\s<)]+/g) || []) assert.ok(u.startsWith('https://playitmyway.com/') || u === 'https://schema.org', `${p.slug}: foreign URL ${u}`);
     }
   }
   const big = read('games', 'spot-the-difference', 'index.html'), little = read('games', 'whats-different', 'index.html');

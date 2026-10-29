@@ -190,6 +190,68 @@
       .num-btn { padding: 10px; font-size: 1.1em; }
     }
   </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Sudoku",
+            "url": "https://playitmyway.com/games/sudoku/",
+            "description": "Play Sudoku free online with easy, medium and hard levels. A classic 9×9 number puzzle that trains logic and concentration. No ads, no download.",
+            "teaches": "Constraint reasoning and elimination. Every puzzle has exactly one solution, so correct logic is never punished.",
+            "about": [
+              "Logic & Puzzles"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "14-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 14
+            },
+            "timeRequired": "PT20M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Sudoku",
+                "item": "https://playitmyway.com/games/sudoku/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
 </head>
 <body>
   <a href="../../" class="back-link">← Back to Games</a>
@@ -692,6 +754,44 @@
 
     newGame();
   </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>The board is 9 squares across and 9 down, split into nine 3×3 boxes. Some numbers are already filled in on grey squares. These are fixed and cannot be changed.</li>
+        <li>Fill every empty square with a number from 1 to 9. Each row, each column and each 3×3 box must have every number exactly once.</li>
+        <li>Pick a square, then pick a number. A right number shows in blue. A wrong one stays in the square, turns it red and adds an error. You can type over it, but the error still counts. Three errors ends the game.</li>
+        <li>Fill the whole board with the right numbers to win. The timer stops and you get 3 stars for no errors, 2 for one error and 1 for two.</li>
+        <li>Easy, Medium and Hard leave up to 35, 45 or 55 empty squares. Each puzzle is checked to have only one answer.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap a square, then tap a number on the pad below the board. The ⌫ button clears the square. Choosing a square that holds a number also lights up every other square with that number.</li>
+        <li><strong>Keyboard:</strong> <kbd>Tab</kbd> into the board, use the arrow keys to move between squares, and type <kbd>1</kbd> to <kbd>9</kbd>. <kbd>Backspace</kbd> or <kbd>Delete</kbd> clears a square.</li>
+      </ul>
+      <p>💡 Hint fills in one random empty square with its right number, three times per puzzle. That square turns grey and fixed, like the starting numbers. Hints never count as errors. Your best time for each level lasts only this visit: nothing is saved.</p>
+      <h3>What it practises</h3>
+      <p>Logic by elimination: checking a row, a column and a box to rule numbers out until only one can fit a square.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Sudoku</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 14+ · Logic &amp; Puzzles · about 20 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../2048-slider/"><img src="../../icons/games/2048-slider.svg" alt="" width="40" height="40"><span class="game-more-name">2048 Slider</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../minesweeper/"><img src="../../icons/games/minesweeper.svg" alt="" width="40" height="40"><span class="game-more-name">Minesweeper</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../word-guess/"><img src="../../icons/games/word-guess.svg" alt="" width="40" height="40"><span class="game-more-name">Word Guess</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../laser-mirrors/"><img src="../../icons/games/laser-mirrors.svg" alt="" width="40" height="40"><span class="game-more-name">Laser Mirrors</span><span class="game-more-age">Ages 14+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

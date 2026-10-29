@@ -10,14 +10,14 @@
 
     <!-- SEO Meta Tags -->
     <title>Rock Paper Scissors – Free Game vs Computer | Play It My Way</title>
-    <meta name="description" content="Play Rock Paper Scissors against Plum, a silly purple dino! Best-of-5 matches with funny reactions for kids ages 5+. No ads, no download." />
+    <meta name="description" content="Play Rock Paper Scissors against Plum, a silly purple dino! First to 5 wins, with funny reactions for kids ages 5+. No ads, no download." />
     <meta name="keywords" content="rock paper scissors online, rock paper scissors vs computer, quick game for kids, free kids game online" />
     <meta name="author" content="Play It My Way" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Rock Paper Scissors – Free Online Game for Kids" />
-    <meta property="og:description" content="Beat Plum the purple dino at Rock Paper Scissors! Best-of-5 matches with silly reactions. Free for ages 5+, no ads, no download." />
+    <meta property="og:description" content="Beat Plum the purple dino at Rock Paper Scissors! First to 5 wins, with silly reactions. Free for ages 5+, no ads, no download." />
     <meta property="og:type" content="game" />
     <meta property="og:url" content="https://playitmyway.com/games/rock-paper-scissors/" />
     <meta property="og:site_name" content="Play It My Way" />
@@ -346,6 +346,68 @@
         .confetti-bit { display: none; }
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Rock Paper Scissors",
+            "url": "https://playitmyway.com/games/rock-paper-scissors/",
+            "description": "Play Rock Paper Scissors against Plum, a silly purple dino! First to 5 wins, with funny reactions for kids ages 5+. No ads, no download.",
+            "teaches": "The rule of who beats whom (rock blunts scissors, scissors cut paper, paper wraps rock) and playing fair: Plum picks at random, and the first to five wins.",
+            "about": [
+              "Logic & Puzzles"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "5-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 5
+            },
+            "timeRequired": "PT3M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Rock Paper Scissors",
+                "item": "https://playitmyway.com/games/rock-paper-scissors/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a class="back-link" href="../../">← Back to Games</a>
@@ -423,7 +485,16 @@
         <li><strong>Scissors</strong> <svg class="pic" width="22" height="22" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-scissors"/></svg> cut <strong>paper</strong> <svg class="pic" width="22" height="22" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#p-hand-paper"/></svg></li>
         <li>Same move? It's a tie — nobody scores, play again!</li>
         <li>First to <strong>5 points</strong> wins the match 🏆</li>
+        <li>Press <strong>🔄 New match</strong> to go back to 0–0 and start again.</li>
       </ul>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap Rock, Paper or Scissors. Both hands shake while the game counts "Rock… Paper… Scissors…", then both moves are shown. If your device is set to reduce motion, the moves are shown straight away.</li>
+        <li><strong>Keyboard:</strong> <kbd>1</kbd> is rock, <kbd>2</kbd> is paper and <kbd>3</kbd> is scissors.</li>
+      </ul>
+      <p>After each round the game says who won and why, such as "Paper covers rock", and Plum's face changes: dizzy when you win, beaming when Plum wins, puzzled on a tie. Nothing is saved: reloading the page starts a new match.</p>
+      <h3>What it practises</h3>
+      <p>Learning which move beats which: every round that is not a tie spells out the rule, such as "Rock smashes scissors". Plum picks each move completely at random, so there is no pattern to find and no move that wins more often. It is a fair game of chance, so sometimes you win and sometimes Plum does.</p>
     </section>
 
     <script src="../shared/art/pictures.js"></script>
@@ -697,6 +768,26 @@
         newMatch();
       })();
     </script>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Rock Paper Scissors</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 5+ · Logic &amp; Puzzles · about 3 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../sort-it-out/"><img src="../../icons/games/sort-it-out.svg" alt="" width="40" height="40"><span class="game-more-name">Sort It Out</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../tic-tac-toe/"><img src="../../icons/games/tic-tac-toe.svg" alt="" width="40" height="40"><span class="game-more-name">Tic Tac Toe</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../pebble-push/"><img src="../../icons/games/pebble-push.svg" alt="" width="40" height="40"><span class="game-more-name">Pebble Push</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../chart-detective/"><img src="../../icons/games/chart-detective.svg" alt="" width="40" height="40"><span class="game-more-name">Chart Detective</span><span class="game-more-age">Ages 5+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

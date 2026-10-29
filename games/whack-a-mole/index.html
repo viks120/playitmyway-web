@@ -470,6 +470,68 @@
         .mode-btn { padding: 6px 12px; font-size: 0.8em; }
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Whack-a-Mole",
+            "url": "https://playitmyway.com/games/whack-a-mole/",
+            "description": "Tap the cute animals before they hide! A free whack-a-mole game for kids ages 5+ with easy, medium and hard speeds. No ads, no download.",
+            "teaches": "Reaction time and hand-eye coordination — tap each animal before it hides.",
+            "about": [
+              "Speed & Coordination"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "5-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 5
+            },
+            "timeRequired": "PT3M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Whack-a-Mole",
+                "item": "https://playitmyway.com/games/whack-a-mole/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
@@ -974,6 +1036,43 @@
       updateDisplay();
       updateTimer();
     </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Nine molehills sit in a meadow, three across and three down. Press Let's Play! and the 2-minute clock starts.</li>
+        <li>Animals pop up out of the holes, often more than one at a time. Tap each one before it ducks back down. Every animal is worth 10 points; there are no tricks to avoid.</li>
+        <li>When the clock runs out you see how many animals you tapped and get stars: always at least 1, 2 from 150 points, 3 from 300 points.</li>
+        <li>Pick a speed before you start. On Easy 🐢 an animal stays up for 3 to 4 seconds. On Medium 🐇 it is 2 to 3 seconds, and on Hard 🚀 1.2 to 2 seconds. New animals also pop up sooner on the faster speeds. Changing the speed mid-game starts a new game.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap or click an animal while it is up.</li>
+        <li><strong>Keyboard:</strong> <kbd>Tab</kbd> moves from hole to hole, and <kbd>Enter</kbd> or <kbd>Space</kbd> whacks the animal in that hole. <kbd>Esc</kbd> closes the end-of-game panel.</li>
+      </ul>
+      <p>A missed animal or an empty hole costs nothing; the animal just hides again. The best score lasts only this visit: nothing is saved.</p>
+      <h3>What it practises</h3>
+      <p>Reaction time and hand-eye coordination: spotting an animal anywhere in the grid and tapping it before it hides. The faster speeds give less time to look and move.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Whack-a-Mole</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 5+ · Speed &amp; Coordination · about 3 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../catch-falling-object/"><img src="../../icons/games/catch-falling-object.svg" alt="" width="40" height="40"><span class="game-more-name">Catch the Fruit</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../balloon-pop/"><img src="../../icons/games/balloon-pop.svg" alt="" width="40" height="40"><span class="game-more-name">Balloon Pop</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../pond-prix/"><img src="../../icons/games/pond-prix.svg" alt="" width="40" height="40"><span class="game-more-name">Pond Prix</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../sound-it-out/"><img src="../../icons/games/sound-it-out.svg" alt="" width="40" height="40"><span class="game-more-name">Sound It Out</span><span class="game-more-age">Ages 5+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

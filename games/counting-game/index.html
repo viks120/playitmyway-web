@@ -824,6 +824,68 @@
         }
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Count With Me",
+            "url": "https://playitmyway.com/games/counting-game/",
+            "description": "Learn numbers 1-20, addition and subtraction in a free counting game for toddlers and preschoolers ages 3+. Friendly, colorful and easy. No ads, no download.",
+            "teaches": "Counting to 20, reading quantities on a ten-frame, number bonds to ten, and first addition and subtraction with objects to count.",
+            "about": [
+              "Numbers & Maths"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "3-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 3
+            },
+            "timeRequired": "PT10M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Count With Me",
+                "item": "https://playitmyway.com/games/counting-game/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
@@ -1600,6 +1662,43 @@
       // Initialize game
       resetGame();
     </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Pick a mode: Count Objects, Addition, Subtraction or Ten Frame. Clover asks a question and three number buttons sit underneath.</li>
+        <li>Count Objects shows 1 to 5 of one fruit. Sometimes another fruit is mixed in, so count only the one asked for. Ten Frame shows up to 20 dots in frames of ten boxes; sometimes you count the empty boxes instead.</li>
+        <li>Addition asks sums up to 5 + 5. Subtraction takes a smaller number away from 3 to 10. Both are written as numbers only.</li>
+        <li>Tap the right number, then press Next Question. A game is 10 questions and ends with one to three stars. A right first try scores 10 points, and more once you get three or more in a row. The level rises every 50 points; the questions stay the same size.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap a number to answer. In Count Objects, tap each fruit as you count it to mark it; tap again to unmark.</li>
+        <li><strong>Keyboard:</strong> every fruit and number is a button, so <kbd>Tab</kbd> to it and press <kbd>Enter</kbd> or <kbd>Space</kbd>. <kbd>Esc</kbd> closes the end-of-game card.</li>
+      </ul>
+      <p>The wrong numbers are real slips, like counting every fruit or adding instead of taking away. A first wrong answer greys out and a hint appears. If your number matches a known slip, the hint names it; if not, it gives a counting tip. Right after a hint scores 5. A second wrong answer shows the right number. For fruit, adding, taking away and plain dot counts, it then counts up to that number with you. For 11 to 20 dots it says "ten and some more", and for empty boxes it shows how the dots and empty boxes make 10. Nothing is saved.</p>
+      <h3>What it practises</h3>
+      <p>Counting a set while ignoring other things, reading ten-frames up to 20 as "ten and some more", how many more make 10, adding within 10, and taking away from numbers up to 10.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Count With Me</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 3+ · Numbers &amp; Maths · about 10 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../trace-letters/"><img src="../../icons/games/trace-letters.svg" alt="" width="40" height="40"><span class="game-more-name">Trace Letters &amp; Numbers</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../dot-to-dot/"><img src="../../icons/games/dot-to-dot.svg" alt="" width="40" height="40"><span class="game-more-name">Dot to Dot</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../balloon-pop/"><img src="../../icons/games/balloon-pop.svg" alt="" width="40" height="40"><span class="game-more-name">Balloon Pop</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../number-line-hop/"><img src="../../icons/games/number-line-hop.svg" alt="" width="40" height="40"><span class="game-more-name">Number Line Hop</span><span class="game-more-age">Ages 5+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

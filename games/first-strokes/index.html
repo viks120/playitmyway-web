@@ -383,6 +383,68 @@
         .start-ring { opacity: 0.9; r: 7; }
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "First Strokes",
+            "url": "https://playitmyway.com/games/first-strokes/",
+            "description": "Trace standing lines, circles, zigzags and waves — the classic pre-writing progression that comes before letters. Perfect for ages 2-3. No ads, no download.",
+            "teaches": "The straight lines, curves and zigzags that come before letters. Three help levels: full guide, faded guide, then no guide at all.",
+            "about": [
+              "Writing & Fine Motor"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "2-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 2
+            },
+            "timeRequired": "PT5M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "First Strokes",
+                "item": "https://playitmyway.com/games/first-strokes/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a class="back-link" href="../../">← Back to Games</a>
@@ -439,9 +501,17 @@
         <li>Trace slowly along the grey path — your line paints in as you go!</li>
         <li>Follow the little arrow, and do the strokes in number order.</li>
         <li>Not sure how? Tap <strong>👀 Show me</strong> to watch first.</li>
-        <li>Traced it? Tap <strong>Again with less help</strong> — the pattern fades away until you can draw it all by yourself!</li>
+        <li>Traced it? Tap <strong>Again with less help</strong> to trace the same pattern again. First the pattern fades, then it hides, leaving only the green dot and a faint box. After <strong>On your own</strong>, <strong>Next →</strong> moves on to the next pattern.</li>
       </ol>
-      <p class="note">This activity is traced by touch or mouse. Grown-ups: tracing with one finger, nice and slow, is great pencil practice.</p>
+      <p class="note">This activity is traced by touch or mouse. There are no keys for the tracing itself.</p>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> press on the green dot and drag along the path. If you wander off, the line stops painting. Come back to where your line stopped to carry on.</li>
+        <li>Lift your finger to rest, then touch the end of your line to keep going. <strong>🔄 Start over</strong> clears your line so you can begin that pattern again.</li>
+        <li>The <strong>Trace</strong>, <strong>Fading</strong> and <strong>On your own</strong> buttons choose how much of the pattern shows. Tap any pattern in the list below the board to switch.</li>
+      </ul>
+      <h3>What it practises</h3>
+      <p>Thirteen patterns that come before letters: standing, sleeping and sloping lines, two kinds of cross, a circle, a zigzag, bumps, cups, waves, loops, a rainbow arc and a spiral, each from a set start in a set direction. In <strong>On your own</strong>, your finished line is shown over the real pattern so you can compare. It is a picture, not a score, and nothing is saved: the ticks last only this visit.</p>
     </section>
 
     <script>
@@ -1006,6 +1076,26 @@
         buildPicker();
       })();
     </script>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">First Strokes</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 2+ · Writing &amp; Fine Motor · about 5 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../trace-shapes/"><img src="../../icons/games/trace-shapes.svg" alt="" width="40" height="40"><span class="game-more-name">Trace Shapes</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../trace-letters/"><img src="../../icons/games/trace-letters.svg" alt="" width="40" height="40"><span class="game-more-name">Trace Letters &amp; Numbers</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../trace-name/"><img src="../../icons/games/trace-name.svg" alt="" width="40" height="40"><span class="game-more-name">Trace Your Name</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../dot-to-dot/"><img src="../../icons/games/dot-to-dot.svg" alt="" width="40" height="40"><span class="game-more-name">Dot to Dot</span><span class="game-more-age">Ages 3+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

@@ -383,6 +383,68 @@
         .start-screen h2 { margin-bottom: 12px; }
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Catch the Fruit",
+            "url": "https://playitmyway.com/games/catch-falling-object/",
+            "description": "Move the basket to catch falling fruit! A free arcade game for kids ages 5+ that builds reflexes and hand-eye coordination. No ads, no download.",
+            "teaches": "Reaction speed and hand-eye coordination. No academic content — this one is for fun and for tired afternoons.",
+            "about": [
+              "Speed & Coordination"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "5-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 5
+            },
+            "timeRequired": "PT3M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Catch the Fruit",
+                "item": "https://playitmyway.com/games/catch-falling-object/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
@@ -858,6 +920,44 @@
 
       updateDisplay();
     </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Fruit falls from the top of the orchard. Mango holds a basket at the bottom. Move the basket under the fruit to catch it.</li>
+        <li>Each fruit is worth 10 points. A star is worth 50. Every 5 catches in a row, stars included, earn 20 extra points.</li>
+        <li>Keep away from the bombs. Catching a bomb costs one of your 3 hearts. A fruit or star you miss costs no hearts. Catching a bomb, or missing a fruit or star, starts your run of catches again from zero.</li>
+        <li>Every 100 points takes you up a level. Things fall faster up to level 7, and come more often up to level 10.</li>
+        <li>The game ends when the third bomb lands in the basket. You get 1 star, 2 stars for 200 points, or 3 stars for 500.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> slide your finger, or move the mouse, across the game. The basket follows. The Pause and New Game buttons sit under the game.</li>
+        <li><strong>Keyboard:</strong> <kbd>←</kbd> and <kbd>→</kbd> move the basket a step left or right. <kbd>Esc</kbd> pauses and resumes, and closes the Game Over box.</li>
+      </ul>
+      <p>Your best score is kept only for this visit. Nothing is saved.</p>
+      <h3>What it practises</h3>
+      <p>Reaction speed and hand-eye coordination: seeing where a piece will land, getting the basket there in time, and steering away from the bombs. There is no reading or maths in it.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Catch the Fruit</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 5+ · Speed &amp; Coordination · about 3 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../balloon-pop/"><img src="../../icons/games/balloon-pop.svg" alt="" width="40" height="40"><span class="game-more-name">Balloon Pop</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../whack-a-mole/"><img src="../../icons/games/whack-a-mole.svg" alt="" width="40" height="40"><span class="game-more-name">Whack-a-Mole</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../pond-prix/"><img src="../../icons/games/pond-prix.svg" alt="" width="40" height="40"><span class="game-more-name">Pond Prix</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../sound-it-out/"><img src="../../icons/games/sound-it-out.svg" alt="" width="40" height="40"><span class="game-more-name">Sound It Out</span><span class="game-more-age">Ages 5+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

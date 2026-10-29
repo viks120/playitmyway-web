@@ -470,6 +470,68 @@
         .btn { padding: 10px 18px; font-size: 0.9em; }
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Sentence Builder",
+            "url": "https://playitmyway.com/games/sentence-builder/",
+            "description": "Arrange jumbled words into correct sentences! A free grammar game for kids ages 7+ that teaches sentence structure and word order. No ads, no download.",
+            "teaches": "Word order and sentence structure, with a written grammar explanation for every sentence — including the ones they get wrong.",
+            "about": [
+              "Reading & Letters"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "7-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 7
+            },
+            "timeRequired": "PT10M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Sentence Builder",
+                "item": "https://playitmyway.com/games/sentence-builder/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
@@ -979,6 +1041,43 @@
       updateDisplay();
       startNewGame();
     </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>The words of a sentence are mixed up in the word bank. A question above them, like "What is the cat doing?", gives a clue.</li>
+        <li>Tap the words in the order they belong. Each one joins your sentence and turns green. Use every word, then press Check.</li>
+        <li>Right first time scores 50 points. Each press of 💡 Hint shows the first word but takes 10 points off, down to 10. Either way, a short note explains how the sentence is built, such as "Subject (The cat) + Verb (is sleeping)".</li>
+        <li>A round is 10 sentences. Easy has 4 words, Medium 6 to 9 words, and Hard 8 to 12 words with parts like "Although…" or "who…". At the end you get one to three stars.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap a word to add it. Tap it again, in the sentence or the bank, to take it back out. ↺ Clear empties the sentence.</li>
+        <li><strong>Keyboard:</strong> every word and button can be reached with <kbd>Tab</kbd> and pressed with <kbd>Enter</kbd> or <kbd>Space</kbd>. <kbd>Esc</kbd> closes the results box.</li>
+      </ul>
+      <p>A first wrong try outlines the first word that is out of place and lets you fix it, for half points. A second wrong try shows the right sentence and its explanation. Nothing is saved: the best score lasts only this visit.</p>
+      <h3>What it practises</h3>
+      <p>Word order: putting the subject, verb and the rest of a sentence in the right place, from short sentences up to ones with two clauses. Every sentence ends with a plain grammar note, including the ones you get wrong.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Sentence Builder</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 7+ · Reading &amp; Letters · about 10 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../silly-story-builder/"><img src="../../icons/games/silly-story-builder.svg" alt="" width="40" height="40"><span class="game-more-name">Silly Story Builder</span><span class="game-more-age">Ages 7+</span></a></li>
+        <li><a href="../word-scramble/"><img src="../../icons/games/word-scramble.svg" alt="" width="40" height="40"><span class="game-more-name">Word Scramble</span><span class="game-more-age">Ages 7+</span></a></li>
+        <li><a href="../sound-it-out/"><img src="../../icons/games/sound-it-out.svg" alt="" width="40" height="40"><span class="game-more-name">Sound It Out</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../balloon-pop/"><img src="../../icons/games/balloon-pop.svg" alt="" width="40" height="40"><span class="game-more-name">Balloon Pop</span><span class="game-more-age">Ages 5+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

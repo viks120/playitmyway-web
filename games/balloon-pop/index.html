@@ -509,6 +509,70 @@
         .btn { padding: 8px 16px; font-size: 0.85em; }
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Balloon Pop",
+            "url": "https://playitmyway.com/games/balloon-pop/",
+            "description": "Pop balloons in number and letter order! A free educational balloon game that teaches counting and the alphabet to kids ages 5+. No ads, no download.",
+            "teaches": "Finding numbers or letters in order, quickly — recognising the symbol, not just reciting the sequence.",
+            "about": [
+              "Numbers & Maths",
+              "Reading & Letters",
+              "Speed & Coordination"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "5-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 5
+            },
+            "timeRequired": "PT3M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Balloon Pop",
+                "item": "https://playitmyway.com/games/balloon-pop/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
@@ -1036,6 +1100,43 @@
       // begin — the board waits behind the Start overlay until then
       updateDisplay();
     </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Press Start to play Numbers, or tap Letters or Free Pop to start a new game in that mode straight away. Balloons with numbers or letters on them bob in the sky, and the box above says which one to pop next.</li>
+        <li>In Numbers, pop 1, then 2, then 3, all the way to 10. In Letters, pop A, then B, then C, up to F. Each right pop scores 10 points.</li>
+        <li>You have 30 seconds. Finish the run and you go up a level with 15 more seconds on the clock. Each new level makes the run longer (up to 14, then 16, then 18 and so on in Numbers; up to J, then L and so on in Letters; never past 26 or Z) and puts one more balloon in the sky, up to 12.</li>
+        <li>When the time runs out, you see your score, your level and one to three stars. Free Pop has no order and no levels: pop any balloon for 10 points before the clock runs out.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap or click a balloon to pop it.</li>
+        <li><strong>Keyboard:</strong> every balloon is a button. <kbd>Tab</kbd> moves between them and <kbd>Enter</kbd> or <kbd>Space</kbd> pops the one you are on. <kbd>Esc</kbd> closes the end-of-game box.</li>
+      </ul>
+      <p>A wrong balloon does not pop. It costs 5 points (the score never drops below 0) and the game says what you hit and what it wants, like "That was 7 — we're looking for 3!". The best score lasts only this visit; nothing is saved.</p>
+      <h3>What it practises</h3>
+      <p>Finding the next number or letter in order among a jumble of others, against the clock. You have to recognise each written numeral or letter by sight, not just say the sequence.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Balloon Pop</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 5+ · Numbers &amp; Maths · Reading &amp; Letters · Speed &amp; Coordination · about 3 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../pond-prix/"><img src="../../icons/games/pond-prix.svg" alt="" width="40" height="40"><span class="game-more-name">Pond Prix</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../trace-letters/"><img src="../../icons/games/trace-letters.svg" alt="" width="40" height="40"><span class="game-more-name">Trace Letters &amp; Numbers</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../sound-it-out/"><img src="../../icons/games/sound-it-out.svg" alt="" width="40" height="40"><span class="game-more-name">Sound It Out</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../catch-falling-object/"><img src="../../icons/games/catch-falling-object.svg" alt="" width="40" height="40"><span class="game-more-name">Catch the Fruit</span><span class="game-more-age">Ages 5+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

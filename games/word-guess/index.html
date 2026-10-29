@@ -297,6 +297,69 @@
         .confetti-bit { display: none; }
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Word Guess",
+            "url": "https://playitmyway.com/games/word-guess/",
+            "description": "Crack the hidden word in six tries: five, six or seven letters, a fresh one every round. Green means right spot, yellow means wrong spot. No ads, no download.",
+            "teaches": "Vocabulary and deduction — narrowing thousands of five, six and seven-letter words down with each guess.",
+            "about": [
+              "Reading & Letters",
+              "Logic & Puzzles"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "14-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 14
+            },
+            "timeRequired": "PT5M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Word Guess",
+                "item": "https://playitmyway.com/games/word-guess/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a class="back-link" href="../../">← Back to Games</a>
@@ -334,8 +397,17 @@
         <li><span class="swatch sw-correct"></span><strong>Right letter, right spot</strong></li>
         <li><span class="swatch sw-present"></span><strong>Right letter, wrong spot</strong></li>
         <li><span class="swatch sw-absent"></span><strong>Not in the word at all</strong></li>
-        <li>Six tries. A brand new word every round — nothing is saved, so your scores reset when you leave.</li>
+        <li>Six tries. A brand new word every round — nothing is saved, so the Won count and Streak reset when you leave.</li>
+        <li>A guess that is too short, or not in the word list, shakes and does not use up a try. If all six tries miss, the hidden word is shown.</li>
       </ul>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap letters on the on-screen keyboard, <strong>⌫ Del</strong> to rub one out and <strong>Enter</strong> to check. The keys take the same colours as the tiles (a key keeps its best result), so you can see which letters you have tried and which are ruled out.</li>
+        <li><strong>Keyboard:</strong> type the letters, <kbd>Backspace</kbd> deletes and <kbd>Enter</kbd> checks the guess.</li>
+        <li><strong>🔄 New word</strong> starts a fresh round. <strong>👁️ Colour-blind mode</strong> turns the green into blue and the amber into a deeper orange; the colour key above changes to match.</li>
+      </ul>
+      <h3>What it practises</h3>
+      <p>Spelling and vocabulary, plus deduction: each row of colours rules letters in or out, and the next guess should use what you learned.</p>
     </section>
 
     <script src="words.js"></script>
@@ -723,6 +795,26 @@
         newRound();
       })();
     </script>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Word Guess</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 14+ · Reading &amp; Letters · Logic &amp; Puzzles · about 5 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../2048-slider/"><img src="../../icons/games/2048-slider.svg" alt="" width="40" height="40"><span class="game-more-name">2048 Slider</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../minesweeper/"><img src="../../icons/games/minesweeper.svg" alt="" width="40" height="40"><span class="game-more-name">Minesweeper</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../sudoku/"><img src="../../icons/games/sudoku.svg" alt="" width="40" height="40"><span class="game-more-name">Sudoku</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../laser-mirrors/"><img src="../../icons/games/laser-mirrors.svg" alt="" width="40" height="40"><span class="game-more-name">Laser Mirrors</span><span class="game-more-age">Ages 14+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

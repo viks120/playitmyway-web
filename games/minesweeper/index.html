@@ -195,6 +195,68 @@
       .back-link { top: 5px; left: 5px; padding: 5px 8px; font-size: 0.8em; }
     }
   </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Minesweeper",
+            "url": "https://playitmyway.com/games/minesweeper/",
+            "description": "Play classic Minesweeper free online. Clear the board without hitting a mine across three difficulty levels of pure logic. No ads, no download.",
+            "teaches": "Deduction from limited information — proving where a mine must be rather than guessing.",
+            "about": [
+              "Logic & Puzzles"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "14-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 14
+            },
+            "timeRequired": "PT10M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Minesweeper",
+                "item": "https://playitmyway.com/games/minesweeper/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
 </head>
 <body>
   <a href="../../" class="back-link">← Back to Games</a>
@@ -600,6 +662,44 @@
     document.getElementById('grid').addEventListener('contextmenu', (e) => e.preventDefault());
     newGame();
   </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>The board is a grid of hidden squares. Some hide mines. Pick Easy (9×9, 10 mines), Medium (16×16, 40 mines) or Hard (16×30, 99 mines).</li>
+        <li>Open a square. Your first square is always safe: the mines are only placed after it, never in it or right next to it, so a patch of the board opens up.</li>
+        <li>An open square shows a number: how many of the squares touching it (up to eight) hide a mine. A blank square has none, and opens its neighbours for you.</li>
+        <li>Use the numbers to work out where the mines must be. Flag them so you do not open them by mistake. The mine counter goes down by one for each flag.</li>
+        <li>Open every square that is not a mine to win. Open a mine and the game is over: every mine is shown.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap or click a square to open it. Right-click, or press and hold on a touch screen, to put a flag on or take it off. Or turn on 🚩 Flag Mode, and then a tap puts a flag on or takes it off instead of opening.</li>
+        <li><strong>Keyboard:</strong> the arrow keys move around the board, <kbd>Enter</kbd> or <kbd>Space</kbd> opens a square, and <kbd>F</kbd> flags it.</li>
+      </ul>
+      <p>A win gives one to three stars for speed: three for under a minute, two for under two minutes. Your best time for each size is kept for this visit only; nothing is saved.</p>
+      <h3>What it practises</h3>
+      <p>Deduction from limited information: reading the numbers around a square to prove where a mine must be, or that a square is safe, rather than guessing.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Minesweeper</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 14+ · Logic &amp; Puzzles · about 10 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../2048-slider/"><img src="../../icons/games/2048-slider.svg" alt="" width="40" height="40"><span class="game-more-name">2048 Slider</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../sudoku/"><img src="../../icons/games/sudoku.svg" alt="" width="40" height="40"><span class="game-more-name">Sudoku</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../word-guess/"><img src="../../icons/games/word-guess.svg" alt="" width="40" height="40"><span class="game-more-name">Word Guess</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../laser-mirrors/"><img src="../../icons/games/laser-mirrors.svg" alt="" width="40" height="40"><span class="game-more-name">Laser Mirrors</span><span class="game-more-age">Ages 14+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

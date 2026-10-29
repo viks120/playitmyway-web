@@ -285,6 +285,68 @@
         .edge-hint.show { animation: none; opacity: 0.85; }
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "One Line Draw",
+            "url": "https://playitmyway.com/games/one-line-draw/",
+            "description": "Trace stars, rockets and castles in one stroke without lifting your finger! 36 brain-teasing puzzle levels for kids ages 7+. No ads, no download.",
+            "teaches": "Planning a route that covers every line without lifting your finger — 36 puzzles, each proven solvable.",
+            "about": [
+              "Logic & Puzzles"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "7-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 7
+            },
+            "timeRequired": "PT15M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "One Line Draw",
+                "item": "https://playitmyway.com/games/one-line-draw/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a class="back-link" href="../../">← Back to Games</a>
@@ -338,6 +400,14 @@
         <li>Stuck? Use <strong>Undo</strong>, <strong>Restart</strong>, or a <strong>Hint</strong> 💡</li>
         <li>Ready for a real challenge? Turn on 🖊️ <strong>No lifting</strong> — one single stroke, and lifting your finger starts the shape over!</li>
       </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> press on a dot and slide along a line to the next dot, or tap one dot after another (not in No lifting, where every lift starts the shape over).</li>
+        <li><strong>Keyboard:</strong> <kbd>Tab</kbd> moves between the dots and <kbd>Enter</kbd> or <kbd>Space</kbd> picks one. No lifting only counts for touch and mouse.</li>
+      </ul>
+      <p>If you tap or pick a dot that is not joined to where you are, or you already drew that line, the dot wiggles and the helper says why. The helper also warns you as soon as your path can no longer finish. 💡 Before you start, Hint makes the good starting dots glow (on a loop shape, every dot glows). After you start, it flashes a line that still lets you finish, or tells you if your path can no longer finish. The 36 puzzles are sorted into Easy, Medium and Hard. Ticks for finished puzzles last only this visit.</p>
+      <h3>What it practises</h3>
+      <p>Planning a route ahead: choosing where to start and which line to take next so you do not get stuck. Every puzzle can be solved in one line. Nothing is scored or saved.</p>
     </section>
     
     
@@ -850,6 +920,26 @@
       buildPicker();
     })();
     </script>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">One Line Draw</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 7+ · Logic &amp; Puzzles · about 15 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../code-the-robot/"><img src="../../icons/games/code-the-robot.svg" alt="" width="40" height="40"><span class="game-more-name">Code the Robot</span><span class="game-more-age">Ages 7+</span></a></li>
+        <li><a href="../math-puzzle/"><img src="../../icons/games/math-puzzle.svg" alt="" width="40" height="40"><span class="game-more-name">Math Puzzle</span><span class="game-more-age">Ages 7+</span></a></li>
+        <li><a href="../stepping-stones/"><img src="../../icons/games/stepping-stones.svg" alt="" width="40" height="40"><span class="game-more-name">Stepping Stones</span><span class="game-more-age">Ages 7+</span></a></li>
+        <li><a href="../frozen-pond/"><img src="../../icons/games/frozen-pond.svg" alt="" width="40" height="40"><span class="game-more-name">Frozen Pond</span><span class="game-more-age">Ages 7+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

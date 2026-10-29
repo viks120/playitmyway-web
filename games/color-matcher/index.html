@@ -590,6 +590,68 @@
         color: #ffd700;
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Color Matcher",
+            "url": "https://playitmyway.com/games/color-matcher/",
+            "description": "Mix red, green and blue sliders to match the target color! A free game for kids ages 3+ that teaches colors and color mixing. No ads, no download.",
+            "teaches": "Mixing red, green and blue light to match a target colour — an early feel for how colour is made.",
+            "about": [
+              "Creative & Free Play"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "3-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 3
+            },
+            "timeRequired": "PT5M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Color Matcher",
+                "item": "https://playitmyway.com/games/color-matcher/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
@@ -994,6 +1056,44 @@
       updatePlayerColor();
       srReady = true;
     </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Two big squares sit side by side. The left one is the Target Color, picked at random. The right one is Your Color, which starts as grey.</li>
+        <li>Move the Red, Green and Blue sliders. Each goes from 0 to 255, and Your Color changes straight away as you slide.</li>
+        <li>When the two squares look the same, press Check Match. You see how close you are as a percentage: 95% or more is Perfect (100 points), 80% or more is Good job (50), 60% or more is Not bad (25). Below that: Keep trying, no points.</li>
+        <li>The target stays until you press New Color or go up a level, so you can keep nudging the sliders and check again.</li>
+        <li>Every 200 points you go up a level. A window shows one to three stars for that match, and closing it brings a new target. The colors do not get harder.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> drag a slider, or tap anywhere along it to jump there. Tap the buttons to check or get a new color.</li>
+        <li><strong>Keyboard:</strong> <kbd>Tab</kbd> moves to each slider and button. On a slider the arrow keys move it one step at a time. <kbd>Enter</kbd> presses a button, and <kbd>Esc</kbd> closes the level-up window.</li>
+      </ul>
+      <p>A match below 60% shows the percentage and plays a short buzz (when sound is on), so you can try again. Nothing is saved: the best score lasts only this visit.</p>
+      <h3>What it practises</h3>
+      <p>Mixing red, green and blue light to match a color by eye, and seeing how each one changes the mix. The percentage shows how close you got.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Color Matcher</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 3+ · Creative &amp; Free Play · about 5 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../drawing-pad/"><img src="../../icons/games/drawing-pad.svg" alt="" width="40" height="40"><span class="game-more-name">Drawing Pad</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../trace-shapes/"><img src="../../icons/games/trace-shapes.svg" alt="" width="40" height="40"><span class="game-more-name">Trace Shapes</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../trace-letters/"><img src="../../icons/games/trace-letters.svg" alt="" width="40" height="40"><span class="game-more-name">Trace Letters &amp; Numbers</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../trace-name/"><img src="../../icons/games/trace-name.svg" alt="" width="40" height="40"><span class="game-more-name">Trace Your Name</span><span class="game-more-age">Ages 3+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

@@ -623,6 +623,69 @@
         color: #ffd700;
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Math Puzzle",
+            "url": "https://playitmyway.com/games/math-puzzle/",
+            "description": "Solve equations, number patterns and logic puzzles in a free math game for kids ages 7+ with multiple difficulty levels. No ads, no download.",
+            "teaches": "Missing-number equations, number sequences and logic puzzles, with a worked explanation when an answer is wrong.",
+            "about": [
+              "Numbers & Maths",
+              "Logic & Puzzles"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "7-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 7
+            },
+            "timeRequired": "PT10M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Math Puzzle",
+                "item": "https://playitmyway.com/games/math-puzzle/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
@@ -1375,6 +1438,43 @@
       // Initialize game
       newPuzzle();
     </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Pick a puzzle type. Equations shows a sum with one number missing, like 5 + ? = 12 or ? × 4 = 20. Sums use add, take away, times and divide. Patterns shows a row of numbers and asks what comes next. Logic asks a short word puzzle.</li>
+        <li>Type your answer in the box and press Check Answer. A few logic answers are words, such as a day of the week; capital letters do not matter.</li>
+        <li>A right answer on the first try scores 50 points, or 25 on the second try. Using Get Hint takes 10 points off that puzzle. Then press Next Puzzle.</li>
+        <li>Every 3 puzzles solved moves you up a level, with a short celebration. The puzzles do not get harder with each level: each one is picked at random from 8 in that type.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap a puzzle type, type in the answer box, then tap Check Answer. New Puzzle picks another one at random, with no points lost; it can pick the same one again.</li>
+        <li><strong>Keyboard:</strong> type in the answer box and press <kbd>Enter</kbd> to check. After the puzzle is over, <kbd>Enter</kbd> goes to the next one. <kbd>Esc</kbd> closes the level-up box.</li>
+      </ul>
+      <p>A first wrong answer shows a hint. In Equations, that hint works out what your guess makes and says whether to try a bigger or smaller number. A second wrong answer ends the puzzle with no points and shows the right answer. In Equations and Patterns it shows the working too, like "12 - 5 = 7, so 5 + 7 = 12" or "Add 2 each time: 8 + 2 = 10". In Logic it shows the hint again. Nothing is saved: the score starts again when you leave.</p>
+      <h3>What it practises</h3>
+      <p>Finding the missing number in a sum by working backwards, spotting the add, take-away, times or divide step in a number sequence, and reading short word problems carefully.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Math Puzzle</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 7+ · Numbers &amp; Maths · Logic &amp; Puzzles · about 10 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../stepping-stones/"><img src="../../icons/games/stepping-stones.svg" alt="" width="40" height="40"><span class="game-more-name">Stepping Stones</span><span class="game-more-age">Ages 7+</span></a></li>
+        <li><a href="../chart-detective/"><img src="../../icons/games/chart-detective.svg" alt="" width="40" height="40"><span class="game-more-name">Chart Detective</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../2048-slider/"><img src="../../icons/games/2048-slider.svg" alt="" width="40" height="40"><span class="game-more-name">2048 Slider</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../plans-and-elevations/"><img src="../../icons/games/plans-and-elevations.svg" alt="" width="40" height="40"><span class="game-more-name">Plans &amp; Elevations</span><span class="game-more-age">Ages 14+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

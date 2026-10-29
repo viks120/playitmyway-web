@@ -633,6 +633,68 @@
         50% { transform: scale(1.1); }
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Word Scramble",
+            "url": "https://playitmyway.com/games/word-scramble/",
+            "description": "Unscramble jumbled letters to build words! A free vocabulary and spelling game for kids ages 7+ that boosts English skills. No ads, no download.",
+            "teaches": "Spelling and letter patterns — rebuilding a word from jumbled letters with a meaning clue.",
+            "about": [
+              "Reading & Letters"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "7-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 7
+            },
+            "timeRequired": "PT10M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Word Scramble",
+                "item": "https://playitmyway.com/games/word-scramble/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
@@ -658,7 +720,7 @@
         Medium (5-6 letters)
       </button>
       <button type="button" class="difficulty-btn" onclick="setDifficulty('hard')">
-        Hard (7+ letters)
+        Hard (8-9 letters)
       </button>
     </div>
 
@@ -1584,6 +1646,43 @@
       // Initialize game
       newWord();
     </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Pick Easy (3 or 4 letters), Medium (5 or 6) or Hard (8 or 9). Each word comes with a category and a clue about what it means, like "A furry pet that says meow".</li>
+        <li>The jumbled letters sit above a row of empty spaces. Put the letters in the spaces in the right order to spell the word.</li>
+        <li>When every space is full, press Check Answer. A right word scores 10 points per letter, or half that if you had a wrong try first. Three right in a row adds a streak bonus.</li>
+        <li>Every 5 words solved takes you up a level. The words stay at the difficulty you chose.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap a letter to put it in the next empty space. Tap a filled space to send its letter back. With a mouse you can also drag a letter into any empty space.</li>
+        <li><strong>Keyboard:</strong> <kbd>Tab</kbd> moves between the letters, spaces and buttons. <kbd>Enter</kbd> or <kbd>Space</kbd> places a letter or takes it back. <kbd>Esc</kbd> closes the level-up box.</li>
+      </ul>
+      <p>A wrong word says how many letters are already in the right spot. Get Hint puts one correct letter in place and takes 5 points off your score, up to 2 per word. After three wrong tries, Show Me reveals the word for no points. Nothing is saved: your score lasts only this visit.</p>
+      <h3>What it practises</h3>
+      <p>Spelling: rebuilding a word letter by letter from a jumble, using a meaning clue to work out which word it is.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Word Scramble</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 7+ · Reading &amp; Letters · about 10 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../silly-story-builder/"><img src="../../icons/games/silly-story-builder.svg" alt="" width="40" height="40"><span class="game-more-name">Silly Story Builder</span><span class="game-more-age">Ages 7+</span></a></li>
+        <li><a href="../sentence-builder/"><img src="../../icons/games/sentence-builder.svg" alt="" width="40" height="40"><span class="game-more-name">Sentence Builder</span><span class="game-more-age">Ages 7+</span></a></li>
+        <li><a href="../sound-it-out/"><img src="../../icons/games/sound-it-out.svg" alt="" width="40" height="40"><span class="game-more-name">Sound It Out</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../balloon-pop/"><img src="../../icons/games/balloon-pop.svg" alt="" width="40" height="40"><span class="game-more-name">Balloon Pop</span><span class="game-more-age">Ages 5+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

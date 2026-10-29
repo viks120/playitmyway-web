@@ -13,7 +13,7 @@
 
     <!-- SEO Meta Tags -->
     <title>Memory Match – Free Brain Game for Kids | Play It My Way</title>
-    <meta name="description" content="Flip cards and find matching pairs of friendly critters and animals! A free memory game for kids ages 3+ that builds focus and concentration. No ads, no download." />
+    <meta name="description" content="Flip cards and find matching pairs of friendly critters and animals! A free memory game for kids ages 3+. No ads, no download." />
     <meta name="keywords" content="memory match game, card matching game, memory game for kids, concentration game, brain game for children" />
     <meta name="author" content="Play It My Way" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
@@ -554,6 +554,68 @@
         color: #ffd700;
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Memory Match",
+            "url": "https://playitmyway.com/games/memory-game/",
+            "description": "Flip cards and find matching pairs of friendly critters and animals! A free memory game for kids ages 3+. No ads, no download.",
+            "teaches": "Visual memory and concentration — holding a picture and its place in mind while looking elsewhere.",
+            "about": [
+              "Logic & Puzzles"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "3-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 3
+            },
+            "timeRequired": "PT5M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Memory Match",
+                "item": "https://playitmyway.com/games/memory-game/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
@@ -1035,6 +1097,44 @@
       // Initialize the game when page loads
       initializeGame();
     </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>The cards lie face down, each showing a question mark. Every picture is on exactly two cards, and the cards are shuffled for each new game.</li>
+        <li>Turn over one card, then another. If the two pictures are the same, you found a pair and both cards stay face up.</li>
+        <li>If they are different, a low buzz plays (when sound is on) and both cards turn back over after a second. Try to remember where each picture was, so you can find its partner later.</li>
+        <li>Find every pair to win. Each pair of cards you turn counts as one move, and fewer moves earn more stars, up to three.</li>
+        <li>Easy has 4 cards (2 pairs), Medium has 8 cards (4 pairs) and Hard has 16 cards (8 pairs). The pictures are the critters Clover, Pip, Plum and Mango (Easy uses the first two), and Hard adds a dog, a cat, a mouse and a hamster.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap or click a card to turn it over. Tap a difficulty button to start a new board of that size, or New Game to reshuffle.</li>
+        <li><strong>Keyboard:</strong> <kbd>Tab</kbd> moves between the cards and <kbd>Enter</kbd> or <kbd>Space</kbd> turns one over. <kbd>Esc</kbd> closes the winning message.</li>
+      </ul>
+      <p>Your moves, a timer (it starts when you turn the first card) and the pairs found show above the board. Nothing is saved: your best score (fewest moves) for each difficulty only lasts this visit.</p>
+      <h3>What it practises</h3>
+      <p>Visual memory and concentration: keeping a picture and where it was in mind while you turn over other cards, then going back to find its match.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Memory Match</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 3+ · Logic &amp; Puzzles · about 5 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../peekaboo-pond/"><img src="../../icons/games/peekaboo-pond.svg" alt="" width="40" height="40"><span class="game-more-name">Peekaboo Pond</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../whats-different/"><img src="../../icons/games/whats-different.svg" alt="" width="40" height="40"><span class="game-more-name">What's Different?</span><span class="game-more-age">Ages 3+</span></a></li>
+        <li><a href="../sort-it-out/"><img src="../../icons/games/sort-it-out.svg" alt="" width="40" height="40"><span class="game-more-name">Sort It Out</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../tic-tac-toe/"><img src="../../icons/games/tic-tac-toe.svg" alt="" width="40" height="40"><span class="game-more-name">Tic Tac Toe</span><span class="game-more-age">Ages 5+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">

@@ -766,6 +766,68 @@
         color: #ffd700;
       }
     </style>
+    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "VideoGame",
+              "LearningResource"
+            ],
+            "name": "Geography Explorer",
+            "url": "https://playitmyway.com/games/geography-explorer/",
+            "description": "Learn countries, capitals, flags and continents with a free geography quiz for kids ages 7+. Test your world knowledge! No ads, no download.",
+            "teaches": "Countries, capitals and flags across 30 countries — wrong answers all come from the same continent, so guessing by region no longer works.",
+            "about": [
+              "World & Science"
+            ],
+            "learningResourceType": "Educational game",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "gamePlatform": "Web browser",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "typicalAgeRange": "7-",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 7
+            },
+            "timeRequired": "PT10M",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Play It My Way",
+              "url": "https://playitmyway.com/"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://playitmyway.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "All games",
+                "item": "https://playitmyway.com/games/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Geography Explorer",
+                "item": "https://playitmyway.com/games/geography-explorer/"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /pimw:seo -->
   </head>
   <body>
     <a href="../../" class="back-link">← Back to Games</a>
@@ -1760,6 +1822,43 @@
       wireWorldMap();
       newChallenge();
     </script>
+    <section class="how-to game-notes">
+      <h2>🤔 How to play</h2>
+      <ol>
+        <li>Pick a challenge type. <strong>Countries</strong> names a country and shows its flag: pick the continent it is on. <strong>Capitals</strong> asks for a country's capital city. <strong>Flags</strong> shows a flag and asks which country it belongs to.</li>
+        <li>In Capitals and Flags there are four answers, and the three wrong ones come from the same continent as the right one, so knowing the region is not enough.</li>
+        <li>A right answer on the first try scores 50 points; on the second try it scores half. In Countries mode, once the answer is shown (right, or after two misses), a red pin drops on the map to show where the country is.</li>
+        <li>Press <strong>Next</strong> for a new question. The country is picked at random from 30, so one can come up again. Every 5 right answers takes you up a level. The questions do not get harder.</li>
+      </ol>
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Touch or mouse:</strong> tap an answer button. In Countries mode you can also tap a continent on the world map. <strong>Get Hint</strong> gives one clue per question; a right answer after it is worth 40 points instead of 50, and half that on a second try. <strong>New Challenge</strong> skips to a new random question.</li>
+        <li><strong>Keyboard:</strong> <kbd>Tab</kbd> moves between the answers and the continents on the map, and <kbd>Enter</kbd> or <kbd>Space</kbd> picks one. <kbd>Esc</kbd> closes the level-up box.</li>
+      </ul>
+      <p>A wrong first answer greys out and a clue about the country appears, such as "Home to the Amazon rainforest and Carnival". A second wrong answer shows the right one with that fact. Nothing is saved: the score starts again at 0 next visit.</p>
+      <h3>What it practises</h3>
+      <p>Which continent 30 countries are on, their capital cities and their flags, telling apart neighbours from the same continent.</p>
+    </section>
+    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">Geography Explorer</li>
+        </ol>
+      </nav>
+      <p class="game-facts">Ages 7+ · World &amp; Science · about 10 minutes</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">
+        <li><a href="../sort-it-out/"><img src="../../icons/games/sort-it-out.svg" alt="" width="40" height="40"><span class="game-more-name">Sort It Out</span><span class="game-more-age">Ages 5+</span></a></li>
+        <li><a href="../science-trivia/"><img src="../../icons/games/science-trivia.svg" alt="" width="40" height="40"><span class="game-more-name">Science Trivia</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../laser-mirrors/"><img src="../../icons/games/laser-mirrors.svg" alt="" width="40" height="40"><span class="game-more-name">Laser Mirrors</span><span class="game-more-age">Ages 14+</span></a></li>
+        <li><a href="../molecule-lab/"><img src="../../icons/games/molecule-lab.svg" alt="" width="40" height="40"><span class="game-more-name">Molecule Lab</span><span class="game-more-age">Ages 14+</span></a></li>
+      </ul>
+      <p class="game-more-all"><a href="../">See all 49 games</a></p>
+    </section>
+    <!-- /pimw:more -->
     <footer class="site-footer">
       <p class="site-footer-badges">🚫 No ads · 🔒 No tracking · 🍪 Nothing stored · 💯 100% free</p>
       <nav class="site-footer-links" aria-label="Site links">
