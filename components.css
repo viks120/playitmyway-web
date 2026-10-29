@@ -286,8 +286,150 @@ html.pimw-installed .site-footer { margin-bottom: 20px; }
 html.pimw-fs .site-footer,
 html.pimw-fs .header,
 html.pimw-fs .game-head,
-html.pimw-fs .how-to {
+html.pimw-fs .how-to,
+html.pimw-fs .game-more {
   display: none;
+}
+
+/* ---- notes below the game: "How to play" and "More games like this" -----
+   .game-notes is the how-to card for the older game pages, which have no
+   how-to styles of their own (the newer pages style .how-to inline).
+   .game-more is written into every game page by docs/build-pages.js: the
+   breadcrumb, the quick facts and four related games. Both are the same
+   white card as the trust footer, so they read on cream and on gradient
+   pages alike, and both leave with the rest of the furniture in full screen. */
+.game-notes,
+.game-more {
+  width: 100%;
+  max-width: 640px;
+  box-sizing: border-box;
+  margin: 28px auto 0;
+  padding: 18px 22px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #33302e;
+  border: 2px solid #efe4d3;
+  border-radius: 16px;
+  box-shadow: 0 4px 0 0 rgba(51, 48, 46, 0.12);
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.game-notes h2,
+.game-more h2 {
+  margin: 0 0 8px;
+  color: #33302e;
+  font-size: 21px;
+  line-height: 1.3;
+}
+
+.game-notes h3 {
+  margin: 14px 0 4px;
+  color: #33302e;
+  font-size: 17px;
+}
+
+.game-notes p { margin: 10px 0 0; }
+
+.game-notes ol,
+.game-notes ul {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.game-notes li { margin: 0 0 4px; }
+
+.game-notes kbd {
+  font-family: inherit;
+  background: #f4ecdf;
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 0.9em;
+}
+
+.game-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: #5f5751;
+}
+
+.game-crumbs li + li::before {
+  content: "›";
+  margin: 0 8px;
+  color: #a39a90;
+}
+
+.game-crumbs a,
+.game-more-all a {
+  color: #9a3412;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.game-crumbs a:hover,
+.game-more-all a:hover {
+  text-decoration: underline;
+}
+
+.game-facts {
+  margin: 0 0 14px;
+  color: #5f5751;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.game-more-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* each related game is a small card: picture, name, age band */
+.game-more-list a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 12px 8px;
+  border: 2px solid #efe4d3;
+  border-radius: 12px;
+  background: #fffaf3;
+  color: #33302e;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 120ms ease;
+}
+
+.game-more-list a:hover { transform: translateY(-2px); }
+
+.game-more-list img {
+  width: 40px;
+  height: 40px;
+}
+
+.game-more-name {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.game-more-age {
+  color: #5f5751;
+  font-size: 13px;
+}
+
+.game-more-all {
+  margin: 12px 0 0;
+  text-align: center;
 }
 
 /* In-game pictures from games/shared/art/pictures.js: a page holds one

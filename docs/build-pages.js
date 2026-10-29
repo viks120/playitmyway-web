@@ -1,11 +1,13 @@
-/* Generates games/index.html, for-teachers.html and 404.html from
-   catalogue.js. The site itself has no build step — these are committed as
-   finished static files; this script just keeps them in sync with one
-   source of truth. Re-run after adding a game:
+/* Generates games/index.html, for-teachers.html, 404.html, sitemap.xml and
+   sw.js from catalogue.js, and the generated parts of each game page (its
+   structured data and its "More games like this" section). The site itself
+   has no build step — these are committed as finished static files; this
+   script just keeps them in sync with one source of truth. Re-run after
+   adding a game, and after changing a page, so its sitemap date moves:
 
        node docs/build-pages.js
 
-   Then add the new game to sitemap.xml and the homepage by hand. */
+   Then add the new game to the homepage by hand. */
 const fs = require('fs');
 const path = require('path');
 const C = require('./catalogue.js');
@@ -285,7 +287,7 @@ function buildGamesIndex() {
 function buildTeachers() {
   let h = head({
     up: '',
-    title: 'For Parents & Teachers — What Each Game Builds | Play It My Way',
+    title: 'Parents & Teachers — What Each Game Builds | Play It My Way',
     description: 'What every Play It My Way game actually practises, the age it suits, and how long it takes. Free, ad-free and storage-free games for home and the classroom.',
     keywords: 'educational games for teachers, free classroom games, what skills do kids games teach, ad free games for schools, safe games for kids',
     // no .html: the host 308s that spelling, and a canonical pointing at a
@@ -423,6 +425,154 @@ function build404() {
 /* ---------------- /sw.js ----------------
    The precache list is generated from what is actually on disk, so it can
    never drift from the real site. Re-run this script after adding a game. */
+// ---------------------------------------------------------------------------
+// Game pages are hand-written, but two parts of each are generated here so they
+// stay in step with the catalogue: structured data in the head (the game and
+// its breadcrumb trail, for search engines) and a "More games like this"
+// section above the trust footer. Each sits between pimw: markers; a re-run
+// replaces what is between them and leaves the rest of the page alone.
+const SITE = 'https://playitmyway.com/';
+const unesc = (s) => String(s).replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+
+// Four neighbours per game: shared skills count most, then the closest age
+// band; catalogue order breaks ties, so the choice is stable between runs.
+function relatedTo(g) {
+  const bandIx = (x) => C.bands.findIndex(b => b.id === x.age);
+  return C.games
+    .filter(o => o !== g)
+    .map((o, i) => ({ o, i, score: o.skills.filter(s => g.skills.includes(s)).length * 3 - Math.abs(bandIx(o) - bandIx(g)) * 2 }))
+    .sort((a, b) => b.score - a.score || a.i - b.i)
+    .slice(0, 4)
+    .map(r => r.o);
+}
+
+function placeBlock(page, name, block, before) {
+  const open = `<!-- pimw:${name}`, close = `<!-- /pimw:${name} -->`;
+  const a = page.indexOf(open);
+  if (a !== -1) {
+    const lineStart = page.lastIndexOf('\n', a) + 1;
+    const b = page.indexOf(close, a) + close.length;
+    return page.slice(0, lineStart) + block + page.slice(b);
+  }
+  const at = page.indexOf(before);
+  if (at === -1) throw new Error(`no ${before.trim()} to place pimw:${name} before`);
+  const lineStart = page.lastIndexOf('\n', at) + 1;
+  return page.slice(0, lineStart) + block + '\n' + page.slice(lineStart);
+}
+
+function buildGamePages() {
+  for (const g of C.games) {
+    const file = path.join(ROOT, 'games', g.slug, 'index.html');
+    let page = fs.readFileSync(file, 'utf8');
+    const url = SITE + 'games/' + g.slug + '/';
+    const band = bandOf(g.age);
+    const skills = skillsOf(g);
+    const desc = page.match(/<meta\s+name="description"\s+content="([^"]*)"/);
+
+    const jsonld = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': ['VideoGame', 'LearningResource'],
+          name: g.name,
+          url,
+          description: desc ? unesc(desc[1]) : g.practises,
+          teaches: g.practises,
+          about: skills.map(s => s.name),
+          learningResourceType: 'Educational game',
+          inLanguage: 'en',
+          isAccessibleForFree: true,
+          gamePlatform: 'Web browser',
+          applicationCategory: 'GameApplication',
+          operatingSystem: 'Any',
+          typicalAgeRange: g.age + '-',
+          audience: { '@type': 'PeopleAudience', suggestedMinAge: Number(g.age) },
+          ...(g.mins === 'open' ? {} : { timeRequired: 'PT' + g.mins + 'M' }),
+          publisher: { '@type': 'Organization', name: 'Play It My Way', url: SITE }
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: SITE },
+            { '@type': 'ListItem', position: 2, name: 'All games', item: SITE + 'games/' },
+            { '@type': 'ListItem', position: 3, name: g.name, item: url }
+          ]
+        }
+      ]
+    };
+    // "</" never appears in the output, so no text can close the script early
+    const ld = JSON.stringify(jsonld, null, 2).replace(/<\//g, '<\\/').replace(/^/gm, '      ');
+    page = placeBlock(page, 'seo', `    <!-- pimw:seo — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <script type="application/ld+json">
+${ld}
+    </script>
+    <!-- /pimw:seo -->`, '</head>');
+
+    const mins = g.mins === 'open' ? 'open-ended' : 'about ' + g.mins + ' minutes';
+    let more = `    <!-- pimw:more — written by docs/build-pages.js from docs/catalogue.js; edits here are overwritten -->
+    <section class="game-more" aria-labelledby="game-more-h">
+      <nav class="game-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="../../">Home</a></li>
+          <li><a href="../">All games</a></li>
+          <li aria-current="page">${esc(g.name)}</li>
+        </ol>
+      </nav>
+      <p class="game-facts">${band.label} · ${skills.map(s => esc(s.name)).join(' · ')} · ${mins}</p>
+      <h2 id="game-more-h">More games like this</h2>
+      <ul class="game-more-list">`;
+    for (const o of relatedTo(g)) {
+      more += `
+        <li><a href="../${o.slug}/"><img src="../../icons/games/${o.slug}.svg" alt="" width="40" height="40"><span class="game-more-name">${esc(o.name)}</span><span class="game-more-age">${bandOf(o.age).label}</span></a></li>`;
+    }
+    more += `
+      </ul>
+      <p class="game-more-all"><a href="../">See all ${C.games.length} games</a></p>
+    </section>
+    <!-- /pimw:more -->`;
+    page = placeBlock(page, 'more', more, '<footer class="site-footer">');
+
+    fs.writeFileSync(file, page);
+  }
+  return C.games.length;
+}
+
+// The sitemap lists every public page with the date it last changed: the last
+// commit that touched it, or today for a page with uncommitted edits. Google
+// reads lastmod when it is accurate and ignores priority and changefreq, so
+// those are left out. Without git (a copied folder), lastmod is left out too.
+function buildSitemap() {
+  const { execFileSync } = require('child_process');
+  const git = (args) => {
+    try { return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); }
+    catch (e) { return null; }
+  };
+  const d = new Date();
+  const today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const changed = (p) => {
+    const dirty = git(['status', '--porcelain', '--', p]);
+    if (dirty === null) return null;
+    return dirty ? today : (git(['log', '-1', '--format=%cs', '--', p]) || today);
+  };
+
+  const pages = [
+    ['', 'index.html'],
+    ['games/', 'games/index.html'],
+    ['for-teachers', 'for-teachers.html'],
+    ...C.games.map(g => ['games/' + g.slug + '/', 'games/' + g.slug + '/']),
+    ['privacy-policy', 'privacy-policy.html'],
+    ['disclaimer', 'disclaimer.html']
+  ];
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<!-- written by docs/build-pages.js; edits here are overwritten -->\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+  for (const [loc, src] of pages) {
+    const mod = changed(src);
+    xml += `  <url>\n    <loc>${SITE}${loc}</loc>\n${mod ? `    <lastmod>${mod}</lastmod>\n` : ''}  </url>\n`;
+  }
+  xml += '</urlset>\n';
+  fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), xml);
+  return pages.length;
+}
+
 function buildServiceWorker() {
   const skip = new Set(['sw.js', 'manifest.json', 'robots.txt', 'sitemap.xml', 'CNAME']);
   const urls = [];
@@ -567,8 +717,12 @@ function OFFLINE() {
 const n = buildGamesIndex();
 const s = buildTeachers();
 build404();
+const gp = buildGamePages();
 const cached = buildServiceWorker();
+const sm = buildSitemap();
 console.log('games/index.html  — ' + n + ' games across ' + C.bands.filter(b => C.games.some(g => g.age === b.id)).length + ' bands');
 console.log('for-teachers.html — ' + s + ' skill groups');
 console.log('404.html          — written');
+console.log('game pages        — ' + gp + ' given structured data and related games');
 console.log('sw.js             — precaching ' + cached + ' files');
+console.log('sitemap.xml       — ' + sm + ' pages');
