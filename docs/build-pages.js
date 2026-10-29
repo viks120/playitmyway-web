@@ -67,7 +67,7 @@ const FOOT = (up) => `
         <a href="${up || './'}">Home</a>
         <a href="${up}games/">All games</a>
         <a href="${up}for-teachers.html">For grown-ups</a>
-        <a href="${up}disclaimer.html">Disclaimer</a>
+        <a href="${up}disclaimer.html">Terms of Use &amp; Disclaimer</a>
         <a href="${up}privacy-policy.html">Privacy Policy</a>
       </nav>
       <p class="footer-contact">

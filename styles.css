@@ -362,6 +362,8 @@ body {
   font-weight: 600;
   text-decoration: none;
   margin: 0 var(--space-2);
+  /* a label wraps as a whole, never mid-name ("Terms of Use &" / "Disclaimer") */
+  white-space: nowrap;
 }
 
 .footer-links a:hover {
