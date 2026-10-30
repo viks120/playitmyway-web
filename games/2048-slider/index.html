@@ -1282,6 +1282,9 @@
         game.keptGoing = true;
         game.gameOver = false;
         document.getElementById("gameOver").classList.remove("show");
+        // the winning move may have filled the board with no merges left,
+        // so end the run now instead of leaving it frozen
+        game.checkGameOver();
       }
 
       function showInstructions() {
